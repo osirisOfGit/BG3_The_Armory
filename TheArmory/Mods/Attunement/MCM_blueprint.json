@@ -18,17 +18,6 @@
 					},
 					"Settings": [
 						{
-							"Id": "enabled",
-							"Name": "Enable Mod",
-							"Description": "Enables or disables the mod. Restart your game when disabling to fully clear stat changes.",
-							"Handles": {
-								"NameHandle": "h8f6e37ff1b634b3d9dd0978f96207cc578g4",
-								"DescriptionHandle": "habf22a0adc65460da381ac71e4033d11c85e"
-							},
-							"Type": "checkbox",
-							"Default": true
-						},
-						{
 							"Id": "log_level",
 							"Name": "Log level",
 							"Description": "0 = Off, 1 = Error, 2 = Warn, 3 = Info, 4 = Debug, 5 = Trace (Anything higher than Info will only be logged to the log.txt, not the SE console)",
