@@ -1,0 +1,390 @@
+{
+	"AIBounds" : 
+	[
+		{
+			"ActualHeight" : 0.18894641101360321,
+			"BoundType" : "Move",
+			"Height" : 0.0,
+			"Max" : 
+			[
+				0.19487577676773071,
+				0.14081206917762756,
+				0.42740336060523987
+			],
+			"Min" : 
+			[
+				-0.19487577676773071,
+				-0.0036438405513763428,
+				-0.46065196394920349
+			],
+			"Radius" : 0.16798393428325653,
+			"Shape" : "Box",
+			"Size" : 0.0,
+			"field_2A" : 0
+		},
+		{
+			"ActualHeight" : 0.18894641101360321,
+			"BoundType" : "Hit",
+			"Height" : 0.0,
+			"Max" : 
+			[
+				0.19487577676773071,
+				0.14081206917762756,
+				0.42740336060523987
+			],
+			"Min" : 
+			[
+				-0.19487577676773071,
+				-0.0036438405513763428,
+				-0.46065196394920349
+			],
+			"Radius" : 0.33596786856651306,
+			"Shape" : "Box",
+			"Size" : 0.0,
+			"field_2A" : 0
+		},
+		{
+			"ActualHeight" : 0.18894641101360321,
+			"BoundType" : "Stand",
+			"Height" : 0.0,
+			"Max" : 
+			[
+				0.19487577676773071,
+				0.14081206917762756,
+				0.42740336060523987
+			],
+			"Min" : 
+			[
+				-0.19487577676773071,
+				-0.0036438405513763428,
+				-0.46065196394920349
+			],
+			"Radius" : 0.33596786856651306,
+			"Shape" : "Box",
+			"Size" : 0.0,
+			"field_2A" : 0
+		}
+	],
+	"ActivationGroupId" : "",
+	"AddUseAction" : "function: 00007FF95F214EC0",
+	"AllowCameraMovement" : false,
+	"AllowReceiveDecalWhenAnimated" : false,
+	"AllowSummonGenericUse" : false,
+	"Amount" : 1,
+	"AnubisConfigName" : "",
+	"AttackableWhenClickThrough" : false,
+	"BlockAoEDamage" : false,
+	"BloodSurfaceType" : 0,
+	"BloodType" : "",
+	"BookType" : 0,
+	"CameraOffset" : 
+	[
+		0.0,
+		0.0,
+		0.0
+	],
+	"CanBeImprovisedWeapon" : true,
+	"CanBeMoved" : true,
+	"CanBePickedUp" : true,
+	"CanBePickpocketed" : true,
+	"CanClickThrough" : false,
+	"CanClimbOn" : false,
+	"CanShineThrough" : false,
+	"CanShootThrough" : true,
+	"CastShadow" : true,
+	"CinematicArenaFlags" : 0,
+	"CollideWithCamera" : false,
+	"ColorPreset" : "00000000-0000-0000-0000-000000000000",
+	"CombatComponent" : 
+	{
+		"AiHint" : "00000000-0000-0000-0000-000000000000",
+		"AiUseCombatHelper" : "",
+		"Archetype" : "base",
+		"CanFight" : false,
+		"CanJoinCombat" : true,
+		"CombatGroupID" : "",
+		"Faction" : "376e33c4-dd15-4c46-a586-87d8b421a0c7",
+		"IsBoss" : false,
+		"IsInspector" : true,
+		"ProxyAttachment" : "",
+		"ProxyOwner" : "00000000-0000-0000-0000-000000000000",
+		"StartCombatRange" : -1.0,
+		"StayInAiHints" : false,
+		"SwarmGroup" : "",
+		"Unknown" : 0,
+		"Unknown2" : 0
+	},
+	"ConstellationConfigName" : "",
+	"ContainerAutoAddOnPickup" : false,
+	"ContainerContentFilterCondition" : "",
+	"CoverAmount" : false,
+	"CriticalHitType" : "",
+	"DefaultState" : "",
+	"Description" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "ha141bb21g0e04g4443gaa09g306d0f8e5f25",
+			"Version" : 1
+		}
+	},
+	"DestroyWithStack" : false,
+	"Destroyed" : false,
+	"DisarmDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+	"DisplayName" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "h063baf0cgda17g4461gaae7g4dec8a4a4d19",
+			"Version" : 2
+		}
+	},
+	"DisplayNameAlchemy" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"DropSound" : "4440f988-61e2-71c9-e466-69046de254a4",
+	"EquipSound" : "640f340f-5432-28e3-e4a1-e22f2d7d4699",
+	"Equipment" : null,
+	"EquipmentTypeID" : "92f33192-9144-4dee-8ddf-3fd96e291e28",
+	"ExamineRotation" : 
+	[
+		-75.0,
+		0.0,
+		0.0
+	],
+	"ExcludeInDifficulty" : [],
+	"FadeChildren" : [],
+	"FadeGroup" : "",
+	"Fadeable" : true,
+	"FileName" : "D:/GOG/Baldurs Gate 3/Data/Public/GustavDev/RootTemplates/_merged.lsf",
+	"ForceAffectedByAura" : false,
+	"FreezeGravity" : 0,
+	"GlobalDeletedFlag" : 4,
+	"GravityType" : 0,
+	"GroupID" : 0,
+	"HLOD" : "00000000-0000-0000-0000-000000000000",
+	"HierarchyOnlyFade" : true,
+	"Hostile" : false,
+	"Icon" : "Item_UNI_SCL_SpidersLyre",
+	"Id" : "98282bec-aeaa-4490-ae43-0c27bed58c74",
+	"IgnoreGenerics" : false,
+	"ImpactSound" : "439fcec3-6032-f489-6e80-260d26fab23d",
+	"InteractionFilterList" : [],
+	"InteractionFilterRequirement" : 0,
+	"InteractionFilterType" : 0,
+	"InventoryList" : [],
+	"InventoryMoveSound" : "4440f988-61e2-71c9-e466-69046de254a4",
+	"InventoryType" : 0,
+	"IsBlocker" : false,
+	"IsBlueprintDisabledByDefault" : true,
+	"IsDecorative" : false,
+	"IsDroppedOnDeath" : true,
+	"IsInteractionDisabled" : false,
+	"IsKey" : false,
+	"IsPlatformOwner" : false,
+	"IsPointerBlocker" : false,
+	"IsPortal" : false,
+	"IsPortalProhibitedToPlayers" : false,
+	"IsPublicDomain" : false,
+	"IsReflecting" : false,
+	"IsShadowProxy" : false,
+	"IsSourceContainer" : false,
+	"IsSurfaceBlocker" : false,
+	"IsSurfaceCloudBlocker" : false,
+	"IsTrap" : false,
+	"ItemList" : [],
+	"Key" : "",
+	"LevelName" : "",
+	"LevelOverride" : -1,
+	"LightChannel" : 0,
+	"LockDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+	"LoopSound" : "",
+	"MapMarkerStyle" : "",
+	"MaterialPreset" : "00000000-0000-0000-0000-000000000000",
+	"MaxStackAmount" : 1,
+	"Name" : "UNI_SCL_SpidersLyre",
+	"OnDestroyActions" : 
+	[
+		{
+			"ActivateSoundEvent" : "3ea82655-5140-4287-9ab8-794559f182d3",
+			"Animation" : "",
+			"Conditions" : "",
+			"PlayOnHUD" : false,
+			"Type" : "PlaySound"
+		},
+		{
+			"Animation" : "",
+			"Conditions" : "",
+			"ExplodeFX" : "15362651-9b96-579a-86f5-829e53325d8b",
+			"FadeOutDelay" : 0.0,
+			"FadeOutFX" : "",
+			"SnapToGround" : true,
+			"TargetItemState" : 0,
+			"TemplateAfterDestruction" : "ebdae296-fa2c-4b43-a466-ec592d3017fc",
+			"Type" : "DestroyParameters",
+			"VisualDestruction" : "",
+			"VisualWithDynamicPhysics" : "7b323fa9-ca31-6df8-6bba-46e9d7ee34f7"
+		}
+	],
+	"OnUseDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"OnUsePeaceActions" : [],
+	"OnlyInDifficulty" : [],
+	"Owner" : "",
+	"ParentTemplateFlags" : 0,
+	"ParentTemplateId" : "13739f15-7366-4d7f-9926-991e98b9e964",
+	"PermanentWarnings" : "",
+	"PhysicsCollisionSound" : "0c130d61-2b03-3abb-2d1d-3ea22eb35034",
+	"PhysicsFollowAnimation" : false,
+	"PhysicsOpenTemplate" : "",
+	"PhysicsTemplate" : "f0acac13-2e32-c047-378e-4087af902d05",
+	"PickupSound" : "562f4759-dc4e-f270-26f6-a704e495c0ef",
+	"ReceiveDecal" : false,
+	"ReferencedInTimeline" : false,
+	"RemoveUseAction" : "function: 00007FF95F214FB0",
+	"RenderChannel" : 4,
+	"SeeThrough" : false,
+	"ShadowPhysicsProxy" : "",
+	"ShootThroughType" : 6,
+	"ShortDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"ShortDescriptionParams" : "",
+	"ShowAttachedSpellDescriptions" : false,
+	"SoundAttenuation" : -1,
+	"SoundInitEvent" : "",
+	"SpeakerGroups" : [],
+	"Stats" : "SCL_SpidersLyre",
+	"StatusList" : [],
+	"StoryItem" : true,
+	"TechnicalDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"TechnicalDescriptionParams" : "",
+	"TemplateHandle" : 25433,
+	"TemplateName" : "",
+	"TemplateType" : "item",
+	"TimelineCameraRigOverride" : "00000000-0000-0000-0000-000000000000",
+	"Tooltip" : 2,
+	"Transform" : 
+	{
+		"RotationQuat" : 
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		],
+		"Scale" : 
+		[
+			1.0,
+			1.0,
+			1.0
+		],
+		"Translate" : 
+		[
+			0.0,
+			0.0,
+			0.0
+		]
+	},
+	"TreasureLevel" : -1,
+	"TreasureOnDestroy" : false,
+	"UnequipSound" : "b39cabcd-fb82-afa6-6253-a7ad1850fb8f",
+	"Unimportant" : false,
+	"UnknownDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"UnknownDisplayName" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FF95F215980",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"UseOcclusion" : true,
+	"UseOnDistance" : false,
+	"UsePartyLevelForTreasureLevel" : false,
+	"UseRemotely" : false,
+	"UseSound" : "",
+	"VisualTemplate" : "7a96cad2-3f84-32a1-b2a8-98cbd359f3f6",
+	"Wadable" : false,
+	"WadableSurfaceType" : 13,
+	"WalkOn" : false,
+	"WalkThrough" : true
+}
