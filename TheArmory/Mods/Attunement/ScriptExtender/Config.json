@@ -1,5 +1,0 @@
-{
-    "RequiredVersion": 21,
-    "ModTable": "The Armory",
-    "FeatureFlags": ["Lua"]
-}
