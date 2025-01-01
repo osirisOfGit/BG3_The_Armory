@@ -128,14 +128,6 @@ function EquipmentPicker:PickForSlot(imageButton)
 		icon.Background = { 0, 0, 0, 0.5 }
 
 		icon.OnHoverEnter = function()
-			if previewTimer then
-				Ext.Timer.Cancel(previewTimer)
-			end
-			if endPreviewTimer then
-				Ext.Timer.Cancel(endPreviewTimer)
-				endPreviewTimer = nil
-			end
-
 			previewTimer = Ext.Timer.WaitFor(200, function()
 				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", itemTemplate.Id)
 				previewTimer = nil
@@ -143,10 +135,12 @@ function EquipmentPicker:PickForSlot(imageButton)
 		end
 
 		icon.OnHoverLeave = function()
-			endPreviewTimer = Ext.Timer.WaitFor(100, function()
-				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
-				endPreviewTimer = nil
-			end)
+			if previewTimer then
+				Ext.Timer.Cancel(previewTimer)
+				previewTimer = nil
+			end
+
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		end
 
 		itemGroup:AddText(templateName).TextWrapPos = imageSize * 1.3
