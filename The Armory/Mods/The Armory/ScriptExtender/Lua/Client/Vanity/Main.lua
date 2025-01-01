@@ -1,3 +1,5 @@
+Ext.Require("Client/Vanity/EquipmentPicker.lua")
+
 Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	--- @param tabHeader ExtuiTreeParent
 	function(tabHeader)
@@ -10,7 +12,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		presetCombo.WidthFitPreview = true
 		presetCombo.Options = { "Preset", "Preset", "Preset" }
 
-		local copyPresetButton = tabHeader:AddButton("Duplicate")
+		local copyPresetButton = tabHeader:AddButton("Clone")
 		copyPresetButton.PositionOffset = { 100, 0 }
 
 		local previewPresetButton = tabHeader:AddButton("Preview")
@@ -27,24 +29,24 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		local panelGroup = tabHeader:AddGroup("CharacterPanel")
 		local slotButtons = {
-			{ "Helmet",         "c_slot_helmet" },
-			{ "VanityClothes",  "c_slot_vanityClothes",  true },
-			{ "Cloak",          "c_slot_cloak" },
-			{ "VanityBoots",    "c_slot_vanityBoots",    true },
-			{ "Breast",         "c_slot_breast" },
-			{ "Underwear",      "c_slot_underwear",      true },
-			{ "Gloves",         "c_slot_gloves" },
-			{ "Amulet",         "c_slot_necklace",       true },
-			{ "Boots",          "c_slot_boots" },
-			{ "Ring1",          "c_slot_ring1",          true },
-			{ "Dummy",          "ignore" },
-			{ "Ring2",          "c_slot_ring2",          true },
-			{ "LightSource",    "c_slot_lightSource" },
-			{ "Instrument",     "c_slot_instrument",     true },
-			{ "MeleeMainHand",  "c_slot_meleeMainHand" },
-			{ "RangedMainHand", "c_slot_rangedMainHand", true },
-			{ "MeleeOffHand",   "c_slot_meleeOffHand" },
-			{ "RangedOffHand",  "c_slot_rangedOffHand",  true }
+			{ "Helmet",                "c_slot_helmet" },
+			{ "VanityClothes",         "c_slot_vanityClothes",  true },
+			{ "Cloak",                 "c_slot_cloak" },
+			{ "VanityBoots",           "c_slot_vanityBoots",    true },
+			{ "Breast",                "c_slot_breast" },
+			{ "Underwear",             "c_slot_underwear",      true },
+			{ "Gloves",                "c_slot_gloves" },
+			{ "Amulet",                "c_slot_necklace",       true },
+			{ "Boots",                 "c_slot_boots" },
+			{ "Ring1",                 "c_slot_ring1",          true },
+			{ "Dummy",                 "ignore" },
+			{ "Ring2",                 "c_slot_ring2",          true },
+			{ "LightSource",           "c_slot_lightSource" },
+			{ "MusicalInstrument",     "c_slot_instrument",     true },
+			{ "Melee Main Weapon",     "c_slot_meleeMainHand" },
+			{ "Ranged Main Weapon",    "c_slot_rangedMainHand", true },
+			{ "Melee Offhand Weapon",  "c_slot_meleeOffHand" },
+			{ "Ranged Offhand Weapon", "c_slot_rangedOffHand",  true }
 		}
 
 		for _, button in ipairs(slotButtons) do
@@ -54,13 +56,12 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 				imageButton.Label = button[2]
 				imageButton.PositionOffset = { 100, 0 }
 			else
-				imageButton = panelGroup:AddImageButton(button[1], button[2])
-
 				---@cast imageButton ExtuiImageButton
-
-				-- if button[1] == "MeleeMainHand" or not button[1]:find("Hand") then
-				imageButton.PositionOffset = { button[3] and 100 or 100, 0 }
-				-- end
+				imageButton = panelGroup:AddImageButton(button[1], button[2])
+				imageButton.PositionOffset = { 100, 0 }
+				imageButton.OnClick = function()
+					EquipmentPicker:PickForSlot(imageButton)
+				end
 
 				panelGroup:AddImageButton(button[1] .. "_Dye", "Item_LOOT_Dye_Remover", { 32, 32 }).SameLine = true
 			end

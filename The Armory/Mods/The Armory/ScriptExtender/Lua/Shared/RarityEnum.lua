@@ -2,17 +2,20 @@
 
 ---@enum Rarity
 RarityEnum = {
-	Uncommon = 1,
-	Rare = 2,
-	VeryRare = 3,
-	Legendary = 4,
-	[1] = "Uncommon",
-	[2] = "Rare",
-	[3] = "VeryRare",
-	[4] = "Legendary"
+	Common = 1,
+	Uncommon = 2,
+	Rare = 3,
+	VeryRare = 4,
+	Legendary = 5,
+	[1] = "Common",
+	[2] = "Uncommon",
+	[3] = "Rare",
+	[4] = "VeryRare",
+	[5] = "Legendary"
 }
 
 RarityColors = {
+	Common = {1.00, 1.00, 1.00, 1.0},
 	Uncommon = { 0.00, 0.66, 0.00, 1.0 },
 	Rare = { 0.20, 0.80, 1.00, 1.0 },
 	VeryRare = { 0.64, 0.27, 0.91, 1.0 },
