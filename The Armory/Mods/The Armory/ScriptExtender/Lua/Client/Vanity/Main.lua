@@ -42,24 +42,25 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			{ "LightSource",    "c_slot_lightSource" },
 			{ "Instrument",     "c_slot_instrument",     true },
 			{ "MeleeMainHand",  "c_slot_meleeMainHand" },
-			{ "MeleeOffHand",   "c_slot_meleeOffHand",   true },
 			{ "RangedMainHand", "c_slot_rangedMainHand", true },
+			{ "MeleeOffHand",   "c_slot_meleeOffHand" },
 			{ "RangedOffHand",  "c_slot_rangedOffHand",  true }
 		}
 
 		for _, button in ipairs(slotButtons) do
 			local imageButton
 			if button[1] == "Dummy" then
-				imageButton = panelGroup:AddDummy(60, 60)
+				imageButton = panelGroup:AddDummy(120, 60)
 				imageButton.Label = button[2]
+				imageButton.PositionOffset = { 100, 0 }
 			else
 				imageButton = panelGroup:AddImageButton(button[1], button[2])
 
 				---@cast imageButton ExtuiImageButton
 
-				if button[1] == "MeleeMainHand" or not button[1]:find("Hand") then
-					imageButton.PositionOffset = { button[1] == "Ring2" and 460 or (imageButton.SameLine and 100 or 200), 0 }
-				end
+				-- if button[1] == "MeleeMainHand" or not button[1]:find("Hand") then
+				imageButton.PositionOffset = { button[3] and 100 or 100, 0 }
+				-- end
 
 				panelGroup:AddImageButton(button[1] .. "_Dye", "Item_LOOT_Dye_Remover", { 32, 32 }).SameLine = true
 			end
