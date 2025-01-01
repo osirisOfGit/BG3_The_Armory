@@ -64,6 +64,8 @@ local function BuildStatusTooltip(tooltip, itemStat, itemTemplate)
 	end
 end
 
+local previewTimer
+local endPreviewTimer
 
 ---@param imageButton ExtuiImageButton
 function EquipmentPicker:PickForSlot(imageButton)
@@ -96,9 +98,9 @@ function EquipmentPicker:PickForSlot(imageButton)
 
 	local resultGroup = searchWindow:AddGroup("Search_" .. itemSlot)
 
-	local numPerRow = 8
+	local numPerRow = 4
 	local rowCount = 0
-	local imageSize = 120
+	local imageSize = 90
 	local function displayResult(templateName)
 		local itemTemplate = rootsByName[templateName]
 
@@ -113,7 +115,7 @@ function EquipmentPicker:PickForSlot(imageButton)
 		end
 
 		local itemGroup = resultGroup:AddChildWindow(itemTemplate.Name)
-		itemGroup.Size = { imageSize * 1.5, imageSize * 2 }
+		itemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
 		itemGroup.ChildAlwaysAutoResize = true
 		itemGroup.SameLine = rowCount <= numPerRow
 
@@ -123,9 +125,31 @@ function EquipmentPicker:PickForSlot(imageButton)
 			icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { imageSize, imageSize })
 		end
 		icon.SameLine = true
-		icon.Background = { 0, 0, 0, 1 }
+		icon.Background = { 0, 0, 0, 0.5 }
 
-		itemGroup:AddText(templateName).TextWrapPos = 150
+		icon.OnHoverEnter = function()
+			if previewTimer then
+				Ext.Timer.Cancel(previewTimer)
+			end
+			if endPreviewTimer then
+				Ext.Timer.Cancel(endPreviewTimer)
+				endPreviewTimer = nil
+			end
+
+			previewTimer = Ext.Timer.WaitFor(200, function()
+				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", itemTemplate.Id)
+				previewTimer = nil
+			end)
+		end
+
+		icon.OnHoverLeave = function()
+			endPreviewTimer = Ext.Timer.WaitFor(100, function()
+				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+				endPreviewTimer = nil
+			end)
+		end
+
+		itemGroup:AddText(templateName).TextWrapPos = imageSize * 1.3
 
 		BuildStatusTooltip(icon:Tooltip(), itemStat, itemTemplate)
 

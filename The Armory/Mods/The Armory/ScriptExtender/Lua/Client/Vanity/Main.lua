@@ -3,6 +3,19 @@ Ext.Require("Client/Vanity/EquipmentPicker.lua")
 Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	--- @param tabHeader ExtuiTreeParent
 	function(tabHeader)
+		---comment
+		---@param element ExtuiStyledRenderable
+		---@return ExtuiWindow
+		local function GetWindow(element)
+			if element.ParentElement then
+				return GetWindow(element.ParentElement)
+			end
+			return element
+		end
+		local window = GetWindow(tabHeader)
+		window.OnClose = function ()
+			
+		end
 		tabHeader.TextWrapPos = 0
 
 		--#region Presets
@@ -30,7 +43,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		local panelGroup = tabHeader:AddGroup("CharacterPanel")
 		local slotButtons = {
 			{ "Helmet",                "c_slot_helmet" },
-			{ "VanityClothes",         "c_slot_vanityClothes",  true },
+			{ "VanityBody",         "c_slot_vanityClothes",  true },
 			{ "Cloak",                 "c_slot_cloak" },
 			{ "VanityBoots",           "c_slot_vanityBoots",    true },
 			{ "Breast",                "c_slot_breast" },
