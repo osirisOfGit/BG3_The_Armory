@@ -117,7 +117,11 @@ function EquipmentPicker:PickForSlot(imageButton)
 		itemGroup.ChildAlwaysAutoResize = true
 		itemGroup.SameLine = rowCount <= numPerRow
 
-		local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon or "Item_Unknown", { imageSize, imageSize })
+		local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { imageSize, imageSize })
+		if icon.Image.Icon == "" then
+			icon:Destroy()
+			icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { imageSize, imageSize })
+		end
 		icon.SameLine = true
 		icon.Background = { 0, 0, 0, 1 }
 
