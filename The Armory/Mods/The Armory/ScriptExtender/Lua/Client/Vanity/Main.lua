@@ -62,6 +62,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			{ "Melee Offhand Weapon",  "c_slot_meleeOffHand" },
 			{ "Ranged Offhand Weapon", "c_slot_rangedOffHand",  true }
 		}
+
 		-- https://bg3.norbyte.dev/search?q=type%3Atreasuretable+ST_SimpleMeleeWeapons
 		-- https://bg3.norbyte.dev/search?q=using "_BaseWeapon"&ct=MzaoiTa00DM2NDE0MdFRCi5JLNELzkgsSk3RC09NLMjP0wsP8Iv3SMxJSi1KUYqtAQA%3D
 

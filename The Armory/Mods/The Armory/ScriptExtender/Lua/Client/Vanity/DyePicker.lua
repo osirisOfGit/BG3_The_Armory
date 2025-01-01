@@ -47,11 +47,14 @@ populateTemplateTable()
 
 DyePicker = {}
 
+---@type DyePayload
+local dyePayload = {}
+
 ---@type ExtuiGroup
 local activeDyeGroup
 
 ---@param itemTemplate ItemTemplate
----@param slot string
+---@param slot ActualSlot
 ---@param dyeButton ExtuiImageButton
 function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	local searchWindow = Ext.IMGUI.NewWindow("Searching for Dyes for " .. dyeButton.Label)
@@ -86,30 +89,25 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	local function displayResult(templateName)
 		local dyeTemplate = rootsByName[templateName]
 
+		---@type ResourceMaterialPresetResource
+		local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
+
 		local dyeImageButton = dyeCell:AddImageButton(templateName, dyeTemplate.Icon, { 60, 60 })
+		dyeImageButton.UserData = materialPreset.Guid
 		dyeCell:AddText(templateName).SameLine = true
 
 		local dyeInfoGroup = infoCell:AddGroup(templateName)
 		dyeInfoGroup.Visible = false
 
-		dyeImageButton.OnClick = function()
-			if activeDyeGroup then
-				activeDyeGroup.Visible = false
-			end
-			activeDyeGroup = dyeInfoGroup
-			dyeInfoGroup.Visible = true
-		end
-
 		---@type Object
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
 
-		---@type ResourceMaterialPresetResource
-		local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 		---@type ResourcePresetDataVector3Parameter[]
 		local materialColorParams = {}
 		for _, setting in pairs(materialPreset.Presets.Vector3Parameters) do
-			table.insert(materialColorParams, setting)
+			-- Work smarter, not harder
+			table.insert(materialColorParams, Ext.Json.Parse(Ext.Json.Stringify(setting, { IterateUserdata = true })))
 		end
 		table.sort(materialColorParams, function(a, b)
 			return a.Parameter < b.Parameter
@@ -128,6 +126,20 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 					dyeRow:AddCell():AddText("---")
 				end
 			end
+		end
+
+		dyeImageButton.OnClick = function()
+			if activeDyeGroup then
+				activeDyeGroup.Visible = false
+			end
+			activeDyeGroup = dyeInfoGroup
+			dyeInfoGroup.Visible = true
+			dyePayload = {
+				colors = materialColorParams,
+				materialPreset = dyeImageButton.UserData,
+				slot = slot
+			}
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewDye", Ext.Json.Stringify(dyePayload))
 		end
 	end
 	--#endregion
