@@ -143,6 +143,13 @@ function EquipmentPicker:PickForSlot(imageButton)
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		end
 
+		icon.OnClick = function ()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+			imageButton.UserData = itemTemplate
+			searchWindow.OnClose()
+			searchWindow.Open = false
+		end
+
 		itemGroup:AddText(templateName).TextWrapPos = imageSize * 1.3
 
 		BuildStatusTooltip(icon:Tooltip(), itemStat, itemTemplate)
@@ -198,4 +205,6 @@ function EquipmentPicker:PickForSlot(imageButton)
 			end
 		end)
 	end
+
+	return searchWindow
 end
