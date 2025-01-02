@@ -65,11 +65,11 @@ local function BuildStatusTooltip(tooltip, itemStat, itemTemplate)
 end
 
 local previewTimer
-local endPreviewTimer
 
+---@param slot ActualSlot
 ---@param imageButton ExtuiImageButton
-function EquipmentPicker:PickForSlot(imageButton)
-	local itemSlot = string.find(imageButton.Label, "Ring") and "Ring" or imageButton.Label
+function EquipmentPicker:PickForSlot(slot, imageButton)
+	local itemSlot = string.find(slot, "Ring") and "Ring" or slot
 
 	local searchWindow = Ext.IMGUI.NewWindow("Searching for " .. itemSlot .. " items")
 	searchWindow.Closeable = true
