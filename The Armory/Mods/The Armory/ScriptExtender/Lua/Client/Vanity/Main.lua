@@ -70,8 +70,10 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		---@param template ItemTemplate
 		local function BuildSlots(slot, template)
 			local userDataCopy = {
-				slot = template
 			}
+			if slot then
+				userDataCopy[slot] = template
+			end
 			for _, children in pairs(panelGroup.Children) do
 				if children.UserData then
 					userDataCopy[children.Label] = children.UserData
@@ -108,11 +110,21 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 						end
 					end
 
-					local dyeButton = panelGroup:AddImageButton(button[1] .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+					local dyeButton
+					if userDataCopy[button[1] .. " Dye"] then
+						local dyeTemplate = userDataCopy[button[1] .. " Dye"]
+						dyeButton = panelGroup:AddImageButton(button[1] .. " Dye", dyeTemplate.Icon, { 32, 32 })
+						dyeButton.UserData = dyeTemplate
+					else
+						dyeButton = panelGroup:AddImageButton(button[1] .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+					end
 					dyeButton.SameLine = true
-					dyeButton.ItemReadOnly = imageButton.UserData ~= nil
-					dyeButton.OnClick = function ()
-						DyePicker:PickDye(imageButton.UserData, button[1], dyeButton)
+					dyeButton.OnClick = function()
+						DyePicker:PickDye(imageButton.UserData, button[1], dyeButton).OnClose = function ()
+							if dyeButton.UserData then
+								BuildSlots(dyeButton.Label, dyeButton.UserData)
+							end
+						end
 					end
 				end
 				if button[3] then

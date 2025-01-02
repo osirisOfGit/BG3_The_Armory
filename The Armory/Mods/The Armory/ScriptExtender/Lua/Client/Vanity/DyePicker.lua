@@ -50,14 +50,14 @@ DyePicker = {}
 ---@type DyePayload
 local dyePayload = {}
 
----@type ExtuiGroup
+---@type ExtuiGroup?
 local activeDyeGroup
 
 ---@param itemTemplate ItemTemplate
 ---@param slot ActualSlot
 ---@param dyeButton ExtuiImageButton
 function DyePicker:PickDye(itemTemplate, slot, dyeButton)
-	local searchWindow = Ext.IMGUI.NewWindow("Searching for Dyes for " .. dyeButton.Label)
+	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s Dyes", slot))
 	searchWindow.Closeable = true
 	searchWindow.AlwaysVerticalScrollbar = true
 
@@ -79,6 +79,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	--#endregion
 
 	--#region Results
+	searchWindow:AddSeparator()
 	local resultTable = searchWindow:AddTable(dyeButton.Label, 2)
 	resultTable:AddColumn("Dyes", "WidthFixed")
 	resultTable:AddColumn("Information", "WidthStretch")
@@ -92,7 +93,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		---@type ResourceMaterialPresetResource
 		local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 
-		local dyeImageButton = dyeCell:AddImageButton(templateName, dyeTemplate.Icon, { 60, 60 })
+		local dyeImageButton = dyeCell:AddImageButton(templateName, dyeTemplate.Icon, { 32, 32 })
 		dyeImageButton.UserData = materialPreset.Guid
 		dyeCell:AddText(templateName).SameLine = true
 
@@ -103,11 +104,20 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
 
+		dyeInfoGroup:AddSeparatorText(templateName)
+		dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian")):SetColor("Text", { 1, 1, 1, 0.5 })
+		dyeInfoGroup:AddButton("Select").OnClick = function()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
+			dyeButton.UserData = dyeTemplate
+			searchWindow.OnClose()
+			searchWindow.Open = false
+		end
+		dyeInfoGroup:AddSeparator()
+
 		---@type ResourcePresetDataVector3Parameter[]
 		local materialColorParams = {}
 		for _, setting in pairs(materialPreset.Presets.Vector3Parameters) do
-			-- Work smarter, not harder
-			table.insert(materialColorParams, Ext.Json.Parse(Ext.Json.Stringify(setting, { IterateUserdata = true })))
+			table.insert(materialColorParams, setting)
 		end
 		table.sort(materialColorParams, function(a, b)
 			return a.Parameter < b.Parameter
@@ -121,7 +131,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 				local dyeRow = dyeTable:AddRow()
 				dyeRow:AddCell():AddText(colorSetting.Parameter)
 				if colorSetting.Enabled then
-					dyeRow:AddCell():AddColorEdit("", colorSetting.Value)
+					dyeRow:AddCell():AddColorEdit("", colorSetting.Value).ItemReadOnly = true
 				else
 					dyeRow:AddCell():AddText("---")
 				end
@@ -135,7 +145,6 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 			activeDyeGroup = dyeInfoGroup
 			dyeInfoGroup.Visible = true
 			dyePayload = {
-				colors = materialColorParams,
 				materialPreset = dyeImageButton.UserData,
 				slot = slot
 			}
@@ -148,6 +157,8 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	end
 
 	getAllForModCombo.OnChange = function()
+		activeDyeGroup = nil
+
 		for _, child in pairs(dyeCell.Children) do
 			child:Destroy()
 		end
@@ -170,6 +181,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		getAllForModCombo.SelectedIndex = -1
 
 		delayTimer = Ext.Timer.WaitFor(150, function()
+			activeDyeGroup = nil
 			for _, child in pairs(dyeCell.Children) do
 				child:Destroy()
 			end
@@ -192,4 +204,6 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 			end
 		end)
 	end
+
+	return searchWindow
 end
