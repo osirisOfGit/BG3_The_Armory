@@ -48,5 +48,6 @@ Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingDye", function(channel, sl
 
 		itemEntity.ItemDye.Color = userTracker[user] or "00000000-0000-0000-0000-000000000000"
 		itemEntity:Replicate("ItemDye")
+		userTracker[user] = nil
 	end
 end)
