@@ -55,14 +55,14 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		tabHeader.TextWrapPos = 0
 
 		--#region Presets
-		tabHeader:AddText("Select a Preset").PositionOffset = { 100, 0 }
+		tabHeader:AddText("Select a Preset").PositionOffset = { 300, 0 }
 		local presetCombo = tabHeader:AddCombo("")
 		presetCombo.SameLine = true
 		presetCombo.WidthFitPreview = true
 		presetCombo.Options = { "Preset", "Preset", "Preset" }
 
 		local copyPresetButton = tabHeader:AddButton("Clone")
-		-- copyPresetButton.PositionOffset = { 100, 0 }
+		copyPresetButton.PositionOffset = { 200, 0 }
 
 		local previewPresetButton = tabHeader:AddButton("Preview")
 		previewPresetButton.SameLine = true
@@ -168,7 +168,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 					imageButton.OnClick = function()
 						EquipmentPicker:PickForSlot(slotCell.UserData or button[1], imageButton).OnClose = function()
 							if imageButton.UserData then
-								BuildSlots(slotCell, group, imageButton.Label, imageButton.UserData)
+								BuildSlots(slotCell, group, verticalSlots, imageButton.Label, imageButton.UserData)
 							end
 						end
 					end
@@ -185,7 +185,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 					dyeButton.OnClick = function()
 						DyePicker:PickDye(imageButton.UserData, slotCell.UserData or button[1], dyeButton).OnClose = function()
 							if dyeButton.UserData then
-								BuildSlots(slotCell, group, dyeButton.Label, dyeButton.UserData)
+								BuildSlots(slotCell, group, verticalSlots, dyeButton.Label, dyeButton.UserData)
 							end
 						end
 					end

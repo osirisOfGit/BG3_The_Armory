@@ -150,7 +150,7 @@ function EquipmentPicker:PickForSlot(slot, imageButton)
 			searchWindow.Open = false
 		end
 
-		itemGroup:AddText(templateName).TextWrapPos = imageSize * 1.3
+		itemGroup:AddText(templateName).TextWrapPos = 0
 
 		BuildStatusTooltip(icon:Tooltip(), itemStat, itemTemplate)
 
