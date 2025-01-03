@@ -78,7 +78,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		local displayTable = tabHeader:AddTable("SlotDisplayTable", 5)
 		displayTable.ScrollY = true
-		local equipmentColumn = displayTable:AddColumn("Equipment", "WidthFixed")
+		displayTable:AddColumn("Equipment", "WidthFixed")
 		local displayRow = displayTable:AddRow()
 		local equipmentCell = displayRow:AddCell()
 
@@ -106,16 +106,18 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			{ "Ranged Offhand Weapon", "c_slot_rangedOffHand" }
 		}
 
-		---@type table<string, ExtuiTableCell>
+		---@type table<string, ExtuiCollapsingHeader>
 		local weaponCols = {}
 		for _, weaponSlot in pairs(weaponSlots) do
 			displayTable:AddColumn(weaponSlot[1], "WidthFixed")
 
 			local cell = displayRow:AddCell()
 			cell.UserData = weaponSlot[1]
-			cell:AddImage(weaponSlot[2]).UserData = "keep"
-			
-			weaponCols[weaponSlot[1]] = cell
+			cell:AddGroup(weaponSlot[1]).UserData = "keep"
+
+			local collapse = cell:AddCollapsingHeader("")
+			collapse.UserData = "keep"
+			weaponCols[weaponSlot[1]] = collapse
 		end
 
 		-- https://bg3.norbyte.dev/search?q=type%3Atreasuretable+ST_SimpleMeleeWeapons
@@ -123,11 +125,12 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
 		--- so each weapon type can be configured separately as appropriate. Attaches the Equipment and Dye picker to each configurable slot
-		---@param slotCell ExtuiTableCell
+		--- TODO: Refactor this mess
+		---@param parentContainer ExtuiTableCell|ExtuiGroup|ExtuiCollapsingHeader
 		---@param group string[][]
 		---@param slot string
 		---@param template ItemTemplate
-		local function BuildSlots(slotCell, group, verticalSlots, slot, template)
+		local function BuildSlots(parentContainer, group, verticalSlots, slot, template)
 			local userDataCopy = {
 			}
 
@@ -135,7 +138,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 				userDataCopy[slot] = template
 			end
 
-			for _, child in pairs(slotCell.Children) do
+			for _, child in pairs(parentContainer.Children) do
 				if child.UserData ~= "keep" then
 					-- Will be nil if the slot is empty, which is pointless here, but i'm lazy right now
 					userDataCopy[child.Label] = child.UserData
@@ -143,52 +146,59 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 				end
 			end
 
+
 			for i, button in ipairs(group) do
+				local slotForImageButton = slot or (parentContainer.UserData ~= "keep" and parentContainer.UserData or button[1])
+
 				local imageButton
 				if button[1] == "Dummy" then
-					imageButton = slotCell:AddDummy(116, 60)
+					imageButton = parentContainer:AddDummy(116, 60)
 					imageButton.Label = button[2]
-					-- imageButton.PositionOffset = { 100, 0 }
 				else
 					---@cast imageButton ExtuiImageButton
 
+					--#region Equipment
 					if userDataCopy[button[1]] then
 						local itemTemplate = userDataCopy[button[1]]
-						imageButton = slotCell:AddImageButton(button[1], itemTemplate.Icon)
+						imageButton = parentContainer:AddImageButton(button[1], itemTemplate.Icon)
 						if imageButton.Image.Icon == "" then
 							imageButton:Destroy()
-							imageButton = slotCell:AddImageButton(button[1], "Item_Unknown")
+							imageButton = parentContainer:AddImageButton(button[1], "Item_Unknown")
 						end
 						imageButton.UserData = itemTemplate
 					else
-						imageButton = slotCell:AddImageButton(button[1], button[2])
+						imageButton = parentContainer:AddImageButton(button[1], button[2])
 					end
-					imageButton.Image.Size = {60, 60}
+					imageButton.Image.Size = { 60, 60 }
 					imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 					imageButton.OnClick = function()
-						EquipmentPicker:PickForSlot(slotCell.UserData or button[1], imageButton).OnClose = function()
+						-- Third param allows us to send the weaponSlot and the associated slot at the same time when applicable, filtering results
+						EquipmentPicker:PickForSlot(slotForImageButton, imageButton, slotForImageButton ~= button[1] and button[1] or nil).OnClose = function()
 							if imageButton.UserData then
-								BuildSlots(slotCell, group, verticalSlots, imageButton.Label, imageButton.UserData)
+								BuildSlots(parentContainer, group, verticalSlots, imageButton.Label, imageButton.UserData)
 							end
 						end
 					end
+					--#endregion
 
+					--#region Dyes
 					local dyeButton
 					if userDataCopy[button[1] .. " Dye"] then
 						local dyeTemplate = userDataCopy[button[1] .. " Dye"]
-						dyeButton = slotCell:AddImageButton(button[1] .. " Dye", dyeTemplate.Icon, { 32, 32 })
+						dyeButton = parentContainer:AddImageButton(button[1] .. " Dye", dyeTemplate.Icon, { 32, 32 })
 						dyeButton.UserData = dyeTemplate
 					else
-						dyeButton = slotCell:AddImageButton(button[1] .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+						dyeButton = parentContainer:AddImageButton(button[1] .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 					end
 					dyeButton.SameLine = true
 					dyeButton.OnClick = function()
-						DyePicker:PickDye(imageButton.UserData, slotCell.UserData or button[1], dyeButton).OnClose = function()
+						DyePicker:PickDye(imageButton.UserData, slotForImageButton, dyeButton).OnClose = function()
 							if dyeButton.UserData then
-								BuildSlots(slotCell, group, verticalSlots, dyeButton.Label, dyeButton.UserData)
+								BuildSlots(parentContainer, group, verticalSlots, dyeButton.Label, dyeButton.UserData)
 							end
 						end
 					end
+					--#endregion
 				end
 
 				imageButton.SameLine = not verticalSlots and i % 2 == 0
@@ -196,8 +206,16 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		end
 		BuildSlots(equipmentCell, equipmentSlots, false)
 
+		-- I'll have you know, i'm not proud of this. But the functionality inside of BuildSlots is identical -
+		-- it's just the friggen UI layout that changes
+		for i, slotEntry in pairs(weaponSlots) do
+			-- attaches the overall weapon slot to the group inside the respective column
+			BuildSlots(displayRow.Children[i + 1].Children[1], { slotEntry }, true)
+		end
+
 		for slot, group in pairs(weaponTypes) do
-			BuildSlots(weaponCols[slot], group, true)
+			-- attaches the various weaponTypes to the Collapsing header inside the respective weapon slot column
+			BuildSlots(weaponCols[slot], group, true, slot)
 		end
 
 		--#endregion

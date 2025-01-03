@@ -1,5 +1,5 @@
 ---@enum ActualSlot
-local SlotEnum = {
+SlotEnum = {
 	Helmet = 1,
 	VanityBody = 2,
 	Cloak = 3,

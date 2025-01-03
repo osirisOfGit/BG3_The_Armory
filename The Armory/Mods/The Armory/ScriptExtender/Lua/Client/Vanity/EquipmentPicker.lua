@@ -66,12 +66,15 @@ end
 
 local previewTimer
 
+---@alias ActualWeaponType string
+
 ---@param slot ActualSlot
 ---@param imageButton ExtuiImageButton
-function EquipmentPicker:PickForSlot(slot, imageButton)
+---@param weaponType ActualWeaponType
+function EquipmentPicker:PickForSlot(slot, imageButton, weaponType)
 	local itemSlot = string.find(slot, "Ring") and "Ring" or slot
 
-	local searchWindow = Ext.IMGUI.NewWindow("Searching for " .. itemSlot .. " items")
+	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or ""))
 	searchWindow.Closeable = true
 	searchWindow.AlwaysVerticalScrollbar = true
 
@@ -106,10 +109,24 @@ function EquipmentPicker:PickForSlot(slot, imageButton)
 
 		---@type Armor|Weapon|Object
 		local itemStat = Ext.Stats.Get(itemTemplate.Stats)
-		if (itemSlot == "LightSource" and itemStat.ItemGroup ~= "Torch")
-			or ((itemSlot ~= "LightSource" and itemStat.Slot ~= itemSlot)
-				and (itemSlot ~= "Melee Offhand Weapon" or (itemStat.Slot ~= "Melee Offhand Weapon" and itemStat.Slot ~= "Melee Main Weapon"))
-				and (itemSlot ~= "Ranged Offhand Weapon" or (itemStat.Slot ~= "Ranged Offhand Weapon" and itemStat.Slot ~= "Ranged Main Weapon")))
+
+		-- Try making a logic flow diagram out of this (╬▔皿▔)╯
+		local isTorch = itemSlot == "LightSource" and itemStat.ItemGroup == "Torch"
+		local matchesSlot = itemSlot ~= "LightSource" and itemStat.Slot == itemSlot
+		local matchesWeaponType = not weaponType or string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), weaponType)
+		local canGoInOffhandMelee = itemSlot ~= "Melee Offhand Weapon" or (itemStat.Slot == "Melee Offhand Weapon" or itemStat.Slot == "Melee Main Weapon")
+		local canGoInOffhandRanged = itemSlot ~= "Ranged Offhand Weapon" or (itemStat.Slot == "Ranged Offhand Weapon" or itemStat.Slot == "Ranged Main Weapon")
+		if not isTorch
+			and (
+				not matchesWeaponType
+				or (
+					not matchesSlot
+					or (
+						not canGoInOffhandMelee
+						and not canGoInOffhandRanged
+					)
+				)
+			)
 		then
 			return
 		end
@@ -143,7 +160,7 @@ function EquipmentPicker:PickForSlot(slot, imageButton)
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		end
 
-		icon.OnClick = function ()
+		icon.OnClick = function()
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 			imageButton.UserData = itemTemplate
 			searchWindow.OnClose()
