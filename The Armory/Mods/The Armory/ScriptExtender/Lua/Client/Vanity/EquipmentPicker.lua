@@ -116,17 +116,16 @@ function EquipmentPicker:PickForSlot(slot, imageButton, weaponType)
 		local matchesWeaponType = not weaponType or string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), weaponType)
 		local canGoInOffhandMelee = itemSlot ~= "Melee Offhand Weapon" or (itemStat.Slot == "Melee Offhand Weapon" or itemStat.Slot == "Melee Main Weapon")
 		local canGoInOffhandRanged = itemSlot ~= "Ranged Offhand Weapon" or (itemStat.Slot == "Ranged Offhand Weapon" or itemStat.Slot == "Ranged Main Weapon")
-		if not isTorch
-			and (
-				not matchesWeaponType
-				or (
+		if not matchesWeaponType
+			or (not isTorch
+				and (
 					not matchesSlot
-					or (
-						not canGoInOffhandMelee
-						and not canGoInOffhandRanged
+					and (
+						weaponType == nil
+						or (not canGoInOffhandMelee
+							and not canGoInOffhandRanged)
 					)
-				)
-			)
+				))
 		then
 			return
 		end
