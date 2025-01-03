@@ -163,7 +163,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			PopulateClassesAndSubclasses()
 		end
 
-		local classRaceSection = tabHeader:AddCollapsingHeader("Configure per Race/Class")
+		local classRaceSection = tabHeader:AddCollapsingHeader("Configure per Race/Class/BodyType")
 		local classRaceTable = classRaceSection:AddTable("Class-Race", 7)
 		classRaceTable:AddColumn("FirstRaceOrClassSelect", "WidthStretch")
 		classRaceTable:AddColumn("SecondClassOrRace", "WidthStretch")
@@ -204,7 +204,28 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		classRaceRow:AddCell()
 		classRaceRow:AddCell()
 
-		--- I know there's a bullet tree, but i like this aesthetic more (the ui, not the code lol)
+		local function ClearOnSelect(columnIndex, selectable)
+			---@type ExtuiTableCell
+			local cell = classRaceRow.Children[columnIndex]
+
+			for _, childSelectable in pairs(cell.Children) do
+				---@cast childSelectable ExtuiSelectable
+				
+				if selectable.UserData ~= childSelectable.UserData then
+					childSelectable.Selected = false
+				end
+			end
+
+			for index, columnCell in pairs(classRaceRow.Children) do
+				if index > columnIndex then
+					for _, child in pairs(columnCell.Children) do
+						child:Destroy()
+					end
+				end
+			end
+		end
+
+		--- I know there's a bullet tree, but i like this aesthetic more
 		--- @param trunk table
 		--- @param columnIndex number
 		--- @param valueCollection ResourceClassDescription[]|ResourceRace[]?
@@ -215,10 +236,11 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			for selectType, children in pairs(trunk) do
 				if selectType == "By Race" or selectType == "By Class" or selectType == "By Body Type" then
 					local selectable = cell:AddSelectable(selectType)
+					selectable.UserData = selectType
 					selectable.OnActivate = function()
+						ClearOnSelect(columnIndex, selectable)
 						BuildHorizontalSelectableTree(children, columnIndex + 1)
 					end
-					selectable.UserData = selectType
 				elseif selectType == "Race" or selectType == "ClassDescription" then
 					local table = selectType == "Race" and playableRaces or classesAndSubclasses
 					for parentGuid, childResources in pairs(table) do
@@ -226,23 +248,27 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 						local resource = Ext.StaticData.Get(parentGuid, selectType)
 
 						local selectable = cell:AddSelectable(resource.DisplayName:Get() or resource.Name)
+						selectable.UserData = parentGuid
 						selectable.OnActivate = function()
+							ClearOnSelect(columnIndex, selectable)
 							BuildHorizontalSelectableTree(children, columnIndex + 1, childResources)
 						end
-						selectable.UserData = parentGuid
 					end
 				elseif selectType == "SubRace" or selectType == "SubClass" then
 					for _, childResource in pairs(valueCollection) do
 						local selectable = cell:AddSelectable(childResource.DisplayName:Get() or childResource.Name)
+						selectable.UserData = childResource.ResourceUUID
 						selectable.OnActivate = function()
+							ClearOnSelect(columnIndex, selectable)
 							BuildHorizontalSelectableTree(children, columnIndex + 1)
 						end
-						selectable.UserData = childResource.ResourceUUID
 					end
 				elseif selectType == "BodyType" then
 					for _, bodyType in pairs(children) do
 						local selectable = cell:AddSelectable(bodyType)
+						selectable.UserData = bodyType
 						selectable.OnActivate = function()
+							ClearOnSelect(columnIndex, selectable)
 							BuildHorizontalSelectableTree(children, columnIndex + 1)
 						end
 					end
