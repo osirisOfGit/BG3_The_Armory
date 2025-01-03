@@ -116,6 +116,10 @@ function EquipmentPicker:PickForSlot(slot, imageButton, weaponType)
 		local matchesWeaponType = not weaponType or string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), weaponType)
 		local canGoInOffhandMelee = itemSlot ~= "Melee Offhand Weapon" or (itemStat.Slot == "Melee Offhand Weapon" or itemStat.Slot == "Melee Main Weapon")
 		local canGoInOffhandRanged = itemSlot ~= "Ranged Offhand Weapon" or (itemStat.Slot == "Ranged Offhand Weapon" or itemStat.Slot == "Ranged Main Weapon")
+
+		-- If the weapon type matches, that takes absolute precendence because the UI limits which slots a weapon type can be searched in
+		-- However, we need to account for non-weapon items - so, if we need to ensure that if the slot does not match, but this was given a weapon type, then we don't skip the item
+		-- Then, there's torches >_>
 		if not matchesWeaponType
 			or (not isTorch
 				and (
