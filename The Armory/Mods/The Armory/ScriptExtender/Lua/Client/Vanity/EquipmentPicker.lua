@@ -172,6 +172,7 @@ function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
 	favoritesGroup:AddNewLine()
 
 	local resultGroup = searchWindow:AddCollapsingHeader("Search Results")
+	resultGroup.DefaultOpen = true
 	resultGroup:AddNewLine()
 	resultGroup:AddNewLine()
 
