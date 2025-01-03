@@ -43,8 +43,6 @@ local function populateTemplateTable()
 	table.sort(sortedTemplateNames)
 end
 
-populateTemplateTable()
-
 EquipmentPicker = {}
 
 local numPerRow = 4
@@ -124,6 +122,10 @@ end
 ---@param slotButton ExtuiImageButton
 ---@param weaponType ActualWeaponType
 function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
+	if not next(rootsByName) then
+		populateTemplateTable()
+	end
+	
 	local itemSlot = string.find(slot, "Ring") and "Ring" or slot
 
 	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or ""))
@@ -172,7 +174,7 @@ function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
 		local canGoInOffhandRanged = itemSlot ~= "Ranged Offhand Weapon" or (itemStat.Slot == "Ranged Offhand Weapon" or itemStat.Slot == "Ranged Main Weapon")
 
 		-- If the weapon type matches, that takes absolute precendence because the UI limits which slots a weapon type can be searched in
-		-- However, we need to account for non-weapon items - so, if we need to ensure that if the slot does not match, but we were given a weapon type, then we don't skip the item
+		-- However, we need to account for non-weapon items, so if the slot does not match, but we were given a weapon type, then we don't skip the item
 		-- Then, there's torches >_>
 		if not matchesWeaponType
 			or (not isTorch

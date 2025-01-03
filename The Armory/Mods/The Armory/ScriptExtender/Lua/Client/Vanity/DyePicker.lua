@@ -43,8 +43,6 @@ local function populateTemplateTable()
 	table.sort(sortedTemplateNames)
 end
 
-populateTemplateTable()
-
 DyePicker = {}
 
 ---@type DyePayload
@@ -57,6 +55,10 @@ local activeDyeGroup
 ---@param slot ActualSlot
 ---@param dyeButton ExtuiImageButton
 function DyePicker:PickDye(itemTemplate, slot, dyeButton)
+	if not next(rootsByName) then
+		populateTemplateTable()
+	end
+
 	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s Dyes", slot))
 	searchWindow.Closeable = true
 	searchWindow.AlwaysVerticalScrollbar = true
