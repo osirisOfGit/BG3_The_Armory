@@ -47,6 +47,12 @@ populateTemplateTable()
 
 EquipmentPicker = {}
 
+local numPerRow = 4
+local rowCount = 0
+local imageSize = 90
+
+local previewTimer
+
 ---@param tooltip ExtuiTooltip
 ---@param itemStat Weapon|Armor|Object
 ---@param itemTemplate ItemTemplate
@@ -64,14 +70,60 @@ local function BuildStatusTooltip(tooltip, itemStat, itemTemplate)
 	end
 end
 
-local previewTimer
+---@param itemGroup ExtuiChildWindow
+---@param itemTemplate ItemTemplate
+---@param imageButton ExtuiImageButton
+---@param searchWindow ExtuiWindow
+---@return ExtuiImageButton
+local function createItemGroup(itemGroup, itemTemplate, imageButton, searchWindow)
+	local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { imageSize, imageSize })
+	if icon.Image.Icon == "" then
+		icon:Destroy()
+		icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { imageSize, imageSize })
+	end
+	icon.Background = { 0, 0, 0, 0.5 }
+
+	-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
+	local favoriteButton = itemGroup:AddImageButton("Favorite", "star_empty", { 26, 26 })
+	favoriteButton.SameLine = true
+	favoriteButton.Background = { 0, 0, 0, 0.5 }
+	favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+
+	icon.OnHoverEnter = function()
+		previewTimer = Ext.Timer.WaitFor(200, function()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", itemTemplate.Id)
+			previewTimer = nil
+		end)
+	end
+
+	icon.OnHoverLeave = function()
+		if previewTimer then
+			Ext.Timer.Cancel(previewTimer)
+			previewTimer = nil
+		end
+
+		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+	end
+
+	icon.OnClick = function()
+		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		imageButton.UserData = itemTemplate
+		searchWindow.OnClose()
+		searchWindow.Open = false
+	end
+
+	itemGroup:AddText(itemTemplate.DisplayName:Get()).TextWrapPos = 0
+	BuildStatusTooltip(icon:Tooltip(), Ext.Stats.Get(itemTemplate.Stats), itemTemplate)
+
+	return favoriteButton
+end
 
 ---@alias ActualWeaponType string
 
 ---@param slot ActualSlot
----@param imageButton ExtuiImageButton
+---@param slotButton ExtuiImageButton
 ---@param weaponType ActualWeaponType
-function EquipmentPicker:PickForSlot(slot, imageButton, weaponType)
+function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
 	local itemSlot = string.find(slot, "Ring") and "Ring" or slot
 
 	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or ""))
@@ -97,13 +149,15 @@ function EquipmentPicker:PickForSlot(slot, imageButton, weaponType)
 
 	--#region Results
 	searchWindow:AddSeparatorText("Results")
-	searchWindow:AddNewLine()
 
-	local resultGroup = searchWindow:AddGroup("Search_" .. itemSlot)
+	local favoritesGroup = searchWindow:AddCollapsingHeader("Favorites")
+	favoritesGroup:AddNewLine()
+	favoritesGroup:AddNewLine()
 
-	local numPerRow = 4
-	local rowCount = 0
-	local imageSize = 90
+	local resultGroup = searchWindow:AddCollapsingHeader("Search Results")
+	resultGroup:AddNewLine()
+	resultGroup:AddNewLine()
+
 	local function displayResult(templateName)
 		local itemTemplate = rootsByName[templateName]
 
@@ -118,7 +172,7 @@ function EquipmentPicker:PickForSlot(slot, imageButton, weaponType)
 		local canGoInOffhandRanged = itemSlot ~= "Ranged Offhand Weapon" or (itemStat.Slot == "Ranged Offhand Weapon" or itemStat.Slot == "Ranged Main Weapon")
 
 		-- If the weapon type matches, that takes absolute precendence because the UI limits which slots a weapon type can be searched in
-		-- However, we need to account for non-weapon items - so, if we need to ensure that if the slot does not match, but this was given a weapon type, then we don't skip the item
+		-- However, we need to account for non-weapon items - so, if we need to ensure that if the slot does not match, but we were given a weapon type, then we don't skip the item
 		-- Then, there's torches >_>
 		if not matchesWeaponType
 			or (not isTorch
@@ -139,40 +193,15 @@ function EquipmentPicker:PickForSlot(slot, imageButton, weaponType)
 		itemGroup.ChildAlwaysAutoResize = true
 		itemGroup.SameLine = rowCount <= numPerRow
 
-		local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { imageSize, imageSize })
-		if icon.Image.Icon == "" then
-			icon:Destroy()
-			icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { imageSize, imageSize })
+		local favoriteButton = createItemGroup(itemGroup, itemTemplate, slotButton, searchWindow)
+
+		favoriteButton.OnClick = function()
+			local favoriteItemGroup = favoritesGroup:AddChildWindow(itemTemplate.Name .. "_favorite")
+			favoriteItemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
+			favoriteItemGroup.ChildAlwaysAutoResize = true
+			favoriteItemGroup.SameLine = rowCount <= numPerRow
+			createItemGroup(favoriteItemGroup, itemTemplate, slotButton, searchWindow)
 		end
-		icon.SameLine = true
-		icon.Background = { 0, 0, 0, 0.5 }
-
-		icon.OnHoverEnter = function()
-			previewTimer = Ext.Timer.WaitFor(200, function()
-				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", itemTemplate.Id)
-				previewTimer = nil
-			end)
-		end
-
-		icon.OnHoverLeave = function()
-			if previewTimer then
-				Ext.Timer.Cancel(previewTimer)
-				previewTimer = nil
-			end
-
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
-		end
-
-		icon.OnClick = function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
-			imageButton.UserData = itemTemplate
-			searchWindow.OnClose()
-			searchWindow.Open = false
-		end
-
-		itemGroup:AddText(templateName).TextWrapPos = 0
-
-		BuildStatusTooltip(icon:Tooltip(), itemStat, itemTemplate)
 
 		if rowCount > numPerRow then
 			rowCount = 0

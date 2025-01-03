@@ -52,6 +52,20 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	function(tabHeader)
 		--EventChannels.MCM_WINDOW_CLOSED = "MCM_Window_Closed"
 
+		--#region Settings
+		local settingsButton = tabHeader:AddButton("Settings")
+		local settingsPopup = tabHeader:AddPopup("Settings")
+
+		settingsButton.OnClick = function ()
+			settingsPopup:Open()
+		end
+
+		---@type ExtuiMenu
+		local previewMenu = settingsPopup:AddMenu("Previewing")
+		previewMenu:AddCheckbox("Apply Dyes When Previewing Equipment", true)
+		
+		--#endregion
+
 		tabHeader.TextWrapPos = 0
 
 		--#region Presets
@@ -59,7 +73,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		local presetCombo = tabHeader:AddCombo("")
 		presetCombo.SameLine = true
 		presetCombo.WidthFitPreview = true
-		presetCombo.Options = { "Preset", "Preset", "Preset" }
+		presetCombo.Options = { "Preset1", "Preset2", "Preset3" }
 
 		local copyPresetButton = tabHeader:AddButton("Clone")
 		copyPresetButton.PositionOffset = { 200, 0 }
@@ -183,12 +197,12 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 					--#region Dyes
 					local dyeButton
-					if userDataCopy[button[1] .. " Dye"] then
-						local dyeTemplate = userDataCopy[button[1] .. " Dye"]
-						dyeButton = parentContainer:AddImageButton(button[1] .. " Dye", dyeTemplate.Icon, { 32, 32 })
+					if userDataCopy[slotForImageButton .. " Dye"] then
+						local dyeTemplate = userDataCopy[slotForImageButton .. " Dye"]
+						dyeButton = parentContainer:AddImageButton(slotForImageButton .. " Dye", dyeTemplate.Icon, { 32, 32 })
 						dyeButton.UserData = dyeTemplate
 					else
-						dyeButton = parentContainer:AddImageButton(button[1] .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+						dyeButton = parentContainer:AddImageButton(slotForImageButton .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 					end
 					dyeButton.SameLine = true
 					dyeButton.OnClick = function()
