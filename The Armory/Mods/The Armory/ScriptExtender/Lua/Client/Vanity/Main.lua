@@ -48,10 +48,75 @@ local function PopulateWeaponTypes()
 	end
 end
 
+---@type {[Guid]: ResourceRace[]}
+local playableRaces = {}
+
+local function PopulatePlayableRaces()
+	local function deconstructBitfield(bitfield)
+		local bits = {}
+		for i = 0, 17 do
+			bits[i + 1] = (bitfield >> i) & 1
+		end
+		return bits
+	end
+
+	for _, raceGuid in pairs(Ext.StaticData.GetAll("Race")) do
+		---@type ResourceRace
+		local race = Ext.StaticData.Get(raceGuid, "Race")
+
+		for _, tagGuid in pairs(race.Tags) do
+			---@type ResourceTag
+			local tag = Ext.StaticData.Get(tagGuid, "Tag")
+
+			-- TAGCATEGORY - PlayableRace is 15, but copilots bit logic is off by one, so checking the 14th bit
+			if tag.Categories and deconstructBitfield(tag.Categories)[15] == 1 then
+				goto continueWithRace
+			end
+		end
+		goto nextRace
+		::continueWithRace::
+
+		if race.ParentGuid == "00000000-0000-0000-0000-000000000000" and not playableRaces[race.ResourceUUID] then
+			playableRaces[race.ResourceUUID] = {}
+		else
+			if not playableRaces[race.ParentGuid] then
+				playableRaces[race.ParentGuid] = {}
+			end
+			table.insert(playableRaces[race.ParentGuid], race)
+		end
+
+		::nextRace::
+	end
+end
+
+---@type {[Guid] : ResourceClassDescription[] }
+local classesAndSubclasses = {}
+local function PopulateClassesAndSubclasses()
+	-- All classes
+	-- check ParentGuid
+
+	for _, classGuid in pairs(Ext.StaticData.GetAll("ClassDescription")) do
+		---@type ResourceClassDescription
+		local class = Ext.StaticData.Get(classGuid, "ClassDescription")
+
+		if class.ParentGuid == "00000000-0000-0000-0000-000000000000" and not classesAndSubclasses[class.ResourceUUID] then
+			classesAndSubclasses[class.ResourceUUID] = {}
+		else
+			if not classesAndSubclasses[class.ParentGuid] then
+				classesAndSubclasses[class.ParentGuid] = {}
+			end
+
+			table.insert(classesAndSubclasses[class.ParentGuid], class)
+		end
+	end
+end
+
 Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	--- @param tabHeader ExtuiTreeParent
 	function(tabHeader)
-		PopulateWeaponTypes()
+		if not weaponTypes["Cloak"] then
+			PopulateWeaponTypes()
+		end
 
 		--EventChannels.MCM_WINDOW_CLOSED = "MCM_Window_Closed"
 
@@ -66,7 +131,6 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		---@type ExtuiMenu
 		local previewMenu = settingsPopup:AddMenu("Previewing")
 		previewMenu:AddCheckbox("Apply Dyes When Previewing Equipment", true)
-
 		--#endregion
 
 		tabHeader.TextWrapPos = 0
@@ -88,6 +152,106 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		local applyPresetButton = tabHeader:AddButton("Apply")
 		applyPresetButton.SameLine = true
 		applyPresetButton.PositionOffset = { 100, 0 }
+		--#endregion
+
+		--#region Race/Class Select
+		if #playableRaces == 0 then
+			PopulatePlayableRaces()
+		end
+
+		if not next(classesAndSubclasses) then
+			PopulateClassesAndSubclasses()
+		end
+
+		local classRaceSection = tabHeader:AddCollapsingHeader("Configure per Race/Class")
+		local classRaceTable = classRaceSection:AddTable("Class-Race", 7)
+		classRaceTable:AddColumn("FirstRaceOrClassSelect", "WidthStretch")
+		classRaceTable:AddColumn("SecondClassOrRace", "WidthStretch")
+		classRaceTable:AddColumn("ThirdSubclassOrSubrace", "WidthStretch")
+		classRaceTable:AddColumn("FourthRace", "WidthStretch")
+		classRaceTable:AddColumn("FifthSubRace", "WidthStretch")
+		classRaceTable:AddColumn("SixthBodyTypeSubRace", "WidthStretch")
+
+		local classRaceRow = classRaceTable:AddRow()
+
+		local bodyTypeTree = {
+			BodyType = {
+				1, 2, 3, 4
+			}
+		}
+		local raceTree = {
+			Race = {
+				["By Body Type"] = bodyTypeTree,
+				SubRace = bodyTypeTree
+			}
+		}
+
+		local tree = {
+			["By Race"] = raceTree,
+			["By Class"] = {
+				ClassDescription = {
+					SubClass = raceTree,
+					["By Race"] = raceTree
+				}
+			},
+			["By Body Type"] = bodyTypeTree
+		}
+
+		classRaceRow:AddCell()
+		classRaceRow:AddCell()
+		classRaceRow:AddCell()
+		classRaceRow:AddCell()
+		classRaceRow:AddCell()
+		classRaceRow:AddCell()
+
+		--- I know there's a bullet tree, but i like this aesthetic more (the ui, not the code lol)
+		--- @param trunk table
+		--- @param columnIndex number
+		--- @param valueCollection ResourceClassDescription[]|ResourceRace[]?
+		local function BuildHorizontalSelectableTree(trunk, columnIndex, valueCollection)
+			---@type ExtuiTableCell
+			local cell = classRaceRow.Children[columnIndex]
+
+			for selectType, children in pairs(trunk) do
+				if selectType == "By Race" or selectType == "By Class" or selectType == "By Body Type" then
+					local selectable = cell:AddSelectable(selectType)
+					selectable.OnActivate = function()
+						BuildHorizontalSelectableTree(children, columnIndex + 1)
+					end
+					selectable.UserData = selectType
+				elseif selectType == "Race" or selectType == "ClassDescription" then
+					local table = selectType == "Race" and playableRaces or classesAndSubclasses
+					for parentGuid, childResources in pairs(table) do
+						---@type ResourceRace|ResourceClassDescription
+						local resource = Ext.StaticData.Get(parentGuid, selectType)
+
+						local selectable = cell:AddSelectable(resource.DisplayName:Get() or resource.Name)
+						selectable.OnActivate = function()
+							BuildHorizontalSelectableTree(children, columnIndex + 1, childResources)
+						end
+						selectable.UserData = parentGuid
+					end
+				elseif selectType == "SubRace" or selectType == "SubClass" then
+					for _, childResource in pairs(valueCollection) do
+						local selectable = cell:AddSelectable(childResource.DisplayName:Get() or childResource.Name)
+						selectable.OnActivate = function()
+							BuildHorizontalSelectableTree(children, columnIndex + 1)
+						end
+						selectable.UserData = childResource.ResourceUUID
+					end
+				elseif selectType == "BodyType" then
+					for _, bodyType in pairs(children) do
+						local selectable = cell:AddSelectable(bodyType)
+						selectable.OnActivate = function()
+							BuildHorizontalSelectableTree(children, columnIndex + 1)
+						end
+					end
+				end
+			end
+		end
+
+		BuildHorizontalSelectableTree(tree, 1)
+
 		--#endregion
 
 		--#region Character Panel
@@ -166,7 +330,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 					imageButton.Label = button[2]
 				else
 					---@cast imageButton ExtuiImageButton
-					
+
 					local slotForImageButton = slot or button[1]
 
 					--#region Equipment

@@ -66,7 +66,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	searchWindow.IDContext = "Dye"
 	searchWindow.Label = string.format("Searching for %s Dyes", slot)
 	searchWindow.Closeable = true
-	searchWindow.OnClose = function ()
+	searchWindow.OnClose = function()
 		openWindow = nil
 	end
 
