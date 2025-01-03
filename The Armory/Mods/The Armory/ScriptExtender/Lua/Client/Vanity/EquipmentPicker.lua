@@ -51,6 +51,9 @@ local imageSize = 90
 
 local previewTimer
 
+---@type ExtuiWindow?
+local openWindow = nil
+
 ---@param tooltip ExtuiTooltip
 ---@param itemStat Weapon|Armor|Object
 ---@param itemTemplate ItemTemplate
@@ -106,15 +109,17 @@ local function createItemGroup(itemGroup, itemTemplate, imageButton, searchWindo
 	icon.OnClick = function()
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		imageButton.UserData = itemTemplate
-		searchWindow.OnClose()
+		searchWindow.UserData()
 		searchWindow.Open = false
+		openWindow = nil
 	end
 
-	itemGroup:AddText(itemTemplate.DisplayName:Get()).TextWrapPos = 0
+	itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
 	BuildStatusTooltip(icon:Tooltip(), Ext.Stats.Get(itemTemplate.Stats), itemTemplate)
 
 	return favoriteButton
 end
+
 
 ---@alias ActualWeaponType string
 
@@ -125,12 +130,22 @@ function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
 	if not next(rootsByName) then
 		populateTemplateTable()
 	end
-	
+
+	rowCount = 0
+
 	local itemSlot = string.find(slot, "Ring") and "Ring" or slot
 
 	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or ""))
 	searchWindow.Closeable = true
-	searchWindow.AlwaysVerticalScrollbar = true
+	searchWindow.OnClose = function()
+		openWindow = nil
+	end
+
+	if openWindow then
+		openWindow.Open = false
+		openWindow:Destroy()
+	end
+	openWindow = searchWindow
 
 	--#region Input
 	local searchInput = searchWindow:AddInputText("")
@@ -191,6 +206,7 @@ function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
 		end
 
 		local itemGroup = resultGroup:AddChildWindow(itemTemplate.Name)
+		itemGroup.NoSavedSettings = true
 		itemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
 		itemGroup.ChildAlwaysAutoResize = true
 		itemGroup.SameLine = rowCount <= numPerRow

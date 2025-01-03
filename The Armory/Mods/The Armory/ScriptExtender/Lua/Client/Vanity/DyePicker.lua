@@ -51,6 +51,9 @@ local dyePayload = {}
 ---@type ExtuiGroup?
 local activeDyeGroup
 
+---@type ExtuiWindow?
+local openWindow
+
 ---@param itemTemplate ItemTemplate
 ---@param slot ActualSlot
 ---@param dyeButton ExtuiImageButton
@@ -59,9 +62,19 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		populateTemplateTable()
 	end
 
-	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s Dyes", slot))
+	local searchWindow = Ext.IMGUI.NewWindow("")
+	searchWindow.IDContext = "Dye"
+	searchWindow.Label = string.format("Searching for %s Dyes", slot)
 	searchWindow.Closeable = true
-	searchWindow.AlwaysVerticalScrollbar = true
+	searchWindow.OnClose = function ()
+		openWindow = nil
+	end
+
+	if openWindow then
+		openWindow.Open = false
+		openWindow:Destroy()
+	end
+	openWindow = searchWindow
 
 	--#region Input
 	local searchInput = searchWindow:AddInputText("")
@@ -81,12 +94,24 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	--#endregion
 
 	--#region Results
+	local favoritesHeader = searchWindow:AddCollapsingHeader("Favorites")
+	favoritesHeader:AddNewLine()
+
 	searchWindow:AddSeparator()
-	local resultTable = searchWindow:AddTable(dyeButton.Label, 2)
+	local resultTable = searchWindow:AddTable("Dyes", 2)
+	resultTable.NoSavedSettings = true
 	resultTable:AddColumn("Dyes", "WidthFixed")
 	resultTable:AddColumn("Information", "WidthStretch")
+
 	local row = resultTable:AddRow()
 	local dyeCell = row:AddCell()
+	local dyeWindow = dyeCell:AddChildWindow("DyeResults")
+	dyeWindow.NoScrollWithMouse = false
+	dyeWindow.HorizontalScrollbar = true
+	-- dyeWindow.NoSavedSettings = true
+	dyeWindow.ChildAlwaysAutoResize = true
+	dyeWindow.AutoResizeX = true
+
 	local infoCell = row:AddCell()
 
 	local function displayResult(templateName)
@@ -95,11 +120,17 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		---@type ResourceMaterialPresetResource
 		local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 
-		local dyeImageButton = dyeCell:AddImageButton(templateName, dyeTemplate.Icon, { 32, 32 })
-		dyeImageButton.UserData = materialPreset.Guid
-		dyeCell:AddText(templateName).SameLine = true
+		local favoriteButton = dyeWindow:AddImageButton("Favorite" .. templateName, "star_empty", { 26, 26 })
+		favoriteButton.Background = { 0, 0, 0, 0.5 }
+		favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
 
-		local dyeInfoGroup = infoCell:AddGroup(templateName)
+		local dyeImageButton = dyeWindow:AddImageButton(templateName, dyeTemplate.Icon, { 64, 64 })
+		dyeImageButton.UserData = materialPreset.Guid
+		dyeImageButton.SameLine = true
+		dyeImageButton.Background = { 0, 0, 0, 0.5 }
+		dyeWindow:AddText(templateName).SameLine = true
+
+		local dyeInfoGroup = infoCell:AddGroup(templateName .. dyeButton.Label)
 		dyeInfoGroup.Visible = false
 
 		---@type Object
@@ -109,10 +140,12 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		dyeInfoGroup:AddSeparatorText(templateName)
 		dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian")):SetColor("Text", { 1, 1, 1, 0.5 })
 		dyeInfoGroup:AddButton("Select").OnClick = function()
+			activeDyeGroup = nil
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
 			dyeButton.UserData = dyeTemplate
-			searchWindow.OnClose()
+			searchWindow.UserData()
 			searchWindow.Open = false
+			openWindow = nil
 		end
 		dyeInfoGroup:AddSeparator()
 
@@ -152,6 +185,19 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 			}
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewDye", Ext.Json.Stringify(dyePayload))
 		end
+
+		favoriteButton.OnClick = function()
+			-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
+			local newFavoriteButton = favoritesHeader:AddImageButton("Favorited" .. templateName, "star_fileld", { 26, 26 })
+			newFavoriteButton.Background = { 0, 0, 0, 0.5 }
+			newFavoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+			newFavoriteButton.SameLine = true
+
+			local favoriteDyeButton = favoritesHeader:AddImageButton(templateName, dyeTemplate.Icon, { 64, 64 })
+			favoriteDyeButton.Background = { 0, 0, 0, 0.5 }
+			favoriteDyeButton.SameLine = true
+			favoriteDyeButton.OnClick = dyeImageButton.OnClick
+		end
 	end
 	--#endregion
 	for _, templateName in pairs(sortedTemplateNames) do
@@ -161,7 +207,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	getAllForModCombo.OnChange = function()
 		activeDyeGroup = nil
 
-		for _, child in pairs(dyeCell.Children) do
+		for _, child in pairs(dyeWindow.Children) do
 			child:Destroy()
 		end
 
@@ -184,7 +230,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 
 		delayTimer = Ext.Timer.WaitFor(150, function()
 			activeDyeGroup = nil
-			for _, child in pairs(dyeCell.Children) do
+			for _, child in pairs(dyeWindow.Children) do
 				child:Destroy()
 			end
 

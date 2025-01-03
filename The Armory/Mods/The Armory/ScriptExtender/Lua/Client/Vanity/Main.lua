@@ -6,64 +6,67 @@ local weaponTypes = {
 	["Melee Offhand Weapon"] = { { "Shields", "Item_WPN_HUM_Shield_A_0" } }
 }
 
--- `WPN_Scimitar_FlameBlade` (╯‵□′)╯︵┻━┻
-local foundTypes = {}
+local function PopulateWeaponTypes()
+	-- `WPN_Scimitar_FlameBlade` (╯‵□′)╯︵┻━┻
+	local foundTypes = {}
 
-for _, statString in pairs(Ext.Stats.GetStats("Weapon")) do
-	---@type Weapon
-	local stat = Ext.Stats.Get(statString)
-	if stat.Slot and (stat.Using == "_BaseWeapon") then
-		if not weaponTypes[stat.Slot] then
-			weaponTypes[stat.Slot] = {}
-		end
+	for _, statString in pairs(Ext.Stats.GetStats("Weapon")) do
+		---@type Weapon
+		local stat = Ext.Stats.Get(statString)
+		if stat.Slot and (stat.Using == "_BaseWeapon") then
+			if not weaponTypes[stat.Slot] then
+				weaponTypes[stat.Slot] = {}
+			end
 
-		for _, proficiency in pairs(stat["Proficiency Group"]) do
-			-- Proficiency tends to be the weapon type + 's', and weapon type is in the stat name
-			-- e.g. `WPN_Pike` requires proficiency `Pikes`. Hope mods also follow this pattern
-			if string.find(statString, string.sub(proficiency, 0, -2)) then
-				if not foundTypes[proficiency] then
-					local entry = { proficiency, Ext.Template.GetTemplate(stat.RootTemplate).Icon }
-					table.insert(weaponTypes[stat.Slot], entry)
+			for _, proficiency in pairs(stat["Proficiency Group"]) do
+				-- Proficiency tends to be the weapon type + 's', and weapon type is in the stat name
+				-- e.g. `WPN_Pike` requires proficiency `Pikes`. Hope mods also follow this pattern
+				if string.find(statString, string.sub(proficiency, 0, -2)) then
+					if not foundTypes[proficiency] then
+						local entry = { proficiency, Ext.Template.GetTemplate(stat.RootTemplate).Icon }
+						table.insert(weaponTypes[stat.Slot], entry)
 
-					if string.find(stat.Slot, "Main") then
-						for _, property in pairs(stat["Weapon Properties"]) do
-							if property == "Heavy" or property == "Twohanded" then
-								goto breakOut
+						if string.find(stat.Slot, "Main") then
+							for _, property in pairs(stat["Weapon Properties"]) do
+								if property == "Heavy" or property == "Twohanded" then
+									goto breakOut
+								end
 							end
+							local offHandSlot = string.gsub(stat.Slot, "Main", "Offhand")
+							if not weaponTypes[offHandSlot] then
+								weaponTypes[offHandSlot] = {}
+							end
+							table.insert(weaponTypes[offHandSlot], entry)
 						end
-						local offHandSlot = string.gsub(stat.Slot, "Main", "Offhand")
-						if not weaponTypes[offHandSlot] then
-							weaponTypes[offHandSlot] = {}
-						end
-						table.insert(weaponTypes[offHandSlot], entry)
 					end
+					foundTypes[proficiency] = true
+					::breakOut::
+					break
 				end
-				foundTypes[proficiency] = true
-				::breakOut::
-				break
 			end
 		end
 	end
 end
-foundTypes = nil
 
 Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	--- @param tabHeader ExtuiTreeParent
 	function(tabHeader)
+		PopulateWeaponTypes()
+
 		--EventChannels.MCM_WINDOW_CLOSED = "MCM_Window_Closed"
 
 		--#region Settings
 		local settingsButton = tabHeader:AddButton("Settings")
 		local settingsPopup = tabHeader:AddPopup("Settings")
 
-		settingsButton.OnClick = function ()
+		settingsButton.OnClick = function()
 			settingsPopup:Open()
 		end
 
 		---@type ExtuiMenu
 		local previewMenu = settingsPopup:AddMenu("Previewing")
 		previewMenu:AddCheckbox("Apply Dyes When Previewing Equipment", true)
-		
+
 		--#endregion
 
 		tabHeader.TextWrapPos = 0
@@ -142,15 +145,11 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		--- TODO: Refactor this mess
 		---@param parentContainer ExtuiTableCell|ExtuiGroup|ExtuiCollapsingHeader
 		---@param group string[][]
+		---@param verticalSlots boolean
 		---@param slot string
-		---@param template ItemTemplate
-		local function BuildSlots(parentContainer, group, verticalSlots, slot, template)
+		local function BuildSlots(parentContainer, group, verticalSlots, slot)
 			local userDataCopy = {
 			}
-
-			if slot then
-				userDataCopy[slot] = template
-			end
 
 			for _, child in pairs(parentContainer.Children) do
 				if child.UserData ~= "keep" then
@@ -160,16 +159,15 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 				end
 			end
 
-
 			for i, button in ipairs(group) do
-				local slotForImageButton = slot or (parentContainer.UserData ~= "keep" and parentContainer.UserData or button[1])
-
 				local imageButton
 				if button[1] == "Dummy" then
 					imageButton = parentContainer:AddDummy(116, 60)
 					imageButton.Label = button[2]
 				else
 					---@cast imageButton ExtuiImageButton
+					
+					local slotForImageButton = slot or button[1]
 
 					--#region Equipment
 					if userDataCopy[button[1]] then
@@ -187,9 +185,9 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 					imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 					imageButton.OnClick = function()
 						-- Third param allows us to send the weaponSlot and the associated slot at the same time when applicable, filtering results
-						EquipmentPicker:PickForSlot(slotForImageButton, imageButton, slotForImageButton ~= button[1] and button[1] or nil).OnClose = function()
+						EquipmentPicker:PickForSlot(slotForImageButton, imageButton, slotForImageButton ~= button[1] and button[1] or nil).UserData = function()
 							if imageButton.UserData then
-								BuildSlots(parentContainer, group, verticalSlots, imageButton.Label, imageButton.UserData)
+								BuildSlots(parentContainer, group, verticalSlots, slot)
 							end
 						end
 					end
@@ -206,9 +204,9 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 					end
 					dyeButton.SameLine = true
 					dyeButton.OnClick = function()
-						DyePicker:PickDye(imageButton.UserData, slotForImageButton, dyeButton).OnClose = function()
+						DyePicker:PickDye(imageButton.UserData, slotForImageButton, dyeButton).UserData = function()
 							if dyeButton.UserData then
-								BuildSlots(parentContainer, group, verticalSlots, dyeButton.Label, dyeButton.UserData)
+								BuildSlots(parentContainer, group, verticalSlots, slot)
 							end
 						end
 					end
