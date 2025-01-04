@@ -88,13 +88,11 @@ local function PopulateClassesAndSubclasses()
 			end
 
 			table.insert(classesAndSubclasses[class.ParentGuid], class)
-			table.sort(classesAndSubclasses[class.ParentGuid], function (a, b)
+			table.sort(classesAndSubclasses[class.ParentGuid], function(a, b)
 				return a.Name < b.Name
 			end)
 		end
 	end
-
-
 end
 
 ---@type Guid[]
@@ -114,10 +112,10 @@ local function PopulateOriginCharacters()
 	end
 
 	--- O(fuck it)
-	table.sort(originCharacters, function (a, b)
+	table.sort(originCharacters, function(a, b)
 		return Ext.StaticData.Get(a, "Origin").Name < Ext.StaticData.Get(b, "Origin").Name
 	end)
-	table.sort(hirelings, function (a, b)
+	table.sort(hirelings, function(a, b)
 		-- Future Bug report probably
 		return Ext.StaticData.Get(a, "Origin").DisplayName:Get() < Ext.StaticData.Get(b, "Origin").DisplayName:Get()
 	end)
@@ -175,6 +173,30 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		local characterCriteriaSection = tabHeader:AddCollapsingHeader("Configure per Race/Class/BodyType")
 		local characterCriteriaSelectionTable = tabHeader:AddTable("CharacterCriteraSelection", 7)
+		local charCriteriaHeaders = characterCriteriaSelectionTable:AddRow()
+		charCriteriaHeaders.Headers = true
+		charCriteriaHeaders:AddCell():AddText("Class")
+		charCriteriaHeaders:AddCell():AddText("Subclass")
+		charCriteriaHeaders:AddCell():AddText("Race")
+		charCriteriaHeaders:AddCell():AddText("Subrace")
+		charCriteriaHeaders:AddCell():AddText("Origin")
+		charCriteriaHeaders:AddCell():AddText("Hireling")
+		charCriteriaHeaders:AddCell():AddText("BodyType")
+
+		local selectionRow = characterCriteriaSelectionTable:AddRow()
+		for _, col in pairs(charCriteriaHeaders.Children) do
+			local cell = selectionRow:AddCell()
+			cell.UserData = col.Children[1].Label
+			cell:AddText("---")
+		end
+
+		local function findTextToUpdate(selectType, selectable)
+			for _, cell in pairs(selectionRow.Children) do
+				if cell.UserData == selectType then
+					cell.Children[1].Label = selectable.Label
+				end
+			end
+		end
 
 		local characterCriteriaTable = characterCriteriaSection:AddTable("Class-Race", 6)
 		characterCriteriaTable:AddColumn("FirstRaceOrClassSelect", "WidthStretch")
@@ -200,15 +222,15 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		local raceTree = {
 			Race = {
 				["By Body Type"] = bodyTypeTree,
-				SubRace = bodyTypeTree
+				Subrace = bodyTypeTree
 			}
 		}
 
 		local tree = {
 			["By Race"] = raceTree,
 			["By Class"] = {
-				ClassDescription = {
-					SubClass = {
+				Class = {
+					Subclass = {
 						Race = raceTree.Race,
 						["By Body Type"] = bodyTypeTree,
 						["By Origin"] = {
@@ -245,6 +267,13 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 				---@cast childSelectable ExtuiSelectable
 
 				if selectable.UserData ~= childSelectable.UserData then
+					if childSelectable.Selected then
+						for _, selectedTextCell in pairs(selectionRow.Children) do
+							if selectedTextCell.Children[1].Label == childSelectable.Label then
+								selectedTextCell.Children[1].Label = "---"
+							end
+						end
+					end
 					childSelectable.Selected = false
 				end
 			end
@@ -252,6 +281,11 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			for index, columnCell in pairs(characterCriteriaRow.Children) do
 				if index > columnIndex then
 					for _, child in pairs(columnCell.Children) do
+						for _, selectedTextCell in pairs(selectionRow.Children) do
+							if selectedTextCell.Children[1].Label == child.Label then
+								selectedTextCell.Children[1].Label = "---"
+							end
+						end
 						child:Destroy()
 					end
 				end
@@ -259,7 +293,6 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		end
 
 		--- I know there's a bullet tree, but i like this aesthetic more
-		--- TODO: Sort these alphabetically :sigh:
 		--- @param trunk table
 		--- @param columnIndex number
 		--- @param valueCollection ResourceClassDescription[]|ResourceRace[]?
@@ -273,29 +306,33 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 					selectable.UserData = selectType
 					selectable.OnActivate = function()
 						ClearOnSelect(columnIndex, selectable)
+						findTextToUpdate(selectType, selectable)
 						BuildHorizontalSelectableTree(children, columnIndex + 1)
 					end
-				elseif selectType == "Race" or selectType == "ClassDescription" then
+				elseif selectType == "Race" or selectType == "Class" then
+					-- TODO: Really clean up this mess
 					local table = selectType == "Race" and playableRaces or classesAndSubclasses
-					for parentGuid, childResources in TableUtils:OrderedPairs(table, function (key)
-						return Ext.StaticData.Get(key, selectType).Name
+					for parentGuid, childResources in TableUtils:OrderedPairs(table, function(key)
+						return Ext.StaticData.Get(key, selectType == "Race" and selectType or "ClassDescription").Name
 					end) do
 						---@type ResourceRace|ResourceClassDescription
-						local resource = Ext.StaticData.Get(parentGuid, selectType)
+						local resource = Ext.StaticData.Get(parentGuid, selectType == "Race" and selectType or "ClassDescription")
 
 						local selectable = cell:AddSelectable(resource.DisplayName:Get() or resource.Name)
 						selectable.UserData = parentGuid
 						selectable.OnActivate = function()
 							ClearOnSelect(columnIndex, selectable)
+							findTextToUpdate(selectType, selectable)
 							BuildHorizontalSelectableTree(children, columnIndex + 1, childResources)
 						end
 					end
-				elseif selectType == "SubRace" or selectType == "SubClass" then
+				elseif selectType == "Subrace" or selectType == "Subclass" then
 					for _, childResource in pairs(valueCollection) do
 						local selectable = cell:AddSelectable(childResource.DisplayName:Get() or childResource.Name)
 						selectable.UserData = childResource.ResourceUUID
 						selectable.OnActivate = function()
 							ClearOnSelect(columnIndex, selectable)
+							findTextToUpdate(selectType, selectable)
 							BuildHorizontalSelectableTree(children, columnIndex + 1)
 						end
 					end
@@ -305,6 +342,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 						selectable.UserData = bodyType
 						selectable.OnActivate = function()
 							ClearOnSelect(columnIndex, selectable)
+							findTextToUpdate(selectType, selectable)
 							BuildHorizontalSelectableTree(children, columnIndex + 1)
 						end
 					end
@@ -317,6 +355,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 						selectable.UserData = originGuid
 						selectable.OnActivate = function()
 							ClearOnSelect(columnIndex, selectable)
+							findTextToUpdate(selectType, selectable)
 							BuildHorizontalSelectableTree(children, columnIndex + 1)
 						end
 					end
@@ -326,7 +365,6 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		BuildHorizontalSelectableTree(tree, 1)
 
-		
 
 		--#region Character Panel
 		tabHeader:AddSeparator()
