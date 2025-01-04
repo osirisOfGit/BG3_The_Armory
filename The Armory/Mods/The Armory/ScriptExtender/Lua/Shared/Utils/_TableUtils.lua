@@ -65,3 +65,29 @@ function TableUtils:CompareLists(first, second)
 
 	return true
 end
+
+--- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
+--- Optionally accepts a function to transform the key for sorting and returning
+---@param t table
+---@param keyTransformFunc function
+---@return function
+function TableUtils:OrderedPairs(t, keyTransformFunc)
+	local keys = {}
+	for k in pairs(t) do
+		table.insert(keys, k)
+	end
+	table.sort(keys, function(a, b)
+		local keyA = keyTransformFunc and keyTransformFunc(a) or tostring(a)
+		local keyB = keyTransformFunc and keyTransformFunc(b) or tostring(b)
+		return keyA < keyB
+	end)
+
+	local i = 0
+	return function()
+		i = i + 1
+		if keys[i] then
+			local key = keys[i]
+			return key, t[key]
+		end
+	end
+end

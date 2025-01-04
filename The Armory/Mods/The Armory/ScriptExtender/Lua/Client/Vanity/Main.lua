@@ -52,49 +52,30 @@ end
 local playableRaces = {}
 
 local function PopulatePlayableRaces()
-	local function deconstructBitfield(bitfield)
-		local bits = {}
-		for i = 0, 17 do
-			bits[i + 1] = (bitfield >> i) & 1
-		end
-		return bits
-	end
+	local foundSubraces = {}
+	for _, presetGuid in pairs(Ext.StaticData.GetAll("CharacterCreationPreset")) do
+		---@type ResourceCharacterCreationPreset
+		local preset = Ext.StaticData.Get(presetGuid, "CharacterCreationPreset")
 
-	for _, raceGuid in pairs(Ext.StaticData.GetAll("Race")) do
-		---@type ResourceRace
-		local race = Ext.StaticData.Get(raceGuid, "Race")
+		if preset.RaceUUID then
+			---@type ResourceRace
+			local subRace = Ext.StaticData.Get(preset.SubRaceUUID, "Race")
 
-		for _, tagGuid in pairs(race.Tags) do
-			---@type ResourceTag
-			local tag = Ext.StaticData.Get(tagGuid, "Tag")
+			if not playableRaces[preset.RaceUUID] then
+				playableRaces[preset.RaceUUID] = {}
+			end
 
-			-- TAGCATEGORY - PlayableRace is 15, but copilots bit logic is off by one, so checking the 14th bit
-			if tag.Categories and deconstructBitfield(tag.Categories)[15] == 1 then
-				goto continueWithRace
+			if subRace and not foundSubraces[subRace.ResourceUUID] then
+				table.insert(playableRaces[preset.RaceUUID], subRace)
+				foundSubraces[subRace.ResourceUUID] = true
 			end
 		end
-		goto nextRace
-		::continueWithRace::
-
-		if race.ParentGuid == "00000000-0000-0000-0000-000000000000" and not playableRaces[race.ResourceUUID] then
-			playableRaces[race.ResourceUUID] = {}
-		else
-			if not playableRaces[race.ParentGuid] then
-				playableRaces[race.ParentGuid] = {}
-			end
-			table.insert(playableRaces[race.ParentGuid], race)
-		end
-
-		::nextRace::
 	end
 end
 
 ---@type {[Guid] : ResourceClassDescription[] }
 local classesAndSubclasses = {}
 local function PopulateClassesAndSubclasses()
-	-- All classes
-	-- check ParentGuid
-
 	for _, classGuid in pairs(Ext.StaticData.GetAll("ClassDescription")) do
 		---@type ResourceClassDescription
 		local class = Ext.StaticData.Get(classGuid, "ClassDescription")
@@ -107,8 +88,39 @@ local function PopulateClassesAndSubclasses()
 			end
 
 			table.insert(classesAndSubclasses[class.ParentGuid], class)
+			table.sort(classesAndSubclasses[class.ParentGuid], function (a, b)
+				return a.Name < b.Name
+			end)
 		end
 	end
+
+
+end
+
+---@type Guid[]
+local originCharacters = {}
+---@type Guid[]
+local hirelings = {}
+local function PopulateOriginCharacters()
+	for _, originGuid in pairs(Ext.StaticData.GetAll("Origin")) do
+		---@type ResourceOrigin
+		local origin = Ext.StaticData.Get(originGuid, "Origin")
+
+		if origin.IsHenchman then
+			table.insert(hirelings, originGuid)
+		else
+			table.insert(originCharacters, originGuid)
+		end
+	end
+
+	--- O(fuck it)
+	table.sort(originCharacters, function (a, b)
+		return Ext.StaticData.Get(a, "Origin").Name < Ext.StaticData.Get(b, "Origin").Name
+	end)
+	table.sort(hirelings, function (a, b)
+		-- Future Bug report probably
+		return Ext.StaticData.Get(a, "Origin").DisplayName:Get() < Ext.StaticData.Get(b, "Origin").DisplayName:Get()
+	end)
 end
 
 Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
@@ -157,22 +169,28 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		--#region Race/Class Select
 		if #playableRaces == 0 then
 			PopulatePlayableRaces()
-		end
-
-		if not next(classesAndSubclasses) then
 			PopulateClassesAndSubclasses()
+			PopulateOriginCharacters()
 		end
 
-		local classRaceSection = tabHeader:AddCollapsingHeader("Configure per Race/Class/BodyType")
-		local classRaceTable = classRaceSection:AddTable("Class-Race", 7)
-		classRaceTable:AddColumn("FirstRaceOrClassSelect", "WidthStretch")
-		classRaceTable:AddColumn("SecondClassOrRace", "WidthStretch")
-		classRaceTable:AddColumn("ThirdSubclassOrSubrace", "WidthStretch")
-		classRaceTable:AddColumn("FourthRace", "WidthStretch")
-		classRaceTable:AddColumn("FifthSubRace", "WidthStretch")
-		classRaceTable:AddColumn("SixthBodyTypeSubRace", "WidthStretch")
+		local characterCriteriaSection = tabHeader:AddCollapsingHeader("Configure per Race/Class/BodyType")
+		local characterCriteriaSelectionTable = tabHeader:AddTable("CharacterCriteraSelection", 7)
 
-		local classRaceRow = classRaceTable:AddRow()
+		local characterCriteriaTable = characterCriteriaSection:AddTable("Class-Race", 6)
+		characterCriteriaTable:AddColumn("FirstRaceOrClassSelect", "WidthStretch")
+		characterCriteriaTable:AddColumn("SecondClassOrRace", "WidthStretch")
+		characterCriteriaTable:AddColumn("ThirdSubclassOrSubrace", "WidthStretch")
+		characterCriteriaTable:AddColumn("FourthRace", "WidthStretch")
+		characterCriteriaTable:AddColumn("FifthSubRace", "WidthStretch")
+		characterCriteriaTable:AddColumn("SixthBodyTypeSubRace", "WidthStretch")
+
+		local characterCriteriaRow = characterCriteriaTable:AddRow()
+		characterCriteriaRow:AddCell()
+		characterCriteriaRow:AddCell()
+		characterCriteriaRow:AddCell()
+		characterCriteriaRow:AddCell()
+		characterCriteriaRow:AddCell()
+		characterCriteriaRow:AddCell()
 
 		local bodyTypeTree = {
 			BodyType = {
@@ -190,33 +208,48 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			["By Race"] = raceTree,
 			["By Class"] = {
 				ClassDescription = {
-					SubClass = raceTree,
-					["By Race"] = raceTree
+					SubClass = {
+						Race = raceTree.Race,
+						["By Body Type"] = bodyTypeTree,
+						["By Origin"] = {
+							Origin = {}
+						},
+						["By Hireling"] = {
+							Hireling = {}
+						}
+					},
+					["By Race"] = raceTree,
+					["By Body Type"] = bodyTypeTree,
+					["By Origin"] = {
+						Origin = {}
+					},
+					["By Hireling"] = {
+						Hireling = {}
+					}
 				}
 			},
-			["By Body Type"] = bodyTypeTree
+			["By Body Type"] = bodyTypeTree,
+			["By Origin"] = {
+				Origin = {}
+			},
+			["By Hireling"] = {
+				Hireling = {}
+			}
 		}
-
-		classRaceRow:AddCell()
-		classRaceRow:AddCell()
-		classRaceRow:AddCell()
-		classRaceRow:AddCell()
-		classRaceRow:AddCell()
-		classRaceRow:AddCell()
 
 		local function ClearOnSelect(columnIndex, selectable)
 			---@type ExtuiTableCell
-			local cell = classRaceRow.Children[columnIndex]
+			local cell = characterCriteriaRow.Children[columnIndex]
 
 			for _, childSelectable in pairs(cell.Children) do
 				---@cast childSelectable ExtuiSelectable
-				
+
 				if selectable.UserData ~= childSelectable.UserData then
 					childSelectable.Selected = false
 				end
 			end
 
-			for index, columnCell in pairs(classRaceRow.Children) do
+			for index, columnCell in pairs(characterCriteriaRow.Children) do
 				if index > columnIndex then
 					for _, child in pairs(columnCell.Children) do
 						child:Destroy()
@@ -226,15 +259,16 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		end
 
 		--- I know there's a bullet tree, but i like this aesthetic more
+		--- TODO: Sort these alphabetically :sigh:
 		--- @param trunk table
 		--- @param columnIndex number
 		--- @param valueCollection ResourceClassDescription[]|ResourceRace[]?
 		local function BuildHorizontalSelectableTree(trunk, columnIndex, valueCollection)
 			---@type ExtuiTableCell
-			local cell = classRaceRow.Children[columnIndex]
+			local cell = characterCriteriaRow.Children[columnIndex]
 
-			for selectType, children in pairs(trunk) do
-				if selectType == "By Race" or selectType == "By Class" or selectType == "By Body Type" then
+			for selectType, children in TableUtils:OrderedPairs(trunk) do
+				if selectType == "By Race" or selectType == "By Class" or selectType == "By Body Type" or selectType == "By Origin" or selectType == "By Hireling" then
 					local selectable = cell:AddSelectable(selectType)
 					selectable.UserData = selectType
 					selectable.OnActivate = function()
@@ -243,7 +277,9 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 					end
 				elseif selectType == "Race" or selectType == "ClassDescription" then
 					local table = selectType == "Race" and playableRaces or classesAndSubclasses
-					for parentGuid, childResources in pairs(table) do
+					for parentGuid, childResources in TableUtils:OrderedPairs(table, function (key)
+						return Ext.StaticData.Get(key, selectType).Name
+					end) do
 						---@type ResourceRace|ResourceClassDescription
 						local resource = Ext.StaticData.Get(parentGuid, selectType)
 
@@ -272,13 +308,25 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 							BuildHorizontalSelectableTree(children, columnIndex + 1)
 						end
 					end
+				elseif selectType == "Origin" or selectType == "Hireling" then
+					for _, originGuid in pairs(selectType == "Origin" and originCharacters or hirelings) do
+						---@type ResourceOrigin
+						local origin = Ext.StaticData.Get(originGuid, "Origin")
+
+						local selectable = cell:AddSelectable(origin.DisplayName:Get() or origin.Name)
+						selectable.UserData = originGuid
+						selectable.OnActivate = function()
+							ClearOnSelect(columnIndex, selectable)
+							BuildHorizontalSelectableTree(children, columnIndex + 1)
+						end
+					end
 				end
 			end
 		end
 
 		BuildHorizontalSelectableTree(tree, 1)
 
-		--#endregion
+		
 
 		--#region Character Panel
 		tabHeader:AddSeparator()
