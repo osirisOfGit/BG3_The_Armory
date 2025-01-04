@@ -179,9 +179,9 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		charCriteriaHeaders:AddCell():AddText("Subclass")
 		charCriteriaHeaders:AddCell():AddText("Race")
 		charCriteriaHeaders:AddCell():AddText("Subrace")
+		charCriteriaHeaders:AddCell():AddText("BodyType")
 		charCriteriaHeaders:AddCell():AddText("Origin")
 		charCriteriaHeaders:AddCell():AddText("Hireling")
-		charCriteriaHeaders:AddCell():AddText("BodyType")
 
 		local selectionRow = characterCriteriaSelectionTable:AddRow()
 		for _, col in pairs(charCriteriaHeaders.Children) do
