@@ -48,6 +48,8 @@ local function PopulateWeaponTypes()
 	end
 end
 
+local initialized = false
+
 VanityCharacterPanel = {}
 
 ---@type ExtuiGroup
@@ -57,7 +59,8 @@ local panelGroup
 ---@param preset VanityPreset
 ---@param criteriaCompositeKey string
 function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKey)
-	if not weaponTypes["Cloak"] then
+	if not initialized then
+		initialized = true
 		PopulateWeaponTypes()
 	end
 
@@ -114,8 +117,30 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		weaponCols[weaponSlot[1]] = collapse
 	end
 
-	-- https://bg3.norbyte.dev/search?q=type%3Atreasuretable+ST_SimpleMeleeWeapons
-	-- https://bg3.norbyte.dev/search?q=using "_BaseWeapon"&ct=MzaoiTa00DM2NDE0MdFRCi5JLNELzkgsSk3RC09NLMjP0wsP8Iv3SMxJSi1KUYqtAQA%3D
+	local function InitializeOutfitSlot(itemSlot, weaponType)
+		local outfitSlotEntryForItem
+		if not preset.Outfits[criteriaCompositeKey] then
+			preset.Outfits[criteriaCompositeKey] = {}
+		end
+		if not preset.Outfits[criteriaCompositeKey][itemSlot] then
+			preset.Outfits[criteriaCompositeKey][itemSlot] =
+				TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+		end
+		
+		outfitSlotEntryForItem = preset.Outfits[criteriaCompositeKey][itemSlot]
+		
+		if weaponType then
+			if not outfitSlotEntryForItem.weaponTypes then
+				outfitSlotEntryForItem.weaponTypes = {}
+				outfitSlotEntryForItem.weaponTypes[weaponType] =
+					TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+				outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
+			end
+			outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
+		end
+
+		return outfitSlotEntryForItem
+	end
 
 	--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
 	--- so each weapon type can be configured separately as desired. Attaches the Equipment and Dye picker to each configurable slot
@@ -176,22 +201,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					EquipmentPicker:PickForSlot(itemSlot, weaponType,
 						---@param itemTemplate ItemTemplate
 						function(itemTemplate)
-							local outfitSlotEntryForItem
-							if not preset.Outfits[criteriaCompositeKey] then
-								preset.Outfits[criteriaCompositeKey] = {}
-							end
-							if not preset.Outfits[criteriaCompositeKey][itemSlot] then
-								preset.Outfits[criteriaCompositeKey][itemSlot] =
-									TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
-								outfitSlotEntryForItem = preset.Outfits[criteriaCompositeKey][itemSlot]
-							end
-							if weaponType and not outfitSlotEntryForItem.weaponTypes then
-								outfitSlotEntryForItem.weaponTypes = {}
-								outfitSlotEntryForItem.weaponTypes[weaponType] =
-									TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
-
-								outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
-							end
+							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
 
 							outfitSlotEntryForItem.equipment = {
 								guid = itemTemplate.Id,
@@ -215,11 +225,18 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				end
 				dyeButton.SameLine = true
 				dyeButton.OnClick = function()
-					DyePicker:PickDye(imageButton.UserData, itemSlot, dyeButton).UserData = function()
-						if dyeButton.UserData then
+					DyePicker:PickDye(imageButton.UserData, itemSlot,
+						---@param dyeTemplate ItemTemplate
+						function(dyeTemplate)
+							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
+
+							outfitSlotEntryForItem.dye = {
+								guid = dyeTemplate.Id,
+								modDependency = "TODO"
+							}
+
 							BuildSlots(parentContainer, group, verticalSlots, slot)
-						end
-					end
+						end)
 				end
 				--#endregion
 			end

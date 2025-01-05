@@ -56,8 +56,8 @@ local openWindow
 
 ---@param itemTemplate ItemTemplate
 ---@param slot ActualSlot
----@param dyeButton ExtuiImageButton
-function DyePicker:PickDye(itemTemplate, slot, dyeButton)
+---@param onSelectFunc function
+function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 	if not next(rootsByName) then
 		populateTemplateTable()
 	end
@@ -129,7 +129,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		dyeImageButton.Background = { 0, 0, 0, 0.5 }
 		dyeWindow:AddText(templateName).SameLine = true
 
-		local dyeInfoGroup = infoCell:AddGroup(templateName .. dyeButton.Label)
+		local dyeInfoGroup = infoCell:AddGroup(templateName .. slot .. "dye")
 		dyeInfoGroup.Visible = false
 
 		---@type Object
@@ -141,8 +141,7 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 		dyeInfoGroup:AddButton("Select").OnClick = function()
 			activeDyeGroup = nil
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
-			dyeButton.UserData = dyeTemplate
-			searchWindow.UserData()
+			onSelectFunc(dyeTemplate)
 			searchWindow.Open = false
 			openWindow = nil
 		end

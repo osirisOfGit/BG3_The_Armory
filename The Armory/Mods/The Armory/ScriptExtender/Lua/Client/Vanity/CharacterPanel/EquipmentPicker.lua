@@ -111,6 +111,7 @@ local function createItemGroup(itemGroup, itemTemplate, searchWindow, onSelectFu
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		onSelectFunc(itemTemplate)
 		searchWindow.Open = false
+		openWindow:Destroy()
 		openWindow = nil
 	end
 
@@ -138,6 +139,7 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or ""))
 	searchWindow.Closeable = true
 	searchWindow.OnClose = function()
+		openWindow:Destroy()
 		openWindow = nil
 	end
 
@@ -182,28 +184,29 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 		---@type Armor|Weapon|Object
 		local itemStat = Ext.Stats.Get(itemTemplate.Stats)
 
-		-- Try making a logic flow diagram out of this (╬▔皿▔)╯
-		local isTorch = itemSlot == "LightSource" and itemStat.ItemGroup == "Torch"
-		local matchesSlot = itemSlot ~= "LightSource" and itemStat.Slot == itemSlot
-		local matchesWeaponType = not weaponType or string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), weaponType)
-		local canGoInOffhandMelee = itemSlot ~= "Melee Offhand Weapon" or (itemStat.Slot == "Melee Offhand Weapon" or itemStat.Slot == "Melee Main Weapon")
-		local canGoInOffhandRanged = itemSlot ~= "Ranged Offhand Weapon" or (itemStat.Slot == "Ranged Offhand Weapon" or itemStat.Slot == "Ranged Main Weapon")
+		-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
+		local matchesSlot = itemStat.Slot == itemSlot
 
-		-- If the weapon type matches, that takes absolute precendence because the UI limits which slots a weapon type can be searched in
-		-- However, we need to account for non-weapon items, so if the slot does not match, but we were given a weapon type, then we don't skip the item
-		-- Then, there's torches >_>
-		if not matchesWeaponType
-			or (not isTorch
-				and (
-					not matchesSlot
-					and (
-						weaponType == nil
-						or (not canGoInOffhandMelee
-							and not canGoInOffhandRanged)
-					)
-				))
-		then
+		if weaponType and not string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), weaponType) then
 			return
+		elseif itemSlot == "LightSource" and itemStat.ItemGroup ~= "Torch" then
+			return
+		elseif not matchesSlot and itemSlot ~= "LightSource" then
+			local canGoInOffhand = true
+			if string.find(itemSlot, "Offhand") and string.find(itemStat.Slot, "Main") and itemSlot == string.gsub(itemStat.Slot, "Main", "Offhand") then
+				for _, property in pairs(itemStat["Weapon Properties"]) do
+					if property == "Heavy" or property == "Twohanded" then
+						canGoInOffhand = false
+						break
+					end
+				end
+			else 
+				canGoInOffhand = false
+			end
+
+			if not canGoInOffhand then
+				return
+			end
 		end
 
 		local itemGroup = resultGroup:AddChildWindow(itemTemplate.Name)
