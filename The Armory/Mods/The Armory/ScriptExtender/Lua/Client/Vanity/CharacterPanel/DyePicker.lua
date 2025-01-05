@@ -48,9 +48,6 @@ DyePicker = {}
 ---@type DyePayload
 local dyePayload = {}
 
----@type ExtuiGroup?
-local activeDyeGroup
-
 ---@type ExtuiWindow?
 local openWindow
 
@@ -61,21 +58,23 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 	if not next(rootsByName) then
 		populateTemplateTable()
 	end
-
-	local searchWindow = Ext.IMGUI.NewWindow("")
-	searchWindow.IDContext = "Dye"
-	searchWindow.Label = string.format("Searching for %s Dyes", slot)
+	
+	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s Dyes", slot))
 	searchWindow.Closeable = true
 	searchWindow.OnClose = function()
+		openWindow:Destroy()
 		openWindow = nil
 	end
-
+	
 	if openWindow then
 		openWindow.Open = false
 		openWindow:Destroy()
 	end
 	openWindow = searchWindow
-
+	
+	---@type ExtuiGroup?
+	local activeDyeGroup
+	
 	--#region Input
 	local searchInput = searchWindow:AddInputText("")
 	searchInput.Hint = "Case-insensitive"
@@ -105,11 +104,11 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 
 	local row = resultTable:AddRow()
 	local dyeCell = row:AddCell()
+	-- Child window isn't resizing according to its contents, aboslutely no idea why, i'm extremely tired of spending time on it
+	-- I want the scroll just for this column, not the whole table, so i need it to be a child window.
+	dyeCell:AddText("                               ")
 	local dyeWindow = dyeCell:AddChildWindow("DyeResults")
-	dyeWindow.HorizontalScrollbar = true
 	dyeWindow.NoSavedSettings = true
-	dyeWindow.ChildAlwaysAutoResize = true
-	dyeWindow.AutoResizeX = true
 
 	local infoCell = row:AddCell()
 
@@ -130,7 +129,10 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 		dyeWindow:AddText(templateName).SameLine = true
 
 		local dyeInfoGroup = infoCell:AddGroup(templateName .. slot .. "dye")
-		dyeInfoGroup.Visible = false
+		dyeInfoGroup.Visible = not activeDyeGroup
+		if not activeDyeGroup then
+			activeDyeGroup = dyeInfoGroup
+		end
 
 		---@type Object
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
@@ -143,6 +145,7 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
 			onSelectFunc(dyeTemplate)
 			searchWindow.Open = false
+			openWindow:Destroy()
 			openWindow = nil
 		end
 		dyeInfoGroup:AddSeparator()

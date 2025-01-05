@@ -200,7 +200,7 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 						break
 					end
 				end
-			else 
+			else
 				canGoInOffhand = false
 			end
 
