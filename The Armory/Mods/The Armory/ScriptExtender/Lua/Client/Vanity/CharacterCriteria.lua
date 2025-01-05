@@ -93,24 +93,37 @@ VanityCharacterCriteria.CriteriaType = {
 	[7] = "Hireling"
 }
 
----@param ... string[] of VanityCharacterCriteria values to concat into an ordered key
+---@param criteriaTable {[VanityCharacterCriteriaType] : string} of VanityCharacterCriteria values to concat into an ordered key
 ---@return string compositeKey
-function VanityCharacterCriteria:CreateCriteriaCompositeKey(...)
-	local criteria = { ... }
-	table.sort(criteria, function(a, b)
-		return VanityCharacterCriteria.CriteriaType[a] < VanityCharacterCriteria.CriteriaType[b]
-	end)
+function VanityCharacterCriteria:CreateCriteriaCompositeKey(criteriaTable)
+	local criteria = {}
+	for i = 1, 7 do
+		criteria[i] = criteriaTable[VanityCharacterCriteria.CriteriaType[i]] or ""
+	end
 	return table.concat(criteria, "|")
 end
 
----@param compositeKey string
----@return string[] VanityCharacterCriteriaType
-function VanityCharacterCriteria:DeconstructCriteriaCompositeKey(compositeKey)
-	local criteria = {}
-	for criterion in string.gmatch(compositeKey, "([^|]+)") do
-		table.insert(criteria, criterion)
+local function split(inputstr, sep)
+	if sep == nil then
+		sep = "%s"
 	end
-	return criteria
+	local t = {}
+	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+		table.insert(t, str)
+	end
+	return t
+end
+
+---@param compositeKey string the composite key to parse
+---@return {[VanityCharacterCriteriaType] : string} criteriaTable
+function VanityCharacterCriteria:ParseCriteriaCompositeKey(compositeKey)
+	local criteriaTable = {}
+
+	local criteria = split(compositeKey, "|")
+	for i = 1, 7 do
+		criteriaTable[VanityCharacterCriteria.CriteriaType[i]] = criteria[i] or ""
+	end
+	return criteriaTable
 end
 
 ---@param tabHeader ExtuiTreeParent
@@ -121,17 +134,14 @@ function VanityCharacterCriteria:BuildModule(tabHeader)
 		PopulateOriginCharacters()
 	end
 
-	local characterCriteriaSection = tabHeader:AddCollapsingHeader("Configure per Race/Class/BodyType")
+	local characterCriteriaSection = tabHeader:AddCollapsingHeader("Configure by Character Criteria")
 	local characterCriteriaSelectionTable = tabHeader:AddTable("CharacterCriteraSelection", 7)
 	local charCriteriaHeaders = characterCriteriaSelectionTable:AddRow()
 	charCriteriaHeaders.Headers = true
-	charCriteriaHeaders:AddCell():AddText("Class")
-	charCriteriaHeaders:AddCell():AddText("Subclass")
-	charCriteriaHeaders:AddCell():AddText("Race")
-	charCriteriaHeaders:AddCell():AddText("Subrace")
-	charCriteriaHeaders:AddCell():AddText("BodyType")
-	charCriteriaHeaders:AddCell():AddText("Origin")
-	charCriteriaHeaders:AddCell():AddText("Hireling")
+
+	for _, criteriaType in ipairs(VanityCharacterCriteria.CriteriaType) do
+		charCriteriaHeaders:AddCell():AddText(criteriaType)
+	end
 
 	local selectionRow = characterCriteriaSelectionTable:AddRow()
 	for _, col in pairs(charCriteriaHeaders.Children) do

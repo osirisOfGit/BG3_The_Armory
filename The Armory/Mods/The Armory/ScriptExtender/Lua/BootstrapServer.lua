@@ -9,4 +9,5 @@ Ext.Require("Server/_ConfigManager.lua")
 Ext.Require("Server/Utility.lua")
 
 Ext.Require("Server/Vanity/ItemPreview.lua")
+Ext.Require("Server/Vanity/MiscClientHelpers.lua")
 Ext.Require("Server/Vanity/DyePreview.lua")

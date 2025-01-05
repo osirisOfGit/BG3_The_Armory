@@ -5,6 +5,8 @@ local real_config_table = {}
 local initialized = false
 local updateTimer
 
+local informedUserOfHostRestriction = false
+
 -- This allows us to react to any changes made to fields at any level in the structure and send a NetMessage
 -- just by defining the base table, ConfigurationStructure.config. Client/* implementations can now
 -- reference any slice of this table and allow their IMGUI elements to modify the table without
@@ -58,10 +60,11 @@ local function generate_recursive_metatable(proxy_table, real_table)
 					FileUtils:SaveTableToFile("config.json", real_config_table)
 					Logger:BasicDebug("Configuration updates made - sending updated table to server")
 
-					if Ext.ClientNet.IsHost() then
+					if Ext.ClientNet.IsHost()  then
 						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_UpdateConfiguration", "")
-					else
-						Logger:BasicWarning("You're not the host of this session, so not updating the server configs - your local config is still updated")
+					elseif not informedUserOfHostRestriction then
+						informedUserOfHostRestriction = true
+						Logger:BasicWarning("You're not the host of this session, so not updating the server configs - your local config is still updated. This log will not appear again this session.")
 					end
 				end)
 			end
@@ -76,6 +79,7 @@ ConfigurationStructure.config = generate_recursive_metatable({}, real_config_tab
 
 Ext.Require("Shared/RarityEnum.lua")
 Ext.Require("Shared/SlotEnum.lua")
+Ext.Require("Shared/Configurations/VanityConfig.lua")
 
 local function CopyConfigsIntoReal(table_from_file, proxy_table)
 	for key, value in pairs(table_from_file) do

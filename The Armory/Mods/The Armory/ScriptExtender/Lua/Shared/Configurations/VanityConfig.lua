@@ -6,6 +6,19 @@ ConfigurationStructure.config.vanity = {}
 ConfigurationStructure.config.vanity.settings = {
 	general = {
 		applyDyesWhenPreviewingEquipment = true
+	},
+	equipment = {
+		---@type Guid[]
+		favorites = {},
+		imageSize = 90,
+		rowSize = 4,
+		showNames = true
+	},
+	dyes = {
+		---@type Guid[]
+		favorites = {},
+		showDyeNames = true,
+		imageSize = 90
 	}
 }
 --#endregion
@@ -41,7 +54,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.outfit = {}
 ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	Author = "",
 	Name = "",
-	Description = "",
+	Notes = "",
 	Version = "",
 	---@type Guid?
 	ModSourced = nil,
@@ -51,7 +64,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	Outfits = {},
 }
 
----@type VanityPreset[]
+---@type {[Guid]: VanityPreset}
 ConfigurationStructure.config.vanity.presets = {}
 
 --#endregion

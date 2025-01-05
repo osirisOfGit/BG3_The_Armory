@@ -2,6 +2,17 @@ Ext.Require("Client/Vanity/PresetPicker.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 Ext.Require("Client/Vanity/CharacterPanel/CharacterPanel.lua")
 
+Vanity = {}
+
+---@type VanityPreset?
+Vanity.activePreset = nil
+Vanity.userName = ""
+
+Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, userID)
+	Vanity.username = payload
+end)
+
+Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
 
 Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	--- @param tabHeader ExtuiTreeParent
@@ -29,22 +40,6 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		presetPickerButton.OnClick = function ()
 			VanityPresetPicker:OpenPicker()
 		end
-		presetPickerButton.PositionOffset = { 300, 0 }
-		local presetCombo = tabHeader:AddCombo("")
-		presetCombo.SameLine = true
-		presetCombo.WidthFitPreview = true
-		presetCombo.Options = { "Preset1", "Preset2", "Preset3" }
-
-		local copyPresetButton = tabHeader:AddButton("Clone")
-		copyPresetButton.PositionOffset = { 200, 0 }
-
-		local previewPresetButton = tabHeader:AddButton("Preview")
-		previewPresetButton.SameLine = true
-		previewPresetButton.PositionOffset = { 100, 0 }
-
-		local applyPresetButton = tabHeader:AddButton("Apply")
-		applyPresetButton.SameLine = true
-		applyPresetButton.PositionOffset = { 100, 0 }
 		--#endregion
 
 		VanityCharacterCriteria:BuildModule(tabHeader)
