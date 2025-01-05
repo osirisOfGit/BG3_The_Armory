@@ -75,8 +75,9 @@ end
 ---@param itemTemplate ItemTemplate
 ---@param imageButton ExtuiImageButton
 ---@param searchWindow ExtuiWindow
+---@param onSelectFunc function
 ---@return ExtuiImageButton
-local function createItemGroup(itemGroup, itemTemplate, imageButton, searchWindow)
+local function createItemGroup(itemGroup, itemTemplate, searchWindow, onSelectFunc)
 	local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { imageSize, imageSize })
 	if icon.Image.Icon == "" then
 		icon:Destroy()
@@ -108,8 +109,7 @@ local function createItemGroup(itemGroup, itemTemplate, imageButton, searchWindo
 
 	icon.OnClick = function()
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
-		imageButton.UserData = itemTemplate
-		searchWindow.UserData()
+		onSelectFunc(itemTemplate)
 		searchWindow.Open = false
 		openWindow = nil
 	end
@@ -124,9 +124,9 @@ end
 ---@alias ActualWeaponType string
 
 ---@param slot ActualSlot
----@param slotButton ExtuiImageButton
----@param weaponType ActualWeaponType
-function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
+---@param weaponType ActualWeaponType?
+---@param onSelectFunc function
+function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 	if not next(rootsByName) then
 		populateTemplateTable()
 	end
@@ -212,14 +212,14 @@ function EquipmentPicker:PickForSlot(slot, slotButton, weaponType)
 		itemGroup.ChildAlwaysAutoResize = true
 		itemGroup.SameLine = rowCount <= numPerRow
 
-		local favoriteButton = createItemGroup(itemGroup, itemTemplate, slotButton, searchWindow)
+		local favoriteButton = createItemGroup(itemGroup, itemTemplate, searchWindow, onSelectFunc)
 
 		favoriteButton.OnClick = function()
 			local favoriteItemGroup = favoritesGroup:AddChildWindow(itemTemplate.Name .. "_favorite")
 			favoriteItemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
 			favoriteItemGroup.ChildAlwaysAutoResize = true
 			favoriteItemGroup.SameLine = rowCount <= numPerRow
-			createItemGroup(favoriteItemGroup, itemTemplate, slotButton, searchWindow)
+			createItemGroup(favoriteItemGroup, itemTemplate, searchWindow, onSelectFunc)
 		end
 
 		if rowCount > numPerRow then

@@ -28,26 +28,29 @@ ConfigurationStructure.DynamicClassDefinitions.vanity = {}
 
 ---@class ModDependency
 ConfigurationStructure.DynamicClassDefinitions.modDependency = {
-	Guid = "",
-	Version = ""
+	Guid = nil,
+	Version = nil
 }
 
 ---@class VanityOutfitItemEntry
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfitItemEntry = {
-	guid = "",
-	modDependency = ConfigurationStructure.DynamicClassDefinitions.modDependency
+	guid = nil,
+	---@type ModDependency
+	modDependency = nil,
 }
 
 ---@class VanityOutfitSlot
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot = {
-	equipment = ConfigurationStructure.DynamicClassDefinitions.vanity.outfitItemEntry,
-	dye = ConfigurationStructure.DynamicClassDefinitions.vanity.outfitItemEntry,
+	---@type VanityOutfitItemEntry
+	equipment = nil,
+	---@type {[VanityWeaponType]: VanityOutfitSlot}
+	weaponTypes = nil,
+	---@type VanityOutfitItemEntry
+	dye = nil,
 }
 
 ---@alias VanityWeaponType string
 
----@class VanityOutfit
----@type {[ActualSlot|VanityWeaponType]: VanityOutfitSlot}
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfit = {}
 
 ---@class VanityPreset
@@ -60,7 +63,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	ModSourced = nil,
 	---@type ModDependency[]
 	ModDependencies = {},
-	---@type {[VanityCriteriaCompositeKey] : VanityOutfit}
+	---@type {[VanityCriteriaCompositeKey] : {[ActualSlot]: VanityOutfitSlot}}
 	Outfits = {},
 }
 

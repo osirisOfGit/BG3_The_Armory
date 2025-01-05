@@ -139,7 +139,8 @@ function VanityPresetManager:UpdatePresetView()
 			presetActivelyViewing = presetGroup
 			
 			presetGroup:AddButton("Activate This Preset").OnClick = function ()
-				Vanity:ActivatePreset(preset)
+				-- Pairs iterates through the real table, so need to make sure to pass the proxy one for updates
+				Vanity:ActivatePreset(ConfigurationStructure.config.vanity.presets[guid])
 			end
 			presetGroup:AddButton("Delete This Preset").OnClick = function ()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true

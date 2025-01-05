@@ -1,3 +1,5 @@
+Ext.Require("Client/Vanity/CharacterPanel/CharacterPanel.lua")
+
 ---@type {[Guid]: ResourceRace[]}
 local playableRaces = {}
 
@@ -128,15 +130,6 @@ end
 
 local activeCriteria = {}
 
----@param criteriaType VanityCharacterCriteriaType
----@param value string
----@return string VanityCriteriaCompositeKey
-local function updateActiveCriteria(criteriaType, value)
-	activeCriteria[criteriaType] = value
-
-	return VanityCharacterCriteria:CreateCriteriaCompositeKey(activeCriteria)
-end
-
 ---@type ExtuiGroup
 local criteriaGroup
 
@@ -159,23 +152,20 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 	local characterCriteriaSection = criteriaGroup:AddCollapsingHeader("Configure by Character Criteria")
 	characterCriteriaSection.DefaultOpen = true
-	local characterCriteriaSelectionTable = criteriaGroup:AddTable("CharacterCriteraSelection", 7)
-	local charCriteriaHeaders = characterCriteriaSelectionTable:AddRow()
+	local criteriaSelectionDisplayTable = criteriaGroup:AddTable("CharacterCriteraSelection", 7)
+	local charCriteriaHeaders = criteriaSelectionDisplayTable:AddRow()
 	charCriteriaHeaders.Headers = true
 
+	local selectedCriteriaDisplayRow = criteriaSelectionDisplayTable:AddRow()
 	for _, criteriaType in ipairs(VanityCharacterCriteria.CriteriaType) do
 		charCriteriaHeaders:AddCell():AddText(criteriaType)
-	end
-
-	local selectionRow = characterCriteriaSelectionTable:AddRow()
-	for _, col in pairs(charCriteriaHeaders.Children) do
-		local cell = selectionRow:AddCell()
-		cell.UserData = col.Children[1].Label
+		local cell = selectedCriteriaDisplayRow:AddCell()
+		cell.UserData = criteriaType
 		cell:AddText("---")
 	end
 
 	local function findTextToUpdate(selectType, selectable)
-		for _, cell in pairs(selectionRow.Children) do
+		for _, cell in pairs(selectedCriteriaDisplayRow.Children) do
 			if cell.UserData == selectType then
 				cell.Children[1].Label = selectable.Label
 			end
@@ -252,7 +242,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 			if selectable.Label ~= childSelectable.Label then
 				if childSelectable.Selected then
-					for _, selectedTextCell in pairs(selectionRow.Children) do
+					for _, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
 						if selectedTextCell.Children[1].Label == childSelectable.Label then
 							selectedTextCell.Children[1].Label = "---"
 						end
@@ -265,8 +255,9 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		for index, columnCell in pairs(characterCriteriaRow.Children) do
 			if index > columnIndex then
 				for _, child in pairs(columnCell.Children) do
-					for _, selectedTextCell in pairs(selectionRow.Children) do
+					for colIndex, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
 						if selectedTextCell.Children[1].Label == child.Label then
+							activeCriteria[VanityCharacterCriteria.CriteriaType[colIndex]] = nil
 							selectedTextCell.Children[1].Label = "---"
 						end
 					end
@@ -280,28 +271,32 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	--- @param trunk table
 	--- @param columnIndex number
 	--- @param valueCollection ResourceClassDescription[]|ResourceRace[]?
-	local function BuildHorizontalSelectableTree(trunk, columnIndex, valueCollection, compositeKey)
+	local function BuildHorizontalSelectableTree(trunk, columnIndex, valueCollection, compositeKeyForHighlighting)
 		---@type ExtuiTableCell
 		local cell = characterCriteriaRow.Children[columnIndex]
 
 		local function buildSelectable(selectType, selectValue, children, childResources)
 			local selectable = cell:AddSelectable(selectValue)
-			
+			selectable.UserData = selectType
+
 			if not string.find(selectType, "By") then
-				compositeKey[selectType] = selectable.Label
-				if preset.Outfits[VanityCharacterCriteria:CreateCriteriaCompositeKey(compositeKey)] then
-					selectable:SetColor("TextSelectedBg", { 144 / 255, 238 / 255, 144 / 255, 1 })
+				compositeKeyForHighlighting[selectType] = selectable.Label
+				if preset.Outfits[VanityCharacterCriteria:CreateCriteriaCompositeKey(compositeKeyForHighlighting)] then
+					selectable:SetColor("FrameBg", { 144 / 255, 238 / 255, 144 / 255, 1 })
 				end
 			end
 
 			selectable.OnActivate = function()
 				ClearOnSelect(columnIndex, selectable)
 				findTextToUpdate(selectType, selectable)
+				compositeKeyForHighlighting = activeCriteria
 				if not string.find(selectType, "By") then
 					activeCriteria[selectType] = selectable.Label
-					compositeKey[selectType] = selectable.Label
+					compositeKeyForHighlighting[selectType] = selectable.Label
 				end
-				BuildHorizontalSelectableTree(children, columnIndex + 1, childResources, compositeKey or {})
+				BuildHorizontalSelectableTree(children, columnIndex + 1, childResources, compositeKeyForHighlighting or {})
+
+				VanityCharacterPanel:BuildModule(tabHeader, preset, VanityCharacterCriteria:CreateCriteriaCompositeKey(activeCriteria))
 			end
 		end
 

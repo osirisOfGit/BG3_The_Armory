@@ -50,15 +50,27 @@ end
 
 VanityCharacterPanel = {}
 
+---@type ExtuiGroup
+local panelGroup
+
 ---@param tabHeader ExtuiTreeParent
-function VanityCharacterPanel:BuildModule(tabHeader)
+---@param preset VanityPreset
+---@param criteriaCompositeKey string
+function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKey)
 	if not weaponTypes["Cloak"] then
 		PopulateWeaponTypes()
 	end
 
-	tabHeader:AddSeparator()
+	if not panelGroup then
+		panelGroup = tabHeader:AddGroup("CharacterPanel")
+	else
+		for _, child in pairs(panelGroup.Children) do
+			child:Destroy()
+		end
+	end
+	panelGroup:AddSeparator()
 
-	local displayTable = tabHeader:AddTable("SlotDisplayTable", 5)
+	local displayTable = panelGroup:AddTable("SlotDisplayTable", 5)
 	displayTable.ScrollY = true
 	displayTable:AddColumn("Equipment", "WidthFixed")
 	local displayRow = displayTable:AddRow()
@@ -112,63 +124,98 @@ function VanityCharacterPanel:BuildModule(tabHeader)
 	---@param verticalSlots boolean
 	---@param slot string
 	local function BuildSlots(parentContainer, group, verticalSlots, slot)
-		local userDataCopy = {
-		}
-
 		for _, child in pairs(parentContainer.Children) do
 			if child.UserData ~= "keep" then
-				-- Will be nil if the slot is empty, which is pointless here, but i'm lazy right now
-				userDataCopy[child.Label] = child.UserData
 				child:Destroy()
 			end
 		end
 
-		for i, button in ipairs(group) do
+		local outfit = preset.Outfits[criteriaCompositeKey]
+
+		for i, itemSlotOrWeaponTypeEntry in ipairs(group) do
 			local imageButton
-			if button[1] == "Dummy" then
+			if itemSlotOrWeaponTypeEntry[1] == "Dummy" then
 				imageButton = parentContainer:AddDummy(116, 60)
-				imageButton.Label = button[2]
+				imageButton.Label = itemSlotOrWeaponTypeEntry[2]
 			else
 				---@cast imageButton ExtuiImageButton
 
-				local slotForImageButton = slot or button[1]
+				local itemSlot = slot or itemSlotOrWeaponTypeEntry[1]
+				local weaponType = itemSlot ~= itemSlotOrWeaponTypeEntry[1] and itemSlotOrWeaponTypeEntry[1] or nil
+				---@type VanityOutfitSlot?
+				local outfitSlotEntry
+
+				if outfit and outfit[itemSlot] then
+					if weaponType then
+						if outfit[itemSlot].weaponTypes and outfit[itemSlot].weaponTypes[weaponType] then
+							outfitSlotEntry = outfit[itemSlot].weaponTypes[weaponType]
+						end
+					else
+						outfitSlotEntry = outfit[itemSlot]
+					end
+				end
 
 				--#region Equipment
-				if userDataCopy[button[1]] then
-					local itemTemplate = userDataCopy[button[1]]
-					imageButton = parentContainer:AddImageButton(button[1], itemTemplate.Icon)
+				if outfitSlotEntry then
+					---@type ItemTemplate
+					local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
+
+					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
 					if imageButton.Image.Icon == "" then
 						imageButton:Destroy()
-						imageButton = parentContainer:AddImageButton(button[1], "Item_Unknown")
+						imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
 					end
 					imageButton.UserData = itemTemplate
 				else
-					imageButton = parentContainer:AddImageButton(button[1], button[2])
+					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 				end
 				imageButton.Image.Size = { 60, 60 }
 				imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 				imageButton.OnClick = function()
 					-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
-					EquipmentPicker:PickForSlot(slotForImageButton, imageButton, slotForImageButton ~= button[1] and button[1] or nil).UserData = function()
-						if imageButton.UserData then
+					EquipmentPicker:PickForSlot(itemSlot, weaponType,
+						---@param itemTemplate ItemTemplate
+						function(itemTemplate)
+							local outfitSlotEntryForItem
+							if not preset.Outfits[criteriaCompositeKey] then
+								preset.Outfits[criteriaCompositeKey] = {}
+							end
+							if not preset.Outfits[criteriaCompositeKey][itemSlot] then
+								preset.Outfits[criteriaCompositeKey][itemSlot] =
+									TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+								outfitSlotEntryForItem = preset.Outfits[criteriaCompositeKey][itemSlot]
+							end
+							if weaponType and not outfitSlotEntryForItem.weaponTypes then
+								outfitSlotEntryForItem.weaponTypes = {}
+								outfitSlotEntryForItem.weaponTypes[weaponType] =
+									TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+
+								outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
+							end
+
+							outfitSlotEntryForItem.equipment = {
+								guid = itemTemplate.Id,
+								modDependency = "TODO"
+							}
 							BuildSlots(parentContainer, group, verticalSlots, slot)
-						end
-					end
+						end)
 				end
 				--#endregion
 
 				--#region Dyes
 				local dyeButton
-				if userDataCopy[slotForImageButton .. " Dye"] then
-					local dyeTemplate = userDataCopy[slotForImageButton .. " Dye"]
-					dyeButton = parentContainer:AddImageButton(slotForImageButton .. " Dye", dyeTemplate.Icon, { 32, 32 })
+
+				if outfitSlotEntry and outfitSlotEntry.dye then
+					---@type ItemTemplate
+					local dyeTemplate = Ext.Template.GetTemplate(outfitSlotEntry.dye.guid)
+					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
 					dyeButton.UserData = dyeTemplate
 				else
-					dyeButton = parentContainer:AddImageButton(slotForImageButton .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 				end
 				dyeButton.SameLine = true
 				dyeButton.OnClick = function()
-					DyePicker:PickDye(imageButton.UserData, slotForImageButton, dyeButton).UserData = function()
+					DyePicker:PickDye(imageButton.UserData, itemSlot, dyeButton).UserData = function()
 						if dyeButton.UserData then
 							BuildSlots(parentContainer, group, verticalSlots, slot)
 						end
@@ -194,5 +241,3 @@ function VanityCharacterPanel:BuildModule(tabHeader)
 		BuildSlots(weaponCols[slot], group, true, slot)
 	end
 end
-
-

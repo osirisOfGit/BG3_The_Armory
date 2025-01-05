@@ -1,6 +1,5 @@
 Ext.Require("Client/Vanity/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
-Ext.Require("Client/Vanity/CharacterPanel/CharacterPanel.lua")
 
 Vanity = {}
 
@@ -58,6 +57,4 @@ function Vanity:ActivatePreset(preset)
 	separator.Label = "Active Preset: " .. preset.Name
 
 	VanityCharacterCriteria:BuildModule(mainParent, preset)
-
-	VanityCharacterPanel:BuildModule(mainParent, preset)
 end
