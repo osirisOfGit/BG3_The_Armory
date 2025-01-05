@@ -1,4 +1,4 @@
-Ext.Require("Client/Vanity/PresetPicker.lua")
+Ext.Require("Client/Vanity/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 Ext.Require("Client/Vanity/CharacterPanel/CharacterPanel.lua")
 
@@ -12,11 +12,19 @@ Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, use
 	Vanity.username = payload
 end)
 
-Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
+-- dirty hack to avoid warnings, fix later
+pcall(function() Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "") end)
+
+---@type ExtuiTreeParent
+local mainParent
+
+---@type ExtuiSeparatorText
+local separator
 
 Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	--- @param tabHeader ExtuiTreeParent
 	function(tabHeader)
+		mainParent = tabHeader
 		--EventChannels.MCM_WINDOW_CLOSED = "MCM_Window_Closed"
 
 		--#region Settings
@@ -32,17 +40,24 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		previewMenu:AddCheckbox("Apply Dyes When Previewing Equipment", true)
 		--#endregion
 
-		tabHeader.TextWrapPos = 0
-
 		--#region Presets
-		
-		local presetPickerButton = tabHeader:AddButton("Select a Preset")
-		presetPickerButton.OnClick = function ()
-			VanityPresetPicker:OpenPicker()
+		local presetPickerButton = tabHeader:AddButton("Preset Manager")
+		presetPickerButton.OnClick = function()
+			VanityPresetManager:OpenManager()
 		end
 		--#endregion
 
-		VanityCharacterCriteria:BuildModule(tabHeader)
-
-		VanityCharacterPanel:BuildModule(tabHeader)
+		separator = tabHeader:AddSeparatorText("Choose A Preset")
+		separator:SetStyle("SeparatorTextAlign", 0.5)
 	end)
+
+---comment
+---@param preset VanityPreset
+function Vanity:ActivatePreset(preset)
+	Vanity.activePreset = preset
+	separator.Label = "Active Preset: " .. preset.Name
+
+	VanityCharacterCriteria:BuildModule(mainParent, preset)
+
+	VanityCharacterPanel:BuildModule(mainParent, preset)
+end

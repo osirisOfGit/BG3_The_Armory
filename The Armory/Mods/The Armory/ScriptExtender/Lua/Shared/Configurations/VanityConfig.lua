@@ -56,7 +56,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	Name = "",
 	Notes = "",
 	Version = "",
-	---@type Guid?
+	---@type ModDependency?
 	ModSourced = nil,
 	---@type ModDependency[]
 	ModDependencies = {},
