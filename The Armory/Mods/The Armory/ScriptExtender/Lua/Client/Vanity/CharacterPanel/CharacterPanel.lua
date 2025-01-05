@@ -180,7 +180,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				end
 
 				--#region Equipment
-				if outfitSlotEntry then
+				if outfitSlotEntry and outfitSlotEntry.equipment then
 					---@type ItemTemplate
 					local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
 

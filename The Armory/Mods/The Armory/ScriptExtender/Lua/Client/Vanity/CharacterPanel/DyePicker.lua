@@ -59,7 +59,7 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 		populateTemplateTable()
 	end
 	
-	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s Dyes", slot))
+	local searchWindow = Ext.IMGUI.NewWindow("Dye Picker")
 	searchWindow.Closeable = true
 	searchWindow.OnClose = function()
 		openWindow:Destroy()
@@ -71,6 +71,8 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 		openWindow:Destroy()
 	end
 	openWindow = searchWindow
+
+	searchWindow:AddSeparatorText(string.format("Searching for %s Dyes", slot)):SetStyle("SeparatorTextAlign", 0.5)
 	
 	---@type ExtuiGroup?
 	local activeDyeGroup
@@ -106,7 +108,7 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 	local dyeCell = row:AddCell()
 	-- Child window isn't resizing according to its contents, aboslutely no idea why, i'm extremely tired of spending time on it
 	-- I want the scroll just for this column, not the whole table, so i need it to be a child window.
-	dyeCell:AddText("                               ")
+	dyeCell:AddText("                                                                    ")
 	local dyeWindow = dyeCell:AddChildWindow("DyeResults")
 	dyeWindow.NoSavedSettings = true
 

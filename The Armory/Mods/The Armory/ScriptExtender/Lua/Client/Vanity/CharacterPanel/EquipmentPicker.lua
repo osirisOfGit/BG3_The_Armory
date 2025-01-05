@@ -136,7 +136,7 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 
 	local itemSlot = string.find(slot, "Ring") and "Ring" or slot
 
-	local searchWindow = Ext.IMGUI.NewWindow(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or ""))
+	local searchWindow = Ext.IMGUI.NewWindow("Equipment Picker")
 	searchWindow.Closeable = true
 	searchWindow.OnClose = function()
 		openWindow:Destroy()
@@ -148,6 +148,8 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 		openWindow:Destroy()
 	end
 	openWindow = searchWindow
+
+	searchWindow:AddSeparatorText(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or "")):SetStyle("SeparatorTextAlign", 0.5)
 
 	--#region Input
 	local searchInput = searchWindow:AddInputText("")
