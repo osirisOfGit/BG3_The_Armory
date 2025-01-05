@@ -242,8 +242,9 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 			if selectable.Label ~= childSelectable.Label then
 				if childSelectable.Selected then
-					for _, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
+					for colIndex, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
 						if selectedTextCell.Children[1].Label == childSelectable.Label then
+							activeCriteria[VanityCharacterCriteria.CriteriaType[colIndex]] = nil
 							selectedTextCell.Children[1].Label = "---"
 						end
 					end
@@ -251,7 +252,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 				childSelectable.Selected = false
 			end
 		end
-
+		
 		for index, columnCell in pairs(characterCriteriaRow.Children) do
 			if index > columnIndex then
 				for _, child in pairs(columnCell.Children) do
@@ -275,24 +276,25 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		---@type ExtuiTableCell
 		local cell = characterCriteriaRow.Children[columnIndex]
 
-		local function buildSelectable(selectType, selectValue, children, childResources)
+		local function buildSelectable(selectType, resourceId, selectValue, children, childResources)
+			---@type ExtuiSelectable
 			local selectable = cell:AddSelectable(selectValue)
 			selectable.UserData = selectType
 
 			if not string.find(selectType, "By") then
-				compositeKeyForHighlighting[selectType] = selectable.Label
+				compositeKeyForHighlighting[selectType] = resourceId
 				if preset.Outfits[VanityCharacterCriteria:CreateCriteriaCompositeKey(compositeKeyForHighlighting)] then
-					selectable:SetColor("FrameBg", { 144 / 255, 238 / 255, 144 / 255, 1 })
+					selectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 				end
 			end
 
 			selectable.OnActivate = function()
 				ClearOnSelect(columnIndex, selectable)
 				findTextToUpdate(selectType, selectable)
-				compositeKeyForHighlighting = activeCriteria
+				compositeKeyForHighlighting = TableUtils:DeeplyCopyTable(activeCriteria)
 				if not string.find(selectType, "By") then
-					activeCriteria[selectType] = selectable.Label
-					compositeKeyForHighlighting[selectType] = selectable.Label
+					activeCriteria[selectType] = resourceId
+					compositeKeyForHighlighting[selectType] = resourceId
 				end
 				BuildHorizontalSelectableTree(children, columnIndex + 1, childResources, compositeKeyForHighlighting or {})
 
@@ -302,7 +304,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 		for selectType, children in TableUtils:OrderedPairs(trunk) do
 			if selectType == "By Race" or selectType == "By Class" or selectType == "By Body Type" or selectType == "By Origin" or selectType == "By Hireling" then
-				buildSelectable(selectType, selectType, children, nil)
+				buildSelectable(selectType, nil, selectType, children, nil)
 			elseif selectType == "Race" or selectType == "Class" then
 				-- TODO: Really clean up this mess
 				local table = selectType == "Race" and playableRaces or classesAndSubclasses
@@ -312,22 +314,22 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 					---@type ResourceRace|ResourceClassDescription
 					local resource = Ext.StaticData.Get(parentGuid, selectType == "Race" and selectType or "ClassDescription")
 
-					buildSelectable(selectType, resource.DisplayName:Get() or resource.Name, children, childResources)
+					buildSelectable(selectType, resource.ResourceUUID, resource.DisplayName:Get() or resource.Name, children, childResources)
 				end
 			elseif selectType == "Subrace" or selectType == "Subclass" then
 				for _, childResource in pairs(valueCollection) do
-					buildSelectable(selectType, childResource.DisplayName:Get() or childResource.Name, children, nil)
+					buildSelectable(selectType, childResource.ResourceUUID, childResource.DisplayName:Get() or childResource.Name, children, nil)
 				end
 			elseif selectType == "BodyType" then
 				for _, bodyType in pairs(children) do
-					buildSelectable(selectType, bodyType, children, nil)
+					buildSelectable(selectType, bodyType, bodyType, children, nil)
 				end
 			elseif selectType == "Origin" or selectType == "Hireling" then
 				for _, originGuid in pairs(selectType == "Origin" and originCharacters or hirelings) do
 					---@type ResourceOrigin
 					local origin = Ext.StaticData.Get(originGuid, "Origin")
 
-					buildSelectable(selectType, origin.DisplayName:Get() or origin.Name, children, nil)
+					buildSelectable(selectType, origin.ResourceUUID, origin.DisplayName:Get() or origin.Name, children, nil)
 				end
 			end
 		end
