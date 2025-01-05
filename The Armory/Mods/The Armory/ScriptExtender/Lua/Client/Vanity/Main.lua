@@ -1,3 +1,4 @@
+Ext.Require("Client/Vanity/PresetPicker.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 Ext.Require("Client/Vanity/CharacterPanel/CharacterPanel.lua")
 
@@ -23,7 +24,12 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		tabHeader.TextWrapPos = 0
 
 		--#region Presets
-		tabHeader:AddText("Select a Preset").PositionOffset = { 300, 0 }
+		
+		local presetPickerButton = tabHeader:AddButton("Select a Preset")
+		presetPickerButton.OnClick = function ()
+			VanityPresetPicker:OpenPicker()
+		end
+		presetPickerButton.PositionOffset = { 300, 0 }
 		local presetCombo = tabHeader:AddCombo("")
 		presetCombo.SameLine = true
 		presetCombo.WidthFitPreview = true

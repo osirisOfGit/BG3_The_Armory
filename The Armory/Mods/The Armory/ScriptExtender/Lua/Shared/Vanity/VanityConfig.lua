@@ -1,3 +1,0 @@
-ConfigurationStructure.config.vanity = {}
-
-

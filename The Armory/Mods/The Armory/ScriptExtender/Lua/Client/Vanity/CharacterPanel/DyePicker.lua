@@ -106,9 +106,8 @@ function DyePicker:PickDye(itemTemplate, slot, dyeButton)
 	local row = resultTable:AddRow()
 	local dyeCell = row:AddCell()
 	local dyeWindow = dyeCell:AddChildWindow("DyeResults")
-	dyeWindow.NoScrollWithMouse = false
 	dyeWindow.HorizontalScrollbar = true
-	-- dyeWindow.NoSavedSettings = true
+	dyeWindow.NoSavedSettings = true
 	dyeWindow.ChildAlwaysAutoResize = true
 	dyeWindow.AutoResizeX = true
 

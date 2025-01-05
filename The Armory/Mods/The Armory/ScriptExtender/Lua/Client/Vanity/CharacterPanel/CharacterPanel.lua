@@ -106,8 +106,7 @@ function VanityCharacterPanel:BuildModule(tabHeader)
 	-- https://bg3.norbyte.dev/search?q=using "_BaseWeapon"&ct=MzaoiTa00DM2NDE0MdFRCi5JLNELzkgsSk3RC09NLMjP0wsP8Iv3SMxJSi1KUYqtAQA%3D
 
 	--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
-	--- so each weapon type can be configured separately as appropriate. Attaches the Equipment and Dye picker to each configurable slot
-	--- TODO: Refactor this mess
+	--- so each weapon type can be configured separately as desired. Attaches the Equipment and Dye picker to each configurable slot
 	---@param parentContainer ExtuiTableCell|ExtuiGroup|ExtuiCollapsingHeader
 	---@param group string[][]
 	---@param verticalSlots boolean

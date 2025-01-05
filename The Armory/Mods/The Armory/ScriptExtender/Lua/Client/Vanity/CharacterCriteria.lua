@@ -73,6 +73,46 @@ end
 
 VanityCharacterCriteria = {}
 
+---@alias VanityCriteriaCompositeKey string
+
+---@enum VanityCharacterCriteriaType
+VanityCharacterCriteria.CriteriaType = {
+	Class = 1,
+	Subclass = 2,
+	Race = 3,
+	Subrace = 4,
+	BodyType = 5,
+	Origin = 6,
+	Hireling = 7,
+	[1] = "Class",
+	[2] = "Subclass",
+	[3] = "Race",
+	[4] = "Subrace",
+	[5] = "BodyType",
+	[6] = "Origin",
+	[7] = "Hireling"
+}
+
+---@param ... string[] of VanityCharacterCriteria values to concat into an ordered key
+---@return string compositeKey
+function VanityCharacterCriteria:CreateCriteriaCompositeKey(...)
+	local criteria = { ... }
+	table.sort(criteria, function(a, b)
+		return VanityCharacterCriteria.CriteriaType[a] < VanityCharacterCriteria.CriteriaType[b]
+	end)
+	return table.concat(criteria, "|")
+end
+
+---@param compositeKey string
+---@return string[] VanityCharacterCriteriaType
+function VanityCharacterCriteria:DeconstructCriteriaCompositeKey(compositeKey)
+	local criteria = {}
+	for criterion in string.gmatch(compositeKey, "([^|]+)") do
+		table.insert(criteria, criterion)
+	end
+	return criteria
+end
+
 ---@param tabHeader ExtuiTreeParent
 function VanityCharacterCriteria:BuildModule(tabHeader)
 	if #playableRaces == 0 then
