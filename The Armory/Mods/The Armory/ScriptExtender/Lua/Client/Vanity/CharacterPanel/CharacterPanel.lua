@@ -148,7 +148,7 @@ function VanityCharacterPanel:BuildModule(tabHeader)
 				imageButton.Image.Size = { 60, 60 }
 				imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 				imageButton.OnClick = function()
-					-- Third param allows us to send the weaponSlot and the associated slot at the same time when applicable, filtering results
+					-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
 					EquipmentPicker:PickForSlot(slotForImageButton, imageButton, slotForImageButton ~= button[1] and button[1] or nil).UserData = function()
 						if imageButton.UserData then
 							BuildSlots(parentContainer, group, verticalSlots, slot)

@@ -108,7 +108,7 @@ local function split(inputstr, sep)
 		sep = "%s"
 	end
 	local t = {}
-	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
 		table.insert(t, str)
 	end
 	return t
@@ -126,16 +126,40 @@ function VanityCharacterCriteria:ParseCriteriaCompositeKey(compositeKey)
 	return criteriaTable
 end
 
+local activeCriteria = {}
+
+---@param criteriaType VanityCharacterCriteriaType
+---@param value string
+---@return string VanityCriteriaCompositeKey
+local function updateActiveCriteria(criteriaType, value)
+	activeCriteria[criteriaType] = value
+
+	return VanityCharacterCriteria:CreateCriteriaCompositeKey(activeCriteria)
+end
+
+---@type ExtuiGroup
+local criteriaGroup
+
 ---@param tabHeader ExtuiTreeParent
-function VanityCharacterCriteria:BuildModule(tabHeader)
+---@param preset VanityPreset
+function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	if #playableRaces == 0 then
 		PopulatePlayableRaces()
 		PopulateClassesAndSubclasses()
 		PopulateOriginCharacters()
 	end
 
-	local characterCriteriaSection = tabHeader:AddCollapsingHeader("Configure by Character Criteria")
-	local characterCriteriaSelectionTable = tabHeader:AddTable("CharacterCriteraSelection", 7)
+	if not criteriaGroup then
+		criteriaGroup = tabHeader:AddGroup("CharacterCriteria")
+	else
+		for _, child in pairs(criteriaGroup.Children) do
+			child:Destroy()
+		end
+	end
+
+	local characterCriteriaSection = criteriaGroup:AddCollapsingHeader("Configure by Character Criteria")
+	characterCriteriaSection.DefaultOpen = true
+	local characterCriteriaSelectionTable = criteriaGroup:AddTable("CharacterCriteraSelection", 7)
 	local charCriteriaHeaders = characterCriteriaSelectionTable:AddRow()
 	charCriteriaHeaders.Headers = true
 
@@ -226,7 +250,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader)
 		for _, childSelectable in pairs(cell.Children) do
 			---@cast childSelectable ExtuiSelectable
 
-			if selectable.UserData ~= childSelectable.UserData then
+			if selectable.Label ~= childSelectable.Label then
 				if childSelectable.Selected then
 					for _, selectedTextCell in pairs(selectionRow.Children) do
 						if selectedTextCell.Children[1].Label == childSelectable.Label then
@@ -256,19 +280,34 @@ function VanityCharacterCriteria:BuildModule(tabHeader)
 	--- @param trunk table
 	--- @param columnIndex number
 	--- @param valueCollection ResourceClassDescription[]|ResourceRace[]?
-	local function BuildHorizontalSelectableTree(trunk, columnIndex, valueCollection)
+	local function BuildHorizontalSelectableTree(trunk, columnIndex, valueCollection, compositeKey)
 		---@type ExtuiTableCell
 		local cell = characterCriteriaRow.Children[columnIndex]
 
+		local function buildSelectable(selectType, selectValue, children, childResources)
+			local selectable = cell:AddSelectable(selectValue)
+			
+			if not string.find(selectType, "By") then
+				compositeKey[selectType] = selectable.Label
+				if preset.Outfits[VanityCharacterCriteria:CreateCriteriaCompositeKey(compositeKey)] then
+					selectable:SetColor("TextSelectedBg", { 144 / 255, 238 / 255, 144 / 255, 1 })
+				end
+			end
+
+			selectable.OnActivate = function()
+				ClearOnSelect(columnIndex, selectable)
+				findTextToUpdate(selectType, selectable)
+				if not string.find(selectType, "By") then
+					activeCriteria[selectType] = selectable.Label
+					compositeKey[selectType] = selectable.Label
+				end
+				BuildHorizontalSelectableTree(children, columnIndex + 1, childResources, compositeKey or {})
+			end
+		end
+
 		for selectType, children in TableUtils:OrderedPairs(trunk) do
 			if selectType == "By Race" or selectType == "By Class" or selectType == "By Body Type" or selectType == "By Origin" or selectType == "By Hireling" then
-				local selectable = cell:AddSelectable(selectType)
-				selectable.UserData = selectType
-				selectable.OnActivate = function()
-					ClearOnSelect(columnIndex, selectable)
-					findTextToUpdate(selectType, selectable)
-					BuildHorizontalSelectableTree(children, columnIndex + 1)
-				end
+				buildSelectable(selectType, selectType, children, nil)
 			elseif selectType == "Race" or selectType == "Class" then
 				-- TODO: Really clean up this mess
 				local table = selectType == "Race" and playableRaces or classesAndSubclasses
@@ -278,46 +317,22 @@ function VanityCharacterCriteria:BuildModule(tabHeader)
 					---@type ResourceRace|ResourceClassDescription
 					local resource = Ext.StaticData.Get(parentGuid, selectType == "Race" and selectType or "ClassDescription")
 
-					local selectable = cell:AddSelectable(resource.DisplayName:Get() or resource.Name)
-					selectable.UserData = parentGuid
-					selectable.OnActivate = function()
-						ClearOnSelect(columnIndex, selectable)
-						findTextToUpdate(selectType, selectable)
-						BuildHorizontalSelectableTree(children, columnIndex + 1, childResources)
-					end
+					buildSelectable(selectType, resource.DisplayName:Get() or resource.Name, children, childResources)
 				end
 			elseif selectType == "Subrace" or selectType == "Subclass" then
 				for _, childResource in pairs(valueCollection) do
-					local selectable = cell:AddSelectable(childResource.DisplayName:Get() or childResource.Name)
-					selectable.UserData = childResource.ResourceUUID
-					selectable.OnActivate = function()
-						ClearOnSelect(columnIndex, selectable)
-						findTextToUpdate(selectType, selectable)
-						BuildHorizontalSelectableTree(children, columnIndex + 1)
-					end
+					buildSelectable(selectType, childResource.DisplayName:Get() or childResource.Name, children, nil)
 				end
 			elseif selectType == "BodyType" then
 				for _, bodyType in pairs(children) do
-					local selectable = cell:AddSelectable(bodyType)
-					selectable.UserData = bodyType
-					selectable.OnActivate = function()
-						ClearOnSelect(columnIndex, selectable)
-						findTextToUpdate(selectType, selectable)
-						BuildHorizontalSelectableTree(children, columnIndex + 1)
-					end
+					buildSelectable(selectType, bodyType, children, nil)
 				end
 			elseif selectType == "Origin" or selectType == "Hireling" then
 				for _, originGuid in pairs(selectType == "Origin" and originCharacters or hirelings) do
 					---@type ResourceOrigin
 					local origin = Ext.StaticData.Get(originGuid, "Origin")
 
-					local selectable = cell:AddSelectable(origin.DisplayName:Get() or origin.Name)
-					selectable.UserData = originGuid
-					selectable.OnActivate = function()
-						ClearOnSelect(columnIndex, selectable)
-						findTextToUpdate(selectType, selectable)
-						BuildHorizontalSelectableTree(children, columnIndex + 1)
-					end
+					buildSelectable(selectType, origin.DisplayName:Get() or origin.Name, children, nil)
 				end
 			end
 		end
