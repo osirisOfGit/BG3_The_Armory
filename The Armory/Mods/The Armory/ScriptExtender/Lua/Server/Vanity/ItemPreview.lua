@@ -1,6 +1,5 @@
 ---@class UserEntry
 ---@field previewItem Guid
----@field createdItem Guid
 ---@field equippedItem GUIDSTRING
 
 ---@type {[string] : UserEntry}
@@ -15,35 +14,28 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, template
 	end
 
 	local userPreview = previewingItemTable[user]
+	userPreview.previewItem = Osi.CreateAt(templateUUID, 0, 0, 0, 0, 0, "")
 
-	Osi.TemplateAddTo(templateUUID, character, 1, 0)
-	userPreview.previewItem = templateUUID
-end)
+	Logger:BasicDebug("%s started previewing %s", character, userPreview.previewItem)
 
-Ext.Osiris.RegisterListener("TemplateAddedTo", 4, "after", function(objectTemplate, object2, inventoryHolder, addType)
-	local userId = Osi.GetReservedUserID(inventoryHolder)
-	if userId and previewingItemTable[userId] then
-		local tracker = previewingItemTable[userId]
-		if string.sub(objectTemplate, -36) == tracker.previewItem then
-			Logger:BasicDebug("%s started previewing %s", inventoryHolder, object2)
-			tracker.createdItem = object2
+	userPreview.equippedItem = Osi.GetEquippedItem(character, Ext.Stats.Get(Osi.GetStatString(userPreview.previewItem)).Slot)
 
-			tracker.equippedItem = Osi.GetEquippedItem(inventoryHolder, Ext.Stats.Get(Osi.GetStatString(object2)).Slot)
-
-			Osi.Equip(inventoryHolder, object2, 1, 0)
+	-- Otherwise the avatar doesn't show it in the inventory view
+	Ext.Timer.WaitFor(200, function()
+		if userPreview.previewItem then
+			Osi.Equip(character, userPreview.previewItem, 1, 0)
 		end
-	end
+	end)
 end)
 
 local function DeleteItem(character, userPreview)
-	Logger:BasicDebug("%s stopped previewing %s", character, userPreview.createdItem)
-	Osi.RequestDelete(userPreview.createdItem)
+	Logger:BasicDebug("%s stopped previewing %s", character, userPreview.previewItem)
+	Osi.RequestDelete(userPreview.previewItem)
 	if userPreview.equippedItem then
 		Osi.Equip(character, userPreview.equippedItem)
 		userPreview.equippedItem = nil
 	end
 
-	userPreview.createdItem = nil
 	userPreview.previewItem = nil
 end
 
@@ -53,12 +45,6 @@ Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, p
 
 	local userPreview = previewingItemTable[user]
 	if userPreview and userPreview.previewItem then
-		if not userPreview.createdItem then
-			Ext.Timer.WaitFor(200, function()
-				DeleteItem(character, userPreview)
-			end)
-		else
-			DeleteItem(character, userPreview)
-		end
+		DeleteItem(character, userPreview)
 	end
 end)

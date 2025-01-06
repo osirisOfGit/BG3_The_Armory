@@ -1,0 +1,949 @@
+{
+	"Armor" : 
+	{
+		"AbilityModifierCap" : 0,
+		"ArmorClass" : 0,
+		"ArmorClassAbility" : 0,
+		"ArmorType" : 0,
+		"Shield" : 0
+	},
+	"AttributeFlags" : 
+	{
+		"AttributeFlags" : 0
+	},
+	"BoostsContainer" : 
+	{
+		"Boosts" : []
+	},
+	"CanBeDisarmed" : 
+	{
+		"Flags" : 65535
+	},
+	"CanBeInInventory" : {},
+	"CanBeWielded" : {},
+	"CanEnterChasm" : 
+	{
+		"CanEnter" : false
+	},
+	"CanSeeThrough" : {},
+	"CanShootThrough" : {},
+	"CanWalkThrough" : {},
+	"CombatParticipant" : 
+	{
+		"AiHint" : "00000000-0000-0000-0000-000000000000",
+		"CombatGroupId" : "",
+		"CombatHandle" : null,
+		"Flags" : 
+		[
+			"IsInspector",
+			"CanJoinCombat"
+		],
+		"InitiativeRoll" : -100
+	},
+	"Data" : 
+	{
+		"StatsId" : "SCL_SpidersLyre",
+		"StepsType" : 0,
+		"Weight" : 1000
+	},
+	"DisplayName" : 
+	{
+		"Name" : 
+		{
+			"ArgumentString" : 
+			{
+				"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+				"Version" : 0
+			},
+			"Get" : "function: 00007FFED26A0790",
+			"Handle" : 
+			{
+				"Handle" : "h063baf0cgda17g4461gaae7g4dec8a4a4d19",
+				"Version" : 2
+			}
+		},
+		"Title" : 
+		{
+			"ArgumentString" : 
+			{
+				"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+				"Version" : 0
+			},
+			"Get" : "function: 00007FFED26A0790",
+			"Handle" : 
+			{
+				"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+				"Version" : 0
+			}
+		}
+	},
+	"Equipable" : 
+	{
+		"EquipmentTypeID" : "92f33192-9144-4dee-8ddf-3fd96e291e28",
+		"Slot" : "MusicalInstrument"
+	},
+	"FTBParticipant" : 
+	{
+		"field_18" : null
+	},
+	"Faction" : 
+	{
+		"SummonOwner" : null,
+		"field_0" : "Entity (01c0000200004734)",
+		"field_18" : "376e33c4-dd15-4c46-a586-87d8b421a0c7",
+		"field_8" : "376e33c4-dd15-4c46-a586-87d8b421a0c7"
+	},
+	"GameObjectVisual" : 
+	{
+		"Icon" : "Item_UNI_SCL_SpidersLyre",
+		"RootTemplateId" : "7a96cad2-3f84-32a1-b2a8-98cbd359f3f6",
+		"RootTemplateType" : 0,
+		"Scale" : 1.0,
+		"Type" : 0
+	},
+	"Icon" : 
+	{
+		"Icon" : "Item_UNI_SCL_SpidersLyre"
+	},
+	"InventoryMember" : 
+	{
+		"EquipmentSlot" : 16,
+		"Inventory" : "Entity (01c000030000288c)"
+	},
+	"InventoryMemberTransform" : 
+	{
+		"Transform" : 
+		{
+			"RotationQuat" : 
+			[
+				0.0,
+				0.0,
+				0.0,
+				1.0
+			],
+			"Scale" : 
+			[
+				1.0,
+				1.0,
+				1.0
+			],
+			"Translate" : 
+			[
+				-12.250958442687988,
+				17.7373046875,
+				-354.40399169921875
+			]
+		}
+	},
+	"IsGlobal" : {},
+	"IsItem" : {},
+	"IsStoryItem" : {},
+	"ItemBoosts" : 
+	{
+		"Boosts" : []
+	},
+	"ItemCanMove" : {},
+	"Net" : {},
+	"NonTradable" : {},
+	"ObjectSize" : 
+	{
+		"Size" : 0,
+		"SoundSize" : 0
+	},
+	"OriginalTemplate" : 
+	{
+		"OriginalTemplate" : null
+	},
+	"OwnedAsLoot" : {},
+	"OwneeCurrent" : 
+	{
+		"Ownee" : "Entity (01c0000300002c18)"
+	},
+	"PassiveContainer" : 
+	{
+		"Passives" : []
+	},
+	"Physics" : 
+	{
+		"field_10" : 0,
+		"field_14" : 0,
+		"field_15" : 1,
+		"field_16" : 0,
+		"field_8" : 0,
+		"field_C" : 0
+	},
+	"ProficiencyGroup" : 
+	{
+		"Flags" : 
+		[
+			"MusicalInstrument"
+		]
+	},
+	"ReadyToBeAddedToInventory" : {},
+	"Savegame" : {},
+	"ServerAiArchetype" : 
+	{
+		"field_0" : "base",
+		"field_4" : "base",
+		"field_8" : "",
+		"field_C" : ""
+	},
+	"ServerAnubisTag" : 
+	{
+		"Tags" : []
+	},
+	"ServerBaseData" : 
+	{
+		"Flags" : 0,
+		"Resistances" : 
+		[
+			[
+				[],
+				[],
+				[],
+				[],
+				[],
+				[],
+				[]
+			],
+			[
+				[],
+				[],
+				[],
+				[],
+				[],
+				[],
+				[]
+			]
+		],
+		"Weight" : 1000
+	},
+	"ServerBaseSize" : 
+	{
+		"GameSize" : 0,
+		"SoundSize" : 0
+	},
+	"ServerBaseStats" : 
+	{
+		"Initiative" : 0
+	},
+	"ServerBoostBase" : 
+	{
+		"field_0" : 
+		[
+			""
+		]
+	},
+	"ServerBoostTag" : 
+	{
+		"Tags" : []
+	},
+	"ServerDialogTag" : 
+	{
+		"Tags" : []
+	},
+	"ServerDisplayNameList" : 
+	{
+		"HideTitle" : 3,
+		"Names" : 
+		[
+			{
+				"Name" : "",
+				"NameKey" : 
+				{
+					"ArgumentString" : 
+					{
+						"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+						"Version" : 0
+					},
+					"Get" : "function: 00007FFED26A0790",
+					"Handle" : 
+					{
+						"Handle" : "h063baf0cgda17g4461gaae7g4dec8a4a4d19",
+						"Version" : 2
+					}
+				},
+				"field_10" : 6
+			},
+			{
+				"Name" : "",
+				"NameKey" : 
+				{
+					"ArgumentString" : 
+					{
+						"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+						"Version" : 0
+					},
+					"Get" : "function: 00007FFED26A0790",
+					"Handle" : 
+					{
+						"Handle" : "ResStr_3893813436",
+						"Version" : 0
+					}
+				},
+				"field_10" : 8
+			}
+		],
+		"Titles" : []
+	},
+	"ServerIconList" : 
+	{
+		"Icons" : 
+		[
+			{
+				"Icon" : "Item_UNI_SCL_SpidersLyre",
+				"field_4" : 4
+			}
+		]
+	},
+	"ServerItem" : 
+	{
+		"Activated" : false,
+		"CanBeMoved" : true,
+		"CanBePickedUp" : true,
+		"CanClimbOn" : false,
+		"CanOnlyBeUsedByOwner" : false,
+		"CanShootThrough" : false,
+		"CanUse" : false,
+		"ClientSync1" : false,
+		"Destroy" : false,
+		"Destroyed" : false,
+		"DisableInventoryView80" : false,
+		"DisableSync" : false,
+		"DontAddToHotbar" : false,
+		"Flags" : 
+		[
+			"CanBeMoved",
+			"CanBePickedUp",
+			"Known",
+			"StoryItem"
+		],
+		"Flags2" : 
+		[
+			"Global"
+		],
+		"Floating" : false,
+		"ForceAffectedByAura" : false,
+		"ForceClientSync" : false,
+		"ForceSync" : false,
+		"FreezeGravity" : false,
+		"Frozen" : false,
+		"GMFolding" : false,
+		"Global" : true,
+		"HideHP" : false,
+		"InAutomatedDialog" : false,
+		"InPartyInventory" : false,
+		"InUse" : false,
+		"InteractionDisabled" : false,
+		"Invisible" : false,
+		"Invisible2" : false,
+		"Invulnerable2" : false,
+		"IsContainer" : false,
+		"IsDoor" : false,
+		"IsLadder" : false,
+		"IsMoving" : false,
+		"IsSecretDoor" : false,
+		"IsSurfaceBlocker" : false,
+		"IsSurfaceCloudBlocker" : false,
+		"Item" : "*RECURSION*",
+		"ItemType" : "Common",
+		"Known" : true,
+		"Level" : "",
+		"LevelTransitionPending" : false,
+		"LoadedTemplate" : false,
+		"LuckyFind" : false,
+		"MyHandle" : "Entity (01c0000200004734)",
+		"NoCover" : false,
+		"OffStage" : false,
+		"OriginalTemplate" : "*RECURSION*",
+		"PinnedContainer" : false,
+		"PositionChanged" : false,
+		"PreviousLevel" : "",
+		"ReservedForDialog" : false,
+		"SourceContainer" : false,
+		"Stats" : "SCL_SpidersLyre",
+		"StatusManager" : 
+		{
+			"Statuses" : []
+		},
+		"Sticky" : false,
+		"StoryItem" : true,
+		"Summon" : false,
+		"TeleportOnUse" : false,
+		"Template" : 
+		{
+			"AIBounds" : 
+			[
+				{
+					"ActualHeight" : 0.18894641101360321,
+					"BoundType" : "Move",
+					"Height" : 0.0,
+					"Max" : 
+					[
+						0.19487577676773071,
+						0.14081206917762756,
+						0.42740336060523987
+					],
+					"Min" : 
+					[
+						-0.19487577676773071,
+						-0.0036438405513763428,
+						-0.46065196394920349
+					],
+					"Radius" : 0.16798393428325653,
+					"Shape" : "Box",
+					"Size" : 0.0,
+					"field_2A" : 0
+				},
+				{
+					"ActualHeight" : 0.18894641101360321,
+					"BoundType" : "Hit",
+					"Height" : 0.0,
+					"Max" : 
+					[
+						0.19487577676773071,
+						0.14081206917762756,
+						0.42740336060523987
+					],
+					"Min" : 
+					[
+						-0.19487577676773071,
+						-0.0036438405513763428,
+						-0.46065196394920349
+					],
+					"Radius" : 0.33596786856651306,
+					"Shape" : "Box",
+					"Size" : 0.0,
+					"field_2A" : 0
+				},
+				{
+					"ActualHeight" : 0.18894641101360321,
+					"BoundType" : "Stand",
+					"Height" : 0.0,
+					"Max" : 
+					[
+						0.19487577676773071,
+						0.14081206917762756,
+						0.42740336060523987
+					],
+					"Min" : 
+					[
+						-0.19487577676773071,
+						-0.0036438405513763428,
+						-0.46065196394920349
+					],
+					"Radius" : 0.33596786856651306,
+					"Shape" : "Box",
+					"Size" : 0.0,
+					"field_2A" : 0
+				}
+			],
+			"ActivationGroupId" : "",
+			"AddUseAction" : "function: 00007FFED269FCD0",
+			"AllowCameraMovement" : false,
+			"AllowReceiveDecalWhenAnimated" : false,
+			"AllowSummonGenericUse" : false,
+			"Amount" : 1,
+			"AnubisConfigName" : "",
+			"AttackableWhenClickThrough" : false,
+			"BlockAoEDamage" : false,
+			"BloodSurfaceType" : 0,
+			"BloodType" : "",
+			"BookType" : 0,
+			"CameraOffset" : 
+			[
+				0.0,
+				0.0,
+				0.0
+			],
+			"CanBeImprovisedWeapon" : true,
+			"CanBeMoved" : true,
+			"CanBePickedUp" : true,
+			"CanBePickpocketed" : true,
+			"CanClickThrough" : false,
+			"CanClimbOn" : false,
+			"CanShineThrough" : false,
+			"CanShootThrough" : true,
+			"CastShadow" : true,
+			"CinematicArenaFlags" : 0,
+			"CollideWithCamera" : false,
+			"ColorPreset" : "00000000-0000-0000-0000-000000000000",
+			"CombatComponent" : 
+			{
+				"AiHint" : "00000000-0000-0000-0000-000000000000",
+				"AiUseCombatHelper" : "",
+				"Archetype" : "base",
+				"CanFight" : false,
+				"CanJoinCombat" : true,
+				"CombatGroupID" : "",
+				"Faction" : "376e33c4-dd15-4c46-a586-87d8b421a0c7",
+				"IsBoss" : false,
+				"IsInspector" : true,
+				"ProxyAttachment" : "",
+				"ProxyOwner" : "00000000-0000-0000-0000-000000000000",
+				"StartCombatRange" : -1.0,
+				"StayInAiHints" : false,
+				"SwarmGroup" : "",
+				"Unknown" : 0,
+				"Unknown2" : 0
+			},
+			"ConstellationConfigName" : "",
+			"ContainerAutoAddOnPickup" : false,
+			"ContainerContentFilterCondition" : "",
+			"CoverAmount" : false,
+			"CriticalHitType" : "",
+			"DefaultState" : "",
+			"Description" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ha141bb21g0e04g4443gaa09g306d0f8e5f25",
+					"Version" : 1
+				}
+			},
+			"DestroyWithStack" : false,
+			"Destroyed" : false,
+			"DisarmDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+			"DisplayName" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "h063baf0cgda17g4461gaae7g4dec8a4a4d19",
+					"Version" : 2
+				}
+			},
+			"DisplayNameAlchemy" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"DropSound" : "4440f988-61e2-71c9-e466-69046de254a4",
+			"EquipSound" : "640f340f-5432-28e3-e4a1-e22f2d7d4699",
+			"Equipment" : null,
+			"EquipmentTypeID" : "92f33192-9144-4dee-8ddf-3fd96e291e28",
+			"ExamineRotation" : 
+			[
+				-75.0,
+				0.0,
+				0.0
+			],
+			"ExcludeInDifficulty" : [],
+			"FadeChildren" : [],
+			"FadeGroup" : "",
+			"Fadeable" : true,
+			"FileName" : "D:/GOG/Baldurs Gate 3/Data/Public/GustavDev/RootTemplates/_merged.lsf",
+			"ForceAffectedByAura" : false,
+			"FreezeGravity" : 0,
+			"GlobalDeletedFlag" : 4,
+			"GravityType" : 0,
+			"GroupID" : 0,
+			"HLOD" : "00000000-0000-0000-0000-000000000000",
+			"HierarchyOnlyFade" : true,
+			"Hostile" : false,
+			"Icon" : "Item_UNI_SCL_SpidersLyre",
+			"Id" : "98282bec-aeaa-4490-ae43-0c27bed58c74",
+			"IgnoreGenerics" : false,
+			"ImpactSound" : "439fcec3-6032-f489-6e80-260d26fab23d",
+			"InteractionFilterList" : [],
+			"InteractionFilterRequirement" : 0,
+			"InteractionFilterType" : 0,
+			"InventoryList" : [],
+			"InventoryMoveSound" : "4440f988-61e2-71c9-e466-69046de254a4",
+			"InventoryType" : 0,
+			"IsBlocker" : false,
+			"IsBlueprintDisabledByDefault" : true,
+			"IsDecorative" : false,
+			"IsDroppedOnDeath" : true,
+			"IsInteractionDisabled" : false,
+			"IsKey" : false,
+			"IsPlatformOwner" : false,
+			"IsPointerBlocker" : false,
+			"IsPortal" : false,
+			"IsPortalProhibitedToPlayers" : false,
+			"IsPublicDomain" : false,
+			"IsReflecting" : false,
+			"IsShadowProxy" : false,
+			"IsSourceContainer" : false,
+			"IsSurfaceBlocker" : false,
+			"IsSurfaceCloudBlocker" : false,
+			"IsTrap" : false,
+			"ItemList" : [],
+			"Key" : "",
+			"LevelName" : "",
+			"LevelOverride" : -1,
+			"LightChannel" : 0,
+			"LockDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+			"LoopSound" : "",
+			"MapMarkerStyle" : "",
+			"MaterialPreset" : "00000000-0000-0000-0000-000000000000",
+			"MaxStackAmount" : 1,
+			"Name" : "UNI_SCL_SpidersLyre",
+			"OnDestroyActions" : 
+			[
+				{
+					"ActivateSoundEvent" : "3ea82655-5140-4287-9ab8-794559f182d3",
+					"Animation" : "",
+					"Conditions" : "",
+					"PlayOnHUD" : false,
+					"Type" : "PlaySound"
+				},
+				{
+					"Animation" : "",
+					"Conditions" : "",
+					"ExplodeFX" : "15362651-9b96-579a-86f5-829e53325d8b",
+					"FadeOutDelay" : 0.0,
+					"FadeOutFX" : "",
+					"SnapToGround" : true,
+					"TargetItemState" : 0,
+					"TemplateAfterDestruction" : "ebdae296-fa2c-4b43-a466-ec592d3017fc",
+					"Type" : "DestroyParameters",
+					"VisualDestruction" : "",
+					"VisualWithDynamicPhysics" : "7b323fa9-ca31-6df8-6bba-46e9d7ee34f7"
+				}
+			],
+			"OnUseDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"OnUsePeaceActions" : [],
+			"OnlyInDifficulty" : [],
+			"Owner" : "",
+			"ParentTemplateFlags" : 0,
+			"ParentTemplateId" : "13739f15-7366-4d7f-9926-991e98b9e964",
+			"PermanentWarnings" : "",
+			"PhysicsCollisionSound" : "0c130d61-2b03-3abb-2d1d-3ea22eb35034",
+			"PhysicsFollowAnimation" : false,
+			"PhysicsOpenTemplate" : "",
+			"PhysicsTemplate" : "f0acac13-2e32-c047-378e-4087af902d05",
+			"PickupSound" : "562f4759-dc4e-f270-26f6-a704e495c0ef",
+			"ReceiveDecal" : false,
+			"ReferencedInTimeline" : false,
+			"RemoveUseAction" : "function: 00007FFED269FDC0",
+			"RenderChannel" : 4,
+			"SeeThrough" : false,
+			"ShadowPhysicsProxy" : "",
+			"ShootThroughType" : 6,
+			"ShortDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"ShortDescriptionParams" : "",
+			"ShowAttachedSpellDescriptions" : false,
+			"SoundAttenuation" : -1,
+			"SoundInitEvent" : "",
+			"SpeakerGroups" : [],
+			"Stats" : "SCL_SpidersLyre",
+			"StatusList" : [],
+			"StoryItem" : true,
+			"TechnicalDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"TechnicalDescriptionParams" : "",
+			"TemplateHandle" : 25689,
+			"TemplateName" : "",
+			"TemplateType" : "item",
+			"TimelineCameraRigOverride" : "00000000-0000-0000-0000-000000000000",
+			"Tooltip" : 2,
+			"Transform" : 
+			{
+				"RotationQuat" : 
+				[
+					0.0,
+					0.0,
+					0.0,
+					1.0
+				],
+				"Scale" : 
+				[
+					1.0,
+					1.0,
+					1.0
+				],
+				"Translate" : 
+				[
+					0.0,
+					0.0,
+					0.0
+				]
+			},
+			"TreasureLevel" : -1,
+			"TreasureOnDestroy" : false,
+			"UnequipSound" : "b39cabcd-fb82-afa6-6253-a7ad1850fb8f",
+			"Unimportant" : false,
+			"UnknownDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"UnknownDisplayName" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"UseOcclusion" : true,
+			"UseOnDistance" : false,
+			"UsePartyLevelForTreasureLevel" : false,
+			"UseRemotely" : false,
+			"UseSound" : "",
+			"VisualTemplate" : "7a96cad2-3f84-32a1-b2a8-98cbd359f3f6",
+			"Wadable" : false,
+			"WadableSurfaceType" : 13,
+			"WalkOn" : false,
+			"WalkThrough" : true
+		},
+		"Totem" : false,
+		"TransformChanged" : false,
+		"TreasureGenerated" : false,
+		"TreasureLevel" : -1,
+		"UnEquipLocked" : false,
+		"UnsoldGenerated" : false,
+		"UseRemotely" : false,
+		"WakePhysics" : false,
+		"WalkOn" : false,
+		"WalkThrough" : false,
+		"field_10" : "Entity (01c0000200004734)",
+		"field_68" : "Entity (01c0000300002c18)",
+		"field_70" : ""
+	},
+	"ServerOsirisTag" : 
+	{
+		"Tags" : []
+	},
+	"ServerOwneeHistory" : 
+	{
+		"LatestOwner" : "Entity (01c0000300002c18)",
+		"OriginalOwner" : "Entity (01c0000300002c18)",
+		"PreviousOwner" : null
+	},
+	"ServerOwneeRequest" : 
+	{
+		"LatestOwner" : null,
+		"NewCurrentOwnee" : null,
+		"OriginalOwner" : null
+	},
+	"ServerPassiveBase" : 
+	{
+		"Passives" : []
+	},
+	"ServerPassivePersistentData" : 
+	{
+		"field_0" : 0.0,
+		"field_4" : 0.0
+	},
+	"ServerProficiencyGroupStats" : 
+	{
+		"Stats" : "SCL_SpidersLyre"
+	},
+	"ServerShapeshiftStates" : 
+	{
+		"States" : [],
+		"field_0" : 0
+	},
+	"ServerTemplateTag" : 
+	{
+		"Tags" : 
+		[
+			"cd85b343-55a9-4b66-bd92-42ca70a084aa"
+		]
+	},
+	"ShapeshiftHealthReservation" : 
+	{
+		"Reservations" : {}
+	},
+	"ShootThroughType" : 
+	{
+		"Type" : 6
+	},
+	"Sight" : 
+	{
+		"field_0" : 0.0,
+		"field_4" : 0.0,
+		"field_8" : 0.0,
+		"field_C" : 0.0
+	},
+	"SightData" : 
+	{
+		"field_0" : "d3da0f60-2ebf-1169-72da-a81c4923f170",
+		"field_10" : 0.0,
+		"field_14" : 0.0,
+		"field_18" : 0.0,
+		"field_1C" : 0.0,
+		"field_20" : 0,
+		"field_24" : -1
+	},
+	"Speaker" : 
+	{
+		"field_0" : 
+		[
+			"2af30af9-43be-cdf3-fa06-c71752fe14b8"
+		]
+	},
+	"SpellCastCanBeTargeted" : 
+	{
+		"Dummy" : 0
+	},
+	"StatusImmunities" : 
+	{
+		"PersonalStatusImmunities" : {}
+	},
+	"Tag" : 
+	{
+		"Tags" : 
+		[
+			"cd85b343-55a9-4b66-bd92-42ca70a084aa",
+			"9360d001-0cef-49e0-a2e0-4d715d4976ea"
+		]
+	},
+	"Transform" : 
+	{
+		"Transform" : 
+		{
+			"RotationQuat" : 
+			[
+				0.0,
+				0.0,
+				0.0,
+				1.0
+			],
+			"Scale" : 
+			[
+				1.0,
+				1.0,
+				1.0
+			],
+			"Translate" : 
+			[
+				-12.250958442687988,
+				17.7373046875,
+				-354.40399169921875
+			]
+		}
+	},
+	"TurnBased" : 
+	{
+		"ActedThisRoundInCombat" : false,
+		"CanActInCombat" : false,
+		"CanActInCombat2" : false,
+		"Combat" : "00000000-0000-0000-0000-000000000000",
+		"HadTurnInCombat" : false,
+		"IsActiveCombatTurn" : false,
+		"ItemCanAct" : false,
+		"RequestedEndTurn" : false,
+		"field_10" : 0,
+		"field_18" : 0,
+		"field_1C" : 0,
+		"field_20" : 0,
+		"field_28" : 0,
+		"field_8" : 0,
+		"field_A" : false
+	},
+	"Use" : 
+	{
+		"Boosts" : 
+		[
+			{
+				"Boost" : "UnlockSpell",
+				"Params" : "Shout_SCL_SpiderLyre_Perform",
+				"Params2" : ""
+			},
+			{
+				"Boost" : "UnlockSpell",
+				"Params" : "Shout_Bard_Perform_Lyre",
+				"Params2" : ""
+			}
+		],
+		"BoostsOnEquipMainHand" : [],
+		"BoostsOnEquipOffHand" : [],
+		"CanCombine" : 0,
+		"Charges" : 0,
+		"CombineFlag" : 0,
+		"ItemUseBlocked" : 0,
+		"ItemUseType" : "Unknown1",
+		"MaxCharges" : 0,
+		"Requirements" : []
+	},
+	"Uuid" : 
+	{
+		"EntityUuid" : "2af30af9-43be-cdf3-fa06-c71752fe14b8"
+	},
+	"Value" : 
+	{
+		"Rarity" : 0,
+		"Unique" : false,
+		"Value" : 14
+	},
+	"Wielding" : 
+	{
+		"Owner" : "Entity (01c0000300002c18)"
+	}
+}
