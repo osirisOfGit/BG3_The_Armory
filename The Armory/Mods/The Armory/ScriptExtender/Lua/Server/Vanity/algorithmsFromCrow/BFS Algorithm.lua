@@ -158,6 +158,7 @@ local outfits = {
     [buildKey("Karlach", "", "", "", "2", "Barbarian", "")]                        = "S5_OriginBodyClass",
     -- Scenario #6
     [buildKey("", "", "", "", "", "Barbarian", "")]                                = "S6_OriginClass",
+    [buildKey("", "", "", "", "2", "Barbarian", "")]                                = "S7_OriginClass",
 }
 
 local characters = {
@@ -176,15 +177,19 @@ local characters = {
 -- Demo usage + profiler
 ----------------------------------
 local function main()
-    for key, outfit in pairs(outfits) do
-        local foundOutfit, key = findOutfit_BFS(characters[1], { [key] = outfit })
+    for outfitKey, outfit in TableUtils:OrderedPairs(outfits, function (key)
+        return outfits[key]
+    end) do
+        local foundOutfit, key = findOutfit_BFS(characters[1], outfits)
         print(
             string.format(
                 "BFS: Outfit: %s | Key: %s",
                 tostring(foundOutfit), tostring(key)
             )
         )
+        outfits[outfitKey] = nil
     end
+    
 end
 
 main()
