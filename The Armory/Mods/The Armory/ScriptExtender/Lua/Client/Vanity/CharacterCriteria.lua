@@ -1,4 +1,5 @@
 Ext.Require("Client/Vanity/CharacterPanel/CharacterPanel.lua")
+Ext.Require("Shared/Configurations/VanityCharacterCriteria.lua")
 
 ---@type {[Guid]: ResourceRace[]}
 local playableRaces = {}
@@ -75,59 +76,6 @@ end
 
 VanityCharacterCriteria = {}
 
----@alias VanityCriteriaCompositeKey string
-
----@enum VanityCharacterCriteriaType
-VanityCharacterCriteria.CriteriaType = {
-	Class = 1,
-	Subclass = 2,
-	Race = 3,
-	Subrace = 4,
-	BodyType = 5,
-	Origin = 6,
-	Hireling = 7,
-	[1] = "Class",
-	[2] = "Subclass",
-	[3] = "Race",
-	[4] = "Subrace",
-	[5] = "BodyType",
-	[6] = "Origin",
-	[7] = "Hireling"
-}
-
----@param criteriaTable {[VanityCharacterCriteriaType] : string} of VanityCharacterCriteria values to concat into an ordered key
----@return string compositeKey
-function VanityCharacterCriteria:CreateCriteriaCompositeKey(criteriaTable)
-	local criteria = {}
-	for i = 1, 7 do
-		criteria[i] = criteriaTable[VanityCharacterCriteria.CriteriaType[i]] or ""
-	end
-	return table.concat(criteria, "|")
-end
-
-local function split(inputstr, sep)
-	if sep == nil then
-		sep = "%s"
-	end
-	local t = {}
-	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
-		table.insert(t, str)
-	end
-	return t
-end
-
----@param compositeKey string the composite key to parse
----@return {[VanityCharacterCriteriaType] : string} criteriaTable
-function VanityCharacterCriteria:ParseCriteriaCompositeKey(compositeKey)
-	local criteriaTable = {}
-
-	local criteria = split(compositeKey, "|")
-	for i = 1, 7 do
-		criteriaTable[VanityCharacterCriteria.CriteriaType[i]] = criteria[i] or ""
-	end
-	return criteriaTable
-end
-
 local activeCriteria = {}
 
 ---@type ExtuiGroup
@@ -157,7 +105,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	charCriteriaHeaders.Headers = true
 
 	local selectedCriteriaDisplayRow = criteriaSelectionDisplayTable:AddRow()
-	for _, criteriaType in ipairs(VanityCharacterCriteria.CriteriaType) do
+	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
 		charCriteriaHeaders:AddCell():AddText(criteriaType)
 		local cell = selectedCriteriaDisplayRow:AddCell()
 		cell.UserData = criteriaType
@@ -172,7 +120,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		end
 	end
 
-	local characterCriteriaTable = characterCriteriaSection:AddTable("Class-Race", 6)
+	local characterCriteriaTable = characterCriteriaSection:AddTable("Class-Race", 7)
 	characterCriteriaTable:AddColumn("FirstRaceOrClassSelect", "WidthStretch")
 	characterCriteriaTable:AddColumn("SecondClassOrRace", "WidthStretch")
 	characterCriteriaTable:AddColumn("ThirdSubclassOrSubrace", "WidthStretch")
@@ -181,6 +129,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	characterCriteriaTable:AddColumn("SixthBodyTypeSubRace", "WidthStretch")
 
 	local characterCriteriaRow = characterCriteriaTable:AddRow()
+	characterCriteriaRow:AddCell()
 	characterCriteriaRow:AddCell()
 	characterCriteriaRow:AddCell()
 	characterCriteriaRow:AddCell()
@@ -196,7 +145,21 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	local raceTree = {
 		Race = {
 			["By Body Type"] = bodyTypeTree,
-			Subrace = bodyTypeTree
+			["By Origin"] = {
+				Origin = bodyTypeTree
+			},
+			["By Hireling"] = {
+				Hireling = bodyTypeTree
+			},
+			Subrace = {
+				BodyType = bodyTypeTree.BodyType,
+				["By Origin"] = {
+					Origin = {}
+				},
+				["By Hireling"] = {
+					Hireling = {}
+				},
+			}
 		}
 	}
 
@@ -206,7 +169,15 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 			Class = {
 				Subclass = {
 					Race = raceTree.Race,
-					["By Body Type"] = bodyTypeTree,
+					["By Body Type"] = {
+						BodyType = bodyTypeTree.BodyType,
+						["By Origin"] = {
+							Origin = {}
+						},
+						["By Hireling"] = {
+							Hireling = {}
+						},
+					},
 					["By Origin"] = {
 						Origin = {}
 					},
@@ -244,7 +215,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 				if childSelectable.Selected then
 					for colIndex, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
 						if selectedTextCell.Children[1].Label == childSelectable.Label then
-							activeCriteria[VanityCharacterCriteria.CriteriaType[colIndex]] = nil
+							activeCriteria[VanityCharacterCriteriaType[colIndex]] = nil
 							selectedTextCell.Children[1].Label = "---"
 						end
 					end
@@ -258,7 +229,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 				for _, child in pairs(columnCell.Children) do
 					for colIndex, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
 						if selectedTextCell.Children[1].Label == child.Label then
-							activeCriteria[VanityCharacterCriteria.CriteriaType[colIndex]] = nil
+							activeCriteria[VanityCharacterCriteriaType[colIndex]] = nil
 							selectedTextCell.Children[1].Label = "---"
 						end
 					end
@@ -283,7 +254,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 			if not string.find(selectType, "By") then
 				compositeKeyForHighlighting[selectType] = resourceId
-				if preset.Outfits[VanityCharacterCriteria:CreateCriteriaCompositeKey(compositeKeyForHighlighting)] then
+				if preset.Outfits[CreateCriteriaCompositeKey(compositeKeyForHighlighting)] then
 					selectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 				end
 			end
@@ -298,7 +269,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 				end
 				BuildHorizontalSelectableTree(children, columnIndex + 1, childResources, compositeKeyForHighlighting or {})
 
-				VanityCharacterPanel:BuildModule(tabHeader, preset, VanityCharacterCriteria:CreateCriteriaCompositeKey(activeCriteria))
+				VanityCharacterPanel:BuildModule(tabHeader, preset, CreateCriteriaCompositeKey(activeCriteria))
 			end
 		end
 

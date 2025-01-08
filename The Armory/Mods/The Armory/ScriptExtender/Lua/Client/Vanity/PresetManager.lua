@@ -47,6 +47,7 @@ function VanityPresetManager:OpenManager()
 		local nameInput, nameError = generateFormInput("Name")
 		presetForm:AddText("Notes")
 		local notesInput = presetForm:AddInputText("")
+		notesInput.Multiline = true
 		local versionInput, versionError = generateFormInput("Version")
 
 		local inputErrorTable = {
@@ -138,11 +139,10 @@ function VanityPresetManager:UpdatePresetView()
 			local presetGroup = presetInfoSection:AddGroup(guid)
 			presetActivelyViewing = presetGroup
 			
-			presetGroup:AddButton("Activate This Preset").OnClick = function ()
-				-- Pairs iterates through the real table, so need to make sure to pass the proxy one for updates
-				Vanity:ActivatePreset(ConfigurationStructure.config.vanity.presets[guid])
+			presetGroup:AddButton("Activate (Save After)").OnClick = function ()
+				Vanity:ActivatePreset(guid)
 			end
-			presetGroup:AddButton("Delete This Preset").OnClick = function ()
+			presetGroup:AddButton("Delete").OnClick = function ()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
 				VanityPresetManager:UpdatePresetView()
 			end

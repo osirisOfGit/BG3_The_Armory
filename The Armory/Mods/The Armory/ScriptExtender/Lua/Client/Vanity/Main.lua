@@ -1,3 +1,7 @@
+Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
+	Server = true, Client = true, SyncToClient = true, WriteableOnClient = true
+})
+
 Ext.Require("Client/Vanity/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 
@@ -48,12 +52,19 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		separator = tabHeader:AddSeparatorText("Choose A Preset")
 		separator:SetStyle("SeparatorTextAlign", 0.5)
+
+		local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+		if activePresetUUID then
+			Vanity:ActivatePreset(activePresetUUID)
+		end
 	end)
 
 ---comment
----@param preset VanityPreset
-function Vanity:ActivatePreset(preset)
-	Vanity.activePreset = preset
+---@param presetId Guid
+function Vanity:ActivatePreset(presetId)
+	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = presetId
+
+	local preset = ConfigurationStructure.config.vanity.presets[presetId] 
 	separator.Label = "Active Preset: " .. preset.Name
 
 	VanityCharacterCriteria:BuildModule(mainParent, preset)
