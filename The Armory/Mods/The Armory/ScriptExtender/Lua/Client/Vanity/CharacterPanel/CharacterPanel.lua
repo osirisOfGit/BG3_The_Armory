@@ -206,6 +206,10 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 								guid = itemTemplate.Id,
 								modDependency = "TODO"
 							}
+
+							Ext.Timer.WaitFor(350, function ()
+								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+							end)
 							BuildSlots(parentContainer, group, verticalSlots, slot)
 						end)
 				end
@@ -233,7 +237,9 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 								guid = dyeTemplate.Id,
 								modDependency = "TODO"
 							}
-
+							Ext.Timer.WaitFor(350, function ()
+								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+							end)
 							BuildSlots(parentContainer, group, verticalSlots, slot)
 						end)
 				end

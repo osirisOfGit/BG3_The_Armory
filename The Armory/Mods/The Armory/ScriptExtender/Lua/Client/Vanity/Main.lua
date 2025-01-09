@@ -1,5 +1,10 @@
 Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
-	Server = true, Client = true, SyncToClient = true, WriteableOnClient = true
+	Server = true,
+	Client = true,
+	WriteableOnServer = true,
+	WriteableOnClient = true,
+	SyncToClient = true,
+	SyncToServer = true
 })
 
 Ext.Require("Client/Vanity/PresetManager.lua")
@@ -54,7 +59,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		separator:SetStyle("SeparatorTextAlign", 0.5)
 
 		local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-		if activePresetUUID then
+		if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
 			Vanity:ActivatePreset(activePresetUUID)
 		end
 	end)
@@ -63,6 +68,12 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 ---@param presetId Guid
 function Vanity:ActivatePreset(presetId)
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = presetId
+
+	Ext.Vars.SyncModVariables(ModuleUUID)
+
+	Ext.Timer.WaitFor(100, function ()
+		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId)
+	end)
 
 	local preset = ConfigurationStructure.config.vanity.presets[presetId] 
 	separator.Label = "Active Preset: " .. preset.Name

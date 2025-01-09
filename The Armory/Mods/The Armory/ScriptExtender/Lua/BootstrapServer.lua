@@ -11,4 +11,6 @@ Ext.Require("Server/Utility.lua")
 Ext.Require("Server/Vanity/ItemPreview.lua")
 Ext.Require("Server/Vanity/MiscClientHelpers.lua")
 Ext.Require("Server/Vanity/DyePreview.lua")
-Ext.Require("Server/Vanity/algorithmsFromCrow/BFS Algorithm.lua")
+
+Ext.Require("Server/Vanity/PartyOutfitManager.lua")
+Ext.Require("Server/Vanity/Transmogger.lua")

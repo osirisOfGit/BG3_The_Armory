@@ -53,6 +53,8 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot = {
 
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfit = {}
 
+---@alias VanityOutfit {[ActualSlot]: VanityOutfitSlot}
+
 ---@class VanityPreset
 ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	Author = "",
@@ -63,7 +65,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	ModSourced = nil,
 	---@type ModDependency[]
 	ModDependencies = {},
-	---@type {[VanityCriteriaCompositeKey] : {[ActualSlot]: VanityOutfitSlot}}
+	---@type {[VanityCriteriaCompositeKey] : VanityOutfit}
 	Outfits = {},
 }
 
