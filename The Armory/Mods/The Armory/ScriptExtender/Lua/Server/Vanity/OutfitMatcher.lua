@@ -18,14 +18,16 @@ local function computeScore(char, fields)
   local total = 0
   for i = 1, 7 do
     local val = fields[VanityCharacterCriteriaType[i]]
-    if val ~= "" then
+    if val ~= "" and val ~= nil then
       local slot = VanityCharacterCriteriaType[i]
       local cval = char[slot]
       if slot == "BodyType" and cval then
         cval = tostring(cval)
       end
-      if (cval and val) and cval == val then
+      if cval == val then
         total = total + (SlotWeight[slot] or 0)
+      else
+        return 0
       end
     end
   end

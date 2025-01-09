@@ -34,9 +34,9 @@ function Transmogger:MogCharacter(character, outfit)
 			---@type ItemTemplate
 			local vanityPiece = Ext.Template.GetTemplate(outfitSlot.equipment.guid)
 
-
+			
 			local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
-
+			
 			if not equippedItem then
 				if defaultPieces[actualSlot] then
 					equippedItem = Osi.CreateAt(defaultPieces[actualSlot], 0, 0, 0, 0, 0, "")
@@ -46,59 +46,15 @@ function Transmogger:MogCharacter(character, outfit)
 			else
 				Osi.Unequip(character.Uuid.EntityUuid, equippedItem)
 			end
-
-
+			
+			local createdVanity = Osi.CreateAt(vanityPiece.Id, 0, 0, 0, 1, 0, "")
+			Osi.RequestCanCombine(character.Uuid.EntityUuid, "e64e7287-d830-44a9-bbf9-0903a1cb48ec", equippedItem, createdVanity, "", "", 0)
+			
 			---@type EntityHandle
 			local equippedItemEntity = Ext.Entity.Get(equippedItem)
-
+			
 			Logger:BasicDebug("Mogging %s to look like %s", equippedItemEntity.DisplayName.Name:Get(), vanityPiece.Name)
-
-			if not equippedItemEntity.Vars.TheArmory_OriginalItemInfo then
-				equippedItemEntity.Vars.TheArmory_OriginalItemInfo = Ext.Types.Serialize(equippedItemEntity.GameObjectVisual)
-			end
-
-			local createdVanity = Osi.CreateAt(vanityPiece.Id, 0, 0, 0, 0, 0, "")
-			---@type EntityHandle
-			local createdVanityEntity = Ext.Entity.Get(createdVanity)
-
-			for key, value in pairs(Ext.Types.Serialize(createdVanityEntity.GameObjectVisual)) do
-				equippedItemEntity.GameObjectVisual[key] = value
-			end
-			-- equippedItemEntity.GameObjectVisual.RootTemplateId = vanityPiece.Id
-			-- equippedItemEntity.GameObjectVisual.Icon = vanityPiece.Icon
-			equippedItemEntity:Replicate("GameObjectVisual")
-
-			local function recursiveOverwrite(source, target)
-				local success, err = pcall(function()
-					if source and target then
-						for key, value in pairs(source) do
-							
-							if (type(value) == "table" and type(target[key]) == "table")
-								or key == "VisualSet"
-							then
-								recursiveOverwrite(value, target[key])
-							else
-								target[key] = value
-							end
-						end
-					end
-				end)
-				if not success then
-					Logger:BasicError("Error in recursiveOverwrite for %s", err)
-				end
-			end
-
-			if createdVanityEntity.ServerItem.Template.Equipment then
-				recursiveOverwrite(createdVanityEntity.ServerItem.Template.Equipment, equippedItemEntity.ServerItem.Template.Equipment)
-			end
-			equippedItemEntity.Icon.Icon = vanityPiece.Icon
-			equippedItemEntity:Replicate("Icon")
-
-			Osi.UnloadItem(createdVanity)
-
-			Ext.Timer.WaitFor(100, function()
-				Osi.Equip(character.Uuid.EntityUuid, equippedItem, 1, 0)
-			end)
+			
 		end
 		::continue::
 	end

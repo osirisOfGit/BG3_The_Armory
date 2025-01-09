@@ -30,10 +30,17 @@ local function ApplyTransmogsPerPreset()
 				---@type ResourceRace
 				local raceResource = Ext.StaticData.Get(playerEntity.Race.Race, "Race")
 				if raceResource.ParentGuid == "00000000-0000-0000-0000-000000000000" then
-					criteriaTable["Race"] = raceResource.ResourceUUID
+					-- Humanoid, useless
+					if raceResource.ResourceUUID ~= "899d275e-9893-490a-9cd5-be856794929f" then
+						criteriaTable["Race"] = raceResource.ResourceUUID
+					end
 				else
-					criteriaTable["Race"] = raceResource.ParentGuid
-					criteriaTable["Subrace"] = raceResource.ResourceUUID
+					if raceResource.ParentGuid == "899d275e-9893-490a-9cd5-be856794929f" then
+						criteriaTable["Race"] = raceResource.ResourceUUID
+					else
+						criteriaTable["Race"] = raceResource.ParentGuid
+						criteriaTable["Subrace"] = raceResource.ResourceUUID
+					end
 				end
 
 				local highestClassLevel = 0
@@ -49,7 +56,7 @@ local function ApplyTransmogsPerPreset()
 					end
 				end
 
-				-- criteriaTable["BodyType"] = playerEntity.CharacterCreationStats.BodyShape + playerEntity.CharacterCreationStats.BodyType
+				criteriaTable["BodyType"] = playerEntity.CharacterCreationStats.BodyShape + playerEntity.CharacterCreationStats.BodyType
 
 				---@type ResourceOrigin
 				local originResource = Ext.StaticData.Get(playerEntity.Origin.field_18, "Origin")
@@ -68,7 +75,7 @@ local function ApplyTransmogsPerPreset()
 				else
 					playerOutfit, compositeKey = Matcher.findBestMatch(criteriaTable, activeOutfits)
 				end
-				
+
 				if playerOutfit then
 					Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player[1], Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
 					Transmogger:MogCharacter(playerEntity, playerOutfit)

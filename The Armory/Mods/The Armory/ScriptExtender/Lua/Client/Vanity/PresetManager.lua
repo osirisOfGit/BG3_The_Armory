@@ -141,6 +141,7 @@ function VanityPresetManager:UpdatePresetView()
 			
 			presetGroup:AddButton("Activate (Save After)").OnClick = function ()
 				Vanity:ActivatePreset(guid)
+				VanityPresetManager:UpdatePresetView()
 			end
 			presetGroup:AddButton("Delete").OnClick = function ()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
