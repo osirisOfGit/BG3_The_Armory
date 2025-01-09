@@ -1,4 +1,5 @@
 Ext.Require("Shared/Configurations/VanityCharacterCriteria.lua")
+Ext.Require("Server/Vanity/OutfitMatcher.lua")
 
 Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
 	Server = true,
@@ -65,17 +66,20 @@ local function ApplyTransmogsPerPreset()
 					playerOutfit = activeOutfits[compositeKey]
 					Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player[1], Ext.Json.Stringify(criteriaTable))
 				else
-					-- TODO
+					playerOutfit, compositeKey = Matcher.findBestMatch(criteriaTable, activeOutfits)
 				end
-
+				
 				if playerOutfit then
+					Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player[1], Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
 					Transmogger:MogCharacter(playerEntity, playerOutfit)
+				else
+					Logger:BasicInfo("Could not find an outfit for player %s", player[1])
 				end
 			end
 		end
 	end
 end
 
-Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function (channel, payload, user)
+Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function(channel, payload, user)
 	ApplyTransmogsPerPreset()
 end)

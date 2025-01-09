@@ -70,8 +70,9 @@ function Transmogger:MogCharacter(character, outfit)
 
 			local function recursiveOverwrite(source, target)
 				local success, err = pcall(function()
-					if source then
+					if source and target then
 						for key, value in pairs(source) do
+							
 							if (type(value) == "table" and type(target[key]) == "table")
 								or key == "VisualSet"
 							then
