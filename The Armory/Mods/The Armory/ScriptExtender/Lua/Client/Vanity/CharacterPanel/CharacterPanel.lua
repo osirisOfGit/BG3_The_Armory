@@ -159,7 +159,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		for i, itemSlotOrWeaponTypeEntry in ipairs(group) do
 			local imageButton
 			if itemSlotOrWeaponTypeEntry[1] == "Dummy" then
-				imageButton = parentContainer:AddDummy(116, 60)
+				-- Dummy size math makes 0 sense to me
+				imageButton = parentContainer:AddDummy(164, 60)
 				imageButton.Label = itemSlotOrWeaponTypeEntry[2]
 			else
 				---@cast imageButton ExtuiImageButton
@@ -179,6 +180,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					end
 				end
 
+				local makeResetButton = false
+
 				--#region Equipment
 				if outfitSlotEntry and outfitSlotEntry.equipment then
 					---@type ItemTemplate
@@ -192,6 +195,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					imageButton.UserData = itemTemplate
 
 					Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
+					makeResetButton = true
 				else
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 				end
@@ -209,7 +213,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 								modDependency = "TODO"
 							}
 
-							Ext.Timer.WaitFor(350, function ()
+							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 							end)
 							BuildSlots(parentContainer, group, verticalSlots, slot)
@@ -226,6 +230,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
 					dyeButton.UserData = dyeTemplate
 					Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
+					makeResetButton = true
 				else
 					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 				end
@@ -240,13 +245,25 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 								guid = dyeTemplate.Id,
 								modDependency = "TODO"
 							}
-							Ext.Timer.WaitFor(350, function ()
+							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 							end)
 							BuildSlots(parentContainer, group, verticalSlots, slot)
 						end)
 				end
 				--#endregion
+
+				if makeResetButton then
+					local resetButton = parentContainer:AddImageButton("reset" .. itemSlot, "ico_reset_d", { 32, 32 })
+					resetButton.SameLine = true
+					resetButton.OnClick = function()
+						outfit[itemSlot].delete = true
+						outfit[itemSlot] = TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+						BuildSlots(parentContainer, group, verticalSlots, slot)
+					end
+				else
+					parentContainer:AddDummy(40, 40).SameLine = true
+				end
 			end
 
 			imageButton.SameLine = not verticalSlots and i % 2 == 0
