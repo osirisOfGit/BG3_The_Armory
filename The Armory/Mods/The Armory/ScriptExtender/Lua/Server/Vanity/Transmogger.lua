@@ -1,8 +1,14 @@
+---@diagnostic disable: missing-fields
+
 Ext.Vars.RegisterUserVariable("TheArmory_PlayerOutfit", {
 	Server = true
 })
 
 Ext.Vars.RegisterUserVariable("TheArmory_OriginalItemInfo", {
+	Server = true
+})
+
+Ext.Vars.RegisterUserVariable("TheArmory_Item_ReplicationComponents", {
 	Server = true
 })
 
@@ -24,6 +30,7 @@ local defaultPieces = {
 
 -- Things that will cause me psychic damage: https://discord.com/channels/1174823496086470716/1193836567194771506/1327500800766771271
 
+-- Everything commented out causes crashes
 local componentsToCopy = {
 	"Armor",
 	"AttributeFlags",
@@ -61,6 +68,13 @@ local componentsToCopy = {
 	"Weapon"
 }
 
+local componentsToReplicateOnRefresh = {
+	["DisplayName"] = true,
+	["ServerDisplayNameList"] = true,
+	["ServerIconList"] = true,
+	["Icon"] = true,
+}
+
 Transmogger = {}
 
 ---@param entity EntityHandle
@@ -82,7 +96,7 @@ end
 ---@param character EntityHandle
 ---@param outfit VanityOutfit
 function Transmogger:MogCharacter(character, outfit)
-	character.Vars.TheArmory_PlayerOutfit = outfit
+	character.Vars.TheArmory_PlayerOutfit = Ext.Json.Stringify(outfit, { Beautify = false })
 
 	for actualSlot, outfitSlot in pairs(outfit) do
 		if outfitSlot.equipment and outfitSlot.equipment.guid then
@@ -95,6 +109,11 @@ function Transmogger:MogCharacter(character, outfit)
 					goto continue
 				end
 			else
+				if string.sub(Osi.GetTemplate(equippedItem), -36) == outfitSlot.equipment.guid then
+					Logger:BasicDebug("Equipped item %s is already the vanity item %s", equippedItem, outfitSlot.equipment.guid)
+					goto continue
+				end
+
 				Osi.Unequip(character.Uuid.EntityUuid, equippedItem)
 			end
 
@@ -104,6 +123,7 @@ function Transmogger:MogCharacter(character, outfit)
 			---@type EntityHandle
 			local createdVanityEntity = Ext.Entity.Get(Osi.CreateAt(vanityPiece.Id, 0, 0, 0, 0, 0, ""))
 			createdVanityEntity.Vars.TheArmory_OriginalItemInfo = equippedItem
+			local varComponentsToReplicateOnRefresh = {}
 
 			---@type EntityHandle
 			local equippedItemEntity = Ext.Entity.Get(equippedItem)
@@ -133,12 +153,12 @@ function Transmogger:MogCharacter(character, outfit)
 									createdVanityEntity:CreateComponent(componentToCopy)
 								end
 
-								if componentToCopy == "ProficiencyGroup" then
-									createdVanityEntity.ProficiencyGroup.Flags = equippedItemEntity.ProficiencyGroup.Flags
-								else
-									componentBeingCopied = equippedItemEntity[componentToCopy]
+								componentBeingCopied = equippedItemEntity[componentToCopy]
 
-									Ext.Types.Unserialize(createdVanityEntity[componentToCopy], Ext.Types.Serialize(equippedItemEntity[componentToCopy]))
+								Ext.Types.Unserialize(createdVanityEntity[componentToCopy], Ext.Types.Serialize(equippedItemEntity[componentToCopy]))
+
+								if componentsToReplicateOnRefresh[componentToCopy] then
+									varComponentsToReplicateOnRefresh[componentToCopy] = Ext.Types.Serialize(equippedItemEntity[componentToCopy])
 								end
 
 								if not string.find(componentToCopy, "Server") then
@@ -208,15 +228,41 @@ function Transmogger:MogCharacter(character, outfit)
 			end
 
 			Ext.Timer.WaitFor(50, function()
-				local charUUID = character.Uuid.EntityUuid
-				local vanityUuid = createdVanityEntity.Uuid.EntityUuid
-				Osi.SetOriginalOwner(vanityUuid, charUUID)
-				Osi.SetOwner(vanityUuid, charUUID)
-				Osi.Equip(charUUID, vanityUuid, 1, 0, 1)
+				Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
+
+				Osi.RequestDelete(equippedItem)
 			end)
 
+			createdVanityEntity.Vars.TheArmory_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
 			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid)
 		end
 		::continue::
 	end
 end
+
+Ext.Events.SessionLoaded:Subscribe(function(e)
+	for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Item_ReplicationComponents")) do
+		---@type EntityHandle
+		local entity = Ext.Entity.Get(entityId)
+
+		if entity then
+			Logger:BasicDebug("Updating components in need of refreshing on mogged item %s (%s)", entityId, entity.DisplayName.Name:Get())
+			for component, serializedData in pairs(entity.Vars.TheArmory_Item_ReplicationComponents) do
+				Logger:BasicTrace("Refreshing component %s with %s",
+					component,
+					Ext.Json.Stringify(serializedData, {
+						IterateUserdata = true,
+						StringifyInternalTypes = true,
+						AvoidRecursion = true
+					}))
+
+				Ext.Types.Unserialize(entity[component], serializedData)
+
+				if not string.find(component, "Server") then
+					Logger:BasicTrace("Replicating %s", component)
+					entity:Replicate(component)
+				end
+			end
+		end
+	end
+end)
