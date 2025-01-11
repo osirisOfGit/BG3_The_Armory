@@ -1,7 +1,6 @@
 Matcher = {}
 
 -- Assign a weight to each slot if we want to compute a 'score'.
--- (Origin/Hireling both worth 6, Race=5, Subrace=4, BodyType=3, Class=2, Subclass=1)
 local SlotWeight = {
   Origin   = 6,
   Hireling = 6,

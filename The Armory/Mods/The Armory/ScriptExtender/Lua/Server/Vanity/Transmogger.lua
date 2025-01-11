@@ -22,7 +22,62 @@ local defaultPieces = {
 	MusicalInstrument = "848ad8dc-59f3-464b-b8b2-95eab6022446"
 }
 
+-- Things that will cause me psychic damage: https://discord.com/channels/1174823496086470716/1193836567194771506/1327500800766771271
+
+local componentsToCopy = {
+	"Armor",
+	"AttributeFlags",
+	"BoostsContainer",
+	"CanBeDisarmed",
+	"Data",
+	"DisplayName",
+	"Equipable",
+	["GameObjectVisual"] = {
+		"Icon"
+	},
+	"Icon",
+	"ItemBoosts",
+	"ItemDye",
+	-- "PassiveContainer",
+	-- "ProficiencyGroup",
+	"ServerBaseData",
+	"ServerBaseWeapon",
+	"ServerBoostTag",
+	"ServerDisplayNameList",
+	["ServerItem"] = {
+		"ItemType",
+		"Stats",
+	},
+	"ServerOwneeHistory",
+	"ServerIconList",
+	-- "ServerPassiveBase",
+	-- "ServerPassivePersistentData",
+	-- "ServerProficiencyGroupStats",
+	"ServerTemplateTag",
+	"StatusImmunities",
+	"Tag",
+	"Use",
+	"Value",
+	"Weapon"
+}
+
 Transmogger = {}
+
+---@param entity EntityHandle
+---@return string
+local function buildMetaInfoForLog(entity)
+	---@type Weapon|Armor|Object
+	local stat = Ext.Stats.Get(Osi.GetStatString(entity.Uuid.EntityUuid))
+
+	return Ext.Json.Stringify({
+		uuid = entity.Uuid.EntityUuid,
+		templateUuid = entity.ServerItem.Template.Id,
+		displayName = entity.DisplayName.Name:Get(),
+		statName = stat.Name,
+		modId = stat.ModId,
+		modName = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info.Name
+	})
+end
 
 ---@param character EntityHandle
 ---@param outfit VanityOutfit
@@ -31,12 +86,8 @@ function Transmogger:MogCharacter(character, outfit)
 
 	for actualSlot, outfitSlot in pairs(outfit) do
 		if outfitSlot.equipment and outfitSlot.equipment.guid then
-			---@type ItemTemplate
-			local vanityPiece = Ext.Template.GetTemplate(outfitSlot.equipment.guid)
-
-			
 			local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
-			
+
 			if not equippedItem then
 				if defaultPieces[actualSlot] then
 					equippedItem = Osi.CreateAt(defaultPieces[actualSlot], 0, 0, 0, 0, 0, "")
@@ -46,15 +97,125 @@ function Transmogger:MogCharacter(character, outfit)
 			else
 				Osi.Unequip(character.Uuid.EntityUuid, equippedItem)
 			end
-			
-			local createdVanity = Osi.CreateAt(vanityPiece.Id, 0, 0, 0, 1, 0, "")
-			Osi.RequestCanCombine(character.Uuid.EntityUuid, "e64e7287-d830-44a9-bbf9-0903a1cb48ec", equippedItem, createdVanity, "", "", 0)
-			
+
+			---@type ItemTemplate
+			local vanityPiece = Ext.Template.GetTemplate(outfitSlot.equipment.guid)
+
+			---@type EntityHandle
+			local createdVanityEntity = Ext.Entity.Get(Osi.CreateAt(vanityPiece.Id, 0, 0, 0, 0, 0, ""))
+			createdVanityEntity.Vars.TheArmory_OriginalItemInfo = equippedItem
+
 			---@type EntityHandle
 			local equippedItemEntity = Ext.Entity.Get(equippedItem)
-			
-			Logger:BasicDebug("Mogging %s to look like %s", equippedItemEntity.DisplayName.Name:Get(), vanityPiece.Name)
-			
+
+			Logger:BasicDebug("Mogging %s to look like %s for %s", equippedItemEntity.DisplayName.Name:Get(), vanityPiece.Name, character.DisplayName.Name:Get())
+
+			Logger:BasicTrace("========== STARTING MOG FOR %s to %s ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid)
+
+			local createdErrorDumps
+			for key, componentToCopy in pairs(componentsToCopy) do
+				local componentBeingCopied
+				local success, error = pcall(function()
+					if type(componentToCopy) == "string" then
+						if equippedItemEntity[componentToCopy] then
+							Logger:BasicTrace("Cloning component %s", componentToCopy)
+							if componentToCopy == "BoostsContainer" then
+								for _, statusToRemove in pairs(createdVanityEntity.ServerItem.StatusManager.Statuses) do
+									Logger:BasicTrace("Removing status %s", statusToRemove.StatusId)
+									Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, statusToRemove.StatusId)
+								end
+								for _, statusToAdd in pairs(equippedItemEntity.ServerItem.StatusManager.Statuses) do
+									Logger:BasicTrace("Adding status %s", statusToAdd.StatusId)
+								end
+							else
+								if not createdVanityEntity[componentToCopy] then
+									Logger:BasicTrace("Creating %s on vanity item", componentToCopy)
+									createdVanityEntity:CreateComponent(componentToCopy)
+								end
+
+								if componentToCopy == "ProficiencyGroup" then
+									createdVanityEntity.ProficiencyGroup.Flags = equippedItemEntity.ProficiencyGroup.Flags
+								else
+									componentBeingCopied = equippedItemEntity[componentToCopy]
+
+									Ext.Types.Unserialize(createdVanityEntity[componentToCopy], Ext.Types.Serialize(equippedItemEntity[componentToCopy]))
+								end
+
+								if not string.find(componentToCopy, "Server") then
+									Logger:BasicTrace("Replicating %s", componentToCopy)
+									createdVanityEntity:Replicate(componentToCopy)
+								end
+							end
+						end
+					else
+						if not createdVanityEntity[key] then
+							Logger:BasicTrace("Creating %s on vanity item", key)
+							createdVanityEntity:CreateComponent(key)
+						end
+
+						for _, subComponentToCopy in pairs(componentToCopy) do
+							Logger:BasicTrace("Cloning component %s under %s", subComponentToCopy, key)
+							componentBeingCopied = equippedItemEntity[key][subComponentToCopy]
+							if type(equippedItemEntity[key][subComponentToCopy]) == "string" then
+								createdVanityEntity[key][subComponentToCopy] = equippedItemEntity[key][subComponentToCopy]
+							else
+								Ext.Types.Unserialize(createdVanityEntity[key][subComponentToCopy], Ext.Types.Serialize(equippedItemEntity[key][subComponentToCopy]))
+							end
+						end
+						if not string.find(key, "Server") then
+							Logger:BasicTrace("Replicating %s", key)
+							createdVanityEntity:Replicate(key)
+						end
+					end
+
+					componentBeingCopied = nil
+				end)
+
+				if not success then
+					local componentInfo = componentBeingCopied and Ext.Types.TypeOf(componentBeingCopied)
+					Logger:BasicError(
+						"Encountered error while mogging %s to look like %s for %s. Entity Dumps created at dumps/. \n\tComponent Info: %s\n\tError: %s\n\tBase Item Info: %s\n\tVanity Item Info: %s",
+						equippedItemEntity.DisplayName.Name:Get(),
+						vanityPiece.Name,
+						character.DisplayName.Name:Get(),
+						Ext.Json.Stringify({
+							name = type(componentToCopy) == "string" and componentToCopy or key,
+							subComponents = type(componentToCopy) == "table" and Ext.Json.Stringify(componentToCopy) or nil,
+							typeOfComponent = componentInfo and Ext.Types.Serialize(componentInfo) or "Component was nil?"
+						}),
+						error,
+						buildMetaInfoForLog(equippedItemEntity),
+						buildMetaInfoForLog(createdVanityEntity))
+
+					if not createdErrorDumps then
+						createdErrorDumps = true
+
+						FileUtils:SaveStringContentToFile(FileUtils:BuildRelativeJsonFileTargetPath(equippedItem, "dumps"),
+							Ext.Json.Stringify(equippedItemEntity:GetAllComponents(), {
+								IterateUserdata = true,
+								StringifyInternalTypes = true,
+								AvoidRecursion = true
+							}))
+
+						FileUtils:SaveStringContentToFile(FileUtils:BuildRelativeJsonFileTargetPath(createdVanityEntity.Uuid.EntityUuid, "dumps"),
+							Ext.Json.Stringify(equippedItemEntity:GetAllComponents(), {
+								IterateUserdata = true,
+								StringifyInternalTypes = true,
+								AvoidRecursion = true
+							}))
+					end
+				end
+			end
+
+			Ext.Timer.WaitFor(50, function()
+				local charUUID = character.Uuid.EntityUuid
+				local vanityUuid = createdVanityEntity.Uuid.EntityUuid
+				Osi.SetOriginalOwner(vanityUuid, charUUID)
+				Osi.SetOwner(vanityUuid, charUUID)
+				Osi.Equip(charUUID, vanityUuid, 1, 0, 1)
+			end)
+
+			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid)
 		end
 		::continue::
 	end
