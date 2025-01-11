@@ -73,6 +73,7 @@ local componentsToReplicateOnRefresh = {
 	["ServerDisplayNameList"] = true,
 	["ServerIconList"] = true,
 	["Icon"] = true,
+	["Tag"] = true
 }
 
 Transmogger = {}
@@ -156,6 +157,11 @@ function Transmogger:MogCharacter(character, outfit)
 								componentBeingCopied = equippedItemEntity[componentToCopy]
 
 								Ext.Types.Unserialize(createdVanityEntity[componentToCopy], Ext.Types.Serialize(equippedItemEntity[componentToCopy]))
+
+								if componentToCopy == "Value" then
+									-- TE had reports of crashing when multiple unique items exist in the world (not equipped or in the player inventory)
+									createdVanityEntity.Value.Unique = false
+								end
 
 								if componentsToReplicateOnRefresh[componentToCopy] then
 									varComponentsToReplicateOnRefresh[componentToCopy] = Ext.Types.Serialize(equippedItemEntity[componentToCopy])
