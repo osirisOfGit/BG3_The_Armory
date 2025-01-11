@@ -54,26 +54,8 @@ local previewTimer
 ---@type ExtuiWindow?
 local openWindow = nil
 
----@param tooltip ExtuiTooltip
----@param itemStat Weapon|Armor|Object
----@param itemTemplate ItemTemplate
-local function BuildStatusTooltip(tooltip, itemStat, itemTemplate)
-	tooltip:AddText("\n")
-
-	if itemStat.ModId ~= "" then
-		local mod = Ext.Mod.GetMod(itemStat.ModId).Info
-		tooltip:AddText(string.format("From mod '%s' by '%s'", mod.Name, mod.Author ~= "" and mod.Author or "Larian")).TextWrapPos = 600
-	end
-
-	if itemStat.OriginalModId ~= "" and itemStat.OriginalModId ~= itemStat.ModId then
-		local mod = Ext.Mod.GetMod(itemStat.OriginalModId).Info
-		tooltip:AddText(string.format("Originally from mod '%s' by '%s'", mod.Name, mod.Author ~= "" and mod.Author or "Larian")).TextWrapPos = 600
-	end
-end
-
 ---@param itemGroup ExtuiChildWindow
 ---@param itemTemplate ItemTemplate
----@param imageButton ExtuiImageButton
 ---@param searchWindow ExtuiWindow
 ---@param onSelectFunc function
 ---@return ExtuiImageButton
@@ -116,7 +98,8 @@ local function createItemGroup(itemGroup, itemTemplate, searchWindow, onSelectFu
 	end
 
 	itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
-	BuildStatusTooltip(icon:Tooltip(), Ext.Stats.Get(itemTemplate.Stats), itemTemplate)
+	
+	Helpers:BuildTooltip(icon:Tooltip(), nil, Ext.Stats.Get(itemTemplate.Stats))
 
 	return favoriteButton
 end

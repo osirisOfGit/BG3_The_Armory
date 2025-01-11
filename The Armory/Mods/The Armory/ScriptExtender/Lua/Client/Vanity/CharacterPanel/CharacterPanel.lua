@@ -55,6 +55,30 @@ VanityCharacterPanel = {}
 ---@type ExtuiGroup
 local panelGroup
 
+local equipmentSlots = {
+	{ "Helmet",            "c_slot_helmet" },
+	{ "VanityBody",        "c_slot_vanityClothes" },
+	{ "Cloak",             "c_slot_cloak" },
+	{ "VanityBoots",       "c_slot_vanityBoots" },
+	{ "Breast",            "c_slot_breast" },
+	{ "Underwear",         "c_slot_underwear" },
+	{ "Gloves",            "c_slot_gloves" },
+	{ "Amulet",            "c_slot_necklace" },
+	{ "Boots",             "c_slot_boots" },
+	{ "Ring1",             "c_slot_ring1" },
+	{ "Dummy",             "ignore" },
+	{ "Ring2",             "c_slot_ring2" },
+	{ "LightSource",       "c_slot_lightSource" },
+	{ "MusicalInstrument", "c_slot_instrument" }
+}
+
+local weaponSlots = {
+	{ "Melee Main Weapon",     "c_slot_meleeMainHand" },
+	{ "Melee Offhand Weapon",  "c_slot_meleeOffHand" },
+	{ "Ranged Main Weapon",    "c_slot_rangedMainHand" },
+	{ "Ranged Offhand Weapon", "c_slot_rangedOffHand" }
+}
+
 ---@param tabHeader ExtuiTreeParent
 ---@param preset VanityPreset
 ---@param criteriaCompositeKey string
@@ -78,30 +102,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	displayTable:AddColumn("Equipment", "WidthFixed")
 	local displayRow = displayTable:AddRow()
 	local equipmentCell = displayRow:AddCell()
-
-	local equipmentSlots = {
-		{ "Helmet",            "c_slot_helmet" },
-		{ "VanityBody",        "c_slot_vanityClothes" },
-		{ "Cloak",             "c_slot_cloak" },
-		{ "VanityBoots",       "c_slot_vanityBoots" },
-		{ "Breast",            "c_slot_breast" },
-		{ "Underwear",         "c_slot_underwear" },
-		{ "Gloves",            "c_slot_gloves" },
-		{ "Amulet",            "c_slot_necklace" },
-		{ "Boots",             "c_slot_boots" },
-		{ "Ring1",             "c_slot_ring1" },
-		{ "Dummy",             "ignore" },
-		{ "Ring2",             "c_slot_ring2" },
-		{ "LightSource",       "c_slot_lightSource" },
-		{ "MusicalInstrument", "c_slot_instrument" }
-	}
-
-	local weaponSlots = {
-		{ "Melee Main Weapon",     "c_slot_meleeMainHand" },
-		{ "Melee Offhand Weapon",  "c_slot_meleeOffHand" },
-		{ "Ranged Main Weapon",    "c_slot_rangedMainHand" },
-		{ "Ranged Offhand Weapon", "c_slot_rangedOffHand" }
-	}
 
 	---@type table<string, ExtuiCollapsingHeader>
 	local weaponCols = {}
@@ -190,6 +190,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 						imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
 					end
 					imageButton.UserData = itemTemplate
+
+					Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
 				else
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 				end
@@ -223,6 +225,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					local dyeTemplate = Ext.Template.GetTemplate(outfitSlotEntry.dye.guid)
 					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
 					dyeButton.UserData = dyeTemplate
+					Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
 				else
 					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 				end
