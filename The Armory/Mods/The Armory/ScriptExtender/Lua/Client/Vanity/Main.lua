@@ -75,14 +75,17 @@ function Vanity:ActivatePreset(presetId, initializing)
 	VanityCharacterCriteria:BuildModule(mainParent, preset)
 end
 
--- Mod variables load in after the InsertModMenuTab function runs
-Ext.Events.GameStateChanged:Subscribe(
----@param e EclLuaGameStateChangedEvent
-	function(e)
-		if tostring(e.ToState) == "Running" then
+local hasBeenActivated = false
+
+Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
+	if not hasBeenActivated then
+		-- Mod variables load in after the InsertModMenuTab function runs
+		if ModuleUUID == payload.modUUID then
+			hasBeenActivated = true
 			local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
 				Vanity:ActivatePreset(activePresetUUID, true)
 			end
 		end
-	end)
+	end
+end)

@@ -20,7 +20,8 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewDye", function(channel, payload, 
 		local itemEntity = Ext.Entity.Get(equippedItem)
 		if not itemEntity.ItemDye then
 			itemEntity:CreateComponent("ItemDye")
-		else
+			userTracker[user] = "00000000-0000-0000-0000-000000000000"
+		elseif not userTracker[user] then
 			userTracker[user] = itemEntity.ItemDye.Color
 		end
 
@@ -44,9 +45,9 @@ Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingDye", function(channel, sl
 			return
 		end
 
-		Logger:BasicDebug("DyePreview: Reverting %s on %s to %s", equippedItem, character, userTracker[user] or "00000000-0000-0000-0000-000000000000")
+		Logger:BasicDebug("DyePreview: Reverting %s on %s to %s", equippedItem, character, userTracker[user])
 
-		itemEntity.ItemDye.Color = userTracker[user] or "00000000-0000-0000-0000-000000000000"
+		itemEntity.ItemDye.Color = userTracker[user]
 		itemEntity:Replicate("ItemDye")
 		userTracker[user] = nil
 	end

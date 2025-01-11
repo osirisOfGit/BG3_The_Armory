@@ -62,6 +62,7 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 	local searchWindow = Ext.IMGUI.NewWindow("Dye Picker")
 	searchWindow.Closeable = true
 	searchWindow.OnClose = function()
+		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
 		openWindow:Destroy()
 		openWindow = nil
 	end
