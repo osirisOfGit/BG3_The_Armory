@@ -11,9 +11,6 @@ Ext.Require("Client/Vanity/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 
 Vanity = {}
-
----@type VanityPreset?
-Vanity.activePreset = nil
 Vanity.userName = ""
 
 Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, userID)
@@ -64,19 +61,29 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		end
 	end)
 
----comment
 ---@param presetId Guid
 function Vanity:ActivatePreset(presetId)
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = presetId
 
 	Ext.Vars.SyncModVariables(ModuleUUID)
 
-	Ext.Timer.WaitFor(100, function ()
+	Ext.Timer.WaitFor(100, function()
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId)
 	end)
 
-	local preset = ConfigurationStructure.config.vanity.presets[presetId] 
+	local preset = ConfigurationStructure.config.vanity.presets[presetId]
 	separator.Label = "Active Preset: " .. preset.Name
 
 	VanityCharacterCriteria:BuildModule(mainParent, preset)
 end
+
+Ext.Events.GameStateChanged:Subscribe(
+---@param e EclLuaGameStateChangedEvent
+	function(e)
+		if tostring(e.ToState) == "Running" then
+			local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
+				Vanity:ActivatePreset(activePresetUUID)
+			end
+		end
+	end)
