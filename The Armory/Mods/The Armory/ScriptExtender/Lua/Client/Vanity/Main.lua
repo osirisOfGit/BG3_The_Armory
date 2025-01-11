@@ -54,22 +54,20 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		separator = tabHeader:AddSeparatorText("Choose A Preset")
 		separator:SetStyle("SeparatorTextAlign", 0.5)
-
-		local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-		if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
-			Vanity:ActivatePreset(activePresetUUID)
-		end
 	end)
 
 ---@param presetId Guid
-function Vanity:ActivatePreset(presetId)
+---@param initializing boolean?
+function Vanity:ActivatePreset(presetId, initializing)
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = presetId
 
 	Ext.Vars.SyncModVariables(ModuleUUID)
 
-	Ext.Timer.WaitFor(100, function()
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId)
-	end)
+	if not initializing then
+		Ext.Timer.WaitFor(100, function()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId)
+		end)
+	end
 
 	local preset = ConfigurationStructure.config.vanity.presets[presetId]
 	separator.Label = "Active Preset: " .. preset.Name
@@ -77,13 +75,14 @@ function Vanity:ActivatePreset(presetId)
 	VanityCharacterCriteria:BuildModule(mainParent, preset)
 end
 
+-- Mod variables load in after the InsertModMenuTab function runs
 Ext.Events.GameStateChanged:Subscribe(
 ---@param e EclLuaGameStateChangedEvent
 	function(e)
 		if tostring(e.ToState) == "Running" then
 			local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
-				Vanity:ActivatePreset(activePresetUUID)
+				Vanity:ActivatePreset(activePresetUUID, true)
 			end
 		end
 	end)
