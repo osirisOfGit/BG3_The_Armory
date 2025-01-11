@@ -17,9 +17,6 @@ Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, use
 	Vanity.username = payload
 end)
 
--- dirty hack to avoid warnings, fix later
-pcall(function() Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "") end)
-
 ---@type ExtuiTreeParent
 local mainParent
 
@@ -86,6 +83,8 @@ Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
 				Vanity:ActivatePreset(activePresetUUID, true)
 			end
+
+			Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
 		end
 	end
 end)
