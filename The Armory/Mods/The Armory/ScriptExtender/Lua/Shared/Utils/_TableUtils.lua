@@ -91,3 +91,15 @@ function TableUtils:OrderedPairs(t, keyTransformFunc)
 		end
 	end
 end
+
+---@param list table
+---@param str string
+---@return boolean, number?
+function TableUtils:ListContains(list, str)
+	for i, value in ipairs(list) do
+		if value == str then
+			return true, i
+		end
+	end
+	return false
+end

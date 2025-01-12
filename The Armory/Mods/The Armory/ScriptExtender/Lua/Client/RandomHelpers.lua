@@ -20,3 +20,4 @@ function Helpers:BuildTooltip(tooltip, itemName, itemStat)
 		tooltip:AddText(string.format("Originally from mod '%s' by '%s'", mod.Name, mod.Author ~= "" and mod.Author or "Larian")).TextWrapPos = 600
 	end
 end
+

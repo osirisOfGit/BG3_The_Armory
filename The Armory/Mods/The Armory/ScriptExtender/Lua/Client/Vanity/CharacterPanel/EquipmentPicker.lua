@@ -52,58 +52,7 @@ local imageSize = 90
 local previewTimer
 
 ---@type ExtuiWindow?
-local openWindow = nil
-
----@param itemGroup ExtuiChildWindow
----@param itemTemplate ItemTemplate
----@param searchWindow ExtuiWindow
----@param onSelectFunc function
----@return ExtuiImageButton
-local function createItemGroup(itemGroup, itemTemplate, searchWindow, onSelectFunc)
-	local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { imageSize, imageSize })
-	if icon.Image.Icon == "" then
-		icon:Destroy()
-		icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { imageSize, imageSize })
-	end
-	icon.Background = { 0, 0, 0, 0.5 }
-
-	-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
-	local favoriteButton = itemGroup:AddImageButton("Favorite", "star_empty", { 26, 26 })
-	favoriteButton.SameLine = true
-	favoriteButton.Background = { 0, 0, 0, 0.5 }
-	favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
-
-	icon.OnHoverEnter = function()
-		previewTimer = Ext.Timer.WaitFor(200, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", itemTemplate.Id)
-			previewTimer = nil
-		end)
-	end
-
-	icon.OnHoverLeave = function()
-		if previewTimer then
-			Ext.Timer.Cancel(previewTimer)
-			previewTimer = nil
-		end
-
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
-	end
-
-	icon.OnClick = function()
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
-		onSelectFunc(itemTemplate)
-		searchWindow.Open = false
-		openWindow:Destroy()
-		openWindow = nil
-	end
-
-	itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
-	
-	Helpers:BuildTooltip(icon:Tooltip(), nil, Ext.Stats.Get(itemTemplate.Stats))
-
-	return favoriteButton
-end
-
+local searchWindow = nil
 
 ---@alias ActualWeaponType string
 
@@ -119,18 +68,18 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 
 	local itemSlot = string.find(slot, "Ring") and "Ring" or slot
 
-	local searchWindow = Ext.IMGUI.NewWindow("Equipment Picker")
-	searchWindow.Closeable = true
-	searchWindow.OnClose = function()
-		openWindow:Destroy()
-		openWindow = nil
-	end
+	if not searchWindow then
+		searchWindow = Ext.IMGUI.NewWindow("Equipment Picker")
+		searchWindow.Closeable = true
+	else
+		if not searchWindow.Open then
+			searchWindow.Open = true
+		end
 
-	if openWindow then
-		openWindow.Open = false
-		openWindow:Destroy()
+		for _, child in pairs(searchWindow.Children) do
+			child:Destroy()
+		end
 	end
-	openWindow = searchWindow
 
 	searchWindow:AddSeparatorText(string.format("Searching for %s%s items", slot, weaponType and " (" .. weaponType .. ")" or "")):SetStyle("SeparatorTextAlign", 0.5)
 
@@ -163,6 +112,85 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 	resultGroup:AddNewLine()
 	resultGroup:AddNewLine()
 
+	--- I'm beginning to see why Aahz and Volitio like OOP in Lua so much - managing scope like this is a PITA
+	---@param displayGroup ExtuiCollapsingHeader
+	---@param itemTemplate ItemTemplate
+	---@return boolean
+	local function createItemGroup(displayGroup, itemTemplate)
+		local itemGroup = displayGroup:AddChildWindow(itemTemplate.Id .. displayGroup.Label)
+		itemGroup.NoSavedSettings = true
+		itemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
+		itemGroup.ChildAlwaysAutoResize = true
+		itemGroup.SameLine = rowCount <= numPerRow
+
+		local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { imageSize, imageSize })
+		if icon.Image.Icon == "" then
+			icon:Destroy()
+			icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { imageSize, imageSize })
+		end
+		icon.Background = { 0, 0, 0, 0.5 }
+
+		local isFavorited = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.equipment.favorites, itemTemplate.Id)
+		local favoriteButtonAnchor = itemGroup:AddGroup("favoriteAnchor" .. itemTemplate.Id)
+		favoriteButtonAnchor.SameLine = true
+		local favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id,
+			-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
+			isFavorited and "star_fileld" or "star_empty",
+			{ 26, 26 })
+
+		favoriteButton.UserData = itemTemplate.Id
+		favoriteButton.Background = { 0, 0, 0, 0.5 }
+		favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+
+		favoriteButton.OnClick = function()
+			local isInList, index = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteButton.UserData)
+			if not isInList then
+				table.insert(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteButton.UserData)
+				local func = favoriteButton.OnClick
+				favoriteButton:Destroy()
+				favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id, "star_fileld", { 26, 26 })
+				favoriteButton.UserData = itemTemplate.Id
+				favoriteButton.OnClick = func
+				favoriteButton.SameLine = true
+				favoriteButton.Background = { 0, 0, 0, 0.5 }
+				favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+
+				createItemGroup(favoritesGroup, itemTemplate)
+			else
+				table.remove(ConfigurationStructure.config.vanity.settings.equipment.favorites, index)
+				EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
+			end
+		end
+
+		icon.OnHoverEnter = function()
+			previewTimer = Ext.Timer.WaitFor(200, function()
+				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", itemTemplate.Id)
+				previewTimer = nil
+			end)
+		end
+
+		icon.OnHoverLeave = function()
+			if previewTimer then
+				Ext.Timer.Cancel(previewTimer)
+				previewTimer = nil
+			end
+
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		end
+
+		icon.OnClick = function()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+			onSelectFunc(itemTemplate)
+			searchWindow.Open = false
+		end
+
+		itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
+
+		Helpers:BuildTooltip(icon:Tooltip(), nil, Ext.Stats.Get(itemTemplate.Stats))
+
+		return isFavorited
+	end
+
 	local function displayResult(templateName)
 		local itemTemplate = rootsByName[templateName]
 
@@ -194,20 +222,8 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 			end
 		end
 
-		local itemGroup = resultGroup:AddChildWindow(itemTemplate.Name)
-		itemGroup.NoSavedSettings = true
-		itemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
-		itemGroup.ChildAlwaysAutoResize = true
-		itemGroup.SameLine = rowCount <= numPerRow
-
-		local favoriteButton = createItemGroup(itemGroup, itemTemplate, searchWindow, onSelectFunc)
-
-		favoriteButton.OnClick = function()
-			local favoriteItemGroup = favoritesGroup:AddChildWindow(itemTemplate.Name .. "_favorite")
-			favoriteItemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
-			favoriteItemGroup.ChildAlwaysAutoResize = true
-			favoriteItemGroup.SameLine = rowCount <= numPerRow
-			createItemGroup(favoriteItemGroup, itemTemplate, searchWindow, onSelectFunc)
+		if createItemGroup(resultGroup, itemTemplate) then
+			createItemGroup(favoritesGroup, itemTemplate)
 		end
 
 		if rowCount > numPerRow then
