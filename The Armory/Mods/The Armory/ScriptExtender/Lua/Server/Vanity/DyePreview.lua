@@ -41,7 +41,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingDye", function(channel, sl
 	if equippedItem then
 		---@type EntityHandle
 		local itemEntity = Ext.Entity.Get(equippedItem)
-		if not itemEntity.ItemDye then
+		if not itemEntity.ItemDye or userTracker[user] then
 			return
 		end
 

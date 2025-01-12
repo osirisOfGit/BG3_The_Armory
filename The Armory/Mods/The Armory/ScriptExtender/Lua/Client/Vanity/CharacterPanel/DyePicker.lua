@@ -45,12 +45,13 @@ end
 
 DyePicker = {}
 
----@type DyePayload
-local dyePayload = {}
-
 ---@type ExtuiWindow?
-local openWindow
+local searchWindow
 
+local searchResultsCache = {}
+local useCache
+
+--- TODO: Rewrite all this since it got super messy with favorites
 ---@param itemTemplate ItemTemplate
 ---@param slot ActualSlot
 ---@param onSelectFunc function
@@ -58,26 +59,29 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 	if not next(rootsByName) then
 		populateTemplateTable()
 	end
-	
-	local searchWindow = Ext.IMGUI.NewWindow("Dye Picker")
-	searchWindow.Closeable = true
+
+	if not searchWindow then
+		searchWindow = Ext.IMGUI.NewWindow("Dye Picker")
+		searchWindow.Closeable = true
+	else
+		if not searchWindow.Open then
+			searchWindow.Open = true
+		end
+		for _, child in pairs(searchWindow.Children) do
+			child:Destroy()
+		end
+	end
 	searchWindow.OnClose = function()
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
-		openWindow:Destroy()
-		openWindow = nil
+		useCache = false
+		searchResultsCache = {}
 	end
-	
-	if openWindow then
-		openWindow.Open = false
-		openWindow:Destroy()
-	end
-	openWindow = searchWindow
 
 	searchWindow:AddSeparatorText(string.format("Searching for %s Dyes", slot)):SetStyle("SeparatorTextAlign", 0.5)
-	
+
 	---@type ExtuiGroup?
 	local activeDyeGroup
-	
+
 	--#region Input
 	local searchInput = searchWindow:AddInputText("")
 	searchInput.Hint = "Case-insensitive"
@@ -115,101 +119,114 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 
 	local infoCell = row:AddCell()
 
-	local function displayResult(templateName)
+	local function displayResult(templateName, buildingFavorite)
+		if not useCache and not buildingFavorite then
+			table.insert(searchResultsCache, templateName)
+		end
+
 		local dyeTemplate = rootsByName[templateName]
 
 		---@type ResourceMaterialPresetResource
 		local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 
-		local favoriteButton = dyeWindow:AddImageButton("Favorite" .. templateName, "star_empty", { 26, 26 })
-		favoriteButton.Background = { 0, 0, 0, 0.5 }
-		favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+		local isFavorited, favoriteIndex = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
+		if not buildingFavorite or isFavorited then
+			local targetSection = buildingFavorite and favoritesHeader or dyeWindow
 
-		local dyeImageButton = dyeWindow:AddImageButton(templateName, dyeTemplate.Icon, { 64, 64 })
-		dyeImageButton.UserData = materialPreset.Guid
-		dyeImageButton.SameLine = true
-		dyeImageButton.Background = { 0, 0, 0, 0.5 }
-		dyeWindow:AddText(templateName).SameLine = true
+			local favoriteButton = targetSection:AddImageButton("Favorite" .. templateName, isFavorited and "star_fileld" or "star_empty", { 26, 26 })
+			favoriteButton.Background = { 0, 0, 0, 0.5 }
+			favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+			favoriteButton.SameLine = buildingFavorite or false
 
-		local dyeInfoGroup = infoCell:AddGroup(templateName .. slot .. "dye")
-		dyeInfoGroup.Visible = not activeDyeGroup
-		if not activeDyeGroup then
-			activeDyeGroup = dyeInfoGroup
-		end
+			local dyeImageButton = targetSection:AddImageButton(templateName, dyeTemplate.Icon, { 64, 64 })
+			dyeImageButton.UserData = materialPreset.Guid
+			dyeImageButton.SameLine = true
+			dyeImageButton.Background = { 0, 0, 0, 0.5 }
 
-		---@type Object
-		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
-		local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
+			if not buildingFavorite then
+				targetSection:AddText(templateName).SameLine = true
+			else
+				dyeImageButton:Tooltip():AddText("\t " .. templateName)
+			end
 
-		dyeInfoGroup:AddSeparatorText(templateName)
-		dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian")):SetColor("Text", { 1, 1, 1, 0.5 })
-		dyeInfoGroup:AddButton("Select").OnClick = function()
-			activeDyeGroup = nil
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
-			onSelectFunc(dyeTemplate)
-			searchWindow.Open = false
-			openWindow:Destroy()
-			openWindow = nil
-		end
-		dyeInfoGroup:AddSeparator()
-
-		---@type ResourcePresetDataVector3Parameter[]
-		local materialColorParams = {}
-		for _, setting in pairs(materialPreset.Presets.Vector3Parameters) do
-			table.insert(materialColorParams, setting)
-		end
-		table.sort(materialColorParams, function(a, b)
-			return a.Parameter < b.Parameter
-		end)
-
-		local dyeTable = dyeInfoGroup:AddTable(templateName, 2)
-		dyeTable.SizingStretchProp = true
-
-		for _, colorSetting in pairs(materialColorParams) do
-			if colorSetting.Color then
-				local dyeRow = dyeTable:AddRow()
-				dyeRow:AddCell():AddText(colorSetting.Parameter)
-				if colorSetting.Enabled then
-					dyeRow:AddCell():AddColorEdit("", colorSetting.Value).ItemReadOnly = true
-				else
-					dyeRow:AddCell():AddText("---")
+			dyeImageButton.OnClick = function()
+				if activeDyeGroup then
+					activeDyeGroup:Destroy()
 				end
+				local dyeInfoGroup = infoCell:AddGroup(templateName .. slot .. "dye")
+
+				---@type Object
+				local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
+				local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
+
+				dyeInfoGroup:AddSeparatorText(templateName)
+				dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian"))
+					:SetColor("Text", { 1, 1, 1, 0.5 })
+
+				dyeInfoGroup:AddButton("Select").OnClick = function()
+					activeDyeGroup = nil
+					Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", slot)
+					onSelectFunc(dyeTemplate)
+					searchWindow.Open = false
+					searchWindow:Destroy()
+					searchWindow = nil
+				end
+				dyeInfoGroup:AddSeparator()
+
+				---@type ResourcePresetDataVector3Parameter[]
+				local materialColorParams = {}
+				for _, setting in pairs(Ext.Resource.Get(dyeImageButton.UserData, "MaterialPreset").Presets.Vector3Parameters) do
+					table.insert(materialColorParams, setting)
+				end
+				table.sort(materialColorParams, function(a, b)
+					return a.Parameter < b.Parameter
+				end)
+
+				local dyeTable = dyeInfoGroup:AddTable(templateName, 2)
+				dyeTable.SizingStretchProp = true
+
+				for _, colorSetting in pairs(materialColorParams) do
+					if colorSetting.Color then
+						local dyeRow = dyeTable:AddRow()
+						dyeRow:AddCell():AddText(colorSetting.Parameter)
+						if colorSetting.Enabled then
+							dyeRow:AddCell():AddColorEdit("", colorSetting.Value).ItemReadOnly = true
+						else
+							dyeRow:AddCell():AddText("---")
+						end
+					end
+				end
+
+				activeDyeGroup = dyeInfoGroup
+				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewDye", Ext.Json.Stringify({
+					materialPreset = dyeImageButton.UserData,
+					slot = slot
+				}))
 			end
-		end
 
-		dyeImageButton.OnClick = function()
-			if activeDyeGroup then
-				activeDyeGroup.Visible = false
+			favoriteButton.OnClick = function()
+				if not isFavorited then
+					table.insert(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
+				else
+					table.remove(ConfigurationStructure.config.vanity.settings.dyes.favorites, favoriteIndex)
+				end
+				useCache = true
+				DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 			end
-			activeDyeGroup = dyeInfoGroup
-			dyeInfoGroup.Visible = true
-			dyePayload = {
-				materialPreset = dyeImageButton.UserData,
-				slot = slot
-			}
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewDye", Ext.Json.Stringify(dyePayload))
-		end
-
-		favoriteButton.OnClick = function()
-			-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
-			local newFavoriteButton = favoritesHeader:AddImageButton("Favorited" .. templateName, "star_fileld", { 26, 26 })
-			newFavoriteButton.Background = { 0, 0, 0, 0.5 }
-			newFavoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
-			newFavoriteButton.SameLine = true
-
-			local favoriteDyeButton = favoritesHeader:AddImageButton(templateName, dyeTemplate.Icon, { 64, 64 })
-			favoriteDyeButton.Background = { 0, 0, 0, 0.5 }
-			favoriteDyeButton.SameLine = true
-			favoriteDyeButton.OnClick = dyeImageButton.OnClick
 		end
 	end
 	--#endregion
 	for _, templateName in pairs(sortedTemplateNames) do
-		displayResult(templateName)
+		if not string.find(templateName, "FOCUSDYES_MiraculousDye") and (not useCache or TableUtils:ListContains(searchResultsCache, templateName)) then
+			displayResult(templateName)
+		end
+		displayResult(templateName, true)
 	end
 
 	getAllForModCombo.OnChange = function()
 		activeDyeGroup = nil
+		searchResultsCache = {}
+		useCache = false
 
 		for _, child in pairs(dyeWindow.Children) do
 			child:Destroy()
@@ -234,6 +251,9 @@ function DyePicker:PickDye(itemTemplate, slot, onSelectFunc)
 
 		delayTimer = Ext.Timer.WaitFor(150, function()
 			activeDyeGroup = nil
+			searchResultsCache = {}
+			useCache = false
+
 			for _, child in pairs(dyeWindow.Children) do
 				child:Destroy()
 			end

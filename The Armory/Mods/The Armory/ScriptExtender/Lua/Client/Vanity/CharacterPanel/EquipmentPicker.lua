@@ -158,6 +158,7 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 				createItemGroup(favoritesGroup, itemTemplate)
 			else
 				table.remove(ConfigurationStructure.config.vanity.settings.equipment.favorites, index)
+				
 				EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 			end
 		end
