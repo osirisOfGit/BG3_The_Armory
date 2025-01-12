@@ -69,7 +69,7 @@ end
 --- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
 --- Optionally accepts a function to transform the key for sorting and returning
 ---@param t table
----@param keyTransformFunc function
+---@param keyTransformFunc function?
 ---@return function
 function TableUtils:OrderedPairs(t, keyTransformFunc)
 	local keys = {}

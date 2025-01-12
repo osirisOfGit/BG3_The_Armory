@@ -1,9 +1,12 @@
 ---@class UserEntry
 ---@field previewItem Guid
 ---@field equippedItem GUIDSTRING
+---@field armorSet integer
 
 ---@type {[string] : UserEntry}
 local previewingItemTable = {}
+
+local resetSetTimer
 
 Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, templateUUID, user)
 	user = PeerToUserID(user)
@@ -13,12 +16,26 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, template
 		previewingItemTable[user] = {}
 	end
 
+	if resetSetTimer then
+		Ext.Timer.Cancel(resetSetTimer)
+		resetSetTimer = nil
+	end
+
 	local userPreview = previewingItemTable[user]
+	if not userPreview.armorSet then
+		userPreview.armorSet = Osi.GetArmourSet(character)
+	end
 	userPreview.previewItem = Osi.CreateAt(templateUUID, 0, 0, 0, 0, 0, "")
 
 	Logger:BasicDebug("%s started previewing %s", character, userPreview.previewItem)
 
-	userPreview.equippedItem = Osi.GetEquippedItem(character, Ext.Stats.Get(Osi.GetStatString(userPreview.previewItem)).Slot)
+	local slot = Ext.Stats.Get(Osi.GetStatString(userPreview.previewItem)).Slot
+	userPreview.equippedItem = Osi.GetEquippedItem(character, slot)
+
+	local correctArmorSet = string.find(slot, "Vanity") and 1 or 0
+	if correctArmorSet ~= userPreview.armorSet then
+		Osi.SetArmourSet(character, correctArmorSet)
+	end
 
 	-- Otherwise the avatar doesn't show it in the inventory view
 	Ext.Timer.WaitFor(200, function()
@@ -39,12 +56,22 @@ local function DeleteItem(character, userPreview)
 	userPreview.previewItem = nil
 end
 
+
 Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, payload, user)
 	user = PeerToUserID(user)
 	local character = Osi.GetCurrentCharacter(user)
 
 	local userPreview = previewingItemTable[user]
 	if userPreview and userPreview.previewItem then
+		if resetSetTimer then
+			Ext.Timer.Cancel(resetSetTimer)
+			resetSetTimer = nil
+		end
+
+		resetSetTimer = Ext.Timer.WaitFor(1000, function()
+			Osi.SetArmourSet(character, userPreview.armorSet)
+			userPreview.armorSet = nil
+		end)
 		DeleteItem(character, userPreview)
 	end
 end)

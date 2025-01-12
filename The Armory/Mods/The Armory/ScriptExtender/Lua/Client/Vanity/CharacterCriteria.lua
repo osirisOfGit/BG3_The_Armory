@@ -81,6 +81,72 @@ local activeCriteria = {}
 ---@type ExtuiGroup
 local criteriaGroup
 
+---@param preset VanityPreset
+local function buildConfiguredCriteriaCombinationsPopup(preset)
+	local popupButton = criteriaGroup:AddButton("See Configured Character Criteria Combinations")
+
+	local popup = Ext.IMGUI.NewWindow("Configured Character Criteria Combinations")
+	popup.Closeable = true
+	popup.AlwaysAutoResize = true
+	popup.NoResize = true
+	popup.Open = false
+
+	local refreshButton = popup:AddButton("Refresh")
+
+	local criteriaSelectionDisplayTable = popup:AddTable("ConfiguredCriteriaCombinations", 7)
+	criteriaSelectionDisplayTable.SizingStretchSame = true
+	criteriaSelectionDisplayTable.RowBg = true
+
+	local charCriteriaHeaders = criteriaSelectionDisplayTable:AddRow()
+	charCriteriaHeaders.Headers = true
+
+	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
+		charCriteriaHeaders:AddCell():AddText(criteriaType)
+	end
+
+	local function buildTable()
+		for criteriaCompositeKey, _ in TableUtils:OrderedPairs(preset.Outfits) do
+			local row = criteriaSelectionDisplayTable:AddRow()
+			local parsedCriteriaTable = ParseCriteriaCompositeKey(criteriaCompositeKey)
+
+			for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
+				local criteriaId = parsedCriteriaTable[criteriaType]
+				local criteriaValue
+				if criteriaId == "" then
+					criteriaValue = "---"
+				elseif criteriaType == "BodyType" then
+					criteriaValue = criteriaId
+				else
+					local resourceType = (criteriaType == "Class" or criteriaType == "Subclass") and "ClassDescription" or criteriaType
+					resourceType = criteriaType == "Hireling" and "Origin" or resourceType
+
+					---@type ResourceClassDescription|ResourceRace|ResourceOrigin
+					local resource = Ext.StaticData.Get(criteriaId, resourceType)
+					criteriaValue = resource.DisplayName:Get()
+				end
+
+				row:AddCell():AddText(criteriaValue)
+			end
+		end
+	end
+
+	buildTable()
+
+	refreshButton.OnClick = function ()
+		for _, child in pairs(criteriaSelectionDisplayTable.Children) do
+			if not child.Headers then
+				child:Destroy()
+			end
+		end
+
+		buildTable()
+	end
+
+	popupButton.OnClick = function()
+		popup.Open = true
+	end
+end
+
 ---@param tabHeader ExtuiTreeParent
 ---@param preset VanityPreset
 function VanityCharacterCriteria:BuildModule(tabHeader, preset)
@@ -97,6 +163,8 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 			child:Destroy()
 		end
 	end
+
+	buildConfiguredCriteriaCombinationsPopup(preset)
 
 	local characterCriteriaSection = criteriaGroup:AddCollapsingHeader("Configure by Character Criteria")
 	characterCriteriaSection.DefaultOpen = true
@@ -223,7 +291,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 				childSelectable.Selected = false
 			end
 		end
-		
+
 		for index, columnCell in pairs(characterCriteriaRow.Children) do
 			if index > columnIndex then
 				for _, child in pairs(columnCell.Children) do
