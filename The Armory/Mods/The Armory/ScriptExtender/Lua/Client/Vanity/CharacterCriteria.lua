@@ -206,6 +206,9 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 		selectable.OnClick = function()
 			activeCriteraTypes[criteriaType] = selectable.Selected and selectable.UserData or nil
+			if selectable.Selected then
+				selectable:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
+			end
 
 			selectedCriteriaDisplayRow.Children[VanityCharacterCriteriaType[criteriaType]].Children[1].Label = selectable.Selected and selectable.Label or "---"
 
@@ -216,7 +219,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 			elseif criteriaType == "Race" or criteriaType == "Class" then
 				local subColIndex = VanityCharacterCriteriaType[criteriaType] + 1
 				activeCriteraTypes[VanityCharacterCriteriaType[subColIndex]] = nil
-				
+
 				selectedCriteriaDisplayRow.Children[subColIndex].Children[1].Label = "---"
 				---@type ExtuiTableCell
 				local subColumn = criteriaSelectionRow.Children[subColIndex]
