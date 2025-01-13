@@ -97,6 +97,10 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	end
 	panelGroup:AddSeparator()
 
+	if string.match(criteriaCompositeKey, "^|+$") then
+		return
+	end
+
 	local displayTable = panelGroup:AddTable("SlotDisplayTable", 5)
 	displayTable.ScrollY = true
 	displayTable:AddColumn("Equipment", "WidthFixed")

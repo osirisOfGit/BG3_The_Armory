@@ -26,7 +26,7 @@ local function PopulatePlayableRaces()
 	end
 end
 
----@type {[Guid] : ResourceClassDescription[] }
+---@type {[Guid] : ResourceClassDescription[]}
 local classesAndSubclasses = {}
 local function PopulateClassesAndSubclasses()
 	for _, classGuid in pairs(Ext.StaticData.GetAll("ClassDescription")) do
@@ -75,8 +75,6 @@ local function PopulateOriginCharacters()
 end
 
 VanityCharacterCriteria = {}
-
-local activeCriteria = {}
 
 ---@type ExtuiGroup
 local criteriaGroup
@@ -132,7 +130,7 @@ local function buildConfiguredCriteriaCombinationsPopup(preset)
 
 	buildTable()
 
-	refreshButton.OnClick = function ()
+	refreshButton.OnClick = function()
 		for _, child in pairs(criteriaSelectionDisplayTable.Children) do
 			if not child.Headers then
 				child:Destroy()
@@ -166,213 +164,130 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 	buildConfiguredCriteriaCombinationsPopup(preset)
 
-	local characterCriteriaSection = criteriaGroup:AddCollapsingHeader("Configure by Character Criteria")
-	characterCriteriaSection.DefaultOpen = true
 	local criteriaSelectionDisplayTable = criteriaGroup:AddTable("CharacterCriteraSelection", 7)
+	criteriaSelectionDisplayTable.SizingStretchSame = true
+	criteriaSelectionDisplayTable.NoPadInnerX = true
+
 	local charCriteriaHeaders = criteriaSelectionDisplayTable:AddRow()
 	charCriteriaHeaders.Headers = true
 
+	local nameToUuid = {}
+
 	local selectedCriteriaDisplayRow = criteriaSelectionDisplayTable:AddRow()
-	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
+	for criteriaTypeIndex, criteriaType in ipairs(VanityCharacterCriteriaType) do
 		charCriteriaHeaders:AddCell():AddText(criteriaType)
 		local cell = selectedCriteriaDisplayRow:AddCell()
 		cell.UserData = criteriaType
-		cell:AddText("---")
-	end
+		cell:SetStyle("CellPadding", 0, 0)
 
-	local function findTextToUpdate(selectType, selectable)
-		for _, cell in pairs(selectedCriteriaDisplayRow.Children) do
-			if cell.UserData == selectType then
-				cell.Children[1].Label = selectable.Label
+		local criteriaCombo = cell:AddCombo("")
+		criteriaCombo.IDContext = criteriaType
+		criteriaCombo.WidthFitPreview = true
+
+		local subResourceFunction
+
+		local options = { "         " }
+		if criteriaType == "Origin" or criteriaType == "Hireling" then
+			for _, origin in pairs(criteriaType == "Origin" and originCharacters or hirelings) do
+				---@type ResourceOrigin
+				local resource = Ext.StaticData.Get(origin, "Origin")
+
+				nameToUuid[resource.DisplayName:Get() or resource.Name] = resource.ResourceUUID
+				table.insert(options, resource.DisplayName:Get() or resource.Name)
 			end
-		end
-	end
+			subResourceFunction = function()
+				if criteriaType == "Origin" then
+					---@type ExtuiCombo
+					local hirelingCombo = selectedCriteriaDisplayRow.Children[VanityCharacterCriteriaType["Hireling"]].Children[1]
 
-	local characterCriteriaTable = characterCriteriaSection:AddTable("Class-Race", 7)
-	characterCriteriaTable:AddColumn("FirstRaceOrClassSelect", "WidthStretch")
-	characterCriteriaTable:AddColumn("SecondClassOrRace", "WidthStretch")
-	characterCriteriaTable:AddColumn("ThirdSubclassOrSubrace", "WidthStretch")
-	characterCriteriaTable:AddColumn("FourthRace", "WidthStretch")
-	characterCriteriaTable:AddColumn("FifthSubRace", "WidthStretch")
-	characterCriteriaTable:AddColumn("SixthBodyTypeSubRace", "WidthStretch")
+					hirelingCombo.SelectedIndex = -1
+				else
+					---@type ExtuiCombo
+					local originCombo = selectedCriteriaDisplayRow.Children[VanityCharacterCriteriaType["Origin"]].Children[1]
 
-	local characterCriteriaRow = characterCriteriaTable:AddRow()
-	characterCriteriaRow:AddCell()
-	characterCriteriaRow:AddCell()
-	characterCriteriaRow:AddCell()
-	characterCriteriaRow:AddCell()
-	characterCriteriaRow:AddCell()
-	characterCriteriaRow:AddCell()
-	characterCriteriaRow:AddCell()
+					originCombo.SelectedIndex = -1
+				end
+			end
+		elseif criteriaType == "Class" then
+			for class, _ in pairs(classesAndSubclasses) do
+				---@type ResourceClassDescription
+				local resource = Ext.StaticData.Get(class, "ClassDescription")
+				nameToUuid[resource.DisplayName:Get() or resource.Name] = class
+				table.insert(options, resource.DisplayName:Get() or resource.Name)
+			end
 
-	local bodyTypeTree = {
-		BodyType = {
-			1, 2, 3, 4
-		}
-	}
-	local raceTree = {
-		Race = {
-			["By Body Type"] = bodyTypeTree,
-			["By Origin"] = {
-				Origin = bodyTypeTree
-			},
-			["By Hireling"] = {
-				Hireling = bodyTypeTree
-			},
-			Subrace = {
-				BodyType = bodyTypeTree.BodyType,
-				["By Origin"] = {
-					Origin = {}
-				},
-				["By Hireling"] = {
-					Hireling = {}
-				},
-			}
-		}
-	}
+			subResourceFunction = function(className)
+				---@type ExtuiCombo
+				local subclassCombo = selectedCriteriaDisplayRow.Children[criteriaTypeIndex + 1].Children[1]
+				subclassCombo.SelectedIndex = 0
 
-	local tree = {
-		["By Race"] = raceTree,
-		["By Class"] = {
-			Class = {
-				Subclass = {
-					Race = raceTree.Race,
-					["By Body Type"] = {
-						BodyType = bodyTypeTree.BodyType,
-						["By Origin"] = {
-							Origin = {}
-						},
-						["By Hireling"] = {
-							Hireling = {}
-						},
-					},
-					["By Origin"] = {
-						Origin = {}
-					},
-					["By Hireling"] = {
-						Hireling = {}
-					}
-				},
-				["By Race"] = raceTree,
-				["By Body Type"] = bodyTypeTree,
-				["By Origin"] = {
-					Origin = {}
-				},
-				["By Hireling"] = {
-					Hireling = {}
-				}
-			}
-		},
-		["By Body Type"] = bodyTypeTree,
-		["By Origin"] = {
-			Origin = {}
-		},
-		["By Hireling"] = {
-			Hireling = {}
-		}
-	}
+				if criteriaCombo.SelectedIndex < 1 then
+					subclassCombo.Options = {}
+					subclassCombo.Visible = false
+				else
+					local subOptions = { "         " }
+					for _, subClass in pairs(classesAndSubclasses[nameToUuid[className]]) do
+						nameToUuid[subClass.ResourceUUID] = subClass.DisplayName:Get() or subClass.Name
+						table.insert(subOptions, subClass.DisplayName:Get() or subClass.Name)
+					end
+					subclassCombo.Options = subOptions
+					subclassCombo.Visible = #subclassCombo.Options > 1
+				end
+			end
+		elseif criteriaType == "Race" then
+			for race, _ in pairs(playableRaces) do
+				---@type ResourceRace
+				local resource = Ext.StaticData.Get(race, "Race")
+				nameToUuid[resource.DisplayName:Get() or resource.Name] = race
+				table.insert(options, resource.DisplayName:Get() or resource.Name)
 
-	local function ClearOnSelect(columnIndex, selectable)
-		---@type ExtuiTableCell
-		local cell = characterCriteriaRow.Children[columnIndex]
+				subResourceFunction = function(className)
+					---@type ExtuiCombo
+					local subRaceCombo = selectedCriteriaDisplayRow.Children[criteriaTypeIndex + 1].Children[1]
+					subRaceCombo.SelectedIndex = 0
 
-		for _, childSelectable in pairs(cell.Children) do
-			---@cast childSelectable ExtuiSelectable
-
-			if selectable.Label ~= childSelectable.Label then
-				if childSelectable.Selected then
-					for colIndex, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
-						if selectedTextCell.Children[1].Label == childSelectable.Label then
-							activeCriteria[VanityCharacterCriteriaType[colIndex]] = nil
-							selectedTextCell.Children[1].Label = "---"
+					if criteriaCombo.SelectedIndex < 1 then
+						subRaceCombo.Options = {}
+						subRaceCombo.Visible = false
+					else
+						local subOptions = { "         " }
+						for _, subClass in pairs(playableRaces[nameToUuid[className]]) do
+							nameToUuid[subClass.ResourceUUID] = subClass.DisplayName:Get() or subClass.Name
+							table.insert(subOptions, subClass.DisplayName:Get() or subClass.Name)
 						end
+						subRaceCombo.Options = subOptions
+						subRaceCombo.Visible = #subRaceCombo.Options > 1
 					end
 				end
-				childSelectable.Selected = false
 			end
+		elseif criteriaType == "BodyType" then
+			options = { "         ", 1, 2, 3, 4 }
+		else
+			criteriaCombo.Visible = false
 		end
 
-		for index, columnCell in pairs(characterCriteriaRow.Children) do
-			if index > columnIndex then
-				for _, child in pairs(columnCell.Children) do
-					for colIndex, selectedTextCell in pairs(selectedCriteriaDisplayRow.Children) do
-						if selectedTextCell.Children[1].Label == child.Label then
-							activeCriteria[VanityCharacterCriteriaType[colIndex]] = nil
-							selectedTextCell.Children[1].Label = "---"
-						end
+		criteriaCombo.Options = options
+		criteriaCombo.SelectedIndex = 0
+		criteriaCombo.OnChange = function()
+			if subResourceFunction then
+				subResourceFunction(criteriaCombo.Options[criteriaCombo.SelectedIndex + 1])
+			end
+
+			local selectedCriteria = {}
+			for index, criteriaCell in pairs(selectedCriteriaDisplayRow.Children) do
+				---@type ExtuiCombo
+				local combo = criteriaCell.Children[1]
+
+				if combo.SelectedIndex > 0 then
+					local chosenOption = combo.Options[combo.SelectedIndex + 1]
+					-- 						If it's empty
+					if chosenOption and not chosenOption:match("^%s*$") then
+						selectedCriteria[VanityCharacterCriteriaType[index]] = index ~= VanityCharacterCriteriaType["BodyType"] and nameToUuid[chosenOption] or chosenOption
 					end
-					child:Destroy()
 				end
 			end
+
+			VanityCharacterPanel:BuildModule(tabHeader, preset, CreateCriteriaCompositeKey(selectedCriteria))
 		end
 	end
-
-	--- I know there's a bullet tree, but i like this aesthetic more
-	--- @param trunk table
-	--- @param columnIndex number
-	--- @param valueCollection ResourceClassDescription[]|ResourceRace[]?
-	local function BuildHorizontalSelectableTree(trunk, columnIndex, valueCollection, compositeKeyForHighlighting)
-		---@type ExtuiTableCell
-		local cell = characterCriteriaRow.Children[columnIndex]
-
-		local function buildSelectable(selectType, resourceId, selectValue, children, childResources)
-			---@type ExtuiSelectable
-			local selectable = cell:AddSelectable(selectValue)
-			selectable.UserData = selectType
-
-			if not string.find(selectType, "By") then
-				compositeKeyForHighlighting[selectType] = resourceId
-				if preset.Outfits[CreateCriteriaCompositeKey(compositeKeyForHighlighting)] then
-					selectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
-				end
-			end
-
-			selectable.OnActivate = function()
-				ClearOnSelect(columnIndex, selectable)
-				findTextToUpdate(selectType, selectable)
-				compositeKeyForHighlighting = TableUtils:DeeplyCopyTable(activeCriteria)
-				if not string.find(selectType, "By") then
-					activeCriteria[selectType] = resourceId
-					compositeKeyForHighlighting[selectType] = resourceId
-				end
-				BuildHorizontalSelectableTree(children, columnIndex + 1, childResources, compositeKeyForHighlighting or {})
-
-				VanityCharacterPanel:BuildModule(tabHeader, preset, CreateCriteriaCompositeKey(activeCriteria))
-			end
-		end
-
-		for selectType, children in TableUtils:OrderedPairs(trunk) do
-			if selectType == "By Race" or selectType == "By Class" or selectType == "By Body Type" or selectType == "By Origin" or selectType == "By Hireling" then
-				buildSelectable(selectType, nil, selectType, children, nil)
-			elseif selectType == "Race" or selectType == "Class" then
-				-- TODO: Really clean up this mess
-				local table = selectType == "Race" and playableRaces or classesAndSubclasses
-				for parentGuid, childResources in TableUtils:OrderedPairs(table, function(key)
-					return Ext.StaticData.Get(key, selectType == "Race" and selectType or "ClassDescription").Name
-				end) do
-					---@type ResourceRace|ResourceClassDescription
-					local resource = Ext.StaticData.Get(parentGuid, selectType == "Race" and selectType or "ClassDescription")
-
-					buildSelectable(selectType, resource.ResourceUUID, resource.DisplayName:Get() or resource.Name, children, childResources)
-				end
-			elseif selectType == "Subrace" or selectType == "Subclass" then
-				for _, childResource in pairs(valueCollection) do
-					buildSelectable(selectType, childResource.ResourceUUID, childResource.DisplayName:Get() or childResource.Name, children, nil)
-				end
-			elseif selectType == "BodyType" then
-				for _, bodyType in pairs(children) do
-					buildSelectable(selectType, bodyType, bodyType, children, nil)
-				end
-			elseif selectType == "Origin" or selectType == "Hireling" then
-				for _, originGuid in pairs(selectType == "Origin" and originCharacters or hirelings) do
-					---@type ResourceOrigin
-					local origin = Ext.StaticData.Get(originGuid, "Origin")
-
-					buildSelectable(selectType, origin.ResourceUUID, origin.DisplayName:Get() or origin.Name, children, nil)
-				end
-			end
-		end
-	end
-
-	BuildHorizontalSelectableTree(tree, 1)
 end

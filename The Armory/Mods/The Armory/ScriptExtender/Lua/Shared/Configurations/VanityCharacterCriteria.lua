@@ -2,13 +2,6 @@
 
 ---@enum VanityCharacterCriteriaType
 VanityCharacterCriteriaType = {
-	Origin = 1,
-	Hireling = 2,
-	Race = 3,
-	Subrace = 4,
-	BodyType = 5,
-	Class = 6,
-	Subclass = 7,
 	[1] = "Origin",
 	[2] = "Hireling",
 	[3] = "Race",
@@ -16,6 +9,13 @@ VanityCharacterCriteriaType = {
 	[5] = "BodyType",
 	[6] = "Class",
 	[7] = "Subclass",
+	Origin = 1,
+	Hireling = 2,
+	Race = 3,
+	Subrace = 4,
+	BodyType = 5,
+	Class = 6,
+	Subclass = 7,
 }
 
 ---@param criteriaTable {[VanityCharacterCriteriaType] : string} of VanityCharacterCriteria values to concat into an ordered key
