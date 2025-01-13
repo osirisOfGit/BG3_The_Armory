@@ -45,9 +45,8 @@ end
 
 EquipmentPicker = {}
 
-local numPerRow = 4
+local settings = ConfigurationStructure.config.vanity.settings.equipment
 local rowCount = 0
-local imageSize = 90
 
 local previewTimer
 
@@ -71,13 +70,40 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 	if not searchWindow then
 		searchWindow = Ext.IMGUI.NewWindow("Equipment Picker")
 		searchWindow.Closeable = true
+		searchWindow.MenuBar = true
+		local mainMenu = searchWindow:AddMainMenu()
+		mainMenu.UserData = "keep"
+		mainMenu:SetColor("PopupBg", { 0, 0, 0, 1 })
+
+		---@type ExtuiMenu
+		local settingsMenu = mainMenu:AddMenu("Settings")
+		settingsMenu:AddText("Number of Items Per Row")
+		local perRowSetting = settingsMenu:AddSliderInt("", settings.rowSize, 0, 10)
+		perRowSetting.OnChange = function()
+			settings.rowSize = perRowSetting.Value[1]
+		end
+		settingsMenu:AddSeparator()
+		settingsMenu:AddText("Image Size")
+		local imageSizeSetting = settingsMenu:AddSliderInt("", settings.imageSize, 10, 200)
+		imageSizeSetting.OnChange = function()
+			settings.imageSize = imageSizeSetting.Value[1]
+		end
+		settingsMenu:AddSeparator()
+		settingsMenu:AddText("Show Item Names?")
+		local showNameCheckbox = settingsMenu:AddCheckbox("", settings.showNames)
+		showNameCheckbox.SameLine = true
+		showNameCheckbox.OnChange = function()
+			settings.showNames = showNameCheckbox.Checked
+		end
 	else
 		if not searchWindow.Open then
 			searchWindow.Open = true
 		end
 
 		for _, child in pairs(searchWindow.Children) do
-			child:Destroy()
+			if child.UserData ~= "keep" then
+				child:Destroy()
+			end
 		end
 	end
 
@@ -119,14 +145,14 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 	local function createItemGroup(displayGroup, itemTemplate)
 		local itemGroup = displayGroup:AddChildWindow(itemTemplate.Id .. displayGroup.Label)
 		itemGroup.NoSavedSettings = true
-		itemGroup.Size = { imageSize * 1.5, imageSize * 2.5 }
-		itemGroup.ChildAlwaysAutoResize = true
-		itemGroup.SameLine = rowCount <= numPerRow
+		itemGroup.Size = {settings.imageSize + 40, settings.imageSize + (settings.showNames and 100 or 10)}
+		itemGroup.SameLine = rowCount <= settings.rowSize
+		itemGroup.ResizeY = true
 
-		local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { imageSize, imageSize })
+		local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { settings.imageSize, settings.imageSize })
 		if icon.Image.Icon == "" then
 			icon:Destroy()
-			icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { imageSize, imageSize })
+			icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { settings.imageSize, settings.imageSize })
 		end
 		icon.Background = { 0, 0, 0, 0.5 }
 
@@ -158,7 +184,7 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 				createItemGroup(favoritesGroup, itemTemplate)
 			else
 				table.remove(ConfigurationStructure.config.vanity.settings.equipment.favorites, index)
-				
+
 				EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 			end
 		end
@@ -185,7 +211,9 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 			searchWindow.Open = false
 		end
 
-		itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
+		if settings.showNames then
+			itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
+		end
 
 		Helpers:BuildTooltip(icon:Tooltip(), nil, Ext.Stats.Get(itemTemplate.Stats))
 
@@ -227,7 +255,7 @@ function EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
 			createItemGroup(favoritesGroup, itemTemplate)
 		end
 
-		if rowCount > numPerRow then
+		if rowCount > settings.rowSize then
 			rowCount = 0
 		end
 		rowCount = rowCount + 1
