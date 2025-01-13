@@ -44,6 +44,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		--#region Presets
 		local presetPickerButton = tabHeader:AddButton("Preset Manager")
+		presetPickerButton.SameLine = true
 		presetPickerButton.OnClick = function()
 			VanityPresetManager:OpenManager()
 		end

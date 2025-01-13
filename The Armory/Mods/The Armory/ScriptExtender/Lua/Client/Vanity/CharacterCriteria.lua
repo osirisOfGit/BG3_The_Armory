@@ -164,130 +164,150 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 	buildConfiguredCriteriaCombinationsPopup(preset)
 
-	local criteriaSelectionDisplayTable = criteriaGroup:AddTable("CharacterCriteraSelection", 7)
-	criteriaSelectionDisplayTable.SizingStretchSame = true
-	criteriaSelectionDisplayTable.NoPadInnerX = true
+	local criteriaCollapse = criteriaGroup:AddCollapsingHeader("Select Character Criteria for Outfit")
+	local criteriaSelectionTable = criteriaCollapse:AddTable("CharacterCriteraSelection", 7)
+	criteriaSelectionTable.SizingStretchSame = true
 
-	local charCriteriaHeaders = criteriaSelectionDisplayTable:AddRow()
-	charCriteriaHeaders.Headers = true
+	local criteriaSelectedDisplayTable = tabHeader:AddTable("CriteriaDisplayTable", 7)
+	local criteriaDisplayHeaders = criteriaSelectedDisplayTable:AddRow()
+	criteriaDisplayHeaders.Headers = true
+	local selectedCriteriaDisplayRow = criteriaSelectedDisplayTable:AddRow()
 
-	local nameToUuid = {}
+	local criteriaSelectionHeaders = criteriaSelectionTable:AddRow()
+	criteriaSelectionHeaders.Headers = true
+	local criteriaSelectionRow = criteriaSelectionTable:AddRow()
 
-	local selectedCriteriaDisplayRow = criteriaSelectionDisplayTable:AddRow()
-	for criteriaTypeIndex, criteriaType in ipairs(VanityCharacterCriteriaType) do
-		charCriteriaHeaders:AddCell():AddText(criteriaType)
-		local cell = selectedCriteriaDisplayRow:AddCell()
-		cell.UserData = criteriaType
-		cell:SetStyle("CellPadding", 0, 0)
+	local activeCriteraTypes = {}
 
-		local criteriaCombo = cell:AddCombo("")
-		criteriaCombo.IDContext = criteriaType
-		criteriaCombo.WidthFitPreview = true
+	---@param column ExtuiTableCell
+	---@param selectedId string?
+	local function resetSelectedInColumn(column, selectedId)
+		for _, selectable in pairs(column.Children) do
+			---@cast selectable ExtuiSelectable
+			if selectable.UserData ~= selectedId then
+				selectable.Selected = false
+				selectable:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
+			end
+			if not selectedId then
+				activeCriteraTypes[column.UserData] = nil
+				selectedCriteriaDisplayRow.Children[VanityCharacterCriteriaType[column.UserData]].Children[1].Label = "---"
+			end
+		end
+	end
 
-		local subResourceFunction
+	---@param cell ExtuiTableCell
+	---@param criteriaType VanityCharacterCriteriaType
+	---@param resource ResourceRace|ResourceClassDescription|ResourceOrigin|number
+	local function buildSelectable(cell, criteriaType, resource)
+		---@type ExtuiSelectable
+		local selectable = cell:AddSelectable(type(resource) ~= "number" and (resource.DisplayName:Get() or resource.Name) or resource)
+		selectable.UserData = type(resource) ~= "number" and resource.ResourceUUID or resource
+		selectable.IDContext = criteriaType .. selectable.UserData
 
-		local options = { "         " }
+		selectable.OnClick = function()
+			activeCriteraTypes[criteriaType] = selectable.Selected and selectable.UserData or nil
+
+			selectedCriteriaDisplayRow.Children[VanityCharacterCriteriaType[criteriaType]].Children[1].Label = selectable.Selected and selectable.Label or "---"
+
+			resetSelectedInColumn(criteriaSelectionRow.Children[VanityCharacterCriteriaType[criteriaType]], selectable.UserData)
+
+			if criteriaType == "Origin" or criteriaType == "Hireling" then
+				resetSelectedInColumn(criteriaSelectionRow.Children[VanityCharacterCriteriaType[criteriaType == "Origin" and "Hireling" or "Origin"]])
+			elseif criteriaType == "Race" or criteriaType == "Class" then
+				local subColIndex = VanityCharacterCriteriaType[criteriaType] + 1
+				activeCriteraTypes[VanityCharacterCriteriaType[subColIndex]] = nil
+				
+				selectedCriteriaDisplayRow.Children[subColIndex].Children[1].Label = "---"
+				---@type ExtuiTableCell
+				local subColumn = criteriaSelectionRow.Children[subColIndex]
+				for _, child in pairs(subColumn.Children) do
+					child:Destroy()
+				end
+				if selectable.Selected then
+					for _, subResource in ipairs(criteriaType == "Race" and playableRaces[resource.ResourceUUID] or classesAndSubclasses[resource.ResourceUUID]) do
+						buildSelectable(subColumn, VanityCharacterCriteriaType[subColIndex], subResource)
+					end
+				else
+
+				end
+			end
+
+			local criteriaTableCopy = TableUtils:DeeplyCopyTable(activeCriteraTypes)
+
+			for _, column in pairs(criteriaSelectionRow.Children) do
+				if not criteriaTableCopy[column.UserData] then
+					---@cast column ExtuiTableCell
+					for _, otherSelectable in pairs(column.Children) do
+						---@cast otherSelectable ExtuiSelectable
+
+						criteriaTableCopy[column.UserData] = otherSelectable.UserData or nil
+
+						if preset.Outfits[CreateCriteriaCompositeKey(criteriaTableCopy)] then
+							otherSelectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
+						else
+							otherSelectable:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
+						end
+					end
+					criteriaTableCopy[column.UserData] = nil
+				end
+			end
+
+			VanityCharacterPanel:BuildModule(tabHeader, preset, CreateCriteriaCompositeKey(activeCriteraTypes))
+		end
+	end
+
+	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
+		criteriaSelectionHeaders:AddCell():AddText(criteriaType)
+		criteriaDisplayHeaders:AddCell():AddText(criteriaType)
+
+		selectedCriteriaDisplayRow:AddCell():AddText("---")
+
+		local selectionCell = criteriaSelectionRow:AddCell()
+		selectionCell.UserData = criteriaType
+
 		if criteriaType == "Origin" or criteriaType == "Hireling" then
-			for _, origin in pairs(criteriaType == "Origin" and originCharacters or hirelings) do
+			for _, origin in ipairs(criteriaType == "Origin" and originCharacters or hirelings) do
 				---@type ResourceOrigin
 				local resource = Ext.StaticData.Get(origin, "Origin")
 
-				nameToUuid[resource.DisplayName:Get() or resource.Name] = resource.ResourceUUID
-				table.insert(options, resource.DisplayName:Get() or resource.Name)
-			end
-			subResourceFunction = function()
-				if criteriaType == "Origin" then
-					---@type ExtuiCombo
-					local hirelingCombo = selectedCriteriaDisplayRow.Children[VanityCharacterCriteriaType["Hireling"]].Children[1]
-
-					hirelingCombo.SelectedIndex = -1
-				else
-					---@type ExtuiCombo
-					local originCombo = selectedCriteriaDisplayRow.Children[VanityCharacterCriteriaType["Origin"]].Children[1]
-
-					originCombo.SelectedIndex = -1
-				end
+				buildSelectable(selectionCell, criteriaType, resource)
 			end
 		elseif criteriaType == "Class" then
-			for class, _ in pairs(classesAndSubclasses) do
+			for class, _ in TableUtils:OrderedPairs(classesAndSubclasses, function(key) return Ext.StaticData.Get(key, "ClassDescription").Name end) do
 				---@type ResourceClassDescription
 				local resource = Ext.StaticData.Get(class, "ClassDescription")
-				nameToUuid[resource.DisplayName:Get() or resource.Name] = class
-				table.insert(options, resource.DisplayName:Get() or resource.Name)
-			end
 
-			subResourceFunction = function(className)
-				---@type ExtuiCombo
-				local subclassCombo = selectedCriteriaDisplayRow.Children[criteriaTypeIndex + 1].Children[1]
-				subclassCombo.SelectedIndex = 0
-
-				if criteriaCombo.SelectedIndex < 1 then
-					subclassCombo.Options = {}
-					subclassCombo.Visible = false
-				else
-					local subOptions = { "         " }
-					for _, subClass in pairs(classesAndSubclasses[nameToUuid[className]]) do
-						nameToUuid[subClass.ResourceUUID] = subClass.DisplayName:Get() or subClass.Name
-						table.insert(subOptions, subClass.DisplayName:Get() or subClass.Name)
-					end
-					subclassCombo.Options = subOptions
-					subclassCombo.Visible = #subclassCombo.Options > 1
-				end
+				buildSelectable(selectionCell, criteriaType, resource)
 			end
 		elseif criteriaType == "Race" then
-			for race, _ in pairs(playableRaces) do
+			for race, _ in TableUtils:OrderedPairs(playableRaces, function(key) return Ext.StaticData.Get(key, "Race").Name end) do
 				---@type ResourceRace
 				local resource = Ext.StaticData.Get(race, "Race")
-				nameToUuid[resource.DisplayName:Get() or resource.Name] = race
-				table.insert(options, resource.DisplayName:Get() or resource.Name)
-
-				subResourceFunction = function(className)
-					---@type ExtuiCombo
-					local subRaceCombo = selectedCriteriaDisplayRow.Children[criteriaTypeIndex + 1].Children[1]
-					subRaceCombo.SelectedIndex = 0
-
-					if criteriaCombo.SelectedIndex < 1 then
-						subRaceCombo.Options = {}
-						subRaceCombo.Visible = false
-					else
-						local subOptions = { "         " }
-						for _, subClass in pairs(playableRaces[nameToUuid[className]]) do
-							nameToUuid[subClass.ResourceUUID] = subClass.DisplayName:Get() or subClass.Name
-							table.insert(subOptions, subClass.DisplayName:Get() or subClass.Name)
-						end
-						subRaceCombo.Options = subOptions
-						subRaceCombo.Visible = #subRaceCombo.Options > 1
-					end
-				end
+				buildSelectable(selectionCell, criteriaType, resource)
 			end
 		elseif criteriaType == "BodyType" then
-			options = { "         ", 1, 2, 3, 4 }
-		else
-			criteriaCombo.Visible = false
-		end
-
-		criteriaCombo.Options = options
-		criteriaCombo.SelectedIndex = 0
-		criteriaCombo.OnChange = function()
-			if subResourceFunction then
-				subResourceFunction(criteriaCombo.Options[criteriaCombo.SelectedIndex + 1])
+			for i = 1, 4 do
+				buildSelectable(selectionCell, criteriaType, i)
 			end
+		end
+	end
 
-			local selectedCriteria = {}
-			for index, criteriaCell in pairs(selectedCriteriaDisplayRow.Children) do
-				---@type ExtuiCombo
-				local combo = criteriaCell.Children[1]
+	local criteriaTableCopy = TableUtils:DeeplyCopyTable(activeCriteraTypes)
+	for _, column in pairs(criteriaSelectionRow.Children) do
+		if not criteriaTableCopy[column.UserData] then
+			---@cast column ExtuiTableCell
+			for _, otherSelectable in pairs(column.Children) do
+				---@cast otherSelectable ExtuiSelectable
 
-				if combo.SelectedIndex > 0 then
-					local chosenOption = combo.Options[combo.SelectedIndex + 1]
-					-- 						If it's empty
-					if chosenOption and not chosenOption:match("^%s*$") then
-						selectedCriteria[VanityCharacterCriteriaType[index]] = index ~= VanityCharacterCriteriaType["BodyType"] and nameToUuid[chosenOption] or chosenOption
-					end
+				criteriaTableCopy[column.UserData] = otherSelectable.UserData or nil
+
+				if preset.Outfits[CreateCriteriaCompositeKey(criteriaTableCopy)] then
+					otherSelectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
+				else
+					otherSelectable:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 				end
 			end
-
-			VanityCharacterPanel:BuildModule(tabHeader, preset, CreateCriteriaCompositeKey(selectedCriteria))
+			criteriaTableCopy[column.UserData] = nil
 		end
 	end
 end
