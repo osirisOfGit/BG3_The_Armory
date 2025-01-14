@@ -69,9 +69,14 @@ function EquipmentPicker:OpenWindow(slot, weaponType, onSelectFunc)
 end
 
 ---@param templateName string
----@param displayGroup ExtuiGroup
+---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
 function EquipmentPicker:DisplayResult(templateName, displayGroup)
 	local itemTemplate = self.rootsByName[templateName]
+
+	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, self.rootsByName[templateName].Id)
+	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
+		return
+	end
 
 	---@type Armor|Weapon|Object
 	local itemStat = Ext.Stats.Get(itemTemplate.Stats)
@@ -115,38 +120,33 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 	end
 	icon.Background = { 0, 0, 0, 0.5 }
 
-	-- local isFavorited = TableUtils:ListContains(self.settings.favorites, itemTemplate.Id)
-	-- local favoriteButtonAnchor = itemGroup:AddGroup("favoriteAnchor" .. itemTemplate.Id)
-	-- favoriteButtonAnchor.SameLine = true
-	-- local favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id,
-	-- 	-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
-	-- 	isFavorited and "star_fileld" or "star_empty",
-	-- 	{ 26, 26 })
+	local favoriteButtonAnchor = itemGroup:AddGroup("favoriteAnchor" .. itemTemplate.Id)
+	favoriteButtonAnchor.SameLine = true
+	local favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id,
+		-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
+		isFavorited and "star_fileld" or "star_empty",
+		{ 26, 26 })
 
-	-- favoriteButton.UserData = itemTemplate.Id
-	-- favoriteButton.Background = { 0, 0, 0, 0.5 }
-	-- favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+	favoriteButton.UserData = itemTemplate.Id
+	favoriteButton.Background = { 0, 0, 0, 0.5 }
+	favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
 
-	-- favoriteButton.OnClick = function()
-	-- 	local isInList, index = TableUtils:ListContains(self.settings.favorites, favoriteButton.UserData)
-	-- 	if not isInList then
-	-- 		table.insert(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteButton.UserData)
-	-- 		local func = favoriteButton.OnClick
-	-- 		favoriteButton:Destroy()
-	-- 		favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id, "star_fileld", { 26, 26 })
-	-- 		favoriteButton.UserData = itemTemplate.Id
-	-- 		favoriteButton.OnClick = func
-	-- 		favoriteButton.SameLine = true
-	-- 		favoriteButton.Background = { 0, 0, 0, 0.5 }
-	-- 		favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
-
-	-- 		self:DisplayResult(templateName, self.favoritesGroup)
-	-- 	else
-	-- 		table.remove(ConfigurationStructure.config.vanity.settings.equipment.favorites, index)
-
-	-- 		EquipmentPicker:PickForSlot(slot, weaponType, onSelectFunc)
-	-- 	end
-	-- end
+	favoriteButton.OnClick = function()
+		if not isFavorited then
+			table.insert(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteButton.UserData)
+			local func = favoriteButton.OnClick
+			favoriteButton:Destroy()
+			favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id, "star_fileld", { 26, 26 })
+			favoriteButton.UserData = itemTemplate.Id
+			favoriteButton.OnClick = func
+			favoriteButton.SameLine = true
+			favoriteButton.Background = { 0, 0, 0, 0.5 }
+			favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+		else
+			table.remove(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteIndex)
+		end
+		self:RebuildDisplay()
+	end
 
 	icon.OnHoverEnter = function()
 		self.equipmentPreviewTimer = Ext.Timer.WaitFor(200, function()

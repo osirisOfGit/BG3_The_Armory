@@ -113,15 +113,17 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		table.sort(modOpts)
 		self.getAllForModCombo.Options = modOpts
 		self.getAllForModCombo.OnChange = function()
+			Helpers:KillChildren(self.resultsGroup)
 			-- \[[[^_^]]]/
 			for _, templateName in ipairs(self.templateNamesByModId[self.modIdByModName[self.getAllForModCombo.Options[self.getAllForModCombo.SelectedIndex + 1]]]) do
 				self:DisplayResult(templateName, self.resultsGroup)
 			end
 		end
 
-		self.window:AddSeparatorText("Favorites"):SetStyle("SeparatorTextAlign", 0.2)
-		self.favoritesGroup = self.window:AddGroup(self.title .. "Favorites")
-		self.window:AddSeparatorText("Results"):SetStyle("SeparatorTextAlign", 0.2)
+		self.favoritesGroup = self.window:AddCollapsingHeader("Favorites")
+		self.favoritesGroup.IDContext = self.title .. "Favorites"
+		self.window:AddNewLine()
+		self.window:AddSeparatorText("Results")
 		self.resultsGroup = self.window:AddGroup(self.title .. "Results")
 
 		customizeFunc()
@@ -130,8 +132,6 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 			self.window.Open = true
 		end
 		self.window:SetFocus()
-
-		Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
 	end
 
 	self.separator.Label = string.format("Searching for %s %s", slot, self.title)
@@ -142,11 +142,8 @@ end
 function PickerBaseClass:RebuildDisplay()
 	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
 
-	for _, favoriteGuid in pairs(self.settings.favorites) do
-		local isInList, templateName = TableUtils:ListContains(self.rootsByName, favoriteGuid)
-		if isInList then
-			self:DisplayResult(templateName, self.favoritesGroup)
-		end
+	for _, templateName in pairs(self.sortedTemplateNames) do
+		self:DisplayResult(templateName, self.favoritesGroup)
 	end
 
 	if #self.searchInput.Text >= 3 then
