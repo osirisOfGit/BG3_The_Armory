@@ -94,9 +94,9 @@ end
 
 ---@param list table
 ---@param str string
----@return boolean, number?
+---@return boolean, any?
 function TableUtils:ListContains(list, str)
-	for i, value in ipairs(list) do
+	for i, value in pairs(list) do
 		if value == str then
 			return true, i
 		end

@@ -1,3 +1,4 @@
+Ext.Require("Client/Vanity/CharacterPanel/PickerBaseClass.lua")
 Ext.Require("Client/Vanity/CharacterPanel/DyePicker.lua")
 Ext.Require("Client/Vanity/CharacterPanel/EquipmentPicker.lua")
 

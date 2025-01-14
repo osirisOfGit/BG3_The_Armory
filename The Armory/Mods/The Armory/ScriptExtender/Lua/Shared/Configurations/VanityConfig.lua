@@ -4,20 +4,21 @@ ConfigurationStructure.config.vanity = {}
 
 --#region User Settings
 ConfigurationStructure.config.vanity.settings = {
-	general = {
-		applyDyesWhenPreviewingEquipment = true
-	},
+	general = {},
+	---@class EquipmentSettings
 	equipment = {
 		---@type Guid[]
 		favorites = {},
 		imageSize = 90,
 		rowSize = 4,
-		showNames = true
+		showNames = true,
+		applyDyesWhenPreviewingEquipment = true
 	},
+	---@class DyeSettings
 	dyes = {
 		---@type Guid[]
 		favorites = {},
-		showDyeNames = true,
+		showNames = true,
 		imageSize = 90
 	}
 }
