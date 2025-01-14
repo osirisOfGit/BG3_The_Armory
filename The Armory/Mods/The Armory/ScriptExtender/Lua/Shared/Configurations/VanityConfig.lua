@@ -10,7 +10,7 @@ ConfigurationStructure.config.vanity.settings = {
 		---@type Guid[]
 		favorites = {},
 		imageSize = 90,
-		rowSize = 4,
+		rowSize = 6,
 		showNames = true,
 		applyDyesWhenPreviewingEquipment = true
 	},

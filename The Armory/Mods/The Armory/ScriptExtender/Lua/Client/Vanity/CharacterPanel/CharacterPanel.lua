@@ -208,7 +208,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 				imageButton.OnClick = function()
 					-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
-					EquipmentPicker:PickForSlot(itemSlot, weaponType,
+					EquipmentPicker:OpenWindow(itemSlot, weaponType,
 						---@param itemTemplate ItemTemplate
 						function(itemTemplate)
 							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)

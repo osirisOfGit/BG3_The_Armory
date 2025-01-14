@@ -14,6 +14,8 @@ PickerBaseClass = {
 	slot = nil,
 	---@type function
 	onSelectFunc = nil,
+	---@type ExtuiMenu
+	settingsMenu = nil
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -32,7 +34,7 @@ function PickerBaseClass:InitializeSearchBank() end
 
 function PickerBaseClass:DisplayResult(templateName, group) end
 
-function PickerBaseClass:OpenWindow(slot, customizeFunc)
+function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 	self.slot = slot
 	self.customizeFunc = customizeFunc
 
@@ -45,14 +47,17 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc)
 		self.window.OnClose = function()
 			self.searchInput.Text = ""
 			self.getAllForModCombo.SelectedIndex = -1
+			onCloseFunc()
 		end
 
-		self.settingsMenu = self.window:AddMainMenu("Settings")
+		self.settingsMenu = self.window:AddMainMenu():AddMenu("Settings")
+		self.settingsMenu:SetColor("PopupBg", { 0, 0, 0, 1 })
 		self.settingsMenu:AddSeparator()
 		self.settingsMenu:AddText("Image Size")
 		local imageSizeSetting = self.settingsMenu:AddSliderInt("", self.settings.imageSize, 10, 200)
 		imageSizeSetting.OnChange = function()
 			self.settings.imageSize = imageSizeSetting.Value[1]
+			self:RebuildDisplay()
 		end
 		self.settingsMenu:AddSeparator()
 		self.settingsMenu:AddText("Show Item Names?")
@@ -60,6 +65,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc)
 		showNameCheckbox.SameLine = true
 		showNameCheckbox.OnChange = function()
 			self.settings.showNames = showNameCheckbox.Checked
+			self:RebuildDisplay()
 		end
 
 		self.separator = self.window:AddSeparatorText("")
@@ -130,6 +136,12 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc)
 
 	self.separator.Label = string.format("Searching for %s %s", slot, self.title)
 
+	self:RebuildDisplay()
+end
+
+function PickerBaseClass:RebuildDisplay()
+	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
+
 	for _, favoriteGuid in pairs(self.settings.favorites) do
 		local isInList, templateName = TableUtils:ListContains(self.rootsByName, favoriteGuid)
 		if isInList then
@@ -143,8 +155,8 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc)
 		self.getAllForModCombo.OnChange()
 	else
 		for _, templateName in pairs(self.sortedTemplateNames) do
-			if self.title == "Dyes" and not string.find(templateName, "FOCUSDYES_MiraculousDye") then
-				self:DisplayResult(templateName)
+			if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
+				self:DisplayResult(templateName, self.resultsGroup)
 			end
 		end
 	end
