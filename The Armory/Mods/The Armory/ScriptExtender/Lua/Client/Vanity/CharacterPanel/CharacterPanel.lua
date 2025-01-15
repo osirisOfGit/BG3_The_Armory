@@ -216,6 +216,22 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 							outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
 							outfitSlotEntryForItem.equipment.guid = itemTemplate.Id
 
+							if itemTemplate.Stats then
+								---@type Object
+								local stat = Ext.Stats.Get(itemTemplate.Stats)
+								local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+								if modInfo then
+									outfitSlotEntryForItem.equipment.modDependency = {
+										Guid = modInfo.ModuleUUID,
+										Version = modInfo.ModVersion
+									}
+								end
+							else
+								Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
+									itemTemplate.DisplayName:Get() or itemTemplate.Name,
+									itemTemplate.Id)
+							end
+
 							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 							end)
@@ -246,7 +262,23 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 
 							outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
 							outfitSlotEntryForItem.dye.guid = dyeTemplate.Id
-							
+
+							if dyeTemplate.Stats then
+								---@type Object
+								local stat = Ext.Stats.Get(dyeTemplate.Stats)
+								local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+								if modInfo then
+									outfitSlotEntryForItem.dye.modDependency = {
+										Guid = modInfo.ModuleUUID,
+										Version = modInfo.ModVersion
+									}
+								end
+							else
+								Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
+									dyeTemplate.DisplayName:Get() or dyeTemplate.Name,
+									dyeTemplate.Id)
+							end
+
 							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 							end)

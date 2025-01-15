@@ -62,6 +62,8 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	Name = "",
 	Notes = "",
 	Version = "",
+	---@type boolean
+	SFW = true,
 	---@type ModDependency?
 	ModSourced = nil,
 	---@type ModDependency[]
