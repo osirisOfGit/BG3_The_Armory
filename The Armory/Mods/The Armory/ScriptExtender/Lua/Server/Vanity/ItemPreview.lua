@@ -8,7 +8,10 @@ local previewingItemTable = {}
 
 local resetSetTimer
 
-Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, templateUUID, user)
+Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload, user)
+	payload = Ext.Json.Parse(payload)
+	local templateUUID = payload.templateId
+
 	user = PeerToUserID(user)
 	local character = Osi.GetCurrentCharacter(user)
 
@@ -41,6 +44,25 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, template
 	Ext.Timer.WaitFor(200, function()
 		if userPreview.previewItem then
 			Osi.Equip(character, userPreview.previewItem, 1, 0)
+
+			if payload.dye then
+				---@type EntityHandle
+				local itemEntity = Ext.Entity.Get(userPreview.previewItem)
+
+				if not itemEntity.ItemDye then
+					itemEntity:CreateComponent("ItemDye")
+				end
+
+				---@type ItemTemplate
+				local dyeTemplate = Ext.Template.GetTemplate(payload.dye)
+				
+				---@type ResourceMaterialPresetResource
+				local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
+
+				itemEntity.ItemDye.Color = materialPreset.Guid
+
+				itemEntity:Replicate("ItemDye")
+			end
 		end
 	end)
 end)

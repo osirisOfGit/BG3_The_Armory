@@ -5,7 +5,10 @@ EquipmentPicker = PickerBaseClass:new("Equipment", {
 	settings = ConfigurationStructure.config.vanity.settings.equipment,
 	---@type ActualWeaponType
 	weaponType = nil,
-	equipmentPreviewTimer = nil
+	---@type number
+	equipmentPreviewTimer = nil,
+	---@type VanityOutfitSlot
+	vanityOutfitSlot = nil
 })
 
 function EquipmentPicker:InitializeSearchBank()
@@ -48,10 +51,12 @@ end
 
 ---@param slot ActualSlot
 ---@param weaponType ActualWeaponType?
+---@param outfitSlot VanityOutfitSlot
 ---@param onSelectFunc function
-function EquipmentPicker:OpenWindow(slot, weaponType, onSelectFunc)
+function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	self.weaponType = weaponType
 	self.onSelectFunc = onSelectFunc
+	self.vanityOutfitSlot = outfitSlot
 
 	PickerBaseClass.OpenWindow(self,
 		slot,
@@ -61,6 +66,13 @@ function EquipmentPicker:OpenWindow(slot, weaponType, onSelectFunc)
 			perRowSetting.OnChange = function()
 				self.settings.rowSize = perRowSetting.Value[1]
 				self:RebuildDisplay()
+			end
+
+			self.settingsMenu:AddText("Apply Dye?")
+			local applyDyeCheckbox = self.settingsMenu:AddCheckbox("", self.settings.applyDyesWhenPreviewingEquipment)
+			applyDyeCheckbox.SameLine = true
+			applyDyeCheckbox.OnChange = function()
+				self.settings.applyDyesWhenPreviewingEquipment = applyDyeCheckbox.Checked
 			end
 		end,
 		function()
@@ -150,7 +162,11 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 
 	icon.OnHoverEnter = function()
 		self.equipmentPreviewTimer = Ext.Timer.WaitFor(200, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", itemTemplate.Id)
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", Ext.Json.Stringify({
+				templateId = itemTemplate.Id,
+				dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil
+			}))
+
 			self.equipmentPreviewTimer = nil
 		end)
 	end

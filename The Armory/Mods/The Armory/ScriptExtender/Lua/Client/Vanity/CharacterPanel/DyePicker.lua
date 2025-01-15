@@ -108,6 +108,7 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 			self.activeDyeGroup:Destroy()
 		end
 		local dyeInfoGroup = self.infoCell:AddGroup(templateName .. self.slot .. "dye")
+		self.activeDyeGroup = dyeInfoGroup
 
 		---@type Object
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
@@ -118,7 +119,9 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 			:SetColor("Text", { 1, 1, 1, 0.5 })
 
 		dyeInfoGroup:AddButton("Select").OnClick = function()
+			self.activeDyeGroup:Destroy()
 			self.activeDyeGroup = nil
+			
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", self.slot)
 			self.onSelectFunc(dyeTemplate)
 			self.window.Open = false
@@ -149,7 +152,6 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 			end
 		end
 
-		self.activeDyeGroup = dyeInfoGroup
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewDye", Ext.Json.Stringify({
 			materialPreset = dyeImageButton.UserData,
 			slot = self.slot

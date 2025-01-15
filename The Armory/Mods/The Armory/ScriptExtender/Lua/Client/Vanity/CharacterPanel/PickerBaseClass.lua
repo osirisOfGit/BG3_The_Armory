@@ -25,13 +25,13 @@ function PickerBaseClass:new(title, instance)
 	self.__index = self
 
 	instance.title = title
-    instance.rootsByName = {}
-    instance.sortedTemplateNames = {}
-    instance.templateNamesByModId = {}
-    instance.modIdByModName = {}
-    instance.settings = instance.settings or {}
-    instance.slot = nil
-    instance.settingsMenu = nil
+	instance.rootsByName = {}
+	instance.sortedTemplateNames = {}
+	instance.templateNamesByModId = {}
+	instance.modIdByModName = {}
+	instance.settings = instance.settings or {}
+	instance.slot = nil
+	instance.settingsMenu = nil
 
 	return instance
 end
@@ -57,13 +57,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		self.settingsMenu = self.window:AddMainMenu():AddMenu("Settings")
 		self.settingsMenu:SetColor("PopupBg", { 0, 0, 0, 1 })
-		self.settingsMenu:AddSeparator()
-		self.settingsMenu:AddText("Image Size")
-		local imageSizeSetting = self.settingsMenu:AddSliderInt("", self.settings.imageSize, 10, 200)
-		imageSizeSetting.OnChange = function()
-			self.settings.imageSize = imageSizeSetting.Value[1]
-			self:RebuildDisplay()
-		end
+		
 		self.settingsMenu:AddSeparator()
 		self.settingsMenu:AddText("Show Item Names?")
 		local showNameCheckbox = self.settingsMenu:AddCheckbox("", self.settings.showNames)
@@ -73,6 +67,15 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 			self:RebuildDisplay()
 		end
 
+		self.settingsMenu:AddSeparator()
+
+		self.settingsMenu:AddText("Image Size")
+		local imageSizeSetting = self.settingsMenu:AddSliderInt("", self.settings.imageSize, 10, 200)
+		imageSizeSetting.OnChange = function()
+			self.settings.imageSize = imageSizeSetting.Value[1]
+			self:RebuildDisplay()
+		end
+		
 		self.separator = self.window:AddSeparatorText("")
 		self.separator:SetStyle("SeparatorTextAlign", 0.5)
 
@@ -128,7 +131,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.favoritesGroup = self.window:AddCollapsingHeader("Favorites")
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
 		self.window:AddNewLine()
-		
+
 		self.resultSeparator = self.window:AddSeparatorText("Results")
 		self.resultsGroup = self.window:AddGroup(self.title .. "Results")
 

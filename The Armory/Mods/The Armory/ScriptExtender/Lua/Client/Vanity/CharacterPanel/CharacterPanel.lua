@@ -208,15 +208,13 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 				imageButton.OnClick = function()
 					-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
-					EquipmentPicker:OpenWindow(itemSlot, weaponType,
+					EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
 						---@param itemTemplate ItemTemplate
 						function(itemTemplate)
 							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
 
-							outfitSlotEntryForItem.equipment = {
-								guid = itemTemplate.Id,
-								modDependency = "TODO"
-							}
+							outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
+							outfitSlotEntryForItem.equipment.guid = itemTemplate.Id
 
 							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
@@ -246,10 +244,9 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 						function(dyeTemplate)
 							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
 
-							outfitSlotEntryForItem.dye = {
-								guid = dyeTemplate.Id,
-								modDependency = "TODO"
-							}
+							outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
+							outfitSlotEntryForItem.dye.guid = dyeTemplate.Id
+							
 							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 							end)

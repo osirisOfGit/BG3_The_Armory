@@ -29,22 +29,8 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		mainParent = tabHeader
 		--EventChannels.MCM_WINDOW_CLOSED = "MCM_Window_Closed"
 
-		--#region Settings
-		local settingsButton = tabHeader:AddButton("Settings")
-		local settingsPopup = tabHeader:AddPopup("Settings")
-
-		settingsButton.OnClick = function()
-			settingsPopup:Open()
-		end
-
-		---@type ExtuiMenu
-		local previewMenu = settingsPopup:AddMenu("Previewing")
-		previewMenu:AddCheckbox("Apply Dyes When Previewing Equipment", true)
-		--#endregion
-
 		--#region Presets
 		local presetPickerButton = tabHeader:AddButton("Preset Manager")
-		presetPickerButton.SameLine = true
 		presetPickerButton.OnClick = function()
 			VanityPresetManager:OpenManager()
 		end
