@@ -241,7 +241,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				end
 				dyeButton.SameLine = true
 				dyeButton.OnClick = function()
-					DyePicker:PickDye(imageButton.UserData, itemSlot,
+					DyePicker:OpenWindow(imageButton.UserData, itemSlot,
 						---@param dyeTemplate ItemTemplate
 						function(dyeTemplate)
 							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)

@@ -174,5 +174,5 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 		itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
 	end
 
-	Helpers:BuildTooltip(icon:Tooltip(), nil, Ext.Stats.Get(itemTemplate.Stats))
+	Helpers:BuildTooltip(icon:Tooltip(), itemTemplate.DisplayName:Get() or itemTemplate.Name, Ext.Stats.Get(itemTemplate.Stats))
 end

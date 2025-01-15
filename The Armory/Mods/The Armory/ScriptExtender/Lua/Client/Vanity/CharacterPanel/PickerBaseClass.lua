@@ -12,8 +12,6 @@ PickerBaseClass = {
 	settings = {},
 	---@type ActualSlot
 	slot = nil,
-	---@type function
-	onSelectFunc = nil,
 	---@type ExtuiMenu
 	settingsMenu = nil
 }
@@ -26,7 +24,15 @@ function PickerBaseClass:new(title, instance)
 	setmetatable(instance, self)
 	self.__index = self
 
-	self.title = title
+	instance.title = title
+    instance.rootsByName = {}
+    instance.sortedTemplateNames = {}
+    instance.templateNamesByModId = {}
+    instance.modIdByModName = {}
+    instance.settings = instance.settings or {}
+    instance.slot = nil
+    instance.settingsMenu = nil
+
 	return instance
 end
 
@@ -36,7 +42,6 @@ function PickerBaseClass:DisplayResult(templateName, group) end
 
 function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 	self.slot = slot
-	self.customizeFunc = customizeFunc
 
 	if not self.window then
 		self:InitializeSearchBank()
@@ -123,7 +128,8 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.favoritesGroup = self.window:AddCollapsingHeader("Favorites")
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
 		self.window:AddNewLine()
-		self.window:AddSeparatorText("Results")
+		
+		self.resultSeparator = self.window:AddSeparatorText("Results")
 		self.resultsGroup = self.window:AddGroup(self.title .. "Results")
 
 		customizeFunc()
