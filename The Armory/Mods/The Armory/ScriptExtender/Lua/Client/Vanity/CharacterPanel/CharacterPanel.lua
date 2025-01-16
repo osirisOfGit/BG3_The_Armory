@@ -164,6 +164,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 
 				for _, modDependency in pairs(preset.ModDependencies) do
 					if modDependency.Guid == modInfo.ModuleUUID then
+						modDependency.Version = modInfo.ModVersion
 						return
 					end
 				end
