@@ -45,10 +45,10 @@ function VanityPresetManager:OpenManager()
 
 		local authorInput, authorError = generateFormInput("Author", Vanity.username)
 		local nameInput, nameError = generateFormInput("Name")
-		presetForm:AddText("Notes")
-		local notesInput = presetForm:AddInputText("")
-		notesInput.Multiline = true
 		local versionInput, versionError = generateFormInput("Version")
+
+		presetForm:AddText("Does/Will this contain outfits that have skimpy/nude clothing?")
+		local sfwCheckbox = presetForm:AddCheckbox("", true)
 
 		local inputErrorTable = {
 			[authorInput] = authorError,
@@ -82,8 +82,8 @@ function VanityPresetManager:OpenManager()
 			ConfigurationStructure.config.vanity.presets[generateGUID()] = {
 				Author = authorInput.Text,
 				Name = nameInput.Text,
-				Notes = notesInput.Text,
 				Version = versionInput.Text,
+				SFW = sfwCheckbox.Checked,
 				ModDependencies = {},
 				Outfits = {}
 			}
@@ -100,7 +100,7 @@ function VanityPresetManager:OpenManager()
 		presetTable.NoSavedSettings = true
 
 		presetTable:AddColumn("PresetSelection", "WidthFixed")
-		presetTable:AddColumn("PresetInfo", "WidthFixed")
+		presetTable:AddColumn("PresetInfo", "WidthStretch")
 
 		local row = presetTable:AddRow()
 
@@ -117,6 +117,40 @@ function VanityPresetManager:OpenManager()
 		presetInfoSection = row:AddCell()
 
 		VanityPresetManager:UpdatePresetView()
+	end
+end
+
+---@param preset VanityPreset
+---@param parent ExtuiTreeParent
+local function buildDependencyTable(preset, parent)
+	local dependencyTable = parent:AddTable(preset.Name .. preset.Author, 4)
+
+	local headerRow = dependencyTable:AddRow()
+	headerRow.Headers = true
+	headerRow:AddCell():AddText("Name")
+	headerRow:AddCell():AddText("Author")
+	headerRow:AddCell():AddText("Version")
+	headerRow:AddCell():AddText("UUID")
+
+	for _, dependency in pairs(preset.ModDependencies) do
+		local mod = Ext.Mod.GetMod(dependency.Guid)
+
+		if mod and mod.Info.Author ~= '' then
+			local modRow = dependencyTable:AddRow()
+
+			local nameText = modRow:AddCell():AddText(mod and mod.Info.Name or "Unknown - Mod Not Loaded")
+			nameText.TextWrapPos = 0
+			local authorText = modRow:AddCell():AddText((mod and (mod.Info.Author ~= '' and mod.Info.Author or "Larian")) or "Unknown")
+			authorText.TextWrapPos = 0
+
+			if not mod then
+				nameText:SetColor("Text", { 1, 0.02, 0, 1 })
+				authorText:SetColor("Text", { 1, 0.02, 0, 1 })
+			end
+
+			modRow:AddCell():AddText(table.concat(dependency.Version, "."))
+			modRow:AddCell():AddText(dependency.Guid).TextWrapPos = 0
+		end
 	end
 end
 
@@ -138,12 +172,12 @@ function VanityPresetManager:UpdatePresetView()
 
 			local presetGroup = presetInfoSection:AddGroup(guid)
 			presetActivelyViewing = presetGroup
-			
-			presetGroup:AddButton("Activate (Save After)").OnClick = function ()
+
+			presetGroup:AddButton("Activate (Save After)").OnClick = function()
 				Vanity:ActivatePreset(guid)
 				VanityPresetManager:UpdatePresetView()
 			end
-			presetGroup:AddButton("Delete").OnClick = function ()
+			presetGroup:AddButton("Delete").OnClick = function()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
 				VanityPresetManager:UpdatePresetView()
 			end
@@ -151,7 +185,14 @@ function VanityPresetManager:UpdatePresetView()
 			presetGroup:AddText("Name: " .. preset.Name)
 			presetGroup:AddText("Author: " .. preset.Author)
 			presetGroup:AddText("Version: " .. preset.Version)
-			presetGroup:AddText("Notes: " .. preset.Notes).TextWrapPos = 0
+			presetGroup:AddText("Contains Skimpy Outfits/Nudity? " .. (preset.SFW and "No" or "Yes"))
+
+			presetGroup:AddSeparatorText("Mod Dependencies:")
+			buildDependencyTable(preset, presetGroup)
+
+			presetGroup:AddNewLine()
+			presetGroup:AddSeparatorText("Configured Outfits:")
+			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, presetGroup)
 		end
 	end
 end

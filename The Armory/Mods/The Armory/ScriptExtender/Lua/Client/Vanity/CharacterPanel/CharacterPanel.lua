@@ -98,6 +98,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	end
 	panelGroup:AddSeparator()
 
+	-- if it's just pipes, so no criteria in the outfit
 	if string.match(criteriaCompositeKey, "^|+$") then
 		return
 	end
@@ -144,6 +145,39 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		end
 
 		return outfitSlotEntryForItem
+	end
+
+	---@param itemTemplate ItemTemplate
+	---@param outfitSlotEntryForItem VanityOutfitItemEntry
+	local function RecordModDependency(itemTemplate, outfitSlotEntryForItem)
+		outfitSlotEntryForItem.guid = itemTemplate.Id
+
+		if itemTemplate.Stats then
+			---@type Object
+			local stat = Ext.Stats.Get(itemTemplate.Stats)
+			local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+			if modInfo then
+				outfitSlotEntryForItem.modDependency = {
+					Guid = modInfo.ModuleUUID,
+					Version = modInfo.ModVersion
+				}
+
+				for _, modDependency in pairs(preset.ModDependencies) do
+					if modDependency.Guid == modInfo.ModuleUUID then
+						return
+					end
+				end
+
+				table.insert(preset.ModDependencies, {
+					Guid = modInfo.ModuleUUID,
+					Version = modInfo.ModVersion
+				})
+			end
+		else
+			Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
+				itemTemplate.DisplayName:Get() or itemTemplate.Name,
+				itemTemplate.Id)
+		end
 	end
 
 	--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
@@ -212,25 +246,9 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 						---@param itemTemplate ItemTemplate
 						function(itemTemplate)
 							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
-
 							outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
-							outfitSlotEntryForItem.equipment.guid = itemTemplate.Id
 
-							if itemTemplate.Stats then
-								---@type Object
-								local stat = Ext.Stats.Get(itemTemplate.Stats)
-								local modInfo = Ext.Mod.GetMod(stat.ModId).Info
-								if modInfo then
-									outfitSlotEntryForItem.equipment.modDependency = {
-										Guid = modInfo.ModuleUUID,
-										Version = modInfo.ModVersion
-									}
-								end
-							else
-								Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
-									itemTemplate.DisplayName:Get() or itemTemplate.Name,
-									itemTemplate.Id)
-							end
+							RecordModDependency(itemTemplate, outfitSlotEntryForItem.equipment)
 
 							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
@@ -261,23 +279,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
 
 							outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
-							outfitSlotEntryForItem.dye.guid = dyeTemplate.Id
 
-							if dyeTemplate.Stats then
-								---@type Object
-								local stat = Ext.Stats.Get(dyeTemplate.Stats)
-								local modInfo = Ext.Mod.GetMod(stat.ModId).Info
-								if modInfo then
-									outfitSlotEntryForItem.dye.modDependency = {
-										Guid = modInfo.ModuleUUID,
-										Version = modInfo.ModVersion
-									}
-								end
-							else
-								Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
-									dyeTemplate.DisplayName:Get() or dyeTemplate.Name,
-									dyeTemplate.Id)
-							end
+							RecordModDependency(dyeTemplate, outfitSlotEntryForItem.dye)
 
 							Ext.Timer.WaitFor(350, function()
 								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")

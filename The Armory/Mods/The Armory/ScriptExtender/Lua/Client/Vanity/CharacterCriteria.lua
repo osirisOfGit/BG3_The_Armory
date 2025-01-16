@@ -80,18 +80,11 @@ VanityCharacterCriteria = {}
 local criteriaGroup
 
 ---@param preset VanityPreset
-local function buildConfiguredCriteriaCombinationsPopup(preset)
-	local popupButton = criteriaGroup:AddButton("See Configured Character Criteria Combinations")
+---@param parent ExtuiTreeParent
+function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent)
+	local refreshButton = parent:AddButton("Refresh")
 
-	local popup = Ext.IMGUI.NewWindow("Configured Character Criteria Combinations")
-	popup.Closeable = true
-	popup.AlwaysAutoResize = true
-	popup.NoResize = true
-	popup.Open = false
-
-	local refreshButton = popup:AddButton("Refresh")
-
-	local criteriaSelectionDisplayTable = popup:AddTable("ConfiguredCriteriaCombinations", 7)
+	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 7)
 	criteriaSelectionDisplayTable.SizingStretchSame = true
 	criteriaSelectionDisplayTable.RowBg = true
 
@@ -116,6 +109,7 @@ local function buildConfiguredCriteriaCombinationsPopup(preset)
 					criteriaValue = criteriaId
 				else
 					local resourceType = (criteriaType == "Class" or criteriaType == "Subclass") and "ClassDescription" or criteriaType
+					resourceType = criteriaType == "Subrace" and "Race" or resourceType
 					resourceType = criteriaType == "Hireling" and "Origin" or resourceType
 
 					---@type ResourceClassDescription|ResourceRace|ResourceOrigin
@@ -139,16 +133,15 @@ local function buildConfiguredCriteriaCombinationsPopup(preset)
 
 		buildTable()
 	end
-
-	popupButton.OnClick = function()
-		popup.Open = true
-	end
 end
+
+---@type ExtuiWindow
+local popup
 
 ---@param tabHeader ExtuiTreeParent
 ---@param preset VanityPreset
 function VanityCharacterCriteria:BuildModule(tabHeader, preset)
-	if #playableRaces == 0 then
+	if not next(playableRaces) then
 		PopulatePlayableRaces()
 		PopulateClassesAndSubclasses()
 		PopulateOriginCharacters()
@@ -162,13 +155,30 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		end
 	end
 
-	buildConfiguredCriteriaCombinationsPopup(preset)
+	local popupButton = criteriaGroup:AddButton("See Configured Character Criteria Combinations")
+
+	if not popup then
+		popup = Ext.IMGUI.NewWindow("Configured Character Criteria Combinations")
+		popup.Closeable = true
+		popup.AlwaysAutoResize = true
+		popup.NoResize = true
+		popup.Open = false
+	end
+
+	popupButton.OnClick = function()
+		if not popup.Open then
+			popup.Open = true
+		end
+		popup:SetFocus()
+	end
+
+	self:BuildConfiguredCriteriaCombinationsTable(preset, popup)
 
 	local criteriaCollapse = criteriaGroup:AddCollapsingHeader("Select Character Criteria for Outfit")
 	local criteriaSelectionTable = criteriaCollapse:AddTable("CharacterCriteraSelection", 7)
 	criteriaSelectionTable.SizingStretchSame = true
 
-	local criteriaSelectedDisplayTable = tabHeader:AddTable("CriteriaDisplayTable", 7)
+	local criteriaSelectedDisplayTable = criteriaGroup:AddTable("CriteriaDisplayTable", 7)
 	local criteriaDisplayHeaders = criteriaSelectedDisplayTable:AddRow()
 	criteriaDisplayHeaders.Headers = true
 	local selectedCriteriaDisplayRow = criteriaSelectedDisplayTable:AddRow()

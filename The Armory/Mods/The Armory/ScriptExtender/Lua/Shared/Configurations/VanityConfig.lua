@@ -60,7 +60,6 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.outfit = {}
 ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	Author = "",
 	Name = "",
-	Notes = "",
 	Version = "",
 	---@type boolean
 	SFW = true,
