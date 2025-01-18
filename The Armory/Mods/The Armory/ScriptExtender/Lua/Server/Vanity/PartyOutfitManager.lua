@@ -39,6 +39,7 @@ local function ApplyTransmogsPerPreset()
 
 		if next(activeOutfits) then
 			for _, player in pairs(Osi.DB_Players:Get(nil)) do
+				local startTime = Ext.Utils.MonotonicTime()
 				---@type {[VanityCharacterCriteriaType] : string}
 				local criteriaTable = {}
 
@@ -91,11 +92,11 @@ local function ApplyTransmogsPerPreset()
 					playerOutfit = activeOutfits[compositeKey]
 					Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player[1], Ext.Json.Stringify(criteriaTable))
 				else
-					playerOutfit, compositeKey = Matcher.findBestMatch(criteriaTable, activeOutfits)
+					playerOutfit, compositeKey = OutfitMatcher.findBestMatch(criteriaTable, activeOutfits)
 				end
 
 				if playerOutfit then
-					Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player[1], Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
+					Logger:BasicDebug("Player %s was matched to an outfit (in %dms) with criteria table: %s", player[1], Ext.Utils.MonotonicTime() - startTime, Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
 					playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = compositeKey
 					Transmogger:MogCharacter(playerEntity)
 				else

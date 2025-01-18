@@ -163,6 +163,7 @@ function Transmogger:MogCharacter(character)
 				Logger:BasicDebug("Mogging %s to look like %s for %s", equippedItemEntity.DisplayName.Name:Get(), vanityPiece.Name, character.DisplayName.Name:Get())
 
 				Logger:BasicTrace("========== STARTING MOG FOR %s to %s ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid)
+				local startTime = Ext.Utils.MonotonicTime()
 
 				local createdErrorDumps
 				for key, componentToCopy in pairs(componentsToCopy) do
@@ -272,7 +273,7 @@ function Transmogger:MogCharacter(character)
 				end)
 
 				createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
-				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid)
+				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, Ext.Utils.MonotonicTime() - startTime)
 			end)
 		end
 		::continue::

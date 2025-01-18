@@ -1,9 +1,9 @@
-Matcher = {}
+OutfitMatcher = {}
 
 -- Assign a weight to each slot if we want to compute a 'score'.
 local SlotWeight = {
-  Origin   = 6,
-  Hireling = 6,
+  Origin   = 15,
+  Hireling = 15,
   Race     = 5,
   Subrace  = 4,
   BodyType = 3,
@@ -38,7 +38,7 @@ end
 ---@param char {[VanityCharacterCriteriaType] : string}
 ---@param outfits {[VanityCriteriaCompositeKey] : VanityOutfit}
 ---@return VanityOutfit?, VanityCriteriaCompositeKey?, integer?
-function Matcher.findBestMatch(char, outfits)
+function OutfitMatcher.findBestMatch(char, outfits)
   local bestData = nil
   local bestKey = nil
   local highScore = -1
