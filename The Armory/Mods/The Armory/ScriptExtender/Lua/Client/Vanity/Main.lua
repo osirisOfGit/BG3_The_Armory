@@ -13,7 +13,8 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 	WriteableOnServer = true,
 	WriteableOnClient = true,
 	SyncToClient = true,
-	SyncToServer = true
+	SyncToServer = true,
+	SyncOnWrite = true
 })
 
 Ext.Require("Client/Vanity/PresetManager.lua")

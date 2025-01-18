@@ -16,17 +16,26 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 	WriteableOnServer = true,
 	WriteableOnClient = true,
 	SyncToClient = true,
-	SyncToServer = true
+	SyncToServer = true,
+	SyncOnWrite = true
 })
+
+---@type VanityPreset
+ActiveVanityPreset = nil
+
+Ext.Events.SessionLoaded:Subscribe(function (e)
+	ActiveVanityPreset = ConfigurationStructure:UpdateConfigForServer().vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
+end)
 
 local function ApplyTransmogsPerPreset()
 	local config = ConfigurationStructure:UpdateConfigForServer()
 	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 	if activePresetId then
-		local activePreset = config.vanity.presets[activePresetId]
-		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", activePreset.Name, activePreset.Author, activePreset.Version)
-		local activeOutfits = activePreset.Outfits
+		ActiveVanityPreset = config.vanity.presets[activePresetId]
+
+		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", ActiveVanityPreset.Name, ActiveVanityPreset.Author, ActiveVanityPreset.Version)
+		local activeOutfits = ActiveVanityPreset.Outfits
 
 		if next(activeOutfits) then
 			for _, player in pairs(Osi.DB_Players:Get(nil)) do
@@ -88,7 +97,7 @@ local function ApplyTransmogsPerPreset()
 				if playerOutfit then
 					Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player[1], Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
 					playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = compositeKey
-					Transmogger:MogCharacter(playerEntity, playerOutfit)
+					Transmogger:MogCharacter(playerEntity)
 				else
 					Logger:BasicInfo("Could not find an outfit for player %s", player[1])
 				end

@@ -8,6 +8,10 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_Item_ReplicationComponents", {
 	Server = true
 })
 
+Ext.Vars.RegisterUserVariable("TheArmory_Vanity_Item_CurrentlyMogging", {
+	Server = true
+})
+
 local defaultPieces = {
 	Helmet = "4d2e0931-3a01-4759-834b-8ae36749daab",
 	VanityBody = "2f7aadd5-65ea-4ab6-8c55-88ee584c72df",
@@ -91,8 +95,16 @@ local function buildMetaInfoForLog(entity)
 end
 
 ---@param character EntityHandle
----@param outfit VanityOutfit
-function Transmogger:MogCharacter(character, outfit)
+function Transmogger:MogCharacter(character)
+	---@type VanityOutfit
+	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
+	if not outfit then
+		Logger:BasicDebug("No active outfit found for %s, skipping transmog", character.Uuid.EntityUuid)
+		return
+	end
+
+	Logger:BasicDebug("Found active outfit for %s, beginning Mog process", character.Uuid.EntityUuid)
+
 	for actualSlot, outfitSlot in pairs(outfit) do
 		if outfitSlot.equipment and outfitSlot.equipment.guid then
 			local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
@@ -112,7 +124,9 @@ function Transmogger:MogCharacter(character, outfit)
 				Osi.Unequip(character.Uuid.EntityUuid, equippedItem)
 			end
 
+			---@type string
 			local vanityTemplate = outfitSlot.equipment.guid
+
 			if outfitSlot.weaponTypes then
 				---@type Weapon
 				local itemStat = Ext.Stats.Get(Osi.GetStatString(equippedItem))
@@ -134,10 +148,10 @@ function Transmogger:MogCharacter(character, outfit)
 			Ext.Timer.WaitFor(50, function(e)
 				---@type EntityHandle
 				local createdVanityEntity = Ext.Entity.Get(vanityGuid)
-				
+
 				---@type EntityHandle
 				local equippedItemEntity = Ext.Entity.Get(equippedItem)
-				
+
 				createdVanityEntity.Vars.TheArmory_Vanity_OriginalItemInfo = equippedItemEntity.ServerItem.Template.Id
 
 				local varComponentsToReplicateOnRefresh = {}
@@ -247,6 +261,7 @@ function Transmogger:MogCharacter(character, outfit)
 				end
 
 				Ext.Timer.WaitFor(50, function()
+					createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 					Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
 
 					Osi.RequestDelete(equippedItem)
@@ -297,18 +312,30 @@ Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
 				local inventoryOwner = Osi.GetInventoryOwner(item)
 				if inventoryOwner then
 					local originalItemTemplate = itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo
-					Logger:BasicDebug("Restoring %s to %s as %s was unequipped", originalItemTemplate, inventoryOwner, item)
+					Logger:BasicDebug("%s was unequipped, so restoring to %s and giving to %s", item, originalItemTemplate, inventoryOwner)
 					local vanityIsEquipped = Osi.IsEquipped(item)
 
 					Osi.RequestDelete(item)
 					if vanityIsEquipped == 1 then
-						local originalItem = Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, "")
-						Osi.Equip(inventoryOwner, originalItem)
+						Osi.Equip(inventoryOwner, Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, ""))
 					else
 						Osi.TemplateAddTo(originalItemTemplate, inventoryOwner, 1, 0)
 					end
 				end
 			end
+		end)
+	end
+end)
+
+Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
+	---@type EntityHandle
+	local itemEntity = Ext.Entity.Get(item)
+	if itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging then
+		itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = nil
+	else
+		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
+		Ext.Timer.WaitFor(100, function()
+			Transmogger:MogCharacter(Ext.Entity.Get(character))
 		end)
 	end
 end)
