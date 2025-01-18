@@ -121,7 +121,7 @@ function Transmogger:MogCharacter(character)
 					goto continue
 				end
 
-				Osi.Unequip(character.Uuid.EntityUuid, equippedItem)
+				equippedItem = Transmogger:UnMogItem(equippedItem, true)
 			end
 
 			---@type string
@@ -302,29 +302,41 @@ Ext.Events.SessionLoaded:Subscribe(function(e)
 	end
 end)
 
-Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
-	---@type EntityHandle
-	local itemEntity = Ext.Entity.Get(item)
+---@param item any
+---@return string?
+function Transmogger:UnMogItem(item, currentlyMogging)
+	if Osi.Exists(item) == 1 then
+		---@type EntityHandle
+		local itemEntity = Ext.Entity.Get(item)
 
-	if itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo then
-		Ext.Timer.WaitFor(100, function()
-			if Osi.Exists(item) == 1 then
-				local inventoryOwner = Osi.GetInventoryOwner(item)
-				if inventoryOwner then
-					local originalItemTemplate = itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo
-					Logger:BasicDebug("%s was unequipped, so restoring to %s and giving to %s", item, originalItemTemplate, inventoryOwner)
-					local vanityIsEquipped = Osi.IsEquipped(item)
+		if itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo then
+			local inventoryOwner = Osi.GetInventoryOwner(item)
+			if inventoryOwner then
+				local originalItemTemplate = itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo
+				Logger:BasicDebug("%s was unequipped, so restoring to %s and giving to %s", item, originalItemTemplate, inventoryOwner)
+				local vanityIsEquipped = Osi.IsEquipped(item)
 
-					Osi.RequestDelete(item)
-					if vanityIsEquipped == 1 then
-						Osi.Equip(inventoryOwner, Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, ""))
-					else
-						Osi.TemplateAddTo(originalItemTemplate, inventoryOwner, 1, 0)
+				Osi.RequestDelete(item)
+				if vanityIsEquipped == 1 then
+					local newItem = Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, "")
+					if not currentlyMogging then
+						Osi.Equip(inventoryOwner, newItem)
 					end
+					return newItem
+				else
+					Osi.TemplateAddTo(originalItemTemplate, inventoryOwner, 1, 0)
 				end
 			end
-		end)
+		else
+			return item
+		end
 	end
+end
+
+Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
+	Ext.Timer.WaitFor(100, function()
+		Transmogger:UnMogItem(item)
+	end)
 end)
 
 Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
