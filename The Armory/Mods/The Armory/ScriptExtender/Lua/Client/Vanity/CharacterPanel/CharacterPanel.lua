@@ -241,6 +241,10 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					makeResetButton = true
 				else
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
+					if weaponType then
+						imageButton.Background = {0, 0, 0, 1}
+						imageButton:Tooltip():AddText("\t " .. weaponType)
+					end
 				end
 				imageButton.Image.Size = { 60, 60 }
 				imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
@@ -275,6 +279,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				else
 					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 				end
+				dyeButton.IDContext = itemSlotOrWeaponTypeEntry[1] .. " Dye"
 				dyeButton.SameLine = true
 				dyeButton.OnClick = function()
 					DyePicker:OpenWindow(imageButton.UserData, itemSlot,
