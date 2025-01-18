@@ -121,7 +121,11 @@ function Transmogger:MogCharacter(character)
 					goto continue
 				end
 
-				equippedItem = Transmogger:UnMogItem(equippedItem, true)
+				local unmoggedId = Transmogger:UnMogItem(equippedItem, true)
+				equippedItem = unmoggedId or equippedItem
+				if not unmoggedId then
+					Osi.Unequip(character.Uuid.EntityUuid, equippedItem)
+				end
 			end
 
 			---@type string
@@ -261,10 +265,10 @@ function Transmogger:MogCharacter(character)
 				end
 
 				Ext.Timer.WaitFor(50, function()
+					Osi.RequestDelete(equippedItem)
+
 					createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 					Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
-
-					Osi.RequestDelete(equippedItem)
 				end)
 
 				createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
@@ -327,8 +331,6 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 					Osi.TemplateAddTo(originalItemTemplate, inventoryOwner, 1, 0)
 				end
 			end
-		else
-			return item
 		end
 	end
 end
