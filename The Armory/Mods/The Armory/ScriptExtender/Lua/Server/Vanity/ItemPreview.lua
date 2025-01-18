@@ -55,7 +55,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 
 				---@type ItemTemplate
 				local dyeTemplate = Ext.Template.GetTemplate(payload.dye)
-				
+
 				---@type ResourceMaterialPresetResource
 				local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 
@@ -77,7 +77,6 @@ local function DeleteItem(character, userPreview)
 
 	userPreview.previewItem = nil
 end
-
 
 Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, payload, user)
 	user = PeerToUserID(user)
