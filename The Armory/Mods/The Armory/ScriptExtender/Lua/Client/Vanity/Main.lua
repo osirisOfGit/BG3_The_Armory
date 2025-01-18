@@ -7,6 +7,15 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
 	SyncToServer = true
 })
 
+Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
+	Server = true,
+	Client = true,
+	WriteableOnServer = true,
+	WriteableOnClient = true,
+	SyncToClient = true,
+	SyncToServer = true
+})
+
 Ext.Require("Client/Vanity/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 

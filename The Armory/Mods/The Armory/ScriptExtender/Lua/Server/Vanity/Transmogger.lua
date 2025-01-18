@@ -134,12 +134,13 @@ function Transmogger:MogCharacter(character, outfit)
 			Ext.Timer.WaitFor(50, function(e)
 				---@type EntityHandle
 				local createdVanityEntity = Ext.Entity.Get(vanityGuid)
-				createdVanityEntity.Vars.TheArmory_Vanity_OriginalItemInfo = equippedItem
-
-				local varComponentsToReplicateOnRefresh = {}
-
+				
 				---@type EntityHandle
 				local equippedItemEntity = Ext.Entity.Get(equippedItem)
+				
+				createdVanityEntity.Vars.TheArmory_Vanity_OriginalItemInfo = equippedItemEntity.ServerItem.Template.Id
+
+				local varComponentsToReplicateOnRefresh = {}
 
 				Logger:BasicDebug("Mogging %s to look like %s for %s", equippedItemEntity.DisplayName.Name:Get(), vanityPiece.Name, character.DisplayName.Name:Get())
 
@@ -283,5 +284,31 @@ Ext.Events.SessionLoaded:Subscribe(function(e)
 				end
 			end
 		end
+	end
+end)
+
+Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
+	---@type EntityHandle
+	local itemEntity = Ext.Entity.Get(item)
+
+	if itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo then
+		Ext.Timer.WaitFor(100, function()
+			if Osi.Exists(item) == 1 then
+				local inventoryOwner = Osi.GetInventoryOwner(item)
+				if inventoryOwner then
+					local originalItemTemplate = itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo
+					Logger:BasicDebug("Restoring %s to %s as %s was unequipped", originalItemTemplate, inventoryOwner, item)
+					local vanityIsEquipped = Osi.IsEquipped(item)
+
+					Osi.RequestDelete(item)
+					if vanityIsEquipped == 1 then
+						local originalItem = Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, "")
+						Osi.Equip(inventoryOwner, originalItem)
+					else
+						Osi.TemplateAddTo(originalItemTemplate, inventoryOwner, 1, 0)
+					end
+				end
+			end
+		end)
 	end
 end)

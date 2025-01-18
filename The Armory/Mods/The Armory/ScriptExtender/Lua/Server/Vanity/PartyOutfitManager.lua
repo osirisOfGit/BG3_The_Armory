@@ -10,6 +10,15 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
 	SyncToServer = true
 })
 
+Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
+	Server = true,
+	Client = true,
+	WriteableOnServer = true,
+	WriteableOnClient = true,
+	SyncToClient = true,
+	SyncToServer = true
+})
+
 local function ApplyTransmogsPerPreset()
 	local config = ConfigurationStructure:UpdateConfigForServer()
 	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
@@ -78,6 +87,7 @@ local function ApplyTransmogsPerPreset()
 
 				if playerOutfit then
 					Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player[1], Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
+					playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = compositeKey
 					Transmogger:MogCharacter(playerEntity, playerOutfit)
 				else
 					Logger:BasicInfo("Could not find an outfit for player %s", player[1])
