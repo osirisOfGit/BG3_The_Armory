@@ -138,8 +138,11 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		if weaponType then
 			if not outfitSlotEntryForItem.weaponTypes then
 				outfitSlotEntryForItem.weaponTypes = {}
-				outfitSlotEntryForItem.weaponTypes[weaponType] =
-					TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+			end
+
+			if not outfitSlotEntryForItem.weaponTypes[weaponType] then
+			outfitSlotEntryForItem.weaponTypes[weaponType] =
+				TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
 			end
 			outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
 		end
