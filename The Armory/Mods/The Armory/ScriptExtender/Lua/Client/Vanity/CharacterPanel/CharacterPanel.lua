@@ -164,18 +164,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					Guid = modInfo.ModuleUUID,
 					Version = modInfo.ModVersion
 				}
-
-				for _, modDependency in pairs(preset.ModDependencies) do
-					if modDependency.Guid == modInfo.ModuleUUID then
-						modDependency.Version = modInfo.ModVersion
-						return
-					end
-				end
-
-				table.insert(preset.ModDependencies, {
-					Guid = modInfo.ModuleUUID,
-					Version = modInfo.ModVersion
-				})
 			end
 		else
 			Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",

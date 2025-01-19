@@ -89,6 +89,7 @@ function VanityPresetManager:OpenManager()
 			}
 
 			presetForm.Visible = false
+			VanityPresetManager:UpdatePresetView()
 		end
 
 		createNewPresetButton.OnClick = function()
@@ -123,35 +124,85 @@ end
 ---@param preset VanityPreset
 ---@param parent ExtuiTreeParent
 local function buildDependencyTable(preset, parent)
-	local dependencyTable = parent:AddTable(preset.Name .. preset.Author, 4)
+	local cachedDeps = {
+		dye = {},
+		equipment = {}
+	}
 
-	local headerRow = dependencyTable:AddRow()
-	headerRow.Headers = true
-	headerRow:AddCell():AddText("Name")
-	headerRow:AddCell():AddText("Author")
-	headerRow:AddCell():AddText("Version")
-	headerRow:AddCell():AddText("UUID")
-
-	for _, dependency in pairs(preset.ModDependencies) do
-		local mod = Ext.Mod.GetMod(dependency.Guid)
-
-		if mod and mod.Info.Author ~= '' then
-			local modRow = dependencyTable:AddRow()
-
-			local nameText = modRow:AddCell():AddText(mod and mod.Info.Name or "Unknown - Mod Not Loaded")
-			nameText.TextWrapPos = 0
-			local authorText = modRow:AddCell():AddText((mod and (mod.Info.Author ~= '' and mod.Info.Author or "Larian")) or "Unknown")
-			authorText.TextWrapPos = 0
-
-			if not mod then
-				nameText:SetColor("Text", { 1, 0.02, 0, 1 })
-				authorText:SetColor("Text", { 1, 0.02, 0, 1 })
+	for _, outfitSlot in pairs(preset.Outfits) do
+		for _, vanityOutfit in pairs(outfitSlot) do
+			if vanityOutfit.dye and vanityOutfit.dye.modDependency then
+				if not cachedDeps[vanityOutfit.dye.modDependency.Guid] then
+					table.insert(cachedDeps.dye, vanityOutfit.dye.modDependency)
+					cachedDeps[vanityOutfit.dye.modDependency.Guid] = true
+				end
 			end
-
-			modRow:AddCell():AddText(table.concat(dependency.Version, "."))
-			modRow:AddCell():AddText(dependency.Guid).TextWrapPos = 0
+			if vanityOutfit.equipment and vanityOutfit.equipment.modDependency then
+				if not cachedDeps[vanityOutfit.equipment.modDependency.Guid] then
+					table.insert(cachedDeps.equipment, vanityOutfit.equipment.modDependency)
+					cachedDeps[vanityOutfit.equipment.modDependency.Guid] = true
+				end
+			end
+			if vanityOutfit.weaponTypes then
+				for _, weaponSlot in pairs(vanityOutfit.weaponTypes) do
+					if weaponSlot.equipment.modDependency and not cachedDeps[weaponSlot.equipment.modDependency.Guid] then
+						table.insert(cachedDeps.equipment, weaponSlot.equipment.modDependency)
+						cachedDeps[weaponSlot.equipment.modDependency.Guid] = true
+					end
+				end
+			end
 		end
 	end
+
+	---@param a ModDependency
+	---@param b ModDependency
+	table.sort(cachedDeps.dye, function(a, b)
+		return a.Guid < b.Guid
+	end)
+
+	---@param a ModDependency
+	---@param b ModDependency
+	table.sort(cachedDeps.equipment, function(a, b)
+		return a.Guid < b.Guid
+	end)
+
+	---@param key string
+	---@param modlist ModDependency[]
+	local function buildDepTab(key, modlist)
+		parent:AddText(key .. " Dependencies")
+		local dependencyTable = parent:AddTable(key .. preset.Name .. preset.Author, 4)
+
+		local headerRow = dependencyTable:AddRow()
+		headerRow.Headers = true
+		headerRow:AddCell():AddText("Name")
+		headerRow:AddCell():AddText("Author")
+		headerRow:AddCell():AddText("Version")
+		headerRow:AddCell():AddText("UUID")
+
+		for _, modDependency in ipairs(modlist) do
+			local mod = Ext.Mod.GetMod(modDependency.Guid)
+
+			if mod and mod.Info.Author ~= '' then
+				local modRow = dependencyTable:AddRow()
+
+				local nameText = modRow:AddCell():AddText(mod and mod.Info.Name or "Unknown - Mod Not Loaded")
+				nameText.TextWrapPos = 0
+				local authorText = modRow:AddCell():AddText((mod and (mod.Info.Author ~= '' and mod.Info.Author or "Larian")) or "Unknown")
+				authorText.TextWrapPos = 0
+
+				if not mod then
+					nameText:SetColor("Text", { 1, 0.02, 0, 1 })
+					authorText:SetColor("Text", { 1, 0.02, 0, 1 })
+				end
+
+				modRow:AddCell():AddText(table.concat(modDependency.Version, "."))
+				modRow:AddCell():AddText(modDependency.Guid).TextWrapPos = 0
+			end
+		end
+	end
+
+	buildDepTab("Dye", cachedDeps.dye)
+	buildDepTab("Equipment", cachedDeps.equipment)
 end
 
 function VanityPresetManager:UpdatePresetView()

@@ -89,6 +89,14 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 
 	---@type ResourceMaterialPresetResource
 	local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
+	if not materialPreset then
+		---@type Object
+		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
+		local modInfo = Ext.Mod.GetMod(dyeStat.ModId).Info
+
+		Logger:BasicWarning("Dye %s from Mod %s by %s does not have a materialPreset?", dyeTemplate.DisplayName:Get() or dyeTemplate.Name, modInfo.Name, modInfo.Author)
+		return
+	end
 
 	local favoriteButton = displayGroup:AddImageButton("Favorite" .. templateName, isFavorited and "star_fileld" or "star_empty", { 26, 26 })
 	favoriteButton.Background = { 0, 0, 0, 0.5 }
@@ -121,7 +129,7 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 		dyeInfoGroup:AddButton("Select").OnClick = function()
 			self.activeDyeGroup:Destroy()
 			self.activeDyeGroup = nil
-			
+
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", self.slot)
 			self.onSelectFunc(dyeTemplate)
 			self.window.Open = false
