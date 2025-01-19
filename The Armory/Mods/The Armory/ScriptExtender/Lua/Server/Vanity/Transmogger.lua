@@ -119,6 +119,9 @@ function Transmogger:MogCharacter(character)
 				if string.sub(Osi.GetTemplate(equippedItem), -36) == outfitSlot.equipment.guid then
 					Logger:BasicDebug("Equipped item %s is already the vanity item %s", equippedItem, outfitSlot.equipment.guid)
 					goto continue
+				elseif string.find(actualSlot, "Melee") and equippedItem == Osi.GetEquippedItem(character.Uuid.EntityUuid, "LightSource") then
+					Logger:BasicDebug("Equipped weapon is a lightsource, not mogging with this slot")
+					goto continue
 				end
 
 				local unmoggedId = Transmogger:UnMogItem(equippedItem, true)
@@ -278,6 +281,15 @@ function Transmogger:MogCharacter(character)
 		end
 		::continue::
 	end
+
+	for _, actualSlot in ipairs(SlotEnum) do
+		if not outfit[actualSlot] then
+			local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
+			if equippedItem then
+				Transmogger:UnMogItem(equippedItem)
+			end
+		end
+	end
 end
 
 Ext.Events.SessionLoaded:Subscribe(function(e)
@@ -314,7 +326,7 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 		---@type EntityHandle
 		local itemEntity = Ext.Entity.Get(item)
 
-		if itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo then
+		if itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo and not itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging then
 			local inventoryOwner = Osi.GetInventoryOwner(item)
 			if inventoryOwner then
 				local originalItemTemplate = itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo

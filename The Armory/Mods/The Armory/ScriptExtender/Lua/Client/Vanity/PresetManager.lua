@@ -19,6 +19,7 @@ function VanityPresetManager:OpenManager()
 	if presetWindow then
 		presetWindow.Open = true
 		presetWindow:SetFocus()
+		VanityPresetManager:UpdatePresetView()
 	elseif not presetWindow then
 		presetWindow = Ext.IMGUI.NewWindow("Vanity Preset Manager")
 		presetWindow.Closeable = true
@@ -169,15 +170,16 @@ local function buildDependencyTable(preset, parent)
 	---@param key string
 	---@param modlist ModDependency[]
 	local function buildDepTab(key, modlist)
-		parent:AddText(key .. " Dependencies")
+		parent:AddSeparatorText(key .. " Dependencies"):SetStyle("SeparatorTextAlign", 0.2)
+
 		local dependencyTable = parent:AddTable(key .. preset.Name .. preset.Author, 4)
+		dependencyTable.SizingStretchProp = true
 
 		local headerRow = dependencyTable:AddRow()
 		headerRow.Headers = true
 		headerRow:AddCell():AddText("Name")
 		headerRow:AddCell():AddText("Author")
 		headerRow:AddCell():AddText("Version")
-		headerRow:AddCell():AddText("UUID")
 
 		for _, modDependency in ipairs(modlist) do
 			local mod = Ext.Mod.GetMod(modDependency.Guid)
@@ -187,7 +189,7 @@ local function buildDependencyTable(preset, parent)
 
 				local nameText = modRow:AddCell():AddText(mod and mod.Info.Name or "Unknown - Mod Not Loaded")
 				nameText.TextWrapPos = 0
-				local authorText = modRow:AddCell():AddText((mod and (mod.Info.Author ~= '' and mod.Info.Author or "Larian")) or "Unknown")
+				local authorText = modRow:AddCell():AddText(mod and (mod.Info.Author ~= '' and mod.Info.Author or "Larian") or "Unknown")
 				authorText.TextWrapPos = 0
 
 				if not mod then
@@ -196,12 +198,12 @@ local function buildDependencyTable(preset, parent)
 				end
 
 				modRow:AddCell():AddText(table.concat(modDependency.Version, "."))
-				modRow:AddCell():AddText(modDependency.Guid).TextWrapPos = 0
 			end
 		end
 	end
 
 	buildDepTab("Dye", cachedDeps.dye)
+	parent:AddNewLine()
 	buildDepTab("Equipment", cachedDeps.equipment)
 end
 
@@ -238,11 +240,11 @@ function VanityPresetManager:UpdatePresetView()
 			presetGroup:AddText("Version: " .. preset.Version)
 			presetGroup:AddText("Contains Skimpy Outfits/Nudity? " .. (preset.SFW and "No" or "Yes"))
 
-			presetGroup:AddSeparatorText("Mod Dependencies:")
+			presetGroup:AddSeparatorText("Mod Dependencies")
 			buildDependencyTable(preset, presetGroup)
 
 			presetGroup:AddNewLine()
-			presetGroup:AddSeparatorText("Configured Outfits:")
+			presetGroup:AddSeparatorText("Configured Outfits")
 			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, presetGroup)
 		end
 	end

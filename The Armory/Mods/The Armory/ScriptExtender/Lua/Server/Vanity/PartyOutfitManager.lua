@@ -110,3 +110,7 @@ end
 Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function(channel, payload, user)
 	ApplyTransmogsPerPreset()
 end)
+
+Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function (levelName, isEditorMode)
+	ApplyTransmogsPerPreset()
+end)

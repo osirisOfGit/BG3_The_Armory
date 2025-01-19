@@ -32,8 +32,16 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 
 	Logger:BasicDebug("%s started previewing %s", character, userPreview.previewItem)
 
-	local slot = Ext.Stats.Get(Osi.GetStatString(userPreview.previewItem)).Slot
+	local stat = Osi.GetStatString(userPreview.previewItem)
+	if not stat then
+		return
+	end
+
+	local slot = Ext.Stats.Get(stat).Slot
 	userPreview.equippedItem = Osi.GetEquippedItem(character, slot)
+	if userPreview.equippedItem then
+		Ext.Entity.Get(userPreview.equippedItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+	end
 
 	local correctArmorSet = string.find(slot, "Vanity") and 1 or 0
 	if correctArmorSet ~= userPreview.armorSet then
@@ -43,6 +51,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 	-- Otherwise the avatar doesn't show it in the inventory view
 	Ext.Timer.WaitFor(200, function()
 		if userPreview.previewItem then
+			Ext.Entity.Get(userPreview.previewItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 			Osi.Equip(character, userPreview.previewItem, 1, 0)
 
 			if payload.dye then

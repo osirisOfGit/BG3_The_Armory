@@ -64,12 +64,13 @@ local equipmentSlots = {
 	{ "Breast",            "c_slot_breast" },
 	{ "Underwear",         "c_slot_underwear" },
 	{ "Gloves",            "c_slot_gloves" },
-	{ "Amulet",            "c_slot_necklace" },
-	{ "Boots",             "c_slot_boots" },
-	{ "Ring1",             "c_slot_ring1" },
 	{ "Dummy",             "ignore" },
-	{ "Ring2",             "c_slot_ring2" },
-	{ "LightSource",       "c_slot_lightSource" },
+	-- { "Amulet",            "c_slot_necklace" },
+	{ "Boots",             "c_slot_boots" },
+	-- { "Ring1",             "c_slot_ring1" },
+	-- { "Dummy2",            "ignore" },
+	-- { "Ring2",             "c_slot_ring2" },
+	-- { "LightSource",       "c_slot_lightSource" },
 	{ "MusicalInstrument", "c_slot_instrument" }
 }
 
@@ -141,8 +142,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 			end
 
 			if not outfitSlotEntryForItem.weaponTypes[weaponType] then
-			outfitSlotEntryForItem.weaponTypes[weaponType] =
-				TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+				outfitSlotEntryForItem.weaponTypes[weaponType] =
+					TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
 			end
 			outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
 		end
@@ -189,7 +190,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 
 		for i, itemSlotOrWeaponTypeEntry in ipairs(group) do
 			local imageButton
-			if itemSlotOrWeaponTypeEntry[1] == "Dummy" then
+			if string.find(itemSlotOrWeaponTypeEntry[1], "Dummy") then
 				-- Dummy size math makes 0 sense to me
 				imageButton = parentContainer:AddDummy(164, 60)
 				imageButton.Label = itemSlotOrWeaponTypeEntry[2]
@@ -230,7 +231,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				else
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 					if weaponType then
-						imageButton.Background = {0, 0, 0, 1}
+						imageButton.Background = { 0, 0, 0, 1 }
 						imageButton:Tooltip():AddText("\t " .. weaponType)
 					end
 				end
@@ -292,7 +293,9 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					resetButton.SameLine = true
 					resetButton.OnClick = function()
 						outfit[itemSlot].delete = true
-						outfit[itemSlot] = TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+						Ext.Timer.WaitFor(350, function()
+							Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+						end)
 						BuildSlots(parentContainer, group, verticalSlots, slot)
 					end
 				else
