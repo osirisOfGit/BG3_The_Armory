@@ -170,7 +170,7 @@ local function buildDependencyTable(preset, parent)
 	---@param key string
 	---@param modlist ModDependency[]
 	local function buildDepTab(key, modlist)
-		parent:AddSeparatorText(key .. " Dependencies"):SetStyle("SeparatorTextAlign", 0.2)
+		parent:AddSeparatorText(key .. " Dependencies"):SetStyle("SeparatorTextAlign", 0.1)
 
 		local dependencyTable = parent:AddTable(key .. preset.Name .. preset.Author, 4)
 		dependencyTable.SizingStretchProp = true

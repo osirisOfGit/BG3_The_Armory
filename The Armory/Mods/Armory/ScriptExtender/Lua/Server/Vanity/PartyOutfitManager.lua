@@ -23,7 +23,7 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 ---@type VanityPreset
 ActiveVanityPreset = nil
 
-Ext.Events.SessionLoaded:Subscribe(function (e)
+Ext.Events.SessionLoaded:Subscribe(function(e)
 	ActiveVanityPreset = ConfigurationStructure:UpdateConfigForServer().vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
 end)
 
@@ -46,20 +46,9 @@ local function ApplyTransmogsPerPreset()
 				---@type EntityHandle
 				local playerEntity = Ext.Entity.Get(player[1])
 
-				---@type ResourceRace
-				local raceResource = Ext.StaticData.Get(playerEntity.Race.Race, "Race")
-				if raceResource.ParentGuid == "00000000-0000-0000-0000-000000000000" then
-					-- Humanoid, useless
-					if raceResource.ResourceUUID ~= "899d275e-9893-490a-9cd5-be856794929f" then
-						criteriaTable["Race"] = raceResource.ResourceUUID
-					end
-				else
-					if raceResource.ParentGuid == "899d275e-9893-490a-9cd5-be856794929f" then
-						criteriaTable["Race"] = raceResource.ResourceUUID
-					else
-						criteriaTable["Race"] = raceResource.ParentGuid
-						criteriaTable["Subrace"] = raceResource.ResourceUUID
-					end
+				criteriaTable["Race"] = playerEntity.CharacterCreationStats.Race
+				if playerEntity.CharacterCreationStats.SubRace ~= "00000000-0000-0000-0000-000000000000" then
+					criteriaTable["Subrace"] = playerEntity.CharacterCreationStats.SubRace
 				end
 
 				local highestClassLevel = 0
@@ -75,7 +64,18 @@ local function ApplyTransmogsPerPreset()
 					end
 				end
 
-				criteriaTable["BodyType"] = playerEntity.CharacterCreationStats.BodyShape + playerEntity.CharacterCreationStats.BodyType
+				--[[
+				     BodyType    BodyShape
+				1       1            0
+				2       1            1
+				3       0            0
+				4       0            1
+				]]
+				local bodyType = playerEntity.CharacterCreationStats.BodyType
+				local bodyShape = playerEntity.CharacterCreationStats.BodyShape
+				bodyShape = bodyType == 0 and bodyShape + 1 or bodyShape
+				bodyType = bodyType == 0 and 2 or bodyType
+				criteriaTable["BodyType"] = bodyShape + bodyType
 
 				---@type ResourceOrigin
 				local originResource = Ext.StaticData.Get(playerEntity.Origin.field_18, "Origin")
@@ -96,11 +96,12 @@ local function ApplyTransmogsPerPreset()
 				end
 
 				if playerOutfit then
-					Logger:BasicDebug("Player %s was matched to an outfit (in %dms) with criteria table: %s", player[1], Ext.Utils.MonotonicTime() - startTime, Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
+					Logger:BasicDebug("Player %s was matched to an outfit (in %dms) with criteria table: %s", player[1], Ext.Utils.MonotonicTime() - startTime,
+						Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
 					playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = compositeKey
 					Transmogger:MogCharacter(playerEntity)
 				else
-					Logger:BasicInfo("Could not find an outfit for player %s", player[1])
+					Logger:BasicInfo("Could not find an outfit for player %s with criteriaTable %s", player[1], Ext.Json.Stringify(criteriaTable))
 				end
 			end
 		end
@@ -111,6 +112,6 @@ Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function(channel, payloa
 	ApplyTransmogsPerPreset()
 end)
 
-Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function (levelName, isEditorMode)
+Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
 	ApplyTransmogsPerPreset()
 end)
