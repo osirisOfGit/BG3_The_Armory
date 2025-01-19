@@ -296,6 +296,10 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 						Ext.Timer.WaitFor(350, function()
 							Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 						end)
+
+						if not outfit() then
+							outfit.delete = true
+						end
 						BuildSlots(parentContainer, group, verticalSlots, slot)
 					end
 				else
