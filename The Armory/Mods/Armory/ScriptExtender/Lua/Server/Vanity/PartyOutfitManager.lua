@@ -49,8 +49,6 @@ local function FindAndApplyOutfit(player, activeOutfits)
 			criteriaTable["Class"] = classInfo.ClassUUID
 			if classInfo.SubClassUUID ~= "00000000-0000-0000-0000-000000000000" then
 				criteriaTable["Subclass"] = classInfo.SubClassUUID
-			else
-				criteriaTable["Subclass"] = nil
 			end
 		end
 	end
