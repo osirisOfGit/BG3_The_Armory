@@ -398,6 +398,15 @@ Ext.Events.SessionLoaded:Subscribe(function(e)
 	end
 end)
 
+function Transmogger:ClearOutfit(character)
+	for _, actualSlot in ipairs(SlotEnum) do
+		local equippedItem = Osi.GetEquippedItem(character, actualSlot)
+		if equippedItem then
+			Transmogger:UnMogItem(equippedItem)
+		end
+	end
+end
+
 ---@param item any
 ---@return string?
 function Transmogger:UnMogItem(item, currentlyMogging)

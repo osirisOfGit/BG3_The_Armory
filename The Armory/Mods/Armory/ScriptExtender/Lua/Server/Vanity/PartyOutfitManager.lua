@@ -91,6 +91,8 @@ local function FindAndApplyOutfit(player, activeOutfits)
 		Transmogger:MogCharacter(playerEntity)
 	else
 		Logger:BasicInfo("Could not find an outfit for player %s with criteriaTable %s", player, Ext.Json.Stringify(criteriaTable))
+		playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = nil
+		Transmogger:ClearOutfit(player)
 	end
 end
 
