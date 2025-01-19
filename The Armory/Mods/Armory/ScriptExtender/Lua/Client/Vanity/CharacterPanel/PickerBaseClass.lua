@@ -13,7 +13,9 @@ PickerBaseClass = {
 	---@type ActualSlot
 	slot = nil,
 	---@type ExtuiMenu
-	settingsMenu = nil
+	settingsMenu = nil,
+	---@type string[]
+	blacklistedItems = {}
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -32,6 +34,7 @@ function PickerBaseClass:new(title, instance)
 	instance.settings = instance.settings or {}
 	instance.slot = nil
 	instance.settingsMenu = nil
+	instance.blacklistedItems = {}
 
 	return instance
 end

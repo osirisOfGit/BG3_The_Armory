@@ -79,6 +79,10 @@ end
 ---@param templateName string
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
 function DyePicker:DisplayResult(templateName, displayGroup)
+	if TableUtils:ListContains(self.blacklistedItems, templateName) then
+		return
+	end
+
 	local dyeTemplate = self.rootsByName[templateName]
 
 	local isFavorited, favoriteIndex = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
@@ -94,6 +98,7 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId).Info
 
+		table.insert(self.blacklistedItems, templateName)
 		Logger:BasicWarning("Dye %s from Mod %s by %s does not have a materialPreset?", dyeTemplate.DisplayName:Get() or dyeTemplate.Name, modInfo.Name, modInfo.Author)
 		return
 	end
