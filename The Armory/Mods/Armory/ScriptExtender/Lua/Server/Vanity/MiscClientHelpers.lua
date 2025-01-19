@@ -1,5 +1,3 @@
 Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, peerId)
-	Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
-		Ext.Net.PostMessageToUser(peerId, ModuleUUID .. "UserName", Osi.GetUserName(PeerToUserID(peerId)))
-	end)
+	Ext.Net.PostMessageToUser(peerId, ModuleUUID .. "UserName", Osi.GetUserName(PeerToUserID(peerId)))
 end)
