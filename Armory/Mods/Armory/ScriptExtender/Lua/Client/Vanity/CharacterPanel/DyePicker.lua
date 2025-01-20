@@ -150,6 +150,8 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 			return a.Parameter < b.Parameter
 		end)
 
+		dyeInfoGroup:AddText("Values are not editable"):SetStyle("Alpha", 0.65)
+
 		local dyeTable = dyeInfoGroup:AddTable(templateName, 2)
 		dyeTable.SizingStretchProp = true
 
