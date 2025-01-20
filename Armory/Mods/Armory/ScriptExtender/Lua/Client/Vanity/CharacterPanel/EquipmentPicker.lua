@@ -80,6 +80,11 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 		end)
 end
 
+local equivalentSlots = {
+	["Breast"] = "VanityBody",
+	["Boots"] = "VanityBoots"
+}
+
 ---@param templateName string
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
 function EquipmentPicker:DisplayResult(templateName, displayGroup)
@@ -113,7 +118,17 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 			canGoInOffhand = false
 		end
 
-		if not canGoInOffhand then
+		local isEquivalentSlot = false
+		for slot1, slot2 in pairs(equivalentSlots) do
+			if (slot1 == self.slot and string.find(slot2, itemStat.Slot))
+				or (slot2 == self.slot and string.find(slot1, itemStat.Slot))
+			then
+				isEquivalentSlot = true
+				break
+			end
+		end
+
+		if not canGoInOffhand and not isEquivalentSlot then
 			return
 		end
 	end
