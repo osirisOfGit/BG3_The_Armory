@@ -1,0 +1,40 @@
+{
+	"SchemaVersion": 1,
+	"Tabs": [
+		{
+			"TabName": "General",
+			"TabDescription": "General settings",
+			"TabId": "general",
+			"Handles": {
+				"NameHandle": "h00aacc9655e949239e57f8ce94ca32c339d8",
+				"DescriptionHandle": "h8ff17773028742ef8f317e869b25b448be46"
+			},
+			"Sections": [
+				{
+					"SectionName": "General Mod Behavior",
+					"SectionId": "general-mod-behavior",
+					"Handles": {
+						"NameHandle": "h160b31157d2549caad29691b44e745c2b7d3"
+					},
+					"Settings": [
+						{
+							"Id": "log_level",
+							"Name": "Log level",
+							"Description": "0 = Off, 1 = Error, 2 = Warn, 3 = Info, 4 = Debug, 5 = Trace (Anything higher than Info will only be logged to the log.txt, not the SE console)",
+							"Handles": {
+								"NameHandle": "h4adbc671c54d486ca3989249c74cf6ee1e4c",
+								"DescriptionHandle": "h838d4b555a7c471f86daa380f5e8f37a0796"
+							},
+							"Type": "slider_int",
+							"Default": 3,
+							"Options": {
+								"Min": 0,
+								"Max": 5
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}
