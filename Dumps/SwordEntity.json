@@ -1,0 +1,1051 @@
+{
+	"AttributeFlags" : 
+	{
+		"AttributeFlags" : 0
+	},
+	"BoostsContainer" : 
+	{
+		"Boosts" : 
+		[
+			{
+				"Boosts" : 
+				[
+					"Entity (01c00002000019a8)"
+				],
+				"Type" : "WeaponEnchantment"
+			},
+			{
+				"Boosts" : 
+				[
+					"Entity (01c00002000019a9)"
+				],
+				"Type" : "WeaponProperty"
+			}
+		]
+	},
+	"CanBeDisarmed" : 
+	{
+		"Flags" : 65535
+	},
+	"CanBeInInventory" : {},
+	"CanEnterChasm" : 
+	{
+		"CanEnter" : true
+	},
+	"CanSeeThrough" : {},
+	"CanShootThrough" : {},
+	"CanWalkThrough" : {},
+	"CombatParticipant" : 
+	{
+		"AiHint" : "00000000-0000-0000-0000-000000000000",
+		"CombatGroupId" : "",
+		"CombatHandle" : null,
+		"Flags" : 
+		[
+			"IsInspector",
+			"CanJoinCombat"
+		],
+		"InitiativeRoll" : -100
+	},
+	"Data" : 
+	{
+		"StatsId" : "MAG_Harpers_SingingSword",
+		"StepsType" : 0,
+		"Weight" : 1350
+	},
+	"DisplayName" : 
+	{
+		"Name" : 
+		{
+			"ArgumentString" : 
+			{
+				"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+				"Version" : 0
+			},
+			"Get" : "function: 00007FFED26A0790",
+			"Handle" : 
+			{
+				"Handle" : "h4b12abcag6c27g476ag835fga4023845864f",
+				"Version" : 2
+			}
+		},
+		"Title" : 
+		{
+			"ArgumentString" : 
+			{
+				"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+				"Version" : 0
+			},
+			"Get" : "function: 00007FFED26A0790",
+			"Handle" : 
+			{
+				"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+				"Version" : 0
+			}
+		}
+	},
+	"Equipable" : 
+	{
+		"EquipmentTypeID" : "f85002a2-8e0e-4a49-aa0f-f52e987d3a3a",
+		"Slot" : "MeleeMainHand"
+	},
+	"FTBParticipant" : 
+	{
+		"field_18" : null
+	},
+	"Faction" : 
+	{
+		"SummonOwner" : null,
+		"field_0" : "Entity (01c0000200001006)",
+		"field_18" : "376e33c4-dd15-4c46-a586-87d8b421a0c7",
+		"field_8" : "376e33c4-dd15-4c46-a586-87d8b421a0c7"
+	},
+	"GameObjectVisual" : 
+	{
+		"Icon" : "Item_WPN_HUM_Longsword_A_1",
+		"RootTemplateId" : "7a96cad2-3f84-32a1-b2a8-98cbd359f3f6",
+		"RootTemplateType" : 0,
+		"Scale" : 1.0,
+		"Type" : 0
+	},
+	"Icon" : 
+	{
+		"Icon" : "Item_WPN_HUM_Longsword_A_1"
+	},
+	"InventoryMember" : 
+	{
+		"EquipmentSlot" : 3,
+		"Inventory" : "Entity (01c000020000240e)"
+	},
+	"InventoryMemberTransform" : 
+	{
+		"Transform" : 
+		{
+			"RotationQuat" : 
+			[
+				0.0,
+				0.0,
+				0.0,
+				1.0
+			],
+			"Scale" : 
+			[
+				1.0,
+				1.0,
+				1.0
+			],
+			"Translate" : 
+			[
+				-12.250958442687988,
+				17.7373046875,
+				-354.40399169921875
+			]
+		}
+	},
+	"IsGlobal" : {},
+	"IsItem" : {},
+	"ItemBoosts" : 
+	{
+		"Boosts" : []
+	},
+	"ItemCanMove" : {},
+	"Net" : {},
+	"ObjectSize" : 
+	{
+		"Size" : 0,
+		"SoundSize" : 0
+	},
+	"OriginalTemplate" : 
+	{
+		"OriginalTemplate" : null
+	},
+	"OwnedAsLoot" : {},
+	"OwneeCurrent" : 
+	{
+		"Ownee" : "Entity (01c00002000021d4)"
+	},
+	"PassiveContainer" : 
+	{
+		"Passives" : []
+	},
+	"Physics" : 
+	{
+		"field_10" : 0,
+		"field_14" : 0,
+		"field_15" : 1,
+		"field_16" : 0,
+		"field_8" : 0,
+		"field_C" : 0
+	},
+	"ProficiencyGroup" : 
+	{
+		"Flags" : 
+		[
+			"Longswords",
+			"MartialWeapons"
+		]
+	},
+	"ReadyToBeAddedToInventory" : {},
+	"Savegame" : {},
+	"ServerAiArchetype" : 
+	{
+		"field_0" : "base",
+		"field_4" : "base",
+		"field_8" : "",
+		"field_C" : ""
+	},
+	"ServerAnubisTag" : 
+	{
+		"Tags" : []
+	},
+	"ServerBaseData" : 
+	{
+		"Flags" : 0,
+		"Resistances" : 
+		[
+			[
+				[],
+				[],
+				[],
+				[],
+				[],
+				[],
+				[]
+			],
+			[
+				[],
+				[],
+				[],
+				[],
+				[],
+				[],
+				[]
+			]
+		],
+		"Weight" : 1350
+	},
+	"ServerBaseSize" : 
+	{
+		"GameSize" : 0,
+		"SoundSize" : 0
+	},
+	"ServerBaseStats" : 
+	{
+		"Initiative" : 0
+	},
+	"ServerBaseWeapon" : 
+	{
+		"DamageList" : 
+		[
+			{
+				"DamageType" : "Slashing",
+				"Roll" : 
+				{
+					"AmountOfDices" : 1,
+					"DiceAdditionalValue" : 0,
+					"DiceNegative" : false,
+					"DiceValue" : "D8"
+				},
+				"field_10" : 0
+			},
+			{
+				"DamageType" : "Slashing",
+				"Roll" : 
+				{
+					"AmountOfDices" : 1,
+					"DiceAdditionalValue" : 0,
+					"DiceNegative" : false,
+					"DiceValue" : "D10"
+				},
+				"field_10" : 1
+			}
+		]
+	},
+	"ServerBoostBase" : 
+	{
+		"field_0" : 
+		[
+			"WeaponEnchantment(1);WeaponProperty(Magical)"
+		]
+	},
+	"ServerBoostTag" : 
+	{
+		"Tags" : []
+	},
+	"ServerDialogTag" : 
+	{
+		"Tags" : []
+	},
+	"ServerDisplayNameList" : 
+	{
+		"HideTitle" : 3,
+		"Names" : 
+		[
+			{
+				"Name" : "",
+				"NameKey" : 
+				{
+					"ArgumentString" : 
+					{
+						"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+						"Version" : 0
+					},
+					"Get" : "function: 00007FFED26A0790",
+					"Handle" : 
+					{
+						"Handle" : "h4b12abcag6c27g476ag835fga4023845864f",
+						"Version" : 2
+					}
+				},
+				"field_10" : 6
+			},
+			{
+				"Name" : "",
+				"NameKey" : 
+				{
+					"ArgumentString" : 
+					{
+						"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+						"Version" : 0
+					},
+					"Get" : "function: 00007FFED26A0790",
+					"Handle" : 
+					{
+						"Handle" : "ResStr_3917449244",
+						"Version" : 0
+					}
+				},
+				"field_10" : 8
+			}
+		],
+		"Titles" : []
+	},
+	"ServerIconList" : 
+	{
+		"Icons" : 
+		[
+			{
+				"Icon" : "Item_WPN_HUM_Longsword_A_1",
+				"field_4" : 516
+			}
+		]
+	},
+	"ServerItem" : 
+	{
+		"Activated" : false,
+		"CanBeMoved" : true,
+		"CanBePickedUp" : true,
+		"CanClimbOn" : false,
+		"CanOnlyBeUsedByOwner" : false,
+		"CanShootThrough" : false,
+		"CanUse" : false,
+		"ClientSync1" : false,
+		"Destroy" : false,
+		"Destroyed" : false,
+		"DisableInventoryView80" : false,
+		"DisableSync" : false,
+		"DontAddToHotbar" : false,
+		"Flags" : 
+		[
+			"CanBeMoved",
+			"CanBePickedUp",
+			"Known"
+		],
+		"Flags2" : 
+		[
+			"Global"
+		],
+		"Floating" : false,
+		"ForceAffectedByAura" : false,
+		"ForceClientSync" : false,
+		"ForceSync" : false,
+		"FreezeGravity" : false,
+		"Frozen" : false,
+		"GMFolding" : false,
+		"Global" : true,
+		"HideHP" : false,
+		"InAutomatedDialog" : false,
+		"InPartyInventory" : false,
+		"InUse" : false,
+		"InteractionDisabled" : false,
+		"Invisible" : false,
+		"Invisible2" : false,
+		"Invulnerable2" : false,
+		"IsContainer" : false,
+		"IsDoor" : false,
+		"IsLadder" : false,
+		"IsMoving" : false,
+		"IsSecretDoor" : false,
+		"IsSurfaceBlocker" : false,
+		"IsSurfaceCloudBlocker" : false,
+		"Item" : "*RECURSION*",
+		"ItemType" : "Common",
+		"Known" : true,
+		"Level" : "",
+		"LevelTransitionPending" : false,
+		"LoadedTemplate" : false,
+		"LuckyFind" : false,
+		"MyHandle" : "Entity (01c0000200001006)",
+		"NoCover" : false,
+		"OffStage" : false,
+		"OriginalTemplate" : "*RECURSION*",
+		"PinnedContainer" : false,
+		"PositionChanged" : false,
+		"PreviousLevel" : "",
+		"ReservedForDialog" : false,
+		"SourceContainer" : false,
+		"Stats" : "MAG_Harpers_SingingSword",
+		"StatusManager" : 
+		{
+			"Statuses" : []
+		},
+		"Sticky" : false,
+		"StoryItem" : false,
+		"Summon" : false,
+		"TeleportOnUse" : false,
+		"Template" : 
+		{
+			"AIBounds" : 
+			[
+				{
+					"ActualHeight" : 0.16316799819469452,
+					"BoundType" : "Hit",
+					"Height" : 0.0,
+					"Max" : 
+					[
+						0.10685399919748306,
+						0.071978002786636353,
+						0.2787570059299469
+					],
+					"Min" : 
+					[
+						-0.10685399919748306,
+						-0.047118999063968658,
+						-0.97406798601150513
+					],
+					"Radius" : 0.42423000931739807,
+					"Shape" : "Box",
+					"Size" : 0.0,
+					"field_2A" : 0
+				},
+				{
+					"ActualHeight" : 0.16316799819469452,
+					"BoundType" : "Stand",
+					"Height" : 0.0,
+					"Max" : 
+					[
+						0.10685399919748306,
+						0.071978002786636353,
+						0.2787570059299469
+					],
+					"Min" : 
+					[
+						-0.10685399919748306,
+						-0.047118999063968658,
+						-0.97406798601150513
+					],
+					"Radius" : 0.42423000931739807,
+					"Shape" : "Box",
+					"Size" : 0.0,
+					"field_2A" : 0
+				},
+				{
+					"ActualHeight" : 0.16316799819469452,
+					"BoundType" : "Move",
+					"Height" : 0.0,
+					"Max" : 
+					[
+						0.053426999598741531,
+						0.071978002786636353,
+						0.13937850296497345
+					],
+					"Min" : 
+					[
+						-0.053426999598741531,
+						-0.047118999063968658,
+						-0.48703399300575256
+					],
+					"Radius" : 0.21211500465869904,
+					"Shape" : "Box",
+					"Size" : 0.0,
+					"field_2A" : 0
+				}
+			],
+			"ActivationGroupId" : "",
+			"AddUseAction" : "function: 00007FFED269FCD0",
+			"AllowCameraMovement" : false,
+			"AllowReceiveDecalWhenAnimated" : false,
+			"AllowSummonGenericUse" : false,
+			"Amount" : 1,
+			"AnubisConfigName" : "",
+			"AttackableWhenClickThrough" : false,
+			"BlockAoEDamage" : false,
+			"BloodSurfaceType" : 0,
+			"BloodType" : "",
+			"BookType" : 0,
+			"CameraOffset" : 
+			[
+				0.0,
+				0.0,
+				0.0
+			],
+			"CanBeImprovisedWeapon" : false,
+			"CanBeMoved" : true,
+			"CanBePickedUp" : true,
+			"CanBePickpocketed" : true,
+			"CanClickThrough" : false,
+			"CanClimbOn" : false,
+			"CanShineThrough" : false,
+			"CanShootThrough" : true,
+			"CastShadow" : true,
+			"CinematicArenaFlags" : 0,
+			"CollideWithCamera" : false,
+			"ColorPreset" : "00000000-0000-0000-0000-000000000000",
+			"CombatComponent" : 
+			{
+				"AiHint" : "00000000-0000-0000-0000-000000000000",
+				"AiUseCombatHelper" : "",
+				"Archetype" : "base",
+				"CanFight" : false,
+				"CanJoinCombat" : true,
+				"CombatGroupID" : "",
+				"Faction" : "376e33c4-dd15-4c46-a586-87d8b421a0c7",
+				"IsBoss" : false,
+				"IsInspector" : true,
+				"ProxyAttachment" : "",
+				"ProxyOwner" : "00000000-0000-0000-0000-000000000000",
+				"StartCombatRange" : -1.0,
+				"StayInAiHints" : false,
+				"SwarmGroup" : "",
+				"Unknown" : 0,
+				"Unknown2" : 0
+			},
+			"ConstellationConfigName" : "",
+			"ContainerAutoAddOnPickup" : false,
+			"ContainerContentFilterCondition" : "",
+			"CoverAmount" : false,
+			"CriticalHitType" : "",
+			"DefaultState" : "",
+			"Description" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "h534ed91dg3f44g494eg8895g5ad0eb23d896",
+					"Version" : 2
+				}
+			},
+			"DestroyWithStack" : false,
+			"Destroyed" : false,
+			"DisarmDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+			"DisplayName" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "h4b12abcag6c27g476ag835fga4023845864f",
+					"Version" : 2
+				}
+			},
+			"DisplayNameAlchemy" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"DropSound" : "f55dc72a-13b8-6e3d-7500-559a5d1f3031",
+			"EquipSound" : "da469251-95cf-5387-6295-5b1d5ce5a41f",
+			"Equipment" : null,
+			"EquipmentTypeID" : "f85002a2-8e0e-4a49-aa0f-f52e987d3a3a",
+			"ExamineRotation" : 
+			[
+				-35.0,
+				0.0,
+				0.0
+			],
+			"ExcludeInDifficulty" : [],
+			"FadeChildren" : [],
+			"FadeGroup" : "",
+			"Fadeable" : true,
+			"FileName" : "D:/GOG/Baldurs Gate 3/Data/Public/GustavDev/RootTemplates/_merged.lsf",
+			"ForceAffectedByAura" : false,
+			"FreezeGravity" : 0,
+			"GlobalDeletedFlag" : 4,
+			"GravityType" : 0,
+			"GroupID" : 0,
+			"HLOD" : "00000000-0000-0000-0000-000000000000",
+			"HierarchyOnlyFade" : true,
+			"Hostile" : false,
+			"Icon" : "Item_WPN_HUM_Longsword_A_1",
+			"Id" : "5e7030e9-d59c-4edf-8278-8981a8e8baef",
+			"IgnoreGenerics" : false,
+			"ImpactSound" : "f55dc72a-13b8-6e3d-7500-559a5d1f3031",
+			"InteractionFilterList" : [],
+			"InteractionFilterRequirement" : 0,
+			"InteractionFilterType" : 0,
+			"InventoryList" : 
+			[
+				"Empty"
+			],
+			"InventoryMoveSound" : "f55dc72a-13b8-6e3d-7500-559a5d1f3031",
+			"InventoryType" : 0,
+			"IsBlocker" : false,
+			"IsBlueprintDisabledByDefault" : true,
+			"IsDecorative" : false,
+			"IsDroppedOnDeath" : true,
+			"IsInteractionDisabled" : false,
+			"IsKey" : false,
+			"IsPlatformOwner" : false,
+			"IsPointerBlocker" : false,
+			"IsPortal" : false,
+			"IsPortalProhibitedToPlayers" : false,
+			"IsPublicDomain" : false,
+			"IsReflecting" : false,
+			"IsShadowProxy" : false,
+			"IsSourceContainer" : false,
+			"IsSurfaceBlocker" : false,
+			"IsSurfaceCloudBlocker" : false,
+			"IsTrap" : false,
+			"ItemList" : [],
+			"Key" : "",
+			"LevelName" : "",
+			"LevelOverride" : -1,
+			"LightChannel" : 0,
+			"LockDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+			"LoopSound" : "",
+			"MapMarkerStyle" : "",
+			"MaterialPreset" : "00000000-0000-0000-0000-000000000000",
+			"MaxStackAmount" : 1,
+			"Name" : "MAG_Harpers_SingingSword",
+			"OnDestroyActions" : 
+			[
+				{
+					"ActivateSoundEvent" : "3ea82655-5140-4287-9ab8-794559f182d3",
+					"Animation" : "",
+					"Conditions" : "",
+					"PlayOnHUD" : false,
+					"Type" : "PlaySound"
+				}
+			],
+			"OnUseDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"OnUsePeaceActions" : [],
+			"OnlyInDifficulty" : [],
+			"Owner" : "",
+			"ParentTemplateFlags" : 0,
+			"ParentTemplateId" : "3fc2ba50-3070-4caa-abe8-3bf885969bde",
+			"PermanentWarnings" : "",
+			"PhysicsCollisionSound" : "0c130d61-2b03-3abb-2d1d-3ea22eb35034",
+			"PhysicsFollowAnimation" : false,
+			"PhysicsOpenTemplate" : "",
+			"PhysicsTemplate" : "cd4a8a69-8f43-bfe1-5998-5831c52ffd19",
+			"PickupSound" : "28ea7a9f-b66a-3410-7985-d7cd5cb896f0",
+			"ReceiveDecal" : false,
+			"ReferencedInTimeline" : false,
+			"RemoveUseAction" : "function: 00007FFED269FDC0",
+			"RenderChannel" : 4,
+			"SeeThrough" : false,
+			"ShadowPhysicsProxy" : "",
+			"ShootThroughType" : 6,
+			"ShortDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"ShortDescriptionParams" : "",
+			"ShowAttachedSpellDescriptions" : false,
+			"SoundAttenuation" : -1,
+			"SoundInitEvent" : "",
+			"SpeakerGroups" : [],
+			"Stats" : "MAG_Harpers_SingingSword",
+			"StatusList" : [],
+			"StoryItem" : false,
+			"TechnicalDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "",
+					"Version" : 0
+				}
+			},
+			"TechnicalDescriptionParams" : "",
+			"TemplateHandle" : 25877,
+			"TemplateName" : "",
+			"TemplateType" : "item",
+			"TimelineCameraRigOverride" : "00000000-0000-0000-0000-000000000000",
+			"Tooltip" : 2,
+			"Transform" : 
+			{
+				"RotationQuat" : 
+				[
+					0.0,
+					0.0,
+					0.0,
+					1.0
+				],
+				"Scale" : 
+				[
+					1.0,
+					1.0,
+					1.0
+				],
+				"Translate" : 
+				[
+					0.0,
+					0.0,
+					0.0
+				]
+			},
+			"TreasureLevel" : -1,
+			"TreasureOnDestroy" : false,
+			"UnequipSound" : "503428af-9061-40a7-b9c4-64c8ec78fff3",
+			"Unimportant" : false,
+			"UnknownDescription" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"UnknownDisplayName" : 
+			{
+				"ArgumentString" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				},
+				"Get" : "function: 00007FFED26A0790",
+				"Handle" : 
+				{
+					"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+					"Version" : 0
+				}
+			},
+			"UseOcclusion" : true,
+			"UseOnDistance" : false,
+			"UsePartyLevelForTreasureLevel" : false,
+			"UseRemotely" : false,
+			"UseSound" : "",
+			"VisualTemplate" : "b1f5b46a-227c-6923-17c6-4a3aa38ec052",
+			"Wadable" : false,
+			"WadableSurfaceType" : 13,
+			"WalkOn" : false,
+			"WalkThrough" : true
+		},
+		"Totem" : false,
+		"TransformChanged" : false,
+		"TreasureGenerated" : false,
+		"TreasureLevel" : -1,
+		"UnEquipLocked" : false,
+		"UnsoldGenerated" : false,
+		"UseRemotely" : false,
+		"WakePhysics" : false,
+		"WalkOn" : false,
+		"WalkThrough" : false,
+		"field_10" : "Entity (01c0000200001006)",
+		"field_68" : "Entity (01c00002000021d4)",
+		"field_70" : ""
+	},
+	"ServerOsirisTag" : 
+	{
+		"Tags" : 
+		[
+			"add41a41-a1a8-4405-ae7f-ce12a0788a1a"
+		]
+	},
+	"ServerOwneeHistory" : 
+	{
+		"LatestOwner" : "Entity (01c00002000021d4)",
+		"OriginalOwner" : "Entity (01c00002000021d4)",
+		"PreviousOwner" : "Entity (01c00002000021d2)"
+	},
+	"ServerOwneeRequest" : 
+	{
+		"LatestOwner" : null,
+		"NewCurrentOwnee" : null,
+		"OriginalOwner" : null
+	},
+	"ServerPassiveBase" : 
+	{
+		"Passives" : []
+	},
+	"ServerPassivePersistentData" : 
+	{
+		"field_0" : 0.0,
+		"field_4" : 0.0
+	},
+	"ServerProficiencyGroupStats" : 
+	{
+		"Stats" : "MAG_Harpers_SingingSword"
+	},
+	"ServerReplicationDependencyOwner" : 
+	{
+		"Dependents" : 
+		[
+			"Entity (01c00002000019a8)",
+			"Entity (01c00002000019a9)"
+		]
+	},
+	"ServerShapeshiftStates" : 
+	{
+		"States" : [],
+		"field_0" : 0
+	},
+	"ServerTemplateTag" : 
+	{
+		"Tags" : 
+		[
+			"b148cfca-53d8-4b73-b052-de08394a235e",
+			"ef13fc1c-dd55-4167-ab82-88059e5798f3",
+			"96a99a42-ec5d-4081-9d62-c9e3f0057136",
+			"abadcad5-9229-4999-8c7a-cd557ff2c95c",
+			"983087c8-c9d3-4a87-bc69-65f9329666c8"
+		]
+	},
+	"ShapeshiftHealthReservation" : 
+	{
+		"Reservations" : {}
+	},
+	"ShootThroughType" : 
+	{
+		"Type" : 6
+	},
+	"Sight" : 
+	{
+		"field_0" : 0.0,
+		"field_4" : 0.0,
+		"field_8" : 0.0,
+		"field_C" : 0.0
+	},
+	"SightData" : 
+	{
+		"field_0" : "10077a31-7d7d-eb87-d059-154c8c566ac0",
+		"field_10" : 0.0,
+		"field_14" : 0.0,
+		"field_18" : 0.0,
+		"field_1C" : 0.0,
+		"field_20" : 0,
+		"field_24" : 32755
+	},
+	"Speaker" : 
+	{
+		"field_0" : 
+		[
+			"fb1a2202-7a21-6982-793b-b39ceb414757"
+		]
+	},
+	"SpellCastCanBeTargeted" : 
+	{
+		"Dummy" : 0
+	},
+	"StatusImmunities" : 
+	{
+		"PersonalStatusImmunities" : 
+		{
+			"BLEEDING" : "00000000-0000-0000-0000-000000000000",
+			"BURNING" : "00000000-0000-0000-0000-000000000000",
+			"SG_Condition" : "00000000-0000-0000-0000-000000000000",
+			"SILENCED" : "00000000-0000-0000-0000-000000000000"
+		}
+	},
+	"Tag" : 
+	{
+		"Tags" : 
+		[
+			"add41a41-a1a8-4405-ae7f-ce12a0788a1a",
+			"b148cfca-53d8-4b73-b052-de08394a235e",
+			"ef13fc1c-dd55-4167-ab82-88059e5798f3",
+			"96a99a42-ec5d-4081-9d62-c9e3f0057136",
+			"abadcad5-9229-4999-8c7a-cd557ff2c95c",
+			"983087c8-c9d3-4a87-bc69-65f9329666c8",
+			"9360d001-0cef-49e0-a2e0-4d715d4976ea"
+		]
+	},
+	"Transform" : 
+	{
+		"Transform" : 
+		{
+			"RotationQuat" : 
+			[
+				0.0,
+				0.0,
+				0.0,
+				1.0
+			],
+			"Scale" : 
+			[
+				1.0,
+				1.0,
+				1.0
+			],
+			"Translate" : 
+			[
+				-12.250958442687988,
+				17.7373046875,
+				-354.40399169921875
+			]
+		}
+	},
+	"TurnBased" : 
+	{
+		"ActedThisRoundInCombat" : false,
+		"CanActInCombat" : false,
+		"CanActInCombat2" : false,
+		"Combat" : "00000000-0000-0000-0000-000000000000",
+		"HadTurnInCombat" : false,
+		"IsActiveCombatTurn" : false,
+		"ItemCanAct" : false,
+		"RequestedEndTurn" : false,
+		"field_10" : 0,
+		"field_18" : 0,
+		"field_1C" : 0,
+		"field_20" : 0,
+		"field_28" : 0,
+		"field_8" : 0,
+		"field_A" : false
+	},
+	"Use" : 
+	{
+		"Boosts" : 
+		[
+			{
+				"Boost" : "UnlockSpell",
+				"Params" : "Shout_MAG_Harpers_SingingSword_Sing",
+				"Params2" : ""
+			},
+			{
+				"Boost" : "UnlockSpell",
+				"Params" : "Shout_MAG_Harpers_SingingSword_Shriek",
+				"Params2" : ""
+			}
+		],
+		"BoostsOnEquipMainHand" : 
+		[
+			{
+				"Boost" : "UnlockSpell",
+				"Params" : "Target_PommelStrike",
+				"Params2" : ""
+			},
+			{
+				"Boost" : "UnlockSpell",
+				"Params" : "Target_Slash_New",
+				"Params2" : ""
+			},
+			{
+				"Boost" : "UnlockSpell",
+				"Params" : "Rush_SpringAttack",
+				"Params2" : ""
+			}
+		],
+		"BoostsOnEquipOffHand" : [],
+		"CanCombine" : 0,
+		"Charges" : 0,
+		"CombineFlag" : 0,
+		"ItemUseBlocked" : 0,
+		"ItemUseType" : "Unknown1",
+		"MaxCharges" : 0,
+		"Requirements" : []
+	},
+	"Uuid" : 
+	{
+		"EntityUuid" : "fb1a2202-7a21-6982-793b-b39ceb414757"
+	},
+	"Value" : 
+	{
+		"Rarity" : 1,
+		"Unique" : true,
+		"Value" : 85
+	},
+	"Weapon" : 
+	{
+		"Ability" : "Strength",
+		"DamageDice" : "D8",
+		"DamageRange" : 0.0,
+		"DamageValues" : [],
+		"Rolls" : 
+		{
+			"Strength" : 
+			[
+				{
+					"AmountOfDices" : 1,
+					"DiceAdditionalValue" : 1,
+					"DiceNegative" : false,
+					"DiceValue" : "D8"
+				}
+			]
+		},
+		"Rolls2" : 
+		{
+			"Strength" : 
+			[
+				{
+					"AmountOfDices" : 1,
+					"DiceAdditionalValue" : 1,
+					"DiceNegative" : false,
+					"DiceValue" : "D10"
+				}
+			]
+		},
+		"VersatileDamageDice" : "D10",
+		"WeaponFunctors" : null,
+		"WeaponGroup" : 2,
+		"WeaponProperties" : 79872,
+		"WeaponRange" : 1.5
+	},
+	"Wielding" : 
+	{
+		"Owner" : "Entity (01c00002000021d4)"
+	}
+}

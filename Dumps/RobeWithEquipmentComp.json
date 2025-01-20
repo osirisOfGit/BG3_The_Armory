@@ -1,0 +1,619 @@
+{
+	"AIBounds" : 
+	[
+		{
+			"ActualHeight" : 0.43849301338195801,
+			"BoundType" : "Move",
+			"Height" : 0.0,
+			"Max" : 
+			[
+				0.30106538534164429,
+				0.27141377329826355,
+				0.15442176163196564
+			],
+			"Min" : 
+			[
+				-0.27742534875869751,
+				-0.003073275089263916,
+				-0.14926590025424957
+			],
+			"Radius" : 0.17750750482082367,
+			"Shape" : "Box",
+			"Size" : 0.0,
+			"field_2A" : 0
+		},
+		{
+			"ActualHeight" : 0.43849301338195801,
+			"BoundType" : "Hit",
+			"Height" : 0.0,
+			"Max" : 
+			[
+				0.60213077068328857,
+				0.27141377329826355,
+				0.30884352326393127
+			],
+			"Min" : 
+			[
+				-0.55485069751739502,
+				-0.003073275089263916,
+				-0.29853180050849915
+			],
+			"Radius" : 0.35501500964164734,
+			"Shape" : "Box",
+			"Size" : 0.0,
+			"field_2A" : 0
+		},
+		{
+			"ActualHeight" : 0.43849301338195801,
+			"BoundType" : "Stand",
+			"Height" : 0.0,
+			"Max" : 
+			[
+				0.60213077068328857,
+				0.27141377329826355,
+				0.30884352326393127
+			],
+			"Min" : 
+			[
+				-0.55485069751739502,
+				-0.003073275089263916,
+				-0.29853180050849915
+			],
+			"Radius" : 0.35501500964164734,
+			"Shape" : "Box",
+			"Size" : 0.0,
+			"field_2A" : 0
+		}
+	],
+	"ActivationGroupId" : "",
+	"AddUseAction" : "function: 00007FFEC1AEFCD0",
+	"AllowCameraMovement" : false,
+	"AllowReceiveDecalWhenAnimated" : false,
+	"AllowSummonGenericUse" : false,
+	"Amount" : 1,
+	"AnubisConfigName" : "",
+	"AttackableWhenClickThrough" : false,
+	"BlockAoEDamage" : false,
+	"BloodSurfaceType" : 0,
+	"BloodType" : "",
+	"BookType" : 0,
+	"CameraOffset" : 
+	[
+		0.0,
+		0.0,
+		0.0
+	],
+	"CanBeImprovisedWeapon" : false,
+	"CanBeMoved" : true,
+	"CanBePickedUp" : true,
+	"CanBePickpocketed" : true,
+	"CanClickThrough" : false,
+	"CanClimbOn" : false,
+	"CanShineThrough" : false,
+	"CanShootThrough" : true,
+	"CastShadow" : true,
+	"CinematicArenaFlags" : 0,
+	"CollideWithCamera" : false,
+	"ColorPreset" : "00000000-0000-0000-0000-000000000000",
+	"CombatComponent" : 
+	{
+		"AiHint" : "00000000-0000-0000-0000-000000000000",
+		"AiUseCombatHelper" : "",
+		"Archetype" : "base",
+		"CanFight" : false,
+		"CanJoinCombat" : true,
+		"CombatGroupID" : "",
+		"Faction" : "376e33c4-dd15-4c46-a586-87d8b421a0c7",
+		"IsBoss" : false,
+		"IsInspector" : true,
+		"ProxyAttachment" : "",
+		"ProxyOwner" : "00000000-0000-0000-0000-000000000000",
+		"StartCombatRange" : -1.0,
+		"StayInAiHints" : false,
+		"SwarmGroup" : "",
+		"Unknown" : 0,
+		"Unknown2" : 0
+	},
+	"ConstellationConfigName" : "",
+	"ContainerAutoAddOnPickup" : false,
+	"ContainerContentFilterCondition" : "",
+	"CoverAmount" : false,
+	"CriticalHitType" : "",
+	"DefaultState" : "",
+	"Description" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "he775db24g6620g4a87gade9geef6c82dbd55",
+			"Version" : 1
+		}
+	},
+	"DestroyWithStack" : false,
+	"Destroyed" : false,
+	"DisarmDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+	"DisplayName" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"DisplayNameAlchemy" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"DropSound" : "fef7023c-75c1-6d74-0668-4e5ab2eb59e4",
+	"EquipSound" : "69b99750-7e82-c433-0a17-b0ad746cf880",
+	"Equipment" : 
+	{
+		"AfroLongHair" : {},
+		"AfroShortHair" : {},
+		"CurlyLongHair" : {},
+		"CurlyShortHair" : {},
+		"DreadLongHair" : {},
+		"DreadShortHair" : {},
+		"LongHair" : {},
+		"ParentRace" : 
+		{
+			"06aaae02-bb9e-4fa3-ac00-b08e13a5b0fa" : "00000000-0000-0000-0000-000000000000",
+			"6d38f246-15cb-48b5-9b85-378016a7a78e" : "00000000-0000-0000-0000-000000000000",
+			"9a8bbeba-850c-402f-bac5-ff15696e6497" : "00000000-0000-0000-0000-000000000000",
+			"f07faafa-0c6f-4f79-a049-70e96b23d51b" : "00000000-0000-0000-0000-000000000000"
+		},
+		"ShortHair" : {},
+		"Slot" : 
+		[
+			"Body"
+		],
+		"SyncWithParent" : [],
+		"VisualSet" : 
+		{
+			"BodySetVisual" : "",
+			"ID" : "",
+			"LocatorAttachments" : [],
+			"MaterialOverrides" : 
+			{
+				"MaterialPresets" : 
+				{
+					"02 Colour" : 
+					{
+						"ForcePresetValues" : false,
+						"GroupName" : "02 Colour",
+						"MaterialPresetResource" : "f6053a4f-f410-2e62-bd02-fb4763d0d440"
+					}
+				},
+				"MaterialResource" : "",
+				"ScalarParameters" : [],
+				"Texture2DParameters" : [],
+				"Vector2Parameters" : [],
+				"Vector3Parameters" : 
+				[
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : false,
+						"Parameter" : "Color_01",
+						"Value" : 
+						[
+							0.40454080700874329,
+							0.14799802005290985,
+							0.073827765882015228
+						]
+					},
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : false,
+						"Parameter" : "Color_02",
+						"Value" : 
+						[
+							0.26317471265792847,
+							0.058187175542116165,
+							0.058187175542116165
+						]
+					},
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : false,
+						"Parameter" : "Color_03",
+						"Value" : 
+						[
+							0.44787082076072693,
+							0.24680040776729584,
+							0.16364066302776337
+						]
+					},
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : true,
+						"Parameter" : "Cloth_Primary",
+						"Value" : 
+						[
+							0.19511955976486206,
+							0.18050472438335419,
+							0.16969728469848633
+						]
+					},
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : true,
+						"Parameter" : "Cloth_Secondary",
+						"Value" : 
+						[
+							0.54824411869049072,
+							0.30509993433952332,
+							0.15770931541919708
+						]
+					},
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : true,
+						"Parameter" : "Cloth_Tertiary",
+						"Value" : 
+						[
+							0.24059230089187622,
+							0.1737891286611557,
+							0.32419270277023315
+						]
+					},
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : true,
+						"Parameter" : "Metal_Primary",
+						"Value" : 
+						[
+							0.45617696642875671,
+							0.48248988389968872,
+							0.3350239098072052
+						]
+					},
+					{
+						"Color" : false,
+						"Custom" : true,
+						"Enabled" : true,
+						"Parameter" : "Custom_1",
+						"Value" : 
+						[
+							0.97523230314254761,
+							0.37168329954147339,
+							1.0
+						]
+					}
+				],
+				"VectorParameters" : [],
+				"VirtualTextureParameters" : []
+			},
+			"Materials" : {},
+			"RealMaterialOverrides" : {},
+			"ShowEquipmentVisuals" : false,
+			"Slots" : [],
+			"field_158" : {}
+		},
+		"Visuals" : 
+		{
+			"06aaae02-bb9e-4fa3-ac00-b08e13a5b0fa" : 
+			[
+				"122fa9ad-bef1-9025-72ad-2042945a173c",
+				"72489ffb-8187-004f-37cd-8e418b203229",
+				"16304959-308d-1d89-40fb-735cb14422a0"
+			],
+			"47c0315c-7dc6-4862-b39b-8bf3a10f8b54" : 
+			[
+				"5773313e-0a86-61dc-0862-5bb582a543af",
+				"9c22cb05-c315-fcf1-47a4-79736396b929",
+				"fdadc330-ab2f-1ca5-b545-250f9663b6fb"
+			],
+			"5640e766-aa53-428d-815b-6a0b4ef95aca" : 
+			[
+				"9af60b2f-38a6-555e-b10e-53fb6889c338",
+				"8ef3e464-0ad2-8326-d2d9-4e18e05332a6",
+				"6c20dacb-b159-442d-d4c3-f31517a7f615"
+			],
+			"6d38f246-15cb-48b5-9b85-378016a7a78e" : 
+			[
+				"35d227a2-7208-0316-93f6-be7dd6fa46e5",
+				"4c744545-2cc8-3760-7b5b-32124cc915b9",
+				"d3d9077b-2f03-35d3-8668-a93fffd774ab"
+			],
+			"71180b76-5752-4a97-b71f-911a69197f58" : 
+			[
+				"ff43d550-a7af-63a1-dd6e-731e525376e0",
+				"a1f319c9-42f2-971a-3819-4e4e0103fa41",
+				"c80e582d-0f68-62a3-bc89-5738d2000319"
+			],
+			"7d73f501-f65e-46af-a13b-2cacf3985d05" : 
+			[
+				"45e6364f-f18f-5842-b59a-afae65c34cf0",
+				"f0d258d2-e455-8c1e-cd8d-90e32862c559",
+				"ba0820d4-8253-bb9e-6957-2ccb5c4a6feb"
+			],
+			"8f00cf38-4588-433a-8175-8acdbbf33f33" : 
+			[
+				"6ae7dab9-20f3-c217-a4c9-bebdfbb3cdd5",
+				"d634ef34-28bd-378e-abc3-481651365562",
+				"cd3e46d6-7734-5a79-97a0-73279ab5be08"
+			],
+			"9a8bbeba-850c-402f-bac5-ff15696e6497" : 
+			[
+				"df5c8e5f-f403-25f5-e1fe-244fc10ed7e0",
+				"23fc2262-72e0-4b5f-6fce-4e1fa03af775",
+				"9d59c45a-a615-5509-9b58-85c4806f3b0b"
+			],
+			"a933e2a8-aee1-4ecb-80d2-8f47b706f024" : 
+			[
+				"2403a22b-d5ba-76bf-f804-0c829d8ef88c",
+				"cb39a6eb-86c7-8a53-6b72-fe7f4816242c",
+				"daaea56e-6f8e-8332-55d6-cf084978fa66"
+			],
+			"abf674d2-2ea4-4a74-ade0-125429f69f83" : 
+			[
+				"64ab37be-810e-79c7-d54c-a3cb3add0ba8",
+				"4218f099-0119-d287-33d7-db1193b7bf53",
+				"c0882c39-fdda-7839-a2e5-cc39bea0756f"
+			],
+			"b4a34ce7-41be-44d9-8486-938fe1472149" : 
+			[
+				"050b510a-1b1e-b51c-7cbd-092bf58497c1",
+				"c6348670-dd36-e470-81f3-0932af56a277",
+				"61f98d4d-69e0-44a3-2958-daef0f4651a3"
+			],
+			"c491d027-4332-4fda-948f-4a3df6772baa" : 
+			[
+				"7fa9cc42-d550-919d-7d17-6eb81af620ed",
+				"9e8d3bf7-ece7-faca-9453-6d26caeb0057",
+				"efcb71b5-f7ce-fd51-80cd-456cf9b697b7"
+			],
+			"e39505f7-f576-4e70-a99e-8e29cd381a11" : 
+			[
+				"db52dade-8e5b-06c4-fb5d-3b0e8fbfffff",
+				"e99f5e52-cba1-dee4-84d4-5428e9a12ae1",
+				"ab495794-c2e9-832f-4ea2-2676230adb37"
+			],
+			"f07faafa-0c6f-4f79-a049-70e96b23d51b" : 
+			[
+				"cd54ff9e-8166-ed27-d017-36e5d6ce27cf",
+				"24b712d8-cc8d-9cc2-710d-1ddfd8aa90b7",
+				"e0a4e5ec-086e-68c5-b058-879296e873e3"
+			]
+		},
+		"WavyLongHair" : {},
+		"WavyShortHair" : {}
+	},
+	"EquipmentTypeID" : "00000000-0000-0000-0000-000000000000",
+	"ExamineRotation" : 
+	[
+		-35.0,
+		0.0,
+		0.0
+	],
+	"ExcludeInDifficulty" : [],
+	"FadeChildren" : [],
+	"FadeGroup" : "",
+	"Fadeable" : true,
+	"FileName" : "D:/GOG/Baldurs Gate 3/Data/Public/GustavDev/RootTemplates/_merged.lsf",
+	"ForceAffectedByAura" : false,
+	"FreezeGravity" : 0,
+	"GlobalDeletedFlag" : 4,
+	"GravityType" : 0,
+	"GroupID" : 0,
+	"HLOD" : "00000000-0000-0000-0000-000000000000",
+	"HierarchyOnlyFade" : true,
+	"Hostile" : false,
+	"Icon" : "Item_ARM_Robe_D",
+	"Id" : "93a05987-c700-430c-8980-a9ccdec86255",
+	"IgnoreGenerics" : false,
+	"ImpactSound" : "80788119-e116-0b2b-6e33-92d15eaf3bcc",
+	"InteractionFilterList" : [],
+	"InteractionFilterRequirement" : 0,
+	"InteractionFilterType" : 0,
+	"InventoryList" : 
+	[
+		"Empty"
+	],
+	"InventoryMoveSound" : "fef7023c-75c1-6d74-0668-4e5ab2eb59e4",
+	"InventoryType" : 0,
+	"IsBlocker" : false,
+	"IsBlueprintDisabledByDefault" : true,
+	"IsDecorative" : false,
+	"IsDroppedOnDeath" : true,
+	"IsInteractionDisabled" : false,
+	"IsKey" : false,
+	"IsPlatformOwner" : false,
+	"IsPointerBlocker" : false,
+	"IsPortal" : false,
+	"IsPortalProhibitedToPlayers" : false,
+	"IsPublicDomain" : false,
+	"IsReflecting" : false,
+	"IsShadowProxy" : false,
+	"IsSourceContainer" : false,
+	"IsSurfaceBlocker" : false,
+	"IsSurfaceCloudBlocker" : false,
+	"IsTrap" : false,
+	"ItemList" : [],
+	"Key" : "",
+	"LevelName" : "",
+	"LevelOverride" : 0,
+	"LightChannel" : 0,
+	"LockDifficultyClassID" : "00000000-0000-0000-0000-000000000000",
+	"LoopSound" : "",
+	"MapMarkerStyle" : "",
+	"MaterialPreset" : "00000000-0000-0000-0000-000000000000",
+	"MaxStackAmount" : 1,
+	"Name" : "MAG_Late_2_Robe_D",
+	"OnDestroyActions" : 
+	[
+		{
+			"ActivateSoundEvent" : "3ea82655-5140-4287-9ab8-794559f182d3",
+			"Animation" : "",
+			"Conditions" : "",
+			"PlayOnHUD" : false,
+			"Type" : "PlaySound"
+		}
+	],
+	"OnUseDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"OnUsePeaceActions" : [],
+	"OnlyInDifficulty" : [],
+	"Owner" : "",
+	"ParentTemplateFlags" : 0,
+	"ParentTemplateId" : "e18ee5a2-485a-42d4-8d64-e5497b4b96c7",
+	"PermanentWarnings" : "",
+	"PhysicsCollisionSound" : "0c130d61-2b03-3abb-2d1d-3ea22eb35034",
+	"PhysicsFollowAnimation" : false,
+	"PhysicsOpenTemplate" : "",
+	"PhysicsTemplate" : "391cbca0-5115-e291-8161-63de82a64f15",
+	"PickupSound" : "c87e342d-a717-4d86-c15a-6c0c7d9520c1",
+	"ReceiveDecal" : false,
+	"ReferencedInTimeline" : false,
+	"RemoveUseAction" : "function: 00007FFEC1AEFDC0",
+	"RenderChannel" : 4,
+	"SeeThrough" : false,
+	"ShadowPhysicsProxy" : "",
+	"ShootThroughType" : 6,
+	"ShortDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"ShortDescriptionParams" : "",
+	"ShowAttachedSpellDescriptions" : false,
+	"SoundAttenuation" : -1,
+	"SoundInitEvent" : "",
+	"SpeakerGroups" : [],
+	"Stats" : "ARM_Robe_Body",
+	"StatusList" : [],
+	"StoryItem" : false,
+	"TechnicalDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"TechnicalDescriptionParams" : "",
+	"TemplateHandle" : 24790,
+	"TemplateName" : "",
+	"TemplateType" : "item",
+	"TimelineCameraRigOverride" : "00000000-0000-0000-0000-000000000000",
+	"Tooltip" : 2,
+	"Transform" : 
+	{
+		"RotationQuat" : 
+		[
+			0.0,
+			0.0,
+			0.0,
+			1.0
+		],
+		"Scale" : 
+		[
+			1.0,
+			1.0,
+			1.0
+		],
+		"Translate" : 
+		[
+			0.0,
+			0.0,
+			0.0
+		]
+	},
+	"TreasureLevel" : -1,
+	"TreasureOnDestroy" : false,
+	"UnequipSound" : "7be8fdbc-81c2-4258-7826-5bc26f262f5b",
+	"Unimportant" : false,
+	"UnknownDescription" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"UnknownDisplayName" : 
+	{
+		"ArgumentString" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		},
+		"Get" : "function: 00007FFEC1AF0790",
+		"Handle" : 
+		{
+			"Handle" : "ls::TranslatedStringRepository::s_HandleUnknown",
+			"Version" : 0
+		}
+	},
+	"UseOcclusion" : true,
+	"UseOnDistance" : false,
+	"UsePartyLevelForTreasureLevel" : false,
+	"UseRemotely" : false,
+	"UseSound" : "",
+	"VisualTemplate" : "8c8e5c5c-a9bc-f2ec-ba02-0d68cb777041",
+	"Wadable" : false,
+	"WadableSurfaceType" : 13,
+	"WalkOn" : false,
+	"WalkThrough" : true
+}
