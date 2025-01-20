@@ -161,7 +161,7 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 	end
 
 	icon.OnHoverEnter = function()
-		self.equipmentPreviewTimer = Ext.Timer.WaitFor(200, function()
+		self.equipmentPreviewTimer = Ext.Timer.WaitFor(300, function()
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", Ext.Json.Stringify({
 				templateId = itemTemplate.Id,
 				dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil
