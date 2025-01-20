@@ -122,8 +122,9 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 
 			local actionCell = row:AddCell()
 			local deleteButton = actionCell:AddButton("X")
-			deleteButton:SetColor("Button", { 1, 0.02, 0, 1 })
-			deleteButton.OnClick = function ()
+			deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
+			deleteButton:SetColor("Text", { 1, 1, 1, 1 })
+			deleteButton.OnClick = function()
 				preset.Outfits[criteriaCompositeKey].delete = true
 				Ext.Timer.WaitFor(350, function()
 					Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
