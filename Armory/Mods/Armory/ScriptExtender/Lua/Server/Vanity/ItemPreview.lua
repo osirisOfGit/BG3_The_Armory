@@ -30,12 +30,17 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 	end
 	userPreview.previewItem = Osi.CreateAt(templateUUID, 0, 0, 0, 0, 0, "")
 
-	Logger:BasicDebug("%s started previewing %s", character, userPreview.previewItem)
+	if not userPreview.previewItem then
+		Logger:BasicWarning("Attempted to create an instance of template %s for preview, but it wasn't made?", templateUUID)
+		return
+	end
 
 	local stat = Osi.GetStatString(userPreview.previewItem)
 	if not stat then
 		return
 	end
+
+	Logger:BasicDebug("%s started previewing %s", character, userPreview.previewItem)
 
 	local slot = Ext.Stats.Get(stat).Slot
 	userPreview.equippedItem = Osi.GetEquippedItem(character, slot)
@@ -44,9 +49,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 	end
 
 	local correctArmorSet = string.find(slot, "Vanity") and 1 or 0
-	if correctArmorSet ~= userPreview.armorSet then
-		Osi.SetArmourSet(character, correctArmorSet)
-	end
+	Osi.SetArmourSet(character, correctArmorSet)
 
 	-- Otherwise the avatar doesn't show it in the inventory view
 	Ext.Timer.WaitFor(200, function()
