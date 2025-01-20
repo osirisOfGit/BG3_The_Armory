@@ -84,7 +84,7 @@ local criteriaGroup
 function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent)
 	local refreshButton = parent:AddButton("Refresh")
 
-	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 7)
+	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
 	criteriaSelectionDisplayTable.SizingStretchSame = true
 	criteriaSelectionDisplayTable.RowBg = true
 
@@ -118,6 +118,17 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				end
 
 				row:AddCell():AddText(criteriaValue)
+			end
+
+			local actionCell = row:AddCell()
+			local deleteButton = actionCell:AddButton("X")
+			deleteButton:SetColor("Button", { 1, 0.02, 0, 1 })
+			deleteButton.OnClick = function ()
+				preset.Outfits[criteriaCompositeKey].delete = true
+				Ext.Timer.WaitFor(350, function()
+					Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+				end)
+				row:Destroy()
 			end
 		end
 	end

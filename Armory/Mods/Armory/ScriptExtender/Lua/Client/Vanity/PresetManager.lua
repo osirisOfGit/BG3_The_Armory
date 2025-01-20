@@ -245,7 +245,8 @@ function VanityPresetManager:UpdatePresetView()
 
 			presetGroup:AddNewLine()
 			presetGroup:AddSeparatorText("Configured Outfits")
-			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, presetGroup)
+			-- Need to pass the proxy value so it can get deleted properly
+			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], presetGroup)
 		end
 	end
 end
