@@ -119,7 +119,7 @@ end
 
 ---@return Configuration
 function ConfigurationStructure:GetRealConfigCopy()
-	return TableUtils:MakeImmutableTableCopy(real_config_table)
+	return TableUtils:DeeplyCopyTable(real_config_table)
 end
 
 function ConfigurationStructure:InitializeConfig()

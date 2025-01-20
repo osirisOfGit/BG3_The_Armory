@@ -104,6 +104,13 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		return
 	end
 
+	local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
+	local copyPopup = panelGroup:AddPopup("CopyOutfit")
+	copyOutfitFromButton.OnClick = function ()
+		VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, copyPopup, criteriaCompositeKey)
+		copyPopup:Open()
+	end
+
 	local displayTable = panelGroup:AddTable("SlotDisplayTable", 5)
 	displayTable.ScrollY = true
 	displayTable:AddColumn("Equipment", "WidthFixed")

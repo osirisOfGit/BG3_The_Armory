@@ -81,7 +81,8 @@ local criteriaGroup
 
 ---@param preset VanityPreset
 ---@param parent ExtuiTreeParent
-function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent)
+---@param outfitToCopyTo VanityCriteriaCompositeKey
+function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo)
 	local refreshButton = parent:AddButton("Refresh")
 
 	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
@@ -121,15 +122,32 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 			end
 
 			local actionCell = row:AddCell()
-			local deleteButton = actionCell:AddButton("X")
-			deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
-			deleteButton:SetColor("Text", { 1, 1, 1, 1 })
-			deleteButton.OnClick = function()
-				preset.Outfits[criteriaCompositeKey].delete = true
-				Ext.Timer.WaitFor(350, function()
-					Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-				end)
-				row:Destroy()
+			if not outfitToCopyTo then
+				local deleteButton = actionCell:AddButton("X")
+				deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
+				deleteButton:SetColor("Text", { 1, 1, 1, 1 })
+				deleteButton.OnClick = function()
+					preset.Outfits[criteriaCompositeKey].delete = true
+					Ext.Timer.WaitFor(350, function()
+						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+					end)
+					row:Destroy()
+				end
+			else
+				local overwriteButton = row:AddButton("Copy To Active Outfit")
+				overwriteButton.IDContext = overwriteButton.Label .. criteriaCompositeKey
+
+				overwriteButton.OnClick = function()
+					if preset.Outfits[outfitToCopyTo] then
+						preset.Outfits[outfitToCopyTo].delete = true
+					end
+					preset.Outfits[outfitToCopyTo] = TableUtils:DeeplyCopyTable(ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits
+					[criteriaCompositeKey])
+					VanityCharacterPanel:BuildModule(parent.ParentElement, preset, outfitToCopyTo)
+					Ext.Timer.WaitFor(350, function()
+						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+					end)
+				end
 			end
 		end
 	end
