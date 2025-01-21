@@ -105,6 +105,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	end
 
 	local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
+	copyOutfitFromButton:Tooltip():AddText("\t  This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)").TextWrapPos = 600
 	local copyPopup = panelGroup:AddPopup("CopyOutfit")
 	copyOutfitFromButton.OnClick = function ()
 		Helpers:KillChildren(copyPopup)

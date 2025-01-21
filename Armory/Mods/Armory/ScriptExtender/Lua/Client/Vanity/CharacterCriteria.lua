@@ -86,14 +86,13 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 	local refreshButton = parent:AddButton("Refresh")
 
 	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
-	criteriaSelectionDisplayTable.NoHostExtendX = true
-	criteriaSelectionDisplayTable.SizingStretchSame = true
+	criteriaSelectionDisplayTable.SizingStretchProp = true
 	criteriaSelectionDisplayTable.RowBg = true
 
 	local charCriteriaHeaders = criteriaSelectionDisplayTable:AddRow()
 	charCriteriaHeaders.Headers = true
 
-	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
+	for i, criteriaType in ipairs(VanityCharacterCriteriaType) do
 		charCriteriaHeaders:AddCell():AddText(criteriaType)
 	end
 
@@ -122,6 +121,10 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					criteriaValue = resource.DisplayName:Get() or resource.Name
 				end
 
+				-- Resizing seems to be ignoring header label sizes no matter what I do. Padding wasn't doing anything either
+				local spaces = (#criteriaType - #criteriaValue) * 3
+				spaces = spaces < 0 and 0 or spaces
+				criteriaValue = criteriaValue .. string.rep(" ",  spaces)
 				row:AddCell():AddText(criteriaValue)
 			end
 
