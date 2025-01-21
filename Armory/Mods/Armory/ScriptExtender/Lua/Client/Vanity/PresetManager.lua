@@ -173,6 +173,7 @@ local function buildDependencyTable(preset, parent)
 		parent:AddSeparatorText(key .. " Dependencies"):SetStyle("SeparatorTextAlign", 0.1)
 
 		local dependencyTable = parent:AddTable(key .. preset.Name .. preset.Author, 4)
+		dependencyTable.PreciseWidths = true
 		dependencyTable.SizingStretchProp = true
 
 		local headerRow = dependencyTable:AddRow()
@@ -245,7 +246,8 @@ function VanityPresetManager:UpdatePresetView()
 
 			presetGroup:AddNewLine()
 			presetGroup:AddSeparatorText("Configured Outfits")
-			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, presetGroup)
+			-- Need to pass the proxy value so it can get deleted properly
+			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], presetGroup)
 		end
 	end
 end

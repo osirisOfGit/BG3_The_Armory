@@ -81,22 +81,26 @@ local criteriaGroup
 
 ---@param preset VanityPreset
 ---@param parent ExtuiTreeParent
-function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent)
+---@param outfitToCopyTo VanityCriteriaCompositeKey
+function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo)
 	local refreshButton = parent:AddButton("Refresh")
 
-	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 7)
-	criteriaSelectionDisplayTable.SizingStretchSame = true
+	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
+	criteriaSelectionDisplayTable.SizingStretchProp = true
 	criteriaSelectionDisplayTable.RowBg = true
 
 	local charCriteriaHeaders = criteriaSelectionDisplayTable:AddRow()
 	charCriteriaHeaders.Headers = true
 
-	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
+	for i, criteriaType in ipairs(VanityCharacterCriteriaType) do
 		charCriteriaHeaders:AddCell():AddText(criteriaType)
 	end
 
 	local function buildTable()
 		for criteriaCompositeKey, _ in TableUtils:OrderedPairs(preset.Outfits) do
+			if criteriaCompositeKey == outfitToCopyTo then
+				goto continue
+			end
 			local row = criteriaSelectionDisplayTable:AddRow()
 			local parsedCriteriaTable = ParseCriteriaCompositeKey(criteriaCompositeKey)
 
@@ -114,11 +118,47 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 
 					---@type ResourceClassDescription|ResourceRace|ResourceOrigin
 					local resource = Ext.StaticData.Get(criteriaId, resourceType)
-					criteriaValue = resource.DisplayName:Get()
+					criteriaValue = resource.DisplayName:Get() or resource.Name
 				end
 
+				-- Resizing seems to be ignoring header label sizes no matter what I do. Padding wasn't doing anything either
+				local spaces = (#criteriaType - #criteriaValue) * 3
+				spaces = spaces < 0 and 0 or spaces
+				criteriaValue = criteriaValue .. string.rep(" ",  spaces)
 				row:AddCell():AddText(criteriaValue)
 			end
+
+			local actionCell = row:AddCell()
+			if not outfitToCopyTo then
+				local deleteButton = actionCell:AddButton("X")
+				deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
+				deleteButton:SetColor("Text", { 1, 1, 1, 1 })
+				deleteButton.OnClick = function()
+					preset.Outfits[criteriaCompositeKey].delete = true
+					Ext.Timer.WaitFor(350, function()
+						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+					end)
+					row:Destroy()
+				end
+			else
+				local overwriteButton = row:AddButton("Copy")
+				overwriteButton.IDContext = overwriteButton.Label .. criteriaCompositeKey
+
+				overwriteButton.OnClick = function()
+					if preset.Outfits[outfitToCopyTo] then
+						preset.Outfits[outfitToCopyTo].delete = true
+					end
+
+					local outfitToCopy = ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits[criteriaCompositeKey]
+					preset.Outfits[outfitToCopyTo] = TableUtils:DeeplyCopyTable(outfitToCopy)
+
+					VanityCharacterPanel:BuildModule(parent.ParentElement, preset, outfitToCopyTo)
+					Ext.Timer.WaitFor(350, function()
+						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+					end)
+				end
+			end
+			::continue::
 		end
 	end
 
