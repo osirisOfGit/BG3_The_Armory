@@ -86,6 +86,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 	local refreshButton = parent:AddButton("Refresh")
 
 	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
+	criteriaSelectionDisplayTable.NoHostExtendX = true
 	criteriaSelectionDisplayTable.SizingStretchSame = true
 	criteriaSelectionDisplayTable.RowBg = true
 
@@ -98,6 +99,9 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 
 	local function buildTable()
 		for criteriaCompositeKey, _ in TableUtils:OrderedPairs(preset.Outfits) do
+			if criteriaCompositeKey == outfitToCopyTo then
+				goto continue
+			end
 			local row = criteriaSelectionDisplayTable:AddRow()
 			local parsedCriteriaTable = ParseCriteriaCompositeKey(criteriaCompositeKey)
 
@@ -115,7 +119,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 
 					---@type ResourceClassDescription|ResourceRace|ResourceOrigin
 					local resource = Ext.StaticData.Get(criteriaId, resourceType)
-					criteriaValue = resource.DisplayName:Get()
+					criteriaValue = resource.DisplayName:Get() or resource.Name
 				end
 
 				row:AddCell():AddText(criteriaValue)
@@ -134,21 +138,24 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					row:Destroy()
 				end
 			else
-				local overwriteButton = row:AddButton("Copy To Active Outfit")
+				local overwriteButton = row:AddButton("Copy")
 				overwriteButton.IDContext = overwriteButton.Label .. criteriaCompositeKey
 
 				overwriteButton.OnClick = function()
 					if preset.Outfits[outfitToCopyTo] then
 						preset.Outfits[outfitToCopyTo].delete = true
 					end
-					preset.Outfits[outfitToCopyTo] = TableUtils:DeeplyCopyTable(ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits
-					[criteriaCompositeKey])
+
+					local outfitToCopy = ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits[criteriaCompositeKey]
+					preset.Outfits[outfitToCopyTo] = TableUtils:DeeplyCopyTable(outfitToCopy)
+
 					VanityCharacterPanel:BuildModule(parent.ParentElement, preset, outfitToCopyTo)
 					Ext.Timer.WaitFor(350, function()
 						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 					end)
 				end
 			end
+			::continue::
 		end
 	end
 

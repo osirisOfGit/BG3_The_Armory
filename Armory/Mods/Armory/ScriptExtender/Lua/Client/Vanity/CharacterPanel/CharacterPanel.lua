@@ -107,6 +107,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
 	local copyPopup = panelGroup:AddPopup("CopyOutfit")
 	copyOutfitFromButton.OnClick = function ()
+		Helpers:KillChildren(copyPopup)
 		VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, copyPopup, criteriaCompositeKey)
 		copyPopup:Open()
 	end

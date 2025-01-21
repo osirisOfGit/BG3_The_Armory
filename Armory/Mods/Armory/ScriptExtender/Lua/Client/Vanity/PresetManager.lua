@@ -173,6 +173,7 @@ local function buildDependencyTable(preset, parent)
 		parent:AddSeparatorText(key .. " Dependencies"):SetStyle("SeparatorTextAlign", 0.1)
 
 		local dependencyTable = parent:AddTable(key .. preset.Name .. preset.Author, 4)
+		dependencyTable.PreciseWidths = true
 		dependencyTable.SizingStretchProp = true
 
 		local headerRow = dependencyTable:AddRow()
