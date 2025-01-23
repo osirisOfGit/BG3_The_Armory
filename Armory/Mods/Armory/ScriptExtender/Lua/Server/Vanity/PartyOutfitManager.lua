@@ -71,7 +71,7 @@ local function FindAndApplyOutfit(player, activeOutfits)
 
 	criteriaTable[originResource.IsHenchman and "Hireling" or "Origin"] = originResource.ResourceUUID
 
-	Logger:BasicDebug("Player %s Criteria Table is: \n%s", player, Ext.Json.Stringify(criteriaTable))
+	Logger:BasicDebug("Player %s Criteria Table is: \n%s", player, Ext.Json.Stringify(ConvertCriteriaTableToDisplay(criteriaTable, true)))
 
 	---@type {[ActualSlot]: VanityOutfitSlot}
 	local playerOutfit
@@ -79,18 +79,17 @@ local function FindAndApplyOutfit(player, activeOutfits)
 	local compositeKey = CreateCriteriaCompositeKey(criteriaTable)
 	if activeOutfits[compositeKey] then
 		playerOutfit = activeOutfits[compositeKey]
-		Logger:BasicDebug("Player %s was matched to an outfit with criteria table: %s", player, Ext.Json.Stringify(criteriaTable))
 	else
 		playerOutfit, compositeKey = OutfitMatcher.findBestMatch(criteriaTable, activeOutfits)
 	end
 
 	if playerOutfit then
-		Logger:BasicDebug("Player %s was matched to an outfit (in %dms) with criteria table: %s", player, Ext.Utils.MonotonicTime() - startTime,
-			Ext.Json.Stringify(ParseCriteriaCompositeKey(compositeKey)))
+		Logger:BasicInfo("Player %s was matched to an outfit (in %dms) with Criteria Table: %s", player, Ext.Utils.MonotonicTime() - startTime,
+			Ext.Json.Stringify(ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(compositeKey), true)))
 		playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = compositeKey
 		Transmogger:MogCharacter(playerEntity)
 	else
-		Logger:BasicInfo("Could not find an outfit for player %s with criteriaTable %s", player, Ext.Json.Stringify(criteriaTable))
+		Logger:BasicInfo("Could not find an outfit for player %s with criteriaTable %s", player, Ext.Json.Stringify(ConvertCriteriaTableToDisplay(criteriaTable, true)))
 		playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = nil
 		Transmogger:ClearOutfit(player)
 	end

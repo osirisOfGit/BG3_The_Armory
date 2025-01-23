@@ -51,3 +51,30 @@ function ParseCriteriaCompositeKey(compositeKey)
 	end
 	return criteriaTable
 end
+
+function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS)
+	local displayTable = {}
+	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
+		local criteriaId = criteriaTable[criteriaType]
+		local criteriaValue
+		if not criteriaId or criteriaId == "" then
+			criteriaValue = "---"
+		elseif criteriaType == "BodyType" then
+			criteriaValue = criteriaId
+		else
+			local resourceType = (criteriaType == "Class" or criteriaType == "Subclass") and "ClassDescription" or criteriaType
+			resourceType = criteriaType == "Subrace" and "Race" or resourceType
+			resourceType = criteriaType == "Hireling" and "Origin" or resourceType
+
+			---@type ResourceClassDescription|ResourceRace|ResourceOrigin
+			local resource = Ext.StaticData.Get(criteriaId, resourceType)
+			criteriaValue = resource.DisplayName:Get() or resource.Name
+			if includeUUIDS then
+				criteriaValue = string.format("%s (%s)", criteriaValue, criteriaId)
+			end
+		end
+		displayTable[criteriaType] = criteriaValue
+	end
+
+	return displayTable
+end
