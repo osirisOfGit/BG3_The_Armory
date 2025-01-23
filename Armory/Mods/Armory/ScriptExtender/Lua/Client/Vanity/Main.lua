@@ -68,15 +68,19 @@ function Vanity:ActivatePreset(presetId, initializing)
 	Ext.Vars.SyncModVariables(ModuleUUID)
 
 	if not initializing then
-		Ext.Timer.WaitFor(100, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId)
+		Ext.Timer.WaitFor(350, function()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId or "")
 		end)
 	end
 
-	local preset = ConfigurationStructure.config.vanity.presets[presetId]
-	separator.Label = "Active Preset: " .. preset.Name
-
-	VanityCharacterCriteria:BuildModule(mainParent, preset)
+	if presetId then
+		local preset = ConfigurationStructure.config.vanity.presets[presetId]
+		separator.Label = "Active Preset: " .. preset.Name
+		VanityCharacterCriteria:BuildModule(mainParent, preset)
+	else
+		separator.Label = "Choose a Preset"
+		VanityCharacterCriteria:BuildModule(mainParent)
+	end
 end
 
 local hasBeenActivated = false

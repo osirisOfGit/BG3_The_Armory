@@ -308,6 +308,10 @@ end
 
 ---@param character EntityHandle
 function Transmogger:ApplyDye(character)
+	if not ActiveVanityPreset then
+		return
+	end
+
 	---@type VanityOutfit
 	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
 	if not outfit then

@@ -99,16 +99,20 @@ local function ApplyTransmogsPerPreset()
 	local config = ConfigurationStructure:UpdateConfigForServer()
 	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
+	local activeOutfits
 	if activePresetId then
 		ActiveVanityPreset = config.vanity.presets[activePresetId]
 
 		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", ActiveVanityPreset.Name, ActiveVanityPreset.Author, ActiveVanityPreset.Version)
-		local activeOutfits = ActiveVanityPreset.Outfits
-
-		if next(activeOutfits) then
-			for _, player in pairs(Osi.DB_Players:Get(nil)) do
-				FindAndApplyOutfit(player[1], activeOutfits)
-			end
+		activeOutfits = ActiveVanityPreset.Outfits
+	else
+		ActiveVanityPreset = nil
+	end
+	for _, player in pairs(Osi.DB_Players:Get(nil)) do
+		if activeOutfits and next(activeOutfits) then
+			FindAndApplyOutfit(player[1], activeOutfits)
+		else
+			Transmogger:ClearOutfit(player[1])
 		end
 	end
 end

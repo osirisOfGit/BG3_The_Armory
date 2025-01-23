@@ -109,7 +109,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				-- Resizing seems to be ignoring header label sizes no matter what I do. Padding wasn't doing anything either
 				local spaces = (#criteriaType - #criteriaValue) * 3
 				spaces = spaces < 0 and 0 or spaces
-				criteriaValue = criteriaValue .. string.rep(" ",  spaces)
+				criteriaValue = criteriaValue .. string.rep(" ", spaces)
 				row:AddCell():AddText(criteriaValue)
 			end
 
@@ -164,7 +164,7 @@ end
 local popup
 
 ---@param tabHeader ExtuiTreeParent
----@param preset VanityPreset
+---@param preset VanityPreset?
 function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	if not next(playableRaces) then
 		PopulatePlayableRaces()
@@ -175,9 +175,12 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	if not criteriaGroup then
 		criteriaGroup = tabHeader:AddGroup("CharacterCriteria")
 	else
-		for _, child in pairs(criteriaGroup.Children) do
-			child:Destroy()
-		end
+		Helpers:KillChildren(criteriaGroup)
+	end
+
+	if not preset then
+		VanityCharacterPanel:BuildModule(tabHeader)
+		return
 	end
 
 	local popupButton = criteriaGroup:AddButton("See Configured Character Criteria Combinations")
@@ -188,6 +191,8 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		popup.AlwaysAutoResize = true
 		popup.NoResize = true
 		popup.Open = false
+	else
+		Helpers:KillChildren(popup)
 	end
 
 	popupButton.OnClick = function()

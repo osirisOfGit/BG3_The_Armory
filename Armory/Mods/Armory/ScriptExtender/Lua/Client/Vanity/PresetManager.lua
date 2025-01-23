@@ -233,6 +233,7 @@ function VanityPresetManager:UpdatePresetView()
 			end
 			presetGroup:AddButton("Delete").OnClick = function()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
+				Vanity:ActivatePreset()
 				VanityPresetManager:UpdatePresetView()
 			end
 
