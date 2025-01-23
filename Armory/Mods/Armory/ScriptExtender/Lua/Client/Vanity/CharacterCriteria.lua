@@ -102,25 +102,10 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				goto continue
 			end
 			local row = criteriaSelectionDisplayTable:AddRow()
-			local parsedCriteriaTable = ParseCriteriaCompositeKey(criteriaCompositeKey)
+			local parsedCriteriaTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(criteriaCompositeKey))
 
 			for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
-				local criteriaId = parsedCriteriaTable[criteriaType]
-				local criteriaValue
-				if criteriaId == "" then
-					criteriaValue = "---"
-				elseif criteriaType == "BodyType" then
-					criteriaValue = criteriaId
-				else
-					local resourceType = (criteriaType == "Class" or criteriaType == "Subclass") and "ClassDescription" or criteriaType
-					resourceType = criteriaType == "Subrace" and "Race" or resourceType
-					resourceType = criteriaType == "Hireling" and "Origin" or resourceType
-
-					---@type ResourceClassDescription|ResourceRace|ResourceOrigin
-					local resource = Ext.StaticData.Get(criteriaId, resourceType)
-					criteriaValue = resource.DisplayName:Get() or resource.Name
-				end
-
+				local criteriaValue = parsedCriteriaTable[criteriaType]
 				-- Resizing seems to be ignoring header label sizes no matter what I do. Padding wasn't doing anything either
 				local spaces = (#criteriaType - #criteriaValue) * 3
 				spaces = spaces < 0 and 0 or spaces
