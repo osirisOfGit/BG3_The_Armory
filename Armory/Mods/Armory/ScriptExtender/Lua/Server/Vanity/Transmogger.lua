@@ -280,12 +280,10 @@ function Transmogger:MogCharacter(character)
 				end
 			end
 
-			Ext.Timer.WaitFor(50, function()
-				Osi.RequestDelete(equippedItem)
+			Osi.RequestDelete(equippedItem)
+			createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 
-				createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
-				Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
-			end)
+			Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
 
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
 			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
