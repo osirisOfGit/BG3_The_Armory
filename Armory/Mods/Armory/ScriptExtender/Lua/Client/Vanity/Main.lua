@@ -60,7 +60,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		separator:SetStyle("SeparatorTextAlign", 0.5)
 	end)
 
----@param presetId Guid
+---@param presetId Guid?
 ---@param initializing boolean?
 function Vanity:ActivatePreset(presetId, initializing)
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = presetId

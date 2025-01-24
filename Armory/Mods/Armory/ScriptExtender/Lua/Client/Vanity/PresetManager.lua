@@ -241,6 +241,11 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					VanityPresetManager:UpdatePresetView(guid)
 					presetWindow.Open = false
 				end
+			else
+				presetGroup:AddButton("Deactivate (Save After)").OnClick = function()
+					Vanity:ActivatePreset()
+					VanityPresetManager:UpdatePresetView(guid)
+				end
 			end
 
 			presetGroup:AddButton("Delete").OnClick = function()
