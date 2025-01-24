@@ -80,7 +80,8 @@ function VanityPresetManager:OpenManager()
 				return
 			end
 
-			ConfigurationStructure.config.vanity.presets[generateGUID()] = {
+			local presetID = generateGUID()
+			ConfigurationStructure.config.vanity.presets[presetID] = {
 				Author = authorInput.Text,
 				Name = nameInput.Text,
 				Version = versionInput.Text,
@@ -90,7 +91,7 @@ function VanityPresetManager:OpenManager()
 			}
 
 			presetForm.Visible = false
-			VanityPresetManager:UpdatePresetView()
+			VanityPresetManager:UpdatePresetView(presetID)
 		end
 
 		createNewPresetButton.OnClick = function()
@@ -208,7 +209,7 @@ local function buildDependencyTable(preset, parent)
 	buildDepTab("Equipment", cachedDeps.equipment)
 end
 
-function VanityPresetManager:UpdatePresetView()
+function VanityPresetManager:UpdatePresetView(presetID)
 	for _, child in pairs(userPresetSection.Children) do
 		child:Destroy()
 	end
@@ -218,8 +219,15 @@ function VanityPresetManager:UpdatePresetView()
 		presetActivelyViewing = nil
 	end
 
+	local activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 	for guid, preset in pairs(ConfigurationStructure.config.vanity.presets) do
-		userPresetSection:AddButton(preset.Name).OnClick = function()
+		if preset.SFW then
+			preset.NSFW = preset.SFW
+			preset.SFW = nil
+		end
+
+		local presetButton = userPresetSection:AddButton(preset.Name)
+		presetButton.OnClick = function()
 			if presetActivelyViewing then
 				presetActivelyViewing:Destroy()
 			end
@@ -227,14 +235,20 @@ function VanityPresetManager:UpdatePresetView()
 			local presetGroup = presetInfoSection:AddGroup(guid)
 			presetActivelyViewing = presetGroup
 
-			presetGroup:AddButton("Activate (Save After)").OnClick = function()
-				Vanity:ActivatePreset(guid)
-				VanityPresetManager:UpdatePresetView()
+			if activePreset ~= guid then
+				presetGroup:AddButton("Activate (Save After)").OnClick = function()
+					Vanity:ActivatePreset(guid)
+					VanityPresetManager:UpdatePresetView(guid)
+					presetWindow.Open = false
+				end
 			end
+
 			presetGroup:AddButton("Delete").OnClick = function()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
-				Vanity:ActivatePreset()
 				VanityPresetManager:UpdatePresetView()
+				if activePreset == guid then
+					Vanity:ActivatePreset()
+				end
 			end
 
 			presetGroup:AddText("Name: " .. preset.Name)
@@ -249,6 +263,9 @@ function VanityPresetManager:UpdatePresetView()
 			presetGroup:AddSeparatorText("Configured Outfits")
 			-- Need to pass the proxy value so it can get deleted properly
 			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], presetGroup)
+		end
+		if presetID == guid then
+			presetButton.OnClick()
 		end
 	end
 end
