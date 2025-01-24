@@ -281,11 +281,11 @@ function Transmogger:MogCharacter(character)
 			end
 
 			Osi.RequestDelete(equippedItem)
-			createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 
+			createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
 			Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
 
-			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
 			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
 				Ext.Utils.MonotonicTime() - startTime)
 		end)
