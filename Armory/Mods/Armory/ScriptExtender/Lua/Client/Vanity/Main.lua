@@ -38,8 +38,8 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	function(tabHeader)
 		mainParent = tabHeader
 
-		local helpTooltip = tabHeader:AddButton("Help"):Tooltip()
-		helpTooltip:AddText("\t Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied. Once a preset is activated, it will only be active for that save (so save after activating it).").TextWrapPos = 800
+		local helpTooltip = tabHeader:AddButton("Instructions"):Tooltip()
+		helpTooltip:AddText("\t  Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it).").TextWrapPos = 800
 		helpTooltip:AddText("The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save").TextWrapPos = 0
 		helpTooltip:AddText("It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process (e.g. Armory type), don't update the tooltips until a reload.").TextWrapPos = 0
 		helpTooltip:AddText("\nAfter creating a preset, you can start defining outfits using the options below. You can select combination of criteria (one item from each column, though Hireling and Origin are mutually exclusive, and you don't have to use all columns) - each combination will create a unique outfit").TextWrapPos = 0
@@ -60,7 +60,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		separator:SetStyle("SeparatorTextAlign", 0.5)
 	end)
 
----@param presetId Guid
+---@param presetId Guid?
 ---@param initializing boolean?
 function Vanity:ActivatePreset(presetId, initializing)
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = presetId
@@ -68,15 +68,19 @@ function Vanity:ActivatePreset(presetId, initializing)
 	Ext.Vars.SyncModVariables(ModuleUUID)
 
 	if not initializing then
-		Ext.Timer.WaitFor(100, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId)
+		Ext.Timer.WaitFor(350, function()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", presetId or "")
 		end)
 	end
 
-	local preset = ConfigurationStructure.config.vanity.presets[presetId]
-	separator.Label = "Active Preset: " .. preset.Name
-
-	VanityCharacterCriteria:BuildModule(mainParent, preset)
+	if presetId then
+		local preset = ConfigurationStructure.config.vanity.presets[presetId]
+		separator.Label = "Active Preset: " .. preset.Name
+		VanityCharacterCriteria:BuildModule(mainParent, preset)
+	else
+		separator.Label = "Choose a Preset"
+		VanityCharacterCriteria:BuildModule(mainParent)
+	end
 end
 
 local hasBeenActivated = false

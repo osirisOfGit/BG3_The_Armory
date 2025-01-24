@@ -82,8 +82,8 @@ local weaponSlots = {
 }
 
 ---@param tabHeader ExtuiTreeParent
----@param preset VanityPreset
----@param criteriaCompositeKey string
+---@param preset VanityPreset?
+---@param criteriaCompositeKey string?
 function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKey)
 	if not initialized then
 		initialized = true
@@ -93,10 +93,15 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	if not panelGroup then
 		panelGroup = tabHeader:AddGroup("CharacterPanel")
 	else
-		for _, child in pairs(panelGroup.Children) do
-			child:Destroy()
-		end
+		Helpers:KillChildren(panelGroup)
 	end
+	
+	if not preset then
+		return
+	end
+
+	---@cast criteriaCompositeKey string
+
 	panelGroup:AddSeparator()
 
 	-- if it's just pipes, so no criteria in the outfit
@@ -107,7 +112,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
 	copyOutfitFromButton:Tooltip():AddText("\t  This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)").TextWrapPos = 600
 	local copyPopup = panelGroup:AddPopup("CopyOutfit")
-	copyOutfitFromButton.OnClick = function ()
+	copyOutfitFromButton.OnClick = function()
 		Helpers:KillChildren(copyPopup)
 		VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, copyPopup, criteriaCompositeKey)
 		copyPopup:Open()
