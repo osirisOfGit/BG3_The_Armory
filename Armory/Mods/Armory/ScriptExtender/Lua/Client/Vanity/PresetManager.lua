@@ -84,7 +84,7 @@ function VanityPresetManager:OpenManager()
 				Author = authorInput.Text,
 				Name = nameInput.Text,
 				Version = versionInput.Text,
-				SFW = sfwCheckbox.Checked,
+				NSFW = sfwCheckbox.Checked,
 				ModDependencies = {},
 				Outfits = {}
 			}
@@ -240,7 +240,7 @@ function VanityPresetManager:UpdatePresetView()
 			presetGroup:AddText("Name: " .. preset.Name)
 			presetGroup:AddText("Author: " .. preset.Author)
 			presetGroup:AddText("Version: " .. preset.Version)
-			presetGroup:AddText("Contains Skimpy Outfits/Nudity? " .. (preset.SFW and "No" or "Yes"))
+			presetGroup:AddText("Contains Skimpy Outfits/Nudity? " .. (preset.NSFW and "Yes" or "No"))
 
 			presetGroup:AddSeparatorText("Mod Dependencies")
 			buildDependencyTable(preset, presetGroup)
