@@ -38,8 +38,8 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 	function(tabHeader)
 		mainParent = tabHeader
 
-		local helpTooltip = tabHeader:AddButton("Help"):Tooltip()
-		helpTooltip:AddText("\t Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied. Once a preset is activated, it will only be active for that save (so save after activating it).").TextWrapPos = 800
+		local helpTooltip = tabHeader:AddButton("Instructions"):Tooltip()
+		helpTooltip:AddText("\t  Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it).").TextWrapPos = 800
 		helpTooltip:AddText("The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save").TextWrapPos = 0
 		helpTooltip:AddText("It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process (e.g. Armory type), don't update the tooltips until a reload.").TextWrapPos = 0
 		helpTooltip:AddText("\nAfter creating a preset, you can start defining outfits using the options below. You can select combination of criteria (one item from each column, though Hireling and Origin are mutually exclusive, and you don't have to use all columns) - each combination will create a unique outfit").TextWrapPos = 0
