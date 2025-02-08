@@ -86,15 +86,16 @@ Transmogger = {}
 ---@return string
 local function buildMetaInfoForLog(entity)
 	---@type Weapon|Armor|Object
-	local stat = Ext.Stats.Get(Osi.GetStatString(entity.Uuid.EntityUuid))
+	local stat = Ext.Stats.Get(entity.Data.StatsId)
 
 	return Ext.Json.Stringify({
-		uuid = entity.Uuid.EntityUuid,
-		templateUuid = entity.ServerItem.Template.Id,
+		uuid = entity.ServerItem.Template.Name .. "_" .. entity.Uuid.EntityUuid,
+		templateUuid = entity.ServerItem.Template.Name .. "_" .. entity.ServerItem.Template.Id,
 		displayName = entity.DisplayName.Name:Get(),
 		statName = stat.Name,
 		modId = stat.ModId,
-		modName = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info.Name
+		modName = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info.Name,
+		modAuthor = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info.Author
 	})
 end
 
@@ -170,7 +171,19 @@ function Transmogger:MogCharacter(character)
 			---@type EntityHandle
 			local equippedItemEntity = Ext.Entity.Get(equippedItem)
 
-			createdVanityEntity.Vars.TheArmory_Vanity_OriginalItemInfo = equippedItemEntity.ServerItem.Template.Id
+			if equippedItemEntity.ServerItem.Template.Stats ~= equippedItemEntity.Data.StatsId then
+				Logger:BasicWarning(
+					"Item's stat string (%s) differs from its template's stat string (%s) - most likely this is a modded item, and the mod author did not ensure the item template points at the stat, and the stat points back to the same template."
+					.. " Work around will be executed, but you'll need to save and reload to finalize the process. Please reach out to the author and ask them to fix for best experience. Item info:\n%s",
+					equippedItemEntity.Data.StatsId,
+					equippedItemEntity.ServerItem.Template.Stats,
+					buildMetaInfoForLog(equippedItemEntity))
+			end
+
+			createdVanityEntity.Vars.TheArmory_Vanity_OriginalItemInfo = {
+				["template"] = equippedItemEntity.ServerItem.Template.Id,
+				["stat"] = equippedItemEntity.Data.StatsId
+			}
 
 			local varComponentsToReplicateOnRefresh = {}
 
@@ -424,21 +437,39 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 			if itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo then
 				local inventoryOwner = Osi.GetInventoryOwner(item)
 				if inventoryOwner then
-					local originalItemTemplate = itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo
+					-- Backwards Compatibility with <= 0.4.0. TODO: Remove in 1.0.0
+					local isTable = type(itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo) == "table"
+					local originalItemTemplate = isTable and itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo.template or itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo
+					local originalItemStat = isTable and itemEntity.Vars.TheArmory_Vanity_OriginalItemInfo.stat or nil
+
 					Logger:BasicDebug("%s was unequipped, so restoring to %s and giving to %s", item, originalItemTemplate, inventoryOwner)
 					local vanityIsEquipped = Osi.IsEquipped(item)
 
 					Osi.RequestDelete(item)
-					if vanityIsEquipped == 1 then
-						local newItem = Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, "")
-						if not currentlyMogging then
-							Osi.Equip(inventoryOwner, newItem)
-							Transmogger:ApplyDye(Ext.Entity.Get(inventoryOwner))
+
+					local newItem = Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, "")
+					if originalItemStat then
+						---@type EntityHandle
+						local newItemEntity = Ext.Entity.Get(newItem)
+						if newItemEntity.Data.StatsId ~= originalItemStat then
+							newItemEntity.Data.StatsId = originalItemStat
+							newItemEntity:Replicate("Data")
+
+							newItemEntity.ServerItem.Stats = originalItemStat
 						end
-						return newItem
-					else
-						Osi.TemplateAddTo(originalItemTemplate, inventoryOwner, 1, 0)
 					end
+					Ext.Timer.WaitFor(20, function()
+						if not currentlyMogging then
+							if vanityIsEquipped == 1 then
+								Osi.Equip(inventoryOwner, newItem)
+								Transmogger:ApplyDye(Ext.Entity.Get(inventoryOwner))
+							else
+								Osi.ToInventory(newItem, inventoryOwner, 1, 0, 1)
+							end
+						end
+					end)
+
+					return newItem
 				end
 			elseif itemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
 				itemEntity.ItemDye.Color = itemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
@@ -449,7 +480,7 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 end
 
 Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
-	Ext.Timer.WaitFor(100, function()
+	Ext.Timer.WaitFor(20, function()
 		Transmogger:UnMogItem(item)
 	end)
 end)
