@@ -458,7 +458,7 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 							newItemEntity.ServerItem.Stats = originalItemStat
 						end
 					end
-					Ext.Timer.WaitFor(100, function()
+					Ext.Timer.WaitFor(20, function()
 						if not currentlyMogging then
 							if vanityIsEquipped == 1 then
 								Osi.Equip(inventoryOwner, newItem)
