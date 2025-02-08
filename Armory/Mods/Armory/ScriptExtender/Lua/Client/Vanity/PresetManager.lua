@@ -48,7 +48,7 @@ function VanityPresetManager:OpenManager()
 		local nameInput, nameError = generateFormInput("Name")
 		local versionInput, versionError = generateFormInput("Version")
 
-		presetForm:AddText("Does/Will this contain outfits that have skimpy/nude clothing?")
+		presetForm:AddText("Does this contain outfits that have skimpy/nude clothing?")
 		local sfwCheckbox = presetForm:AddCheckbox("", true)
 
 		local inputErrorTable = {
