@@ -5,44 +5,6 @@ DyePicker = PickerBaseClass:new("Dyes", {
 	activeDyeGroup = nil
 })
 
-function DyePicker:InitializeSearchBank()
-	for templateName, template in pairs(Ext.ClientTemplate.GetAllRootTemplates()) do
-		---@cast template ItemTemplate
-		if template.TemplateType == "item" then
-			---@type Weapon|Armor|Object
-			local stat = Ext.Stats.Get(template.Stats)
-
-			local success, error = pcall(function()
-				local name = template.DisplayName:Get() or templateName
-				if stat
-					and (stat.ObjectCategory == "Dye")
-					and not self.rootsByName[name]
-				then
-					table.insert(self.sortedTemplateNames, name)
-					self.rootsByName[name] = template
-
-					if stat.ModId ~= "" then
-						if not self.templateNamesByModId[stat.ModId] then
-							self.modIdByModName[Ext.Mod.GetMod(stat.ModId).Info.Name] = stat.ModId
-							self.templateNamesByModId[stat.ModId] = {}
-						end
-						table.insert(self.templateNamesByModId[stat.ModId], name)
-					end
-				end
-			end)
-			if not success then
-				Logger:BasicWarning("Couldn't load item %s with stat %s (from Mod '%s') into the table due to %s",
-					template.Name,
-					stat.Name,
-					stat.ModId ~= "" and Ext.Mod.GetMod(stat.ModId).Info.Name or "Unknown",
-					error)
-			end
-		end
-	end
-
-	table.sort(self.sortedTemplateNames)
-end
-
 function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 	PickerBaseClass.OpenWindow(self,
 		slot,
@@ -83,21 +45,23 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 		return
 	end
 
-	local dyeTemplate = self.rootsByName[templateName]
-
+	local dyeTemplateId = self.itemIndex.templateNameAndId[templateName]
+	---@type ItemTemplate
+	local dyeTemplate = Ext.Template.GetRootTemplate(dyeTemplateId)
+	
 	local isFavorited, favoriteIndex = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
-
+	
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return
 	end
-
+	
 	---@type ResourceMaterialPresetResource
 	local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 	if not materialPreset then
 		---@type Object
-		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
+		local dyeStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[dyeTemplateId])
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId).Info
-
+		
 		table.insert(self.blacklistedItems, templateName)
 		Logger:BasicWarning("Dye %s from Mod %s by %s does not have a materialPreset?", dyeTemplate.DisplayName:Get() or dyeTemplate.Name, modInfo.Name, modInfo.Author)
 		return

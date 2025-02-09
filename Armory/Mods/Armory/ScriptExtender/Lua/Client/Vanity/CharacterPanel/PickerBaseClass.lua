@@ -1,13 +1,27 @@
+local itemIndex = {
+	---@class SearchIndex
+	equipment = {
+		statAndModId = {},
+		statAndTemplateId = {},
+		templateIdAndStat = {},
+		templateNameAndId = {},
+		modIdAndTemplateName = {},
+		mods = {}
+	},
+	dyes = {
+		statAndModId = {},
+		statAndTemplateId = {},
+		templateIdAndStat = {},
+		templateNameAndId = {},
+		modIdAndTemplateName = {},
+		mods = {}
+	}
+}
+
 ---@class PickerBaseClass
 PickerBaseClass = {
-	---@type table<FixedString, ItemTemplate>
-	rootsByName = {},
-	---@type string[]
-	sortedTemplateNames = {},
-	---@type {[string]: Guid[]}
-	templateNamesByModId = {},
-	---@type {[string]: Guid}
-	modIdByModName = {},
+	---@type "Equipment"|"Dyes"
+	title = nil,
 	---@type EquipmentSettings|DyeSettings
 	settings = {},
 	---@type ActualSlot
@@ -15,7 +29,9 @@ PickerBaseClass = {
 	---@type ExtuiMenu
 	settingsMenu = nil,
 	---@type string[]
-	blacklistedItems = {}
+	blacklistedItems = {},
+	---@type SearchIndex
+	itemIndex = {}
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -23,6 +39,7 @@ PickerBaseClass = {
 ---@return PickerBaseClass instance
 function PickerBaseClass:new(title, instance)
 	instance = instance or {}
+
 	setmetatable(instance, self)
 	self.__index = self
 
@@ -32,14 +49,76 @@ function PickerBaseClass:new(title, instance)
 	instance.templateNamesByModId = {}
 	instance.modIdByModName = {}
 	instance.settings = instance.settings or {}
-	instance.slot = nil
-	instance.settingsMenu = nil
 	instance.blacklistedItems = {}
+	instance.itemIndex = title == "Equipment" and itemIndex.equipment or itemIndex.dyes
 
 	return instance
 end
 
-function PickerBaseClass:InitializeSearchBank() end
+function PickerBaseClass:InitializeSearchBank()
+	local itemCount = 0
+	local modCount = 0
+
+	local combinedStats = {}
+	for _, statType in ipairs({ "Armor", "Weapon", "Object" }) do
+		for _, stat in ipairs(Ext.Stats.GetStats(statType)) do
+			table.insert(combinedStats, stat)
+		end
+	end
+	for _, statString in ipairs(combinedStats) do
+		---@type Weapon|Armor|Object
+		local stat = Ext.Stats.Get(statString)
+
+		local success, error = pcall(function(...)
+			local indexShard
+
+			if (stat.ModifierList == "Weapon" or stat.ModifierList == "Armor") then
+				indexShard = itemIndex.equipment
+			elseif stat.ObjectCategory == "Dye" then
+				indexShard = itemIndex.dyes
+			else
+				return
+			end
+
+			if not stat.RootTemplate or stat.RootTemplate == "" or stat.RootTemplate == "00000000-0000-0000-0000-000000000000" then
+				return
+			end
+
+			itemCount = itemCount + 1
+
+			---@type ItemTemplate?
+			local itemTemplate = stat.RootTemplate and Ext.ClientTemplate.GetRootTemplate(stat.RootTemplate) or nil
+			if not itemTemplate then
+				error(string.format("RootTemplate %s does not exist", stat.RootTemplate))
+			end
+
+			indexShard.statAndTemplateId[statString] = stat.RootTemplate
+			indexShard.templateIdAndStat[stat.RootTemplate] = statString
+			indexShard.templateNameAndId[itemTemplate.DisplayName:Get() or itemTemplate.Name] = stat.RootTemplate
+
+			if stat.ModId ~= "" then
+				local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+				if not indexShard.mods[modInfo.Name] then
+					modCount = modCount + 1
+					indexShard.mods[modInfo.Name] = stat.ModId
+					indexShard.modIdAndTemplateName[stat.ModId] = {}
+				end
+				indexShard.statAndModId[statString] = stat.ModId
+				table.insert(indexShard.modIdAndTemplateName[stat.ModId], itemTemplate.DisplayName:Get() or itemTemplate.Name)
+				table.sort(indexShard.modIdAndTemplateName[stat.ModId])
+			end
+		end)
+
+		if not success then
+			Logger:BasicWarning("Couldn't load stat %s (from Mod '%s') into the search table due to %s - please contact the mod author to fix this issue",
+				stat.Name,
+				stat.ModId ~= "" and Ext.Mod.GetMod(stat.ModId).Info.Name or "Unknown",
+				error)
+		end
+	end
+
+	Logger:BasicInfo("Indexed %d armor/weapons and dyes from %d mods", itemCount, modCount)
+end
 
 function PickerBaseClass:DisplayResult(templateName, group) end
 
@@ -47,7 +126,9 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 	self.slot = slot
 
 	if not self.window then
-		self:InitializeSearchBank()
+		if not next(itemIndex.dyes.mods) then
+			PickerBaseClass:InitializeSearchBank()
+		end
 
 		self.window = Ext.IMGUI.NewWindow(self.title)
 		self.window.Closeable = true
@@ -60,7 +141,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		self.settingsMenu = self.window:AddMainMenu():AddMenu("Settings")
 		self.settingsMenu:SetColor("PopupBg", { 0, 0, 0, 1 })
-		
+
 		self.settingsMenu:AddSeparator()
 		self.settingsMenu:AddText("Show Item Names?")
 		local showNameCheckbox = self.settingsMenu:AddCheckbox("", self.settings.showNames)
@@ -78,7 +159,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 			self.settings.imageSize = imageSizeSetting.Value[1]
 			self:RebuildDisplay()
 		end
-		
+
 		self.separator = self.window:AddSeparatorText("")
 		self.separator:SetStyle("SeparatorTextAlign", 0.5)
 
@@ -98,15 +179,13 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 				Helpers:KillChildren(self.resultsGroup)
 
 				self.rowCount = 0
+				local upperSearch
 				if #self.searchInput.Text >= 3 then
-					local upperSearch = string.upper(self.searchInput.Text)
-					for _, templateName in ipairs(self.sortedTemplateNames) do
-						if string.find(string.upper(templateName), upperSearch) then
-							self:DisplayResult(templateName, self.resultsGroup)
-						end
-					end
-				elseif #self.searchInput.Text == 0 then
-					for _, templateName in ipairs(self.sortedTemplateNames) do
+					upperSearch = string.upper(self.searchInput.Text)
+				end
+
+				for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
+					if not upperSearch or string.find(string.upper(templateName), upperSearch) then
 						self:DisplayResult(templateName, self.resultsGroup)
 					end
 				end
@@ -118,15 +197,15 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.getAllForModCombo = self.window:AddCombo("")
 		self.getAllForModCombo.WidthFitPreview = true
 		local modOpts = {}
-		for modId, _ in pairs(self.templateNamesByModId) do
-			table.insert(modOpts, Ext.Mod.GetMod(modId).Info.Name)
+		for modName, _ in TableUtils:OrderedPairs(self.itemIndex.mods) do
+			table.insert(modOpts, modName)
 		end
 		table.sort(modOpts)
 		self.getAllForModCombo.Options = modOpts
 		self.getAllForModCombo.OnChange = function()
 			Helpers:KillChildren(self.resultsGroup)
 			-- \[[[^_^]]]/
-			for _, templateName in ipairs(self.templateNamesByModId[self.modIdByModName[self.getAllForModCombo.Options[self.getAllForModCombo.SelectedIndex + 1]]]) do
+			for _, templateName in ipairs(self.itemIndex.modIdAndTemplateName[self.itemIndex.mods[self.getAllForModCombo.Options[self.getAllForModCombo.SelectedIndex + 1]]]) do
 				self:DisplayResult(templateName, self.resultsGroup)
 			end
 		end
@@ -154,7 +233,7 @@ end
 function PickerBaseClass:RebuildDisplay()
 	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
 
-	for _, templateName in pairs(self.sortedTemplateNames) do
+	for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
 		self:DisplayResult(templateName, self.favoritesGroup)
 	end
 
@@ -163,7 +242,7 @@ function PickerBaseClass:RebuildDisplay()
 	elseif self.getAllForModCombo.SelectedIndex > -1 then
 		self.getAllForModCombo.OnChange()
 	else
-		for _, templateName in pairs(self.sortedTemplateNames) do
+		for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
 			if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
 				self:DisplayResult(templateName, self.resultsGroup)
 			end

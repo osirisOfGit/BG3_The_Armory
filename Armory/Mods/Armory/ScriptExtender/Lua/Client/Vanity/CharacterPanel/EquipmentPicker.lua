@@ -11,44 +11,6 @@ EquipmentPicker = PickerBaseClass:new("Equipment", {
 	vanityOutfitSlot = nil
 })
 
-function EquipmentPicker:InitializeSearchBank()
-	for templateName, template in pairs(Ext.ClientTemplate.GetAllRootTemplates()) do
-		---@cast template ItemTemplate
-		if template.TemplateType == "item" then
-			---@type Weapon|Armor|Object
-			local stat = Ext.Stats.Get(template.Stats)
-
-			local success, error = pcall(function()
-				local name = template.DisplayName:Get() or templateName
-				if stat
-					and (stat.ModifierList == "Weapon" or stat.ModifierList == "Armor")
-					and not self.rootsByName[name]
-				then
-					table.insert(self.sortedTemplateNames, name)
-					self.rootsByName[name] = template
-
-					if stat.ModId ~= "" then
-						if not self.templateNamesByModId[stat.ModId] then
-							self.modIdByModName[Ext.Mod.GetMod(stat.ModId).Info.Name] = stat.ModId
-							self.templateNamesByModId[stat.ModId] = {}
-						end
-						table.insert(self.templateNamesByModId[stat.ModId], name)
-					end
-				end
-			end)
-			if not success then
-				Logger:BasicWarning("Couldn't load item %s with stat %s (from Mod '%s') into the table due to %s",
-					template.Name,
-					stat.Name,
-					stat.ModId ~= "" and Ext.Mod.GetMod(stat.ModId).Info.Name or "Unknown",
-					error)
-			end
-		end
-	end
-
-	table.sort(self.sortedTemplateNames)
-end
-
 ---@param slot ActualSlot
 ---@param weaponType ActualWeaponType?
 ---@param outfitSlot VanityOutfitSlot
@@ -88,15 +50,18 @@ local equivalentSlots = {
 ---@param templateName string
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
 function EquipmentPicker:DisplayResult(templateName, displayGroup)
-	local itemTemplate = self.rootsByName[templateName]
+	local itemTemplateId = self.itemIndex.templateNameAndId[templateName]
+	
+	---@type ItemTemplate
+	local itemTemplate = Ext.Template.GetRootTemplate(itemTemplateId)
 
-	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, self.rootsByName[templateName].Id)
+	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, itemTemplateId)
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return
 	end
 
 	---@type Armor|Weapon|Object
-	local itemStat = Ext.Stats.Get(itemTemplate.Stats)
+	local itemStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplateId])
 
 	-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
 	local matchesSlot = itemStat.Slot == self.slot
@@ -205,5 +170,5 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 		itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
 	end
 
-	Helpers:BuildTooltip(icon:Tooltip(), itemTemplate.DisplayName:Get() or itemTemplate.Name, Ext.Stats.Get(itemTemplate.Stats))
+	Helpers:BuildTooltip(icon:Tooltip(), itemTemplate.DisplayName:Get() or itemTemplate.Name, itemStat)
 end
