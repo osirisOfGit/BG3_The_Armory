@@ -110,6 +110,7 @@ function Transmogger:MogCharacter(character)
 	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
 	if not outfit then
 		Logger:BasicDebug("No active outfit found for %s, skipping transmog", character.Uuid.EntityUuid)
+		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
 		return
 	end
 

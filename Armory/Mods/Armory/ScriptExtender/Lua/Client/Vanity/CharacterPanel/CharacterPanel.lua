@@ -95,7 +95,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	else
 		Helpers:KillChildren(panelGroup)
 	end
-	
+
 	if not preset then
 		return
 	end
@@ -226,8 +226,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					end
 				end
 
-				local makeResetButton = false
-
 				--#region Equipment
 				if outfitSlotEntry and outfitSlotEntry.equipment then
 					---@type ItemTemplate
@@ -241,7 +239,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					imageButton.UserData = itemTemplate
 
 					Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
-					makeResetButton = true
 				else
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 					if weaponType then
@@ -267,6 +264,31 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 							BuildSlots(parentContainer, group, verticalSlots, slot)
 						end)
 				end
+
+				if imageButton.UserData then
+					local customizePopup = parentContainer:AddPopup("CustomizePopup")
+					local oldFunc = imageButton.OnClick
+					imageButton.OnClick = function()
+						Helpers:KillChildren(customizePopup)
+						customizePopup:AddSelectable("Edit").OnActivate = oldFunc
+						customizePopup:AddSelectable("Clear").OnActivate = function()
+							preset.Outfits[criteriaCompositeKey][itemSlot].equipment.delete = true
+							if not preset.Outfits[criteriaCompositeKey][itemSlot]() then
+								preset.Outfits[criteriaCompositeKey][itemSlot].delete = true
+							end
+							if not preset.Outfits[criteriaCompositeKey]() then
+								preset.Outfits[criteriaCompositeKey].delete = true
+							end
+
+							Ext.Timer.WaitFor(350, function()
+								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+							end)
+							BuildSlots(parentContainer, group, verticalSlots, slot)
+						end
+
+						customizePopup:Open()
+					end
+				end
 				--#endregion
 
 				--#region Dyes
@@ -278,7 +300,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
 					dyeButton.UserData = dyeTemplate
 					Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
-					makeResetButton = true
 				else
 					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 				end
@@ -300,25 +321,32 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 							BuildSlots(parentContainer, group, verticalSlots, slot)
 						end)
 				end
-				--#endregion
 
-				if makeResetButton then
-					local resetButton = parentContainer:AddImageButton("reset" .. itemSlot, "ico_reset_d", { 32, 32 })
-					resetButton.SameLine = true
-					resetButton.OnClick = function()
-						outfit[itemSlot].delete = true
-						Ext.Timer.WaitFor(350, function()
-							Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-						end)
+				if dyeButton.UserData then
+					local customizePopup = parentContainer:AddPopup("CustomizePopup")
+					local oldFunc = dyeButton.OnClick
+					dyeButton.OnClick = function()
+						Helpers:KillChildren(customizePopup)
+						customizePopup:AddSelectable("Edit").OnActivate = oldFunc
+						customizePopup:AddSelectable("Clear").OnActivate = function()
+							preset.Outfits[criteriaCompositeKey][itemSlot].dye.delete = true
+							if not preset.Outfits[criteriaCompositeKey][itemSlot]() then
+								preset.Outfits[criteriaCompositeKey][itemSlot].delete = true
+							end
+							if not preset.Outfits[criteriaCompositeKey]() then
+								preset.Outfits[criteriaCompositeKey].delete = true
+							end
 
-						if not outfit() then
-							outfit.delete = true
+							Ext.Timer.WaitFor(350, function()
+								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+							end)
+							BuildSlots(parentContainer, group, verticalSlots, slot)
 						end
-						BuildSlots(parentContainer, group, verticalSlots, slot)
+
+						customizePopup:Open()
 					end
-				else
-					parentContainer:AddDummy(40, 40).SameLine = true
 				end
+				--#endregion
 			end
 
 			imageButton.SameLine = not verticalSlots and i % 2 == 0
