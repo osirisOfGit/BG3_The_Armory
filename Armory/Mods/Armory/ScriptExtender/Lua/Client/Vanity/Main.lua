@@ -21,11 +21,6 @@ Ext.Require("Client/Vanity/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 
 Vanity = {}
-Vanity.userName = ""
-
-Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, userID)
-	Vanity.username = payload
-end)
 
 ---@type ExtuiTreeParent
 local mainParent
@@ -94,8 +89,6 @@ Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
 				Vanity:ActivatePreset(activePresetUUID, true)
 			end
-
-			Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
 		end
 	end
 end)

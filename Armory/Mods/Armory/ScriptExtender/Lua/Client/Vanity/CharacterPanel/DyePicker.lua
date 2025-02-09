@@ -38,60 +38,59 @@ function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 	self.onSelectFunc = onSelectFunc
 end
 
----@param templateName string
+---@param dyeTemplateId string
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
-function DyePicker:DisplayResult(templateName, displayGroup)
-	if TableUtils:ListContains(self.blacklistedItems, templateName) then
+function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
+	if TableUtils:ListContains(self.blacklistedItems, dyeTemplateId) then
 		return
 	end
 
-	local dyeTemplateId = self.itemIndex.templateNameAndId[templateName]
 	---@type ItemTemplate
 	local dyeTemplate = Ext.Template.GetRootTemplate(dyeTemplateId)
-	
+
 	local isFavorited, favoriteIndex = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
-	
+
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return
 	end
-	
+
 	---@type ResourceMaterialPresetResource
 	local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 	if not materialPreset then
 		---@type Object
 		local dyeStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[dyeTemplateId])
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId).Info
-		
-		table.insert(self.blacklistedItems, templateName)
+
+		table.insert(self.blacklistedItems, dyeTemplateId)
 		Logger:BasicWarning("Dye %s from Mod %s by %s does not have a materialPreset?", dyeTemplate.DisplayName:Get() or dyeTemplate.Name, modInfo.Name, modInfo.Author)
 		return
 	end
 
-	local favoriteButton = displayGroup:AddImageButton("Favorite" .. templateName, isFavorited and "star_fileld" or "star_empty", { 26, 26 })
+	local favoriteButton = displayGroup:AddImageButton("Favorite" .. dyeTemplateId, isFavorited and "star_fileld" or "star_empty", { 26, 26 })
 	favoriteButton.Background = { 0, 0, 0, 0.5 }
 	favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
 
-	local dyeImageButton = displayGroup:AddImageButton(templateName, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize })
+	local dyeImageButton = displayGroup:AddImageButton(dyeTemplateId, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize })
 	dyeImageButton.UserData = materialPreset.Guid
 	dyeImageButton.SameLine = true
 	dyeImageButton.Background = { 0, 0, 0, 0.5 }
 
 	if self.settings.showNames then
-		displayGroup:AddText(templateName).SameLine = true
+		displayGroup:AddText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name).SameLine = true
 	end
 
 	dyeImageButton.OnClick = function()
 		if self.activeDyeGroup then
 			self.activeDyeGroup:Destroy()
 		end
-		local dyeInfoGroup = self.infoCell:AddGroup(templateName .. self.slot .. "dye")
+		local dyeInfoGroup = self.infoCell:AddGroup(dyeTemplateId .. dyeTemplate.Stats .. self.slot .. "dye")
 		self.activeDyeGroup = dyeInfoGroup
 
 		---@type Object
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
 
-		dyeInfoGroup:AddSeparatorText(templateName)
+		dyeInfoGroup:AddSeparatorText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name)
 		dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian"))
 			:SetColor("Text", { 1, 1, 1, 0.5 })
 
@@ -116,7 +115,7 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 
 		dyeInfoGroup:AddText("Values are not editable"):SetStyle("Alpha", 0.65)
 
-		local dyeTable = dyeInfoGroup:AddTable(templateName, 2)
+		local dyeTable = dyeInfoGroup:AddTable(dyeTemplateId, 2)
 		dyeTable.SizingStretchProp = true
 
 		for _, colorSetting in pairs(materialColorParams) do

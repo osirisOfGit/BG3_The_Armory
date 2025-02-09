@@ -47,11 +47,9 @@ local equivalentSlots = {
 	["Boots"] = "VanityBoots"
 }
 
----@param templateName string
+---@param itemTemplateId string
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
-function EquipmentPicker:DisplayResult(templateName, displayGroup)
-	local itemTemplateId = self.itemIndex.templateNameAndId[templateName]
-	
+function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 	---@type ItemTemplate
 	local itemTemplate = Ext.Template.GetRootTemplate(itemTemplateId)
 
@@ -99,7 +97,7 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 	end
 
 	local numChildren = #displayGroup.Children
-	local itemGroup = displayGroup:AddChildWindow(itemTemplate.Id .. displayGroup.Label)
+	local itemGroup = displayGroup:AddChildWindow(itemTemplate.Id .. itemStat.Name .. displayGroup.Label)
 	itemGroup.NoSavedSettings = true
 	itemGroup.Size = { self.settings.imageSize + 40, self.settings.imageSize + (self.settings.showNames and 100 or 10) }
 	itemGroup.SameLine = numChildren > 0 and (numChildren % self.settings.rowSize) > 0
@@ -108,13 +106,13 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 	local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { self.settings.imageSize, self.settings.imageSize })
 	if icon.Image.Icon == "" then
 		icon:Destroy()
-		icon = itemGroup:AddImageButton(itemTemplate.Name, "Item_Unknown", { self.settings.imageSize, self.settings.imageSize })
+		icon = itemGroup:AddImageButton(itemTemplate.Name .. itemStat.Name, "Item_Unknown", { self.settings.imageSize, self.settings.imageSize })
 	end
 	icon.Background = { 0, 0, 0, 0.5 }
 
-	local favoriteButtonAnchor = itemGroup:AddGroup("favoriteAnchor" .. itemTemplate.Id)
+	local favoriteButtonAnchor = itemGroup:AddGroup("favoriteAnchor" .. itemTemplate.Id .. itemStat.Name)
 	favoriteButtonAnchor.SameLine = true
-	local favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id,
+	local favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id .. itemStat.Name,
 		-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
 		isFavorited and "star_fileld" or "star_empty",
 		{ 26, 26 })
@@ -128,7 +126,7 @@ function EquipmentPicker:DisplayResult(templateName, displayGroup)
 			table.insert(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteButton.UserData)
 			local func = favoriteButton.OnClick
 			favoriteButton:Destroy()
-			favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id, "star_fileld", { 26, 26 })
+			favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id .. itemStat.Name, "star_fileld", { 26, 26 })
 			favoriteButton.UserData = itemTemplate.Id
 			favoriteButton.OnClick = func
 			favoriteButton.SameLine = true
