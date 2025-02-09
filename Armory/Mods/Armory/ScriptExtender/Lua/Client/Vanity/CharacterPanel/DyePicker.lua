@@ -48,20 +48,20 @@ function DyePicker:DisplayResult(templateName, displayGroup)
 	local dyeTemplateId = self.itemIndex.templateNameAndId[templateName]
 	---@type ItemTemplate
 	local dyeTemplate = Ext.Template.GetRootTemplate(dyeTemplateId)
-	
+
 	local isFavorited, favoriteIndex = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
-	
+
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return
 	end
-	
+
 	---@type ResourceMaterialPresetResource
 	local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 	if not materialPreset then
 		---@type Object
 		local dyeStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[dyeTemplateId])
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId).Info
-		
+
 		table.insert(self.blacklistedItems, templateName)
 		Logger:BasicWarning("Dye %s from Mod %s by %s does not have a materialPreset?", dyeTemplate.DisplayName:Get() or dyeTemplate.Name, modInfo.Name, modInfo.Author)
 		return

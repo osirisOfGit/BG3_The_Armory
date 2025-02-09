@@ -87,15 +87,16 @@ Transmogger = {}
 local function buildMetaInfoForLog(entity)
 	---@type Weapon|Armor|Object
 	local stat = Ext.Stats.Get(entity.Data.StatsId)
-
+	local modInfo = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info or nil
 	return Ext.Json.Stringify({
 		uuid = entity.ServerItem.Template.Name .. "_" .. entity.Uuid.EntityUuid,
 		templateUuid = entity.ServerItem.Template.Name .. "_" .. entity.ServerItem.Template.Id,
 		displayName = entity.DisplayName.Name:Get(),
 		statName = stat.Name,
 		modId = stat.ModId,
-		modName = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info.Name,
-		modAuthor = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info.Author
+		modName = modInfo and modInfo.Name,
+		modAuthor = modInfo and modInfo.Author,
+		modVersion = modInfo and table.concat(modInfo.ModVersion, ".")
 	})
 end
 

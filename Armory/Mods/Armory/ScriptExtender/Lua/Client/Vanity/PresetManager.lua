@@ -1,4 +1,11 @@
+Ext.Require("Client/_FormBuilder.lua")
+
 VanityPresetManager = {}
+VanityPresetManager.userName = ""
+
+Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, userID)
+	VanityPresetManager.username = payload
+end)
 
 ---@type ExtuiWindow
 local presetWindow
@@ -21,6 +28,7 @@ function VanityPresetManager:OpenManager()
 		presetWindow:SetFocus()
 		VanityPresetManager:UpdatePresetView()
 	elseif not presetWindow then
+		Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
 		presetWindow = Ext.IMGUI.NewWindow("Vanity Preset Manager")
 		presetWindow.Closeable = true
 
@@ -29,72 +37,41 @@ function VanityPresetManager:OpenManager()
 		local presetForm = presetWindow:AddGroup("NewPresetForm")
 		presetForm.Visible = false
 
-		local function generateFormInput(fieldId, defaultValue)
-			presetForm:AddText(fieldId)
-			local input = presetForm:AddInputText("", defaultValue)
-
-			local authorError = presetForm:AddText("This is a required field and must be provided")
-			authorError:SetColor("Text", { 1, 0.02, 0, 1 })
-			authorError.Visible = false
-
-			input.OnChange = function()
-				authorError.Visible = false
-			end
-
-			return input, authorError
-		end
-
-		local authorInput, authorError = generateFormInput("Author", Vanity.username)
-		local nameInput, nameError = generateFormInput("Name")
-		local versionInput, versionError = generateFormInput("Version")
-
-		presetForm:AddText("Does this contain outfits that have skimpy/nude clothing?")
-		local sfwCheckbox = presetForm:AddCheckbox("", true)
-
-		local inputErrorTable = {
-			[authorInput] = authorError,
-			[nameInput] = nameError,
-			[versionInput] = versionError
-		}
-
-		local function generateGUID()
-			local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
-			local guid = string.gsub(template, '[xy]', function(c)
-				local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
-				return string.format('%x', v)
-			end)
-			return guid
-		end
-
-		local newPresetSubmit = presetForm:AddButton("Submit")
-		newPresetSubmit.OnClick = function()
-			local hasErrors = false
-			for input, errorText in pairs(inputErrorTable) do
-				-- If it's empty
-				if input.Text:match("^%s*$") then
-					errorText.Visible = true
-					hasErrors = true
-				end
-			end
-			if hasErrors then
-				return
-			end
-
-			local presetID = generateGUID()
-			ConfigurationStructure.config.vanity.presets[presetID] = {
-				Author = authorInput.Text,
-				Name = nameInput.Text,
-				Version = versionInput.Text,
-				NSFW = sfwCheckbox.Checked,
-				ModDependencies = {},
-				Outfits = {}
-			}
-
-			presetForm.Visible = false
-			VanityPresetManager:UpdatePresetView(presetID)
-		end
-
 		createNewPresetButton.OnClick = function()
+			FormBuilder:CreateForm(presetForm, function(values)
+				local presetID = FormBuilder:generateGUID()
+
+				values.ModDependencies = {}
+				values.Outfits = {}
+
+				ConfigurationStructure.config.vanity.presets[presetID] = values
+
+				presetForm.Visible = false
+				VanityPresetManager:UpdatePresetView(presetID)
+			end,
+			{
+				label = "Author",
+				defaultValue = VanityPresetManager.username,
+				type = "Text",
+				errorMessageIfEmpty = "This is a required field",
+			},
+			{
+				label = "Name",
+				type = "Text",
+				errorMessageIfEmpty = "This is a required field",
+			},
+			{
+				label = "Version",
+				defaultValue = "1.0.0",
+				type = "Text",
+				errorMessageIfEmpty = "This is a required field",
+			},
+			{
+				label = "NSFW",
+				defaultValue = true,
+				type = "Checkbox",
+			}
+		)
 			presetForm.Visible = not presetForm.Visible
 		end
 		--#endregion

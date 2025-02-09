@@ -40,7 +40,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 		return
 	end
 
-	Logger:BasicDebug("%s started previewing %s", character, userPreview.previewItem)
+	Logger:BasicDebug("%s started previewing %s", character, templateUUID)
 
 	local slot = Ext.Stats.Get(stat).Slot
 	userPreview.equippedItem = Osi.GetEquippedItem(character, slot)
