@@ -777,7 +777,7 @@ Osi = {}
 --- @alias ActionDataType string|"Book"|"Combine"|"Constrain"|"Consume"|"CreatePuddle"|"CreateSurface"|"Destroy"|"DestroyParameters"|"DisarmTrap"|"Door"|"Equip"|"Insert"|"Ladder"|"LearnSpell"|"Lie"|"Lockpick"|"OpenClose"|"PlaySound"|"Recipe"|"ShowStoryElementUI"|"Sit"|"SpawnCharacter"|"SpellBook"|"Stand"|"StoryUse"|"StoryUseInInventory"|"Teleport"|"Throw"|"Unknown"|"Unknown31"|"Unknown34"|"Unknown35"|"UseSpell"
 --- @alias AdvantageBoostType string|"Advantage"|"Disadvantage"
 --- @alias AdvantageContext string|"Ability"|"AllAbilities"|"AllSavingThrows"|"AllSkills"|"AttackRoll"|"AttackTarget"|"Concentration"|"DeathSavingThrow"|"SavingThrow"|"Skill"|"SourceDialogue"
---- @alias AiBaseFlags string|"CanClimbOn"|"CloudSurfaceBlock"|"Door"|"DoorItemBlock"|"GroundSurfaceBlock"|"Indestructible"|"Portal"|"PortalTarget"|"ShootBlock"|"ShootBlockCharacter"|"ShootBlockItem"|"SubgridEdge"|"Trap"|"UnknownBlock1"|"UnknownBlock2"|"UnknownBlock3"|"UnknownBlock4"|"UnknownBlock5"|"WalkBlock"|"WalkBlock2"|"WalkBlockCharacter"|"WalkBlockItem"
+--- @alias AiBaseFlags string|"Blocker"|"CanClimbOn"|"CloudSurfaceBlock"|"Door"|"DoorItemBlock"|"GroundSurfaceBlock"|"Indestructible"|"Portal"|"PortalTarget"|"ShootBlock"|"ShootBlockCharacter"|"ShootBlockItem"|"SubgridEdge"|"Trap"|"UnknownBlock1"|"UnknownBlock2"|"UnknownBlock3"|"UnknownBlock4"|"UnknownBlock5"|"WalkBlock"|"WalkBlock2"|"WalkBlockCharacter"|"WalkBlockItem"
 --- @alias AnimationSetAnimationFlags string|"AlwaysIgnore"|"NoFallback"
 --- @alias AppliedMaterialFlags string|"Instantiated"|"IsOverlay"|"OverlayOriginalMapsSet"
 --- @alias ArmorType string|"BreastPlate"|"ChainMail"|"ChainShirt"|"Cloth"|"HalfPlate"|"Hide"|"Leather"|"None"|"Padded"|"Plate"|"RingMail"|"ScaleMail"|"Sentinel"|"Splint"|"StuddedLeather"
@@ -836,6 +836,7 @@ Osi = {}
 --- @alias GuiInputTextFlags string|"AllowTabInput"|"AlwaysOverwrite"|"AutoSelectAll"|"CharsDecimal"|"CharsHexadecimal"|"CharsNoBlank"|"CharsScientific"|"CharsUppercase"|"CtrlEnterForNewLine"|"DisplayEmptyRefVal"|"EnterReturnsTrue"|"EscapeClearsAll"|"Multiline"|"NoHorizontalScroll"|"NoUndoRedo"|"ParseEmptyRefVal"|"Password"|"ReadOnly"
 --- @alias GuiItemFlags string|"AllowItemOverlap"|"Disabled"|"ItemReadOnly"|"NoItemNav"|"NoNavDefaultFocus"|"NoTabStop"|"NoWindowHoverableCheck"
 --- @alias GuiItemStatusFlags string|"Active"|"Deactivated"|"Edited"|"Focused"|"HasClipRect"|"HasDeactivated"|"HasDisplayRect"|"HasShortcut"|"HoveredRect"|"HoveredWindow"|"ToggledOpen"|"ToggledSelection"|"Visible"
+--- @alias GuiMeasureScaling string|"Absolute"|"Scaled"
 --- @alias GuiPopupFlags string|"AnyPopupId"|"AnyPopupLevel"|"MouseButtonMiddle"|"MouseButtonRight"|"NoOpenOverExistingPopup"|"NoOpenOverItems"|"NoReopen"
 --- @alias GuiSelectableFlags string|"AllowDoubleClick"|"AllowOverlap"|"DontClosePopups"|"SelectableDisabled"|"SpanAllColumns"
 --- @alias GuiSliderFlags string|"AlwaysClamp"|"Logarithmic"|"NoInput"|"NoRoundToFormat"|"WrapAround"
@@ -876,6 +877,9 @@ Osi = {}
 --- @alias OsiFunctionType string|"Call"|"DB"|"Event"|"Proc"|"Query"
 --- @alias OsirisTaskType string|"Appear"|"AutomatedDialog"|"Combine"|"Disappear"|"Drop"|"FleeFromEntity"|"FleeFromGrid"|"FleeFromRelation"|"FollowNPC"|"FollowOwnerOrLeader"|"LookAt"|"MoveInRange"|"MoveItem"|"MoveToAndTalk"|"MoveToLocation"|"MoveToObject"|"PickupItem"|"PlayAnimation"|"RateLimitedAutomatedDialog"|"Resurrect"|"Steer"|"TeleportToLocation"|"Timer"|"UseItem"|"UseSpell"|"Wander"
 --- @alias PathRootType string|"Bin"|"Bin2"|"Data"|"Debug"|"EngineMod"|"GameMod"|"LocalAppData"|"Localization"|"Mods"|"Projects"|"Public"|"Public2"|"Root"|"Scripts"|"UserProfile"|"WorkingDir"
+--- @alias PhysicsExtraFlags string|"BlockAoEDamage"|"ShootThroughType0"|"ShootThroughType1"|"ShootThroughType2"|"ShootThroughType3"|"ShootThroughType4"|"ShootThroughType5"
+--- @alias PhysicsGroupFlags string|"AttackableWhenClickThrough"|"CanClickThrough"|"CanClimbOn"|"CanSeeThrough"|"CanSeeThrough2"|"CanShineThrough"|"CanShootThrough"|"CanWalkOn"|"Character"|"ClimbableTileConstruction"|"Dead"|"DisableBoundCollision"|"Fadeable"|"Falling"|"Group01"|"Group02"|"Group04"|"Group08"|"Group100"|"Group10000000"|"Group40"|"Group80"|"Group80000"|"IsDecorative"|"Item"|"PlatformOwner"|"PointerBlocker"|"Scenery"|"Terrain"|"TimelinePreview"|"VisibleItem"|"Wadable"
+--- @alias PhysicsType string|"Dynamic"|"Static"
 --- @alias ProficiencyBonusBoostType string|"Ability"|"AllAbilities"|"AllSavingThrows"|"AllSkills"|"AttackRoll"|"AttackTarget"|"SavingThrow"|"Skill"|"SourceDialogue"|"WeaponActionDC"
 --- @alias ProficiencyGroupFlags string|"Battleaxes"|"Clubs"|"Daggers"|"Darts"|"Flails"|"Glaives"|"Greataxes"|"Greatclubs"|"Greatswords"|"Halberds"|"HandCrossbows"|"Handaxes"|"HeavyArmor"|"HeavyCrossbows"|"Javelins"|"LightArmor"|"LightCrossbows"|"LightHammers"|"Longbows"|"Longswords"|"Maces"|"MartialWeapons"|"Mauls"|"MediumArmor"|"Morningstars"|"MusicalInstrument"|"Pikes"|"Quarterstaffs"|"Rapiers"|"Scimitars"|"Shields"|"Shortbows"|"Shortswords"|"Sickles"|"SimpleWeapons"|"Slings"|"Spears"|"Tridents"|"Warhammers"|"Warpicks"
 --- @alias ProjectileTypeIds string|"Magical"|"Physical"
@@ -1178,6 +1182,10 @@ Osi = {}
 --- @field Priority int32
 
 
+--- @class AiFlags
+--- @field Flags uint64
+
+
 --- @class AiFullTile
 --- @field AoOCost int32
 --- @field CollidingCount int32
@@ -1265,7 +1273,7 @@ Osi = {}
 
 
 --- @class AiGridLayerDelta
---- @field AiFlags uint64
+--- @field Flags AiFlags
 --- @field Height number
 
 
@@ -1296,7 +1304,7 @@ Osi = {}
 
 
 --- @class AiGridTile
---- @field AiFlags uint64
+--- @field Flags AiFlags
 --- @field MaxHeight uint16
 --- @field MetaDataIndex uint16
 --- @field MinHeight uint16
@@ -1311,9 +1319,9 @@ Osi = {}
 
 
 --- @class AiIgnoreMask
---- @field AggregateFlags uint64
---- @field AiFlags uint64[]
+--- @field AggregateFlags AiFlags
 --- @field AiGrid AiGrid
+--- @field Flags AiFlags[]
 --- @field NextId uint64
 --- @field Restore boolean
 
@@ -1349,9 +1357,9 @@ Osi = {}
 --- @field CloseEnoughMax number
 --- @field CloseEnoughMin number
 --- @field CloseEnoughPreference number
---- @field CollisionMask uint64
---- @field CollisionMaskMove uint64
---- @field CollisionMaskStand uint64
+--- @field CollisionMask AiFlags
+--- @field CollisionMaskMove AiFlags
+--- @field CollisionMaskStand AiFlags
 --- @field CoverFlags uint16
 --- @field DangerousAuras DangerousAuras
 --- @field ErrorCause uint32
@@ -1412,6 +1420,7 @@ Osi = {}
 --- @field field_29C number
 --- @field field_2A3 uint8
 --- @field field_90 int32
+--- @field UsePlayerWeighting fun(self:AiPath, a1:boolean?, a2:boolean?)
 
 
 --- @class AiPathAoOPosition
@@ -2151,6 +2160,14 @@ Osi = {}
 --- @field StatusDuration int32
 
 
+--- @class CoverageSettings
+--- @field EndHeight number
+--- @field HorizonDistance number
+--- @field Offset vec2
+--- @field StartHeight number
+--- @field TexResourceGUID FixedString
+
+
 --- @class CreatePuddleActionData:IActionData
 --- @field ApplyDeathTypeBloodCheck boolean
 --- @field CellsAtGrow int32
@@ -2377,6 +2394,33 @@ Osi = {}
 --- @field field_44 int32
 
 
+--- @class DirLight
+--- @field CascadeCount uint8
+--- @field CascadeSpeed number
+--- @field ColorAdjustedForIntensity vec3
+--- @field ColorTemperatureAdjustment vec3
+--- @field CoverageSettings CoverageSettings
+--- @field Kelvin number
+--- @field LightDistance number
+--- @field LightSize number
+--- @field LocalCoverageEnabled boolean
+--- @field LocalCoverageScalar number
+--- @field Pitch number
+--- @field RotationAsVec3 vec3
+--- @field ScatteringIntensityScale number
+--- @field ShadowBias number
+--- @field ShadowEnabled boolean
+--- @field ShadowFade number
+--- @field ShadowFarPlane number
+--- @field ShadowNearPlane number
+--- @field ShadowObscurity uint8
+--- @field SunColor vec3
+--- @field SunIntensity number
+--- @field SunlightObscurity uint8
+--- @field UseTemperature boolean
+--- @field Yaw number
+
+
 --- @class DisabledEquipmentComponent:BaseComponent
 --- @field ShapeshiftFlag boolean
 
@@ -2587,6 +2631,26 @@ Osi = {}
 --- @class FloatingComponent:BaseComponent
 --- @field field_18 int32
 --- @field field_1C int32
+
+
+--- @class Fog
+--- @field FogLayer0 FogLayer
+--- @field FogLayer1 FogLayer
+--- @field Phase number
+--- @field RenderDistance number
+
+
+--- @class FogLayer
+--- @field Albedo vec3
+--- @field Density0 number
+--- @field Density1 number
+--- @field Enabled boolean
+--- @field Height0 number
+--- @field Height1 number
+--- @field NoiseCoverage number
+--- @field NoiseFrequency vec3
+--- @field NoiseRotation vec3
+--- @field NoiseWind vec3
 
 
 --- @class GameObjectTemplate
@@ -3234,6 +3298,20 @@ Osi = {}
 --- @field Heal number
 
 
+--- @class Lighting
+--- @field Fog Fog
+--- @field LinearClearColor vec3
+--- @field LinearClearColorOverride boolean
+--- @field Moon MoonLight
+--- @field ParentGUID FixedString
+--- @field SSAOSettings SSAOSettings
+--- @field SkyLight SkyLight
+--- @field Sun DirLight
+--- @field TimelineFog Fog
+--- @field TimelineFogOverride boolean
+--- @field VolumetricCloudSettings VolumetricCloudSettings
+
+
 --- @class LocalTransform
 --- @field LocalBound AABound
 --- @field LocalTransform Transform
@@ -3508,6 +3586,30 @@ Osi = {}
 
 --- @class MonkWeaponDamageDiceOverrideBoostComponent:BaseComponent
 --- @field DamageDice FixedString
+
+
+--- @class MoonLight
+--- @field AlbedoTexResourceGUID FixedString
+--- @field CastLightEnabled boolean
+--- @field Color vec3
+--- @field ColorAdjustedForIntensity vec3
+--- @field ColorTemperatureAdjustment vec3
+--- @field Distance number
+--- @field Earthshine number
+--- @field Enabled boolean
+--- @field Intensity number
+--- @field Kelvin number
+--- @field MoonGlare number
+--- @field NormalTexResourceGUID FixedString
+--- @field Pitch number
+--- @field Radius number
+--- @field RotationAsVec3 vec3
+--- @field TearsAlbedoTexResourceGUID FixedString
+--- @field TearsNormalTexResourceGUID FixedString
+--- @field TearsRotate number
+--- @field TearsScale number
+--- @field UseTemperature boolean
+--- @field Yaw number
 
 
 --- @class MoveableObject
@@ -3850,12 +3952,13 @@ Osi = {}
 
 
 --- @class PhysicsComponent:BaseComponent
---- @field field_10 int32
+--- @field CollidesWith uint32
+--- @field ExtraFlags uint32
+--- @field Physics PhxPhysicsObject
+--- @field PhysicsGroup uint32
 --- @field field_14 uint8
 --- @field field_15 uint8
 --- @field field_16 uint8
---- @field field_8 int32
---- @field field_C int32
 
 
 --- @class PickingStateComponent:BaseComponent
@@ -4158,6 +4261,14 @@ Osi = {}
 --- @field Version uint16
 
 
+--- @class SSAOSettings
+--- @field Bias number
+--- @field DirectLightInfluence number
+--- @field Enabled boolean
+--- @field Intensity number
+--- @field Radius number
+
+
 --- @class SavantBoostComponent:BaseComponent
 --- @field SpellSchool SpellSchoolId
 
@@ -4245,6 +4356,32 @@ Osi = {}
 --- @field Skill SkillId
 
 
+--- @class SkyLight
+--- @field CirrusCloudsAmount number
+--- @field CirrusCloudsColor vec3
+--- @field CirrusCloudsEnabled boolean
+--- @field CirrusCloudsIntensity number
+--- @field Color vec3
+--- @field ColorAdjustedForIntensity vec3
+--- @field ColorTemperatureAdjustment vec3
+--- @field Intensity number
+--- @field Kelvin number
+--- @field PhysicalModel int32
+--- @field ProcStarsAmount number
+--- @field ProcStarsEnabled boolean
+--- @field ProcStarsIntensity number
+--- @field ProcStarsSaturation vec2
+--- @field ProcStarsShimmer number
+--- @field RotateSkydomeEnabled boolean
+--- @field ScatteringEnabled boolean
+--- @field ScatteringIntensity number
+--- @field ScatteringSunColor vec3
+--- @field ScatteringSunIntensity number
+--- @field SkydomeEnabled boolean
+--- @field SkydomeTex FixedString
+--- @field UseTemperature boolean
+
+
 --- @class SomeArray2int
 --- @field A int32
 --- @field B int32
@@ -4316,6 +4453,7 @@ Osi = {}
 
 
 --- @class StaticPhysicsComponent:BaseComponent
+--- @field Physics PhxPhysicsObject
 
 
 --- @class StatsComponent:BaseComponent
@@ -4894,6 +5032,36 @@ Osi = {}
 --- @field Tags Guid[]
 
 
+--- @class VolumetricCloudSettings
+--- @field AmbientLightFactor number
+--- @field BackwardScatteringG number
+--- @field BaseColor vec3
+--- @field BottomFade number
+--- @field ConeRadius number
+--- @field CoverageEndDistance number
+--- @field CoverageSettings CoverageSettings
+--- @field CoverageStartDistance number
+--- @field CoverageWindSpeed number
+--- @field DarkOutline number
+--- @field Density number
+--- @field DetailScale number
+--- @field Distortion number
+--- @field DistortionScale number
+--- @field Enabled boolean
+--- @field ErosionEdgeSize number
+--- @field ForwardScatteringG number
+--- @field HorizonFade number
+--- @field Intensity number
+--- @field LODDistance number
+--- @field RainCoverageMaxInfluence number
+--- @field SampleScalar number
+--- @field SampleThreshold number
+--- @field ShadowFactor number
+--- @field SunLightFactor number
+--- @field SunRayLength number
+--- @field TopColor vec3
+
+
 --- @class WeaponAttackRollAbilityOverrideBoostComponent:BaseComponent
 --- @field Ability AbilityId
 
@@ -5222,8 +5390,6 @@ Osi = {}
 
 --- @class AspkDeflectorComponent:AspkFxBaseComponent
 --- @field Normal vec3
---- @field PlaneVisual1 RenderableObject
---- @field PlaneVisual2 RenderableObject
 --- @field Position vec3
 --- @field PositionModifierXProperty AspkFloatProperty
 --- @field PositionModifierYProperty AspkFloatProperty
@@ -5318,7 +5484,6 @@ Osi = {}
 --- @field Normals AspkPackedUnitVector[]
 --- @field Positions vec3[]
 --- @field Rotations uint16[]
---- @field Scales vec3[]
 --- @field UnitAges number[]
 --- @field UpVectors AspkPackedUnitVector[]
 --- @field Velocities vec3[]
@@ -5477,7 +5642,6 @@ Osi = {}
 --- @field Active boolean
 --- @field AlphaChannel uint8
 --- @field AlphaProperty AspkFloatKeyFrameProperty
---- @field Animation FixedString
 --- @field AnimationSpeedProperty AspkFloatProperty
 --- @field Applied uint64
 --- @field ApplyMaps uint32
@@ -5491,7 +5655,6 @@ Osi = {}
 --- @field EffectEntity EntityHandle
 --- @field FadeTime number
 --- @field HasCustomVectors boolean
---- @field HasPreview boolean
 --- @field Material FixedString
 --- @field ModifierWProperty AspkFloatProperty
 --- @field ModifierXProperty AspkFloatProperty
@@ -5499,7 +5662,6 @@ Osi = {}
 --- @field ModifierZProperty AspkFloatProperty
 --- @field OverlayPriority int32
 --- @field OverlayType uint32
---- @field VisualEntity EntityHandle
 --- @field VisualPosition vec3
 --- @field field_150 uint8
 --- @field field_151 uint8
@@ -5695,6 +5857,7 @@ Osi = {}
 --- @field DynamicParameterModifierYProperty AspkFloatProperty
 --- @field DynamicParameterModifierZProperty AspkFloatProperty
 --- @field DynamicParameterValueProperty AspkFloatKeyFrameProperty
+--- @field DynamicParameterVec vec4
 --- @field DynamicParametersType uint32
 --- @field Effect RenderableObject
 --- @field EmissionBehavior uint32
@@ -5719,10 +5882,6 @@ Osi = {}
 --- @field Velocity vec3
 --- @field VisualEntity EntityHandle
 --- @field Visuals Visual
---- @field field_118 number
---- @field field_11C number
---- @field field_120 number
---- @field field_124 number
 --- @field field_160 number
 --- @field field_164 uint32
 --- @field field_1B8 number
@@ -8462,6 +8621,7 @@ Osi = {}
 --- @field Originator ActionOriginator
 --- @field SyncDataDirty boolean
 --- @field TransactionId int32
+--- @field Type ServerActionType
 --- @field field_16 uint8
 
 
@@ -8641,6 +8801,7 @@ Osi = {}
 --- @class EsvBehaviourState
 --- @field BehaviourMachine EsvBehaviourMachine
 --- @field TransactionId int32
+--- @field Type ServerBehaviourType
 
 
 --- @class EsvBoostTagComponent:BaseComponent
@@ -9227,6 +9388,7 @@ Osi = {}
 --- @class EsvMovementState
 --- @field MovementMachine EsvMovementMachine
 --- @field TransactionId int32
+--- @field Type ServerMovementType
 
 
 --- @class EsvNavigationTargetInfo
@@ -9847,6 +10009,7 @@ Osi = {}
 --- @class EsvSteeringState
 --- @field SteeringMachine EsvSteeringMachine
 --- @field TransactionId int32
+--- @field Type ServerSteeringType
 --- @field field_10 boolean
 
 
@@ -11156,39 +11319,17 @@ Osi = {}
 --- @field OnChange RegistryEntry
 
 
---- @class ExtuiChildWindow:ExtuiTreeParent
---- @field AlwaysAutoResize boolean
---- @field AlwaysHorizontalScrollbar boolean
+--- @class ExtuiChildWindow:ExtuiWindowBase
 --- @field AlwaysUseWindowPadding boolean
---- @field AlwaysVerticalScrollbar boolean
 --- @field AutoResizeX boolean
 --- @field AutoResizeY boolean
 --- @field Border boolean
 --- @field ChildAlwaysAutoResize boolean
 --- @field FrameStyle boolean
---- @field HorizontalScrollbar boolean
---- @field MenuBar boolean
 --- @field NavFlattened boolean
---- @field NoBackground boolean
---- @field NoBringToFrontOnFocus boolean
---- @field NoCollapse boolean
---- @field NoDecoration boolean
---- @field NoFocusOnAppearing boolean
---- @field NoInputs boolean
---- @field NoMouseInputs boolean
---- @field NoMove boolean
---- @field NoNav boolean
---- @field NoNavFocus boolean
---- @field NoNavInputs boolean
---- @field NoResize boolean
---- @field NoSavedSettings boolean
---- @field NoScrollWithMouse boolean
---- @field NoScrollbar boolean
---- @field NoTitleBar boolean
 --- @field ResizeX boolean
 --- @field ResizeY boolean
 --- @field Size vec2?
---- @field UnsavedDocument boolean
 
 
 --- @class ExtuiCollapsingHeader:ExtuiTreeParent
@@ -11452,29 +11593,7 @@ Osi = {}
 --- @class ExtuiNewLine:ExtuiStyledRenderable
 
 
---- @class ExtuiPopup:ExtuiTreeParent
---- @field AlwaysAutoResize boolean
---- @field AlwaysHorizontalScrollbar boolean
---- @field AlwaysVerticalScrollbar boolean
---- @field HorizontalScrollbar boolean
---- @field MenuBar boolean
---- @field NoBackground boolean
---- @field NoBringToFrontOnFocus boolean
---- @field NoCollapse boolean
---- @field NoDecoration boolean
---- @field NoFocusOnAppearing boolean
---- @field NoInputs boolean
---- @field NoMouseInputs boolean
---- @field NoMove boolean
---- @field NoNav boolean
---- @field NoNavFocus boolean
---- @field NoNavInputs boolean
---- @field NoResize boolean
---- @field NoSavedSettings boolean
---- @field NoScrollWithMouse boolean
---- @field NoScrollbar boolean
---- @field NoTitleBar boolean
---- @field UnsavedDocument boolean
+--- @class ExtuiPopup:ExtuiWindowBase
 --- @field Open fun(self:ExtuiPopup, a1:GuiPopupFlags?)
 
 
@@ -11631,6 +11750,8 @@ Osi = {}
 --- @field ColumnDefs ExtuiColumnDefinition[]
 --- @field Columns uint32
 --- @field ContextMenuInBody boolean
+--- @field FreezeCols uint32
+--- @field FreezeRows uint32
 --- @field Hideable boolean
 --- @field HighlightHoveredColumn boolean
 --- @field NoBordersInBody boolean
@@ -11675,7 +11796,7 @@ Osi = {}
 --- @class ExtuiText:ExtuiStyledRenderable
 
 
---- @class ExtuiTooltip:ExtuiTreeParent
+--- @class ExtuiTooltip:ExtuiWindowBase
 
 
 --- @class ExtuiTree:ExtuiTreeParent
@@ -11742,11 +11863,18 @@ Osi = {}
 --- @field RemoveChild fun(self:ExtuiTreeParent, a1:ImguiHandle):boolean
 
 
---- @class ExtuiWindow:ExtuiTreeParent
+--- @class ExtuiWindow:ExtuiWindowBase
+--- @field Closeable boolean
+--- @field OnClose RegistryEntry
+--- @field Open boolean
+--- @field Scaling GuiMeasureScaling
+--- @field AddMainMenu fun(self:ExtuiWindow):ExtuiMenu
+
+
+--- @class ExtuiWindowBase:ExtuiTreeParent
 --- @field AlwaysAutoResize boolean
 --- @field AlwaysHorizontalScrollbar boolean
 --- @field AlwaysVerticalScrollbar boolean
---- @field Closeable boolean
 --- @field HorizontalScrollbar boolean
 --- @field MenuBar boolean
 --- @field NoBackground boolean
@@ -11765,18 +11893,15 @@ Osi = {}
 --- @field NoScrollWithMouse boolean
 --- @field NoScrollbar boolean
 --- @field NoTitleBar boolean
---- @field OnClose RegistryEntry
---- @field Open boolean
 --- @field UnsavedDocument boolean
---- @field AddMainMenu fun(self:ExtuiWindow):ExtuiMenu
---- @field SetBgAlpha fun(self:ExtuiWindow, a1:number?)
---- @field SetCollapsed fun(self:ExtuiWindow, a1:boolean, a2:GuiCond?)
---- @field SetContentSize fun(self:ExtuiWindow, a1:vec2?)
---- @field SetFocus fun(self:ExtuiWindow)
---- @field SetPos fun(self:ExtuiWindow, a1:vec2, a2:GuiCond?, a3:vec2?)
---- @field SetScroll fun(self:ExtuiWindow, a1:vec2?)
---- @field SetSize fun(self:ExtuiWindow, a1:vec2, a2:GuiCond?)
---- @field SetSizeConstraints fun(self:ExtuiWindow, a1:vec2?, a2:vec2?)
+--- @field SetBgAlpha fun(self:ExtuiWindowBase, a1:number?)
+--- @field SetCollapsed fun(self:ExtuiWindowBase, a1:boolean, a2:GuiCond?)
+--- @field SetContentSize fun(self:ExtuiWindowBase, a1:vec2?)
+--- @field SetFocus fun(self:ExtuiWindowBase)
+--- @field SetPos fun(self:ExtuiWindowBase, a1:vec2, a2:GuiCond?, a3:vec2?)
+--- @field SetScroll fun(self:ExtuiWindowBase, a1:vec2?)
+--- @field SetSize fun(self:ExtuiWindowBase, a1:vec2, a2:GuiCond?)
+--- @field SetSizeConstraints fun(self:ExtuiWindowBase, a1:vec2?, a2:vec2?)
 
 
 --- @class GnGenomeVariant
@@ -12451,6 +12576,53 @@ Osi = {}
 --- @field RotateMode uint8
 --- @field Trajectory Variant<PathBezier3Trajectory,PathBezier4Trajectory>
 --- @field Velocity Variant<PathConstantVelocity,PathLinearVelocity,PathMappedVelocity>
+
+
+--- @class PhxPhysicsHit
+--- @field Distance number
+--- @field Normal vec3
+--- @field PhysicsExtraFlags int32
+--- @field PhysicsGroup int32
+--- @field Position vec3
+--- @field Shape PhxPhysicsShape
+
+
+--- @class PhxPhysicsHitAll
+--- @field Distances number[]
+--- @field Normals vec3[]
+--- @field PhysicsExtraFlags int32[]
+--- @field PhysicsGroup int32[]
+--- @field Positions vec3[]
+--- @field Shapes PhxPhysicsShape[]
+
+
+--- @class PhxPhysicsKinematicTargetInfo
+
+
+--- @class PhxPhysicsObject
+--- @field CollidesWith uint32
+--- @field Entity EntityHandle
+--- @field PhysicsExtraFlags uint32
+--- @field PhysicsGroup uint32
+--- @field PhysicsObjectIndex int32
+--- @field Rotate quat
+--- @field Scale vec3
+--- @field Shapes PhxPhysicsShape[]
+--- @field Templates PhxPhysicsTemplate[]
+--- @field Translate vec3
+
+
+--- @class PhxPhysicsShape
+--- @field Name FixedString
+--- @field PhysicsObject PhxPhysicsObject
+--- @field Rotation quat
+--- @field Scale vec3
+--- @field Translate vec3
+--- @field field_34 int32
+
+
+--- @class PhxPhysicsTemplate
+--- @field ID FixedString
 
 
 --- @class ProgressionContainerComponent:BaseComponent
@@ -13391,164 +13563,7 @@ Osi = {}
 
 
 --- @class ResourceLightingResource:ResourceLoadableResource
---- @field Lighting ResourceLightingResourceDetails
-
-
---- @class ResourceLightingResourceDetails
---- @field Fog ResourceLightingResourceDetailsFogSettings
---- @field Moon ResourceLightingResourceDetailsMoonDetails
---- @field ParentGUID FixedString
---- @field SSAOSettings ResourceLightingResourceDetailsDetailsSSAOSettings
---- @field SkyLight ResourceLightingResourceDetailsSkyLightDetails
---- @field Sun ResourceLightingResourceDetailsSunDetails
---- @field TimelineFog ResourceLightingResourceDetailsFogSettings
---- @field TimelineFogOverride boolean
---- @field VolumetricCloudSettings ResourceLightingResourceDetailsDetailsVolumetricCloudSettings
---- @field field_368 int64
---- @field field_370 int64
-
-
---- @class ResourceLightingResourceDetailsDetailsCoverageSettings
---- @field EndHeight number
---- @field HorizonDistance number
---- @field Offset vec2
---- @field StartHeight number
---- @field TexResourceGUID FixedString
-
-
---- @class ResourceLightingResourceDetailsDetailsSSAOSettings
---- @field Bias number
---- @field DirectLightInfluence number
---- @field Enabled boolean
---- @field Intensity number
---- @field Radius number
-
-
---- @class ResourceLightingResourceDetailsDetailsVolumetricCloudSettings
---- @field AmbientLightFactor number
---- @field BackwardScatteringG number
---- @field BaseColor vec3
---- @field BottomFade number
---- @field ConeRadius number
---- @field CoverageEndDistance number
---- @field CoverageSettings ResourceLightingResourceDetailsDetailsCoverageSettings
---- @field CoverageStartDistance number
---- @field CoverageWindSpeed number
---- @field DarkOutline number
---- @field Density number
---- @field DetailScale number
---- @field Distortion number
---- @field DistortionScale number
---- @field Enabled boolean
---- @field ErosionEdgeSize number
---- @field ForwardScatteringG number
---- @field HorizonFade number
---- @field Intensity number
---- @field LODDistance number
---- @field RainCoverageMaxInfluence number
---- @field SampleScalar number
---- @field SampleThreshold number
---- @field ShadowFactor number
---- @field SunLightFactor number
---- @field SunRayLength number
---- @field TopColor vec3
-
-
---- @class ResourceLightingResourceDetailsFogLayer
---- @field Albedo vec3
---- @field Density0 number
---- @field Density1 number
---- @field Enabled boolean
---- @field Height0 number
---- @field Height1 number
---- @field NoiseCoverage number
---- @field NoiseFrequency vec3
---- @field NoiseRotation vec3
---- @field NoiseWind vec3
-
-
---- @class ResourceLightingResourceDetailsFogSettings
---- @field FogLayer0 ResourceLightingResourceDetailsFogLayer
---- @field FogLayer1 ResourceLightingResourceDetailsFogLayer
---- @field Phase number
---- @field RenderDistance number
-
-
---- @class ResourceLightingResourceDetailsMoonDetails
---- @field AlbedoTexResourceGUID FixedString
---- @field CastLightEnabled boolean
---- @field Color vec3
---- @field ColorAdjustedForIntensity vec3
---- @field ColorTemperatureAdjustment vec3
---- @field Distance number
---- @field Earthshine number
---- @field Enabled boolean
---- @field Intensity number
---- @field Kelvin number
---- @field MoonGlare number
---- @field NormalTexResourceGUID FixedString
---- @field Pitch number
---- @field Radius number
---- @field RotationAsVec3 vec3
---- @field TearsAlbedoTexResourceGUID FixedString
---- @field TearsNormalTexResourceGUID FixedString
---- @field TearsRotate number
---- @field TearsScale number
---- @field UseTemperature boolean
---- @field Yaw number
-
-
---- @class ResourceLightingResourceDetailsSkyLightDetails
---- @field CirrusCloudsAmount number
---- @field CirrusCloudsColor vec3
---- @field CirrusCloudsEnabled_FixedString boolean
---- @field CirrusCloudsIntensity number
---- @field Color vec3
---- @field ColorAdjustedForIntensity vec3
---- @field ColorTemperatureAdjustment vec3
---- @field Intensity number
---- @field Kelvin number
---- @field PhysicalModel int32
---- @field ProcStarsAmount number
---- @field ProcStarsEnabled boolean
---- @field ProcStarsIntensity number
---- @field ProcStarsSaturation vec2
---- @field ProcStarsShimmer number
---- @field RotateSkydomeEnabled boolean
---- @field ScatteringEnabled boolean
---- @field ScatteringIntensity number
---- @field ScatteringSunColor vec3
---- @field ScatteringSunIntensity number
---- @field SkydomeEnabled boolean
---- @field SkydomeTex FixedString
---- @field UseTemperature boolean
-
-
---- @class ResourceLightingResourceDetailsSunDetails
---- @field CascadeCount uint8
---- @field CascadeSpeed number
---- @field ColorAdjustedForIntensity vec3
---- @field ColorTemperatureAdjustment vec3
---- @field CoverageSettings ResourceLightingResourceDetailsDetailsCoverageSettings
---- @field Kelvin number
---- @field LightDistance number
---- @field LightSize number
---- @field LocalCoverageEnabled boolean
---- @field LocalCoverageScalar number
---- @field Pitch number
---- @field RotationAsVec3 vec3
---- @field ScatteringIntensityScale number
---- @field ShadowBias number
---- @field ShadowEnabled boolean
---- @field ShadowFade number
---- @field ShadowFarPlane number
---- @field ShadowNearPlane number
---- @field ShadowObscurity uint8
---- @field SunColor vec3
---- @field SunIntensity number
---- @field SunlightObscurity uint8
---- @field UseTemperature boolean
---- @field Yaw number
+--- @field Lighting Lighting
 
 
 --- @class ResourceLimbsMapping:ResourceGuidResource
@@ -16571,6 +16586,14 @@ local Ext_ClientIMGUI = {}
 
 
 
+--- @class Ext_ClientInput
+--- @field InjectKeyDown fun(a1:SDLScanCode, a2:SDLKeyModifier?)
+--- @field InjectKeyPress fun(a1:SDLScanCode, a2:SDLKeyModifier?)
+--- @field InjectKeyUp fun(a1:SDLScanCode, a2:SDLKeyModifier?)
+local Ext_ClientInput = {}
+
+
+
 --- @class Ext_ClientNet
 --- @field IsHost fun():boolean
 --- @field PostMessageToServer fun(a1:string, a2:string, a3:Guid?, a4:FunctionRef?, a5:uint32?)
@@ -16611,6 +16634,8 @@ local Ext_Debug = {}
 
 --- @class Ext_Entity
 --- @field ClearTrace fun()
+--- @field Create fun():EntityHandle
+--- @field Destroy fun(a1:EntityHandle):boolean
 --- @field EnableTracing fun(a1:boolean)
 --- @field Get fun(a1:Guid)
 --- @field GetAllEntities fun():EntityHandle[]
@@ -16667,7 +16692,18 @@ local Ext_Json = {}
 --- @field GetEntitiesOnTile fun(a1:vec3):EntityHandle[]
 --- @field GetHeightsAt fun(a1:number, a2:number):number[]
 --- @field GetTileDebugInfo fun(a1:vec3):AiGridLuaTile
+--- @field RaycastAll fun(a1:vec3, a2:vec3, a3:PhysicsType, a4:PhysicsGroupFlags, a5:PhysicsGroupFlags, a6:int32):PhxPhysicsHitAll
+--- @field RaycastAny fun(a1:vec3, a2:vec3, a3:PhysicsType, a4:PhysicsGroupFlags, a5:PhysicsGroupFlags, a6:int32):boolean
+--- @field RaycastClosest fun(a1:vec3, a2:vec3, a3:PhysicsType, a4:PhysicsGroupFlags, a5:PhysicsGroupFlags, a6:int32):PhxPhysicsHit
 --- @field ReleasePath fun(a1:AiPath)
+--- @field SweepBoxAll fun(a1:vec3, a2:vec3, a3:vec3, a4:PhysicsType, a5:PhysicsGroupFlags, a6:PhysicsGroupFlags, a7:int32):PhxPhysicsHitAll
+--- @field SweepBoxClosest fun(a1:vec3, a2:vec3, a3:vec3, a4:PhysicsType, a5:PhysicsGroupFlags, a6:PhysicsGroupFlags, a7:int32):PhxPhysicsHit
+--- @field SweepCapsuleAll fun(a1:vec3, a2:vec3, a3:number, a4:number, a5:PhysicsType, a6:PhysicsGroupFlags, a7:PhysicsGroupFlags, a8:int32):PhxPhysicsHitAll
+--- @field SweepCapsuleClosest fun(a1:vec3, a2:vec3, a3:number, a4:number, a5:PhysicsType, a6:PhysicsGroupFlags, a7:PhysicsGroupFlags, a8:int32):PhxPhysicsHit
+--- @field SweepSphereAll fun(a1:vec3, a2:vec3, a3:number, a4:PhysicsType, a5:PhysicsGroupFlags, a6:PhysicsGroupFlags, a7:int32):PhxPhysicsHitAll
+--- @field SweepSphereClosest fun(a1:vec3, a2:vec3, a3:number, a4:PhysicsType, a5:PhysicsGroupFlags, a6:PhysicsGroupFlags, a7:int32):PhxPhysicsHit
+--- @field TestBox fun(a1:vec3, a2:vec3, a3:PhysicsType, a4:PhysicsGroupFlags, a5:PhysicsGroupFlags):PhxPhysicsHitAll
+--- @field TestSphere fun(a1:vec3, a2:number, a3:PhysicsType, a4:PhysicsGroupFlags, a5:PhysicsGroupFlags):PhxPhysicsHitAll
 local Ext_Level = {}
 
 
@@ -16913,6 +16949,8 @@ local Ext_Vars = {}
 --- @field ClientAudio Ext_ClientAudio
 --- @field IMGUI Ext_ClientIMGUI
 --- @field ClientIMGUI Ext_ClientIMGUI
+--- @field Input Ext_ClientInput
+--- @field ClientInput Ext_ClientInput
 --- @field Net Ext_ClientNet
 --- @field ClientNet Ext_ClientNet
 --- @field Template Ext_ClientTemplate
@@ -17128,6 +17166,7 @@ Ext_Enums.AdvantageContext = {
 
 --- @enum AiBaseFlags
 Ext_Enums.AiBaseFlags = {
+	Blocker = 1,
 	WalkBlock = 2,
 	WalkBlock2 = 4,
 	ShootBlock = 8,
@@ -17150,6 +17189,7 @@ Ext_Enums.AiBaseFlags = {
 	PortalTarget = 1048576,
 	Door = 4194304,
 	DoorItemBlock = 8388608,
+	[1] = "Blocker",
 	[2] = "WalkBlock",
 	[4] = "WalkBlock2",
 	[8] = "ShootBlock",
@@ -18193,15 +18233,15 @@ Ext_Enums.DiceSizeId = {
 --- @enum DynamicModifierType
 Ext_Enums.DynamicModifierType = {
 	None = 0,
-	Consumable = 1,
+	None = 1,
 	ItemSpell = 2,
-	Consumable = 3,
-	ToggledPassive = 4,
+	ItemSpell = 3,
+	None = 4,
 	[0] = "None",
-	[1] = "Consumable",
+	[1] = "None",
 	[2] = "ItemSpell",
-	[3] = "Consumable",
-	[4] = "ToggledPassive",
+	[3] = "ItemSpell",
+	[4] = "None",
 }
 
 --- @enum ECSComponentChangeFlags
@@ -20330,6 +20370,14 @@ Ext_Enums.GuiItemStatusFlags = {
 	[2097152] = "Active",
 }
 
+--- @enum GuiMeasureScaling
+Ext_Enums.GuiMeasureScaling = {
+	Absolute = 0,
+	Scaled = 1,
+	[0] = "Absolute",
+	[1] = "Scaled",
+}
+
 --- @enum GuiPopupFlags
 Ext_Enums.GuiPopupFlags = {
 	MouseButtonRight = 1,
@@ -20545,13 +20593,13 @@ Ext_Enums.GuiTableFlags = {
 	RowBg = 64,
 	BordersInnerH = 128,
 	BordersOuterH = 256,
-	BordersInnerH = 384,
+	BordersOuterH = 384,
 	BordersInnerV = 512,
-	BordersInnerH = 640,
+	BordersInnerV = 640,
 	BordersOuterV = 1024,
 	BordersOuterV = 1280,
 	BordersOuterV = 1536,
-	BordersInnerH = 1920,
+	BordersOuterV = 1920,
 	NoBordersInBody = 2048,
 	NoBordersInBodyUntilResize = 4096,
 	SizingFixedFit = 8192,
@@ -20580,13 +20628,13 @@ Ext_Enums.GuiTableFlags = {
 	[64] = "RowBg",
 	[128] = "BordersInnerH",
 	[256] = "BordersOuterH",
-	[384] = "BordersInnerH",
+	[384] = "BordersOuterH",
 	[512] = "BordersInnerV",
-	[640] = "BordersInnerH",
+	[640] = "BordersInnerV",
 	[1024] = "BordersOuterV",
 	[1280] = "BordersOuterV",
 	[1536] = "BordersOuterV",
-	[1920] = "BordersInnerH",
+	[1920] = "BordersOuterV",
 	[2048] = "NoBordersInBody",
 	[4096] = "NoBordersInBodyUntilResize",
 	[8192] = "SizingFixedFit",
@@ -20621,7 +20669,7 @@ Ext_Enums.GuiTreeNodeFlags = {
 	AllowOverlap = 4,
 	NoTreePushOnOpen = 8,
 	NoAutoOpenOnLog = 16,
-	NoTreePushOnOpen = 26,
+	CollapsingHeader = 26,
 	DefaultOpen = 32,
 	OpenOnDoubleClick = 64,
 	OpenOnArrow = 128,
@@ -20638,7 +20686,7 @@ Ext_Enums.GuiTreeNodeFlags = {
 	[4] = "AllowOverlap",
 	[8] = "NoTreePushOnOpen",
 	[16] = "NoAutoOpenOnLog",
-	[26] = "NoTreePushOnOpen",
+	[26] = "CollapsingHeader",
 	[32] = "DefaultOpen",
 	[64] = "OpenOnDoubleClick",
 	[128] = "OpenOnArrow",
@@ -20660,7 +20708,7 @@ Ext_Enums.GuiWindowFlags = {
 	NoScrollbar = 8,
 	NoScrollWithMouse = 16,
 	NoCollapse = 32,
-	NoTitleBar = 43,
+	NoScrollbar = 43,
 	AlwaysAutoResize = 64,
 	NoBackground = 128,
 	NoSavedSettings = 256,
@@ -20673,8 +20721,8 @@ Ext_Enums.GuiWindowFlags = {
 	AlwaysHorizontalScrollbar = 32768,
 	NoNavInputs = 65536,
 	NoNavFocus = 131072,
-	NoNavInputs = 196608,
-	NoMouseInputs = 197120,
+	NoNav = 196608,
+	NoNav = 197120,
 	UnsavedDocument = 262144,
 	[1] = "NoTitleBar",
 	[2] = "NoResize",
@@ -20682,7 +20730,7 @@ Ext_Enums.GuiWindowFlags = {
 	[8] = "NoScrollbar",
 	[16] = "NoScrollWithMouse",
 	[32] = "NoCollapse",
-	[43] = "NoTitleBar",
+	[43] = "NoScrollbar",
 	[64] = "AlwaysAutoResize",
 	[128] = "NoBackground",
 	[256] = "NoSavedSettings",
@@ -20695,8 +20743,8 @@ Ext_Enums.GuiWindowFlags = {
 	[32768] = "AlwaysHorizontalScrollbar",
 	[65536] = "NoNavInputs",
 	[131072] = "NoNavFocus",
-	[196608] = "NoNavInputs",
-	[197120] = "NoMouseInputs",
+	[196608] = "NoNav",
+	[197120] = "NoNav",
 	[262144] = "UnsavedDocument",
 }
 
@@ -20825,19 +20873,19 @@ Ext_Enums.IngredientType = {
 --- @enum InputType
 Ext_Enums.InputType = {
 	Unknown = 0,
-	Unknown = 1,
-	Unknown = 2,
-	ValueChange = 4,
-	Unknown = 8,
-	Unknown = 16,
-	Unknown = 32,
+	Press = 1,
+	Release = 2,
+	Unknown = 4,
+	Hold = 8,
+	Repeat = 16,
+	AcceleratedRepeat = 32,
 	[0] = "Unknown",
-	[1] = "Unknown",
-	[2] = "Unknown",
-	[4] = "ValueChange",
-	[8] = "Unknown",
-	[16] = "Unknown",
-	[32] = "Unknown",
+	[1] = "Press",
+	[2] = "Release",
+	[4] = "Unknown",
+	[8] = "Hold",
+	[16] = "Repeat",
+	[32] = "AcceleratedRepeat",
 }
 
 --- @enum ItemDataRarity
@@ -22062,12 +22110,12 @@ Ext_Enums.NsManipulationModes = {
 Ext_Enums.NsModifierKeys = {
 	ModifierKeys_Alt = 0,
 	ModifierKeys_Control = 1,
-	ModifierKeys_Shift = 2,
-	ModifierKeys_Shift = 3,
+	ModifierKeys_Alt = 2,
+	ModifierKeys_Control = 3,
 	[0] = "ModifierKeys_Alt",
 	[1] = "ModifierKeys_Control",
-	[2] = "ModifierKeys_Shift",
-	[3] = "ModifierKeys_Shift",
+	[2] = "ModifierKeys_Alt",
+	[3] = "ModifierKeys_Control",
 }
 
 --- @enum NsMouseAction
@@ -22234,6 +22282,100 @@ Ext_Enums.PathRootType = {
 	[13] = "Scripts",
 	[14] = "WorkingDir",
 	[15] = "Debug",
+}
+
+--- @enum PhysicsExtraFlags
+Ext_Enums.PhysicsExtraFlags = {
+	ShootThroughType0 = 1,
+	ShootThroughType1 = 2,
+	ShootThroughType2 = 4,
+	ShootThroughType3 = 8,
+	ShootThroughType4 = 16,
+	ShootThroughType5 = 32,
+	BlockAoEDamage = 64,
+	[1] = "ShootThroughType0",
+	[2] = "ShootThroughType1",
+	[4] = "ShootThroughType2",
+	[8] = "ShootThroughType3",
+	[16] = "ShootThroughType4",
+	[32] = "ShootThroughType5",
+	[64] = "BlockAoEDamage",
+}
+
+--- @enum PhysicsGroupFlags
+Ext_Enums.PhysicsGroupFlags = {
+	Group01 = 1,
+	Group02 = 2,
+	Group04 = 4,
+	Group08 = 8,
+	Terrain = 16,
+	CanWalkOn = 32,
+	Group40 = 64,
+	Group80 = 128,
+	Group100 = 256,
+	Character = 512,
+	Item = 1024,
+	Scenery = 2048,
+	Fadeable = 4096,
+	Wadable = 8192,
+	Dead = 16384,
+	VisibleItem = 32768,
+	CanClickThrough = 65536,
+	CanSeeThrough = 131072,
+	PointerBlocker = 262144,
+	Group80000 = 524288,
+	CanClimbOn = 1048576,
+	IsDecorative = 2097152,
+	CanShootThrough = 4194304,
+	CanSeeThrough2 = 8388608,
+	ClimbableTileConstruction = 16777216,
+	DisableBoundCollision = 33554432,
+	PlatformOwner = 67108864,
+	Falling = 134217728,
+	Group10000000 = 268435456,
+	TimelinePreview = 536870912,
+	CanShineThrough = 1073741824,
+	AttackableWhenClickThrough = 2147483648,
+	[1] = "Group01",
+	[2] = "Group02",
+	[4] = "Group04",
+	[8] = "Group08",
+	[16] = "Terrain",
+	[32] = "CanWalkOn",
+	[64] = "Group40",
+	[128] = "Group80",
+	[256] = "Group100",
+	[512] = "Character",
+	[1024] = "Item",
+	[2048] = "Scenery",
+	[4096] = "Fadeable",
+	[8192] = "Wadable",
+	[16384] = "Dead",
+	[32768] = "VisibleItem",
+	[65536] = "CanClickThrough",
+	[131072] = "CanSeeThrough",
+	[262144] = "PointerBlocker",
+	[524288] = "Group80000",
+	[1048576] = "CanClimbOn",
+	[2097152] = "IsDecorative",
+	[4194304] = "CanShootThrough",
+	[8388608] = "CanSeeThrough2",
+	[16777216] = "ClimbableTileConstruction",
+	[33554432] = "DisableBoundCollision",
+	[67108864] = "PlatformOwner",
+	[134217728] = "Falling",
+	[268435456] = "Group10000000",
+	[536870912] = "TimelinePreview",
+	[1073741824] = "CanShineThrough",
+	[2147483648] = "AttackableWhenClickThrough",
+}
+
+--- @enum PhysicsType
+Ext_Enums.PhysicsType = {
+	Static = 1,
+	Dynamic = 4,
+	[1] = "Static",
+	[4] = "Dynamic",
 }
 
 --- @enum ProficiencyBonusBoostType
@@ -23925,29 +24067,29 @@ Ext_Enums.SpellLearningStrategy = {
 --- @enum SpellMetaConditionType
 Ext_Enums.SpellMetaConditionType = {
 	None = 0,
-	Roll = 1,
+	None = 1,
 	OriginRoll = 2,
-	Roll = 3,
+	OriginRoll = 3,
 	None = 4,
-	Roll = 5,
-	ThrowableTarget = 6,
-	ThrowableTarget = 7,
-	Cycle = 8,
-	Cycle = 9,
-	Cycle = 10,
-	Cycle = 11,
+	Target = 5,
+	OriginRoll = 6,
+	Target = 7,
+	None = 8,
+	None = 9,
+	OriginRoll = 10,
+	Highlight = 11,
 	[0] = "None",
-	[1] = "Roll",
+	[1] = "None",
 	[2] = "OriginRoll",
-	[3] = "Roll",
+	[3] = "OriginRoll",
 	[4] = "None",
-	[5] = "Roll",
-	[6] = "ThrowableTarget",
-	[7] = "ThrowableTarget",
-	[8] = "Cycle",
-	[9] = "Cycle",
-	[10] = "Cycle",
-	[11] = "Cycle",
+	[5] = "Target",
+	[6] = "OriginRoll",
+	[7] = "Target",
+	[8] = "None",
+	[9] = "None",
+	[10] = "OriginRoll",
+	[11] = "Highlight",
 }
 
 --- @enum SpellModificationValueType
@@ -25268,7 +25410,7 @@ Ext_Enums.VisualFlags = {
 	AllowTPose = 32768,
 	HasBlueprint = 65536,
 	SeeThrough = 131072,
-	PreparedDestroyed = 1073741824,
+	PreparedDestroyed2 = 1073741824,
 	[1] = "CastShadow",
 	[2] = "ReceiveDecal",
 	[4] = "Reflecting",
@@ -25287,7 +25429,7 @@ Ext_Enums.VisualFlags = {
 	[32768] = "AllowTPose",
 	[65536] = "HasBlueprint",
 	[131072] = "SeeThrough",
-	[1073741824] = "PreparedDestroyed",
+	[1073741824] = "PreparedDestroyed2",
 }
 
 --- @enum VisualObjectType
@@ -25391,6 +25533,8 @@ Ext_Enums.WeaponType = {
 --- @field ClientAudio Ext_ClientAudio
 --- @field IMGUI Ext_ClientIMGUI
 --- @field ClientIMGUI Ext_ClientIMGUI
+--- @field Input Ext_ClientInput
+--- @field ClientInput Ext_ClientInput
 --- @field Net Ext_ClientNet|Ext_ServerNet
 --- @field ClientNet Ext_ClientNet
 --- @field Template Ext_ClientTemplate|Ext_ServerTemplate
@@ -25426,85 +25570,85 @@ Ext = {Events = {}}
 --- @class SubscribableEventDev<T>:{ (Throw:fun(self:SubscribableEvent, e:T|LuaEventBase))}
 
 --#region Extender Events
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaDoConsoleCommandEvent>  
 Ext.Events.DoConsoleCommand = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EclLuaControllerAxisEvent>  
 Ext.Events.EclLuaControllerAxis = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EclLuaControllerButtonEvent>  
 Ext.Events.EclLuaControllerButton = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EclLuaGameStateChangedEvent>  
 Ext.Events.EclLuaGameStateChanged = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EclLuaKeyInputEvent>  
 Ext.Events.EclLuaKeyInput = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EclLuaMouseButtonEvent>  
 Ext.Events.EclLuaMouseButton = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EclLuaMouseWheelEvent>  
 Ext.Events.EclLuaMouseWheel = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EclLuaViewportResizedEvent>  
 Ext.Events.EclLuaViewportResized = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.Empty = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EsvLuaAfterExecuteFunctorEvent>  
 Ext.Events.EsvLuaAfterExecuteFunctor = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EsvLuaBeforeDealDamageEvent>  
 Ext.Events.EsvLuaBeforeDealDamage = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EsvLuaDealDamageEvent>  
 Ext.Events.EsvLuaDealDamage = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EsvLuaExecuteFunctorEvent>  
 Ext.Events.EsvLuaExecuteFunctor = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<EsvLuaGameStateChangedEvent>  
 Ext.Events.EsvLuaGameStateChanged = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaFindPathEvent>  
 Ext.Events.FindPath = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.GameStateChanged = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.ModuleLoadStarted = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.ModuleResume = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaNetMessageEvent>  
 Ext.Events.NetMessage = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.NetModMessage = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.ResetCompleted = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.SessionLoaded = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.SessionLoading = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.Shutdown = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.StatsLoaded = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.StatsStructureLoaded = {}
---- ????**Server/Client**????  
+--- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaTickEvent>  
 Ext.Events.Tick = {}
 --#endregion

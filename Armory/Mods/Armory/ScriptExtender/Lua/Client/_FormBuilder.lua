@@ -26,7 +26,7 @@ end
 function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 	Helpers:KillChildren(parent)
 
-	local formInputs = {...}
+	local formInputs = { ... }
 
 	for _, formInput in pairs(formInputs) do
 		parent:AddText(formInput.label)
@@ -71,7 +71,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 			elseif formInput.type == "Checkbox" then
 				inputs[formInput.propertyField or formInput.label] = formInput.input.Checked
 			end
-		    ::continue::
+			::continue::
 		end
 
 		if hasErrors then

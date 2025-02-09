@@ -169,6 +169,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		self.separator = self.window:AddSeparatorText("")
 		self.separator:SetStyle("SeparatorTextAlign", 0.5)
+		self.separator.Font = "Large"
 
 		self.searchInput = self.window:AddInputText("")
 		self.searchInput.Hint = "Case-insensitive, min 3 characters"

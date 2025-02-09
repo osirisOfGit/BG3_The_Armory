@@ -103,6 +103,7 @@ end
 ---@param character EntityHandle
 function Transmogger:MogCharacter(character)
 	if not ActiveVanityPreset then
+		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
 		return
 	end
 
@@ -110,6 +111,7 @@ function Transmogger:MogCharacter(character)
 	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
 	if not outfit then
 		Logger:BasicDebug("No active outfit found for %s, skipping transmog", character.Uuid.EntityUuid)
+		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
 		return
 	end
 
@@ -337,65 +339,93 @@ function Transmogger:ApplyDye(character)
 	if not ActiveVanityPreset then
 		return
 	end
+	Logger:BasicDebug("Beginning Dye process for %s", character.Uuid.EntityUuid)
 
 	---@type VanityOutfit
 	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
-	if not outfit then
-		Logger:BasicDebug("No active outfit found for %s, skipping dying", character.Uuid.EntityUuid)
-		return
-	end
 
-	Logger:BasicDebug("Found active outfit for %s, beginning Dye process", character.Uuid.EntityUuid)
-
-	for actualSlot, outfitSlot in pairs(outfit) do
+	for _, actualSlot in ipairs(SlotEnum) do
 		local success, error = pcall(function()
 			local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
 
 			if not equippedItem then
 				goto continue
 			end
-
-			---@type string
-			local dyeTemplate = outfitSlot.dye and outfitSlot.dye.guid
-
-			if equippedItem and outfitSlot.weaponTypes then
-				---@type Weapon
-				local itemStat = Ext.Stats.Get(Ext.Entity.Get(equippedItem).Data.StatsId)
-				for _, proficiencyGroup in pairs(itemStat["Proficiency Group"]) do
-					if outfitSlot.weaponTypes[proficiencyGroup] then
-						if outfitSlot.weaponTypes[proficiencyGroup].dye then
-							dyeTemplate = outfitSlot.weaponTypes[proficiencyGroup].dye.guid
-						end
-						break
-					end
-				end
-			end
-
-			if not dyeTemplate then
-				goto continue
-			end
-
-			Logger:BasicDebug("Applying dye %s to %s", dyeTemplate, equippedItem)
-
 			--- @type EntityHandle
 			local equippedItemEntity = Ext.Entity.Get(equippedItem)
 
-			if not equippedItemEntity.ItemDye then
-				equippedItemEntity:CreateComponent("ItemDye")
-				equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = "00000000-0000-0000-0000-000000000000"
-			elseif not equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
-				equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = equippedItemEntity.ItemDye.Color
+			if outfit and outfit[actualSlot] then
+				local outfitSlot = outfit[actualSlot]
+				---@type string
+				local dyeTemplate = outfitSlot.dye and outfitSlot.dye.guid
+
+				if equippedItem and outfitSlot.weaponTypes then
+					---@type Weapon
+					local itemStat = Ext.Stats.Get(Ext.Entity.Get(equippedItem).Data.StatsId)
+					for _, proficiencyGroup in pairs(itemStat["Proficiency Group"]) do
+						if outfitSlot.weaponTypes[proficiencyGroup] then
+							if outfitSlot.weaponTypes[proficiencyGroup].dye then
+								dyeTemplate = outfitSlot.weaponTypes[proficiencyGroup].dye.guid
+							end
+							break
+						end
+					end
+				end
+
+				if not dyeTemplate then
+					if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
+						Logger:BasicDebug("%s in slot %s for %s doesn't have a corresponding outfit slot, so resetting the dye to %s", equippedItem, actualSlot,
+							character.DisplayName.Name:Get(), equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo)
+							if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo == "00000000-0000-0000-0000-000000000000" then
+								if equippedItemEntity.ItemDye then
+									equippedItemEntity:RemoveComponent("ItemDye")
+								end
+							else
+								if not equippedItemEntity.ItemDye then
+									equippedItemEntity:CreateComponent("ItemDye")
+								end
+								equippedItemEntity.ItemDye.Color = equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
+							end
+							equippedItemEntity:Replicate("ItemDye")
+							equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = nil
+					end
+					goto continue
+				end
+
+				Logger:BasicDebug("Applying dye %s to %s", dyeTemplate, equippedItem)
+
+				if not equippedItemEntity.ItemDye then
+					equippedItemEntity:CreateComponent("ItemDye")
+					equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = "00000000-0000-0000-0000-000000000000"
+				elseif not equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
+					equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = equippedItemEntity.ItemDye.Color
+				end
+
+				---@type ItemTemplate
+				local itemDyeTemplate = Ext.Template.GetTemplate(dyeTemplate)
+
+				---@type ResourceMaterialPresetResource
+				local materialPreset = Ext.Resource.Get(itemDyeTemplate.ColorPreset, "MaterialPreset")
+
+				equippedItemEntity.ItemDye.Color = materialPreset.Guid
+				equippedItemEntity:Replicate("ItemDye")
+			elseif equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
+				Logger:BasicDebug("%s in slot %s for %s doesn't have a corresponding outfit slot, so resetting the dye to %s", equippedItem, actualSlot,
+					character.DisplayName.Name:Get(), equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo)
+
+				if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo == "00000000-0000-0000-0000-000000000000" then
+					if equippedItemEntity.ItemDye then
+						equippedItemEntity:RemoveComponent("ItemDye")
+					end
+				else
+					if not equippedItemEntity.ItemDye then
+						equippedItemEntity:CreateComponent("ItemDye")
+					end
+					equippedItemEntity.ItemDye.Color = equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
+				end
+				equippedItemEntity:Replicate("ItemDye")
+				equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = nil
 			end
-
-			---@type ItemTemplate
-			local itemDyeTemplate = Ext.Template.GetTemplate(dyeTemplate)
-
-			---@type ResourceMaterialPresetResource
-			local materialPreset = Ext.Resource.Get(itemDyeTemplate.ColorPreset, "MaterialPreset")
-
-			equippedItemEntity.ItemDye.Color = materialPreset.Guid
-			equippedItemEntity:Replicate("ItemDye")
-
 			::continue::
 		end)
 
@@ -439,6 +469,7 @@ function Transmogger:ClearOutfit(character)
 			Transmogger:UnMogItem(equippedItem)
 		end
 	end
+	Transmogger:ApplyDye(Ext.Entity.Get(character))
 end
 
 ---@param item any
@@ -514,9 +545,6 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 
 					return newItem
 				end
-			elseif itemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
-				itemEntity.ItemDye.Color = itemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
-				itemEntity:Replicate("ItemDye")
 			end
 		end
 	end
@@ -533,6 +561,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	local itemEntity = Ext.Entity.Get(item)
 	if itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging then
 		itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = nil
+		Transmogger:ApplyDye(Ext.Entity.Get(character))
 	else
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
 		Ext.Timer.WaitFor(100, function()
