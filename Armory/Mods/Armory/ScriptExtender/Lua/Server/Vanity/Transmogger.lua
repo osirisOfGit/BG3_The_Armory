@@ -151,6 +151,19 @@ function Transmogger:MogCharacter(character)
 				goto continue
 			end
 
+			---@type EntityHandle
+			local entity = Ext.Entity.Get(equippedItem)
+			if not Ext.Template.GetRootTemplate(entity.ServerItem.Template.Id) then
+				Logger:BasicWarning(
+					"Item %s points to RootTemplate %s which does not exist - this indicates that this is likely a LocalItem, and therefore incompatible with Transmog due to being completely unique to the game world."
+					.. " If this is not intended, please contact the modAuthor. Item info: \n%s",
+					entity.ServerItem.Template.Name .. "_" .. equippedItem,
+					entity.ServerItem.Template.Name .. "_" .. entity.ServerItem.Template.Id,
+					buildMetaInfoForLog(entity)
+				)
+				goto continue
+			end
+
 			local unmoggedId = Transmogger:UnMogItem(equippedItem, true)
 			equippedItem = unmoggedId or equippedItem
 			if not unmoggedId then
@@ -175,7 +188,8 @@ function Transmogger:MogCharacter(character)
 			if equippedItemEntity.ServerItem.Template.Stats ~= equippedItemEntity.Data.StatsId then
 				Logger:BasicWarning(
 					"Item's stat string (%s) differs from its template's stat string (%s) - most likely this is a modded item, and the mod author did not ensure the item template points at the stat, and the stat points back to the same template."
-					.. " Work around will be executed, but you'll need to save and reload to finalize the process. Please reach out to the author and ask them to fix for best experience. Item info:\n%s",
+					..
+					" Work around will be executed, but you'll need to save and reload to finalize the process. Please reach out to the author and ask them to fix for best experience. Item info:\n%s",
 					equippedItemEntity.Data.StatsId,
 					equippedItemEntity.ServerItem.Template.Stats,
 					buildMetaInfoForLog(equippedItemEntity))
@@ -446,12 +460,39 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 					Logger:BasicDebug("%s was unequipped, so restoring to %s and giving to %s", item, originalItemTemplate, inventoryOwner)
 					local vanityIsEquipped = Osi.IsEquipped(item)
 
+					local newItem = Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, "")
+					if not newItem then
+						local modInfo
+						if originalItemStat then
+							---@type Weapon|Armor|Object?
+							local stat = Ext.Stats.Get(originalItemStat)
+							modInfo = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info or nil
+						end
+
+						---@type ItemTemplate
+						local templateInfo = Ext.Template.GetRootTemplate(originalItemTemplate)
+						local itemInfo = Ext.Json.Stringify({
+							templateUuid = templateInfo.Name .. "_" .. originalItemTemplate,
+							displayName = templateInfo.DisplayName:Get() or templateInfo.Name,
+							statName = originalItemStat,
+							modName = modInfo and modInfo.Name,
+							modAuthor = modInfo and modInfo.Author,
+							modVersion = modInfo and table.concat(modInfo.ModVersion, ".")
+						})
+
+						Logger:BasicError(
+							"Unable to create a new instance of the template %s - can't correctly undo the transmog on this item, so doing a partial transmog on a different template. Item info: \n%s",
+							originalItemTemplate,
+							itemInfo)
+
+						newItem = Osi.CreateAt(itemEntity.ServerItem.Template.Id, 0, 0, 0, 0, 0, "")
+					end
+
 					Osi.RequestDelete(item)
 
-					local newItem = Osi.CreateAt(originalItemTemplate, 0, 0, 0, 0, 0, "")
+					---@type EntityHandle
+					local newItemEntity = Ext.Entity.Get(newItem)
 					if originalItemStat then
-						---@type EntityHandle
-						local newItemEntity = Ext.Entity.Get(newItem)
 						if newItemEntity.Data.StatsId ~= originalItemStat then
 							newItemEntity.Data.StatsId = originalItemStat
 							newItemEntity:Replicate("Data")
@@ -459,16 +500,17 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 							newItemEntity.ServerItem.Stats = originalItemStat
 						end
 					end
-					Ext.Timer.WaitFor(20, function()
-						if not currentlyMogging then
+					if not currentlyMogging then
+						Ext.Timer.WaitFor(20, function()
 							if vanityIsEquipped == 1 then
+								newItemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 								Osi.Equip(inventoryOwner, newItem)
 								Transmogger:ApplyDye(Ext.Entity.Get(inventoryOwner))
 							else
 								Osi.ToInventory(newItem, inventoryOwner, 1, 0, 1)
 							end
-						end
-					end)
+						end)
+					end
 
 					return newItem
 				end
@@ -494,6 +536,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	else
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
 		Ext.Timer.WaitFor(100, function()
+			Logger:BasicDebug("Item %s was equipped on %s, executing transmog", itemEntity.DisplayName.Name:Get() or itemEntity.ServerItem.Template.Name, character)
 			Transmogger:MogCharacter(Ext.Entity.Get(character))
 		end)
 	end

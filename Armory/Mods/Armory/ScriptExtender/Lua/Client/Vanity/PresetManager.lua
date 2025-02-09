@@ -22,6 +22,55 @@ local presetInfoSection
 ---@type ExtuiGroup?
 local presetActivelyViewing
 
+---@param parent ExtuiTreeParent
+---@param forPresetId string?
+local function buildPresetForm(parent, forPresetId)
+	---@type VanityPreset?
+	local preset
+	if forPresetId then
+		preset = ConfigurationStructure.config.vanity.presets[forPresetId]
+	end
+
+	FormBuilder:CreateForm(parent, function(values)
+			local presetID = forPresetId or FormBuilder:generateGUID()
+
+			values.Outfits = preset and ConfigurationStructure:GetRealConfigCopy().vanity.presets[forPresetId].Outfits or {}
+
+			if ConfigurationStructure.config.vanity.presets[presetID] then
+				ConfigurationStructure.config.vanity.presets[presetID].delete = true
+			end
+
+			ConfigurationStructure.config.vanity.presets[presetID] = values
+
+			parent.Visible = false
+			VanityPresetManager:UpdatePresetView(presetID)
+		end,
+		{
+			label = "Author",
+			defaultValue = preset and preset.Author or VanityPresetManager.username,
+			type = "Text",
+			errorMessageIfEmpty = "This is a required field",
+		},
+		{
+			label = "Name",
+			defaultValue = preset and preset.Name or nil,
+			type = "Text",
+			errorMessageIfEmpty = "This is a required field",
+		},
+		{
+			label = "Version",
+			defaultValue = preset and preset.Version or "1.0.0",
+			type = "Text",
+			errorMessageIfEmpty = "This is a required field",
+		},
+		{
+			label = "NSFW",
+			defaultValue = preset and preset.NSFW or true,
+			type = "Checkbox",
+		}
+	)
+end
+
 function VanityPresetManager:OpenManager()
 	if presetWindow then
 		presetWindow.Open = true
@@ -32,49 +81,14 @@ function VanityPresetManager:OpenManager()
 		presetWindow = Ext.IMGUI.NewWindow("Vanity Preset Manager")
 		presetWindow.Closeable = true
 
-		--#region Create New Preset
 		local createNewPresetButton = presetWindow:AddButton("Create a New Preset")
 		local presetForm = presetWindow:AddGroup("NewPresetForm")
 		presetForm.Visible = false
 
 		createNewPresetButton.OnClick = function()
-			FormBuilder:CreateForm(presetForm, function(values)
-				local presetID = FormBuilder:generateGUID()
-
-				values.ModDependencies = {}
-				values.Outfits = {}
-
-				ConfigurationStructure.config.vanity.presets[presetID] = values
-
-				presetForm.Visible = false
-				VanityPresetManager:UpdatePresetView(presetID)
-			end,
-			{
-				label = "Author",
-				defaultValue = VanityPresetManager.username,
-				type = "Text",
-				errorMessageIfEmpty = "This is a required field",
-			},
-			{
-				label = "Name",
-				type = "Text",
-				errorMessageIfEmpty = "This is a required field",
-			},
-			{
-				label = "Version",
-				defaultValue = "1.0.0",
-				type = "Text",
-				errorMessageIfEmpty = "This is a required field",
-			},
-			{
-				label = "NSFW",
-				defaultValue = true,
-				type = "Checkbox",
-			}
-		)
+			buildPresetForm(presetForm)
 			presetForm.Visible = not presetForm.Visible
 		end
-		--#endregion
 
 		local presetTable = presetWindow:AddTable("PresetTable", 2)
 		presetTable.NoSavedSettings = true
@@ -233,10 +247,22 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			presetGroup:AddText("Name: " .. preset.Name)
-			presetGroup:AddText("Author: " .. preset.Author)
-			presetGroup:AddText("Version: " .. preset.Version)
-			presetGroup:AddText("Contains Skimpy Outfits/Nudity? " .. (preset.NSFW and "Yes" or "No"))
+			local editButton = presetGroup:AddButton("Edit")
+
+			local infoGroup = presetGroup:AddGroup("info")
+			infoGroup:AddText("Name: " .. preset.Name)
+			infoGroup:AddText("Author: " .. preset.Author)
+			infoGroup:AddText("Version: " .. preset.Version)
+			infoGroup:AddText("Contains Skimpy Outfits/Nudity? " .. (preset.NSFW and "Yes" or "No"))
+
+			editButton.OnClick = function()
+				if editButton.UserData then
+					VanityPresetManager:UpdatePresetView(guid)
+				else
+					editButton.UserData = true
+					buildPresetForm(infoGroup, guid)
+				end
+			end
 
 			presetGroup:AddSeparatorText("Mod Dependencies")
 			buildDependencyTable(preset, presetGroup)
@@ -246,6 +272,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			-- Need to pass the proxy value so it can get deleted properly
 			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], presetGroup)
 		end
+
 		if presetID == guid then
 			presetButton.OnClick()
 		end
