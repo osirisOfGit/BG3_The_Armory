@@ -187,6 +187,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		end
 	end
 
+	local customizePopup = panelGroup:AddPopup("CustomizePopup")
+
 	--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
 	--- so each weapon type can be configured separately as desired. Attaches the Equipment and Dye picker to each configurable slot
 	---@param parentContainer ExtuiTableCell|ExtuiGroup|ExtuiCollapsingHeader
@@ -266,7 +268,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				end
 
 				if imageButton.UserData then
-					local customizePopup = parentContainer:AddPopup("CustomizePopup")
 					local oldFunc = imageButton.OnClick
 					imageButton.OnClick = function()
 						Helpers:KillChildren(customizePopup)
@@ -323,7 +324,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 				end
 
 				if dyeButton.UserData then
-					local customizePopup = parentContainer:AddPopup("CustomizePopup")
 					local oldFunc = dyeButton.OnClick
 					dyeButton.OnClick = function()
 						Helpers:KillChildren(customizePopup)
