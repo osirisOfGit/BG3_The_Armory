@@ -90,7 +90,7 @@ function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
 
-		dyeInfoGroup:AddSeparatorText(dyeTemplateId)
+		dyeInfoGroup:AddSeparatorText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name)
 		dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian"))
 			:SetColor("Text", { 1, 1, 1, 0.5 })
 

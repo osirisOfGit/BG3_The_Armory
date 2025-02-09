@@ -4,7 +4,7 @@ local itemIndex = {
 		statAndModId = {},
 		statAndTemplateId = {},
 		templateIdAndStat = {},
-		templateNameAndId = {},
+		templateIdAndTemplateName = {},
 		modIdAndTemplateIds = {},
 		mods = {}
 	},
@@ -12,7 +12,7 @@ local itemIndex = {
 		statAndModId = {},
 		statAndTemplateId = {},
 		templateIdAndStat = {},
-		templateNameAndId = {},
+		templateIdAndTemplateName = {},
 		modIdAndTemplateIds = {},
 		mods = {}
 	}
@@ -59,6 +59,8 @@ function PickerBaseClass:InitializeSearchBank()
 	local itemCount = 0
 	local modCount = 0
 
+	local modcache = {}
+
 	local combinedStats = {}
 	for _, statType in ipairs({ "Armor", "Weapon", "Object" }) do
 		for _, stat in ipairs(Ext.Stats.GetStats(statType)) do
@@ -94,18 +96,21 @@ function PickerBaseClass:InitializeSearchBank()
 
 			indexShard.statAndTemplateId[statString] = stat.RootTemplate
 			indexShard.templateIdAndStat[stat.RootTemplate] = statString
-			indexShard.templateNameAndId[itemTemplate.DisplayName:Get() or itemTemplate.Name] = stat.RootTemplate
+			indexShard.templateIdAndTemplateName[stat.RootTemplate] = itemTemplate.DisplayName:Get() or itemTemplate.Name
 
 			if stat.ModId ~= "" then
 				local modInfo = Ext.Mod.GetMod(stat.ModId).Info
 				if not indexShard.mods[modInfo.Name] then
-					modCount = modCount + 1
+					if not modcache[stat.ModId] then
+						modCount = modCount + 1
+						modcache[stat.ModId] = true
+					end
 					indexShard.mods[modInfo.Name] = stat.ModId
 					indexShard.modIdAndTemplateIds[stat.ModId] = {}
 				end
 				indexShard.statAndModId[statString] = stat.ModId
 				table.insert(indexShard.modIdAndTemplateIds[stat.ModId], itemTemplate.Id)
-				table.sort(indexShard.modIdAndTemplateIds[stat.ModId], function (a, b)
+				table.sort(indexShard.modIdAndTemplateIds[stat.ModId], function(a, b)
 					return Ext.Template.GetRootTemplate(a).Name < Ext.Template.GetRootTemplate(b).Name
 				end)
 			end
@@ -186,7 +191,9 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 					upperSearch = string.upper(self.searchInput.Text)
 				end
 
-				for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
+				for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
+					return self.itemIndex.templateIdAndTemplateName[key]
+				end) do
 					if not upperSearch or string.find(string.upper(templateName), upperSearch) then
 						self:DisplayResult(templateId, self.resultsGroup)
 					end
@@ -235,7 +242,9 @@ end
 function PickerBaseClass:RebuildDisplay()
 	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
 
-	for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
+	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
+		return self.itemIndex.templateIdAndTemplateName[key]
+	end) do
 		self:DisplayResult(templateId, self.favoritesGroup)
 	end
 
@@ -244,7 +253,9 @@ function PickerBaseClass:RebuildDisplay()
 	elseif self.getAllForModCombo.SelectedIndex > -1 then
 		self.getAllForModCombo.OnChange()
 	else
-		for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
+		for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
+			return self.itemIndex.templateIdAndTemplateName[key]
+		end) do
 			if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
 				self:DisplayResult(templateId, self.resultsGroup)
 			end
