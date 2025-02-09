@@ -6,7 +6,6 @@ local itemIndex = {
 		templateIdAndStat = {},
 		templateNameAndId = {},
 		modIdAndTemplateName = {},
-		---@type {[string] : ModuleInfo}
 		mods = {}
 	},
 	dyes = {
@@ -15,7 +14,6 @@ local itemIndex = {
 		templateIdAndStat = {},
 		templateNameAndId = {},
 		modIdAndTemplateName = {},
-		---@type {[string] : ModuleInfo}
 		mods = {}
 	}
 }
@@ -99,9 +97,10 @@ function PickerBaseClass:InitializeSearchBank()
 			indexShard.templateNameAndId[itemTemplate.DisplayName:Get() or itemTemplate.Name] = stat.RootTemplate
 
 			if stat.ModId ~= "" then
-				if not indexShard.mods[stat.ModId] then
+				local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+				if not indexShard.mods[modInfo.Name] then
 					modCount = modCount + 1
-					indexShard.mods[stat.ModId] = Ext.Mod.GetMod(stat.ModId).Info
+					indexShard.mods[modInfo.Name] = stat.ModId
 					indexShard.modIdAndTemplateName[stat.ModId] = {}
 				end
 				indexShard.statAndModId[statString] = stat.ModId
