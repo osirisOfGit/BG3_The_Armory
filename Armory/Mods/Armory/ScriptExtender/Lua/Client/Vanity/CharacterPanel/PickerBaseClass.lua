@@ -5,7 +5,7 @@ local itemIndex = {
 		statAndTemplateId = {},
 		templateIdAndStat = {},
 		templateNameAndId = {},
-		modIdAndTemplateName = {},
+		modIdAndTemplateIds = {},
 		mods = {}
 	},
 	dyes = {
@@ -13,7 +13,7 @@ local itemIndex = {
 		statAndTemplateId = {},
 		templateIdAndStat = {},
 		templateNameAndId = {},
-		modIdAndTemplateName = {},
+		modIdAndTemplateIds = {},
 		mods = {}
 	}
 }
@@ -101,11 +101,13 @@ function PickerBaseClass:InitializeSearchBank()
 				if not indexShard.mods[modInfo.Name] then
 					modCount = modCount + 1
 					indexShard.mods[modInfo.Name] = stat.ModId
-					indexShard.modIdAndTemplateName[stat.ModId] = {}
+					indexShard.modIdAndTemplateIds[stat.ModId] = {}
 				end
 				indexShard.statAndModId[statString] = stat.ModId
-				table.insert(indexShard.modIdAndTemplateName[stat.ModId], itemTemplate.DisplayName:Get() or itemTemplate.Name)
-				table.sort(indexShard.modIdAndTemplateName[stat.ModId])
+				table.insert(indexShard.modIdAndTemplateIds[stat.ModId], itemTemplate.Id)
+				table.sort(indexShard.modIdAndTemplateIds[stat.ModId], function (a, b)
+					return Ext.Template.GetRootTemplate(a).Name < Ext.Template.GetRootTemplate(b).Name
+				end)
 			end
 		end)
 
@@ -186,7 +188,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 				for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
 					if not upperSearch or string.find(string.upper(templateName), upperSearch) then
-						self:DisplayResult(templateName, self.resultsGroup)
+						self:DisplayResult(templateId, self.resultsGroup)
 					end
 				end
 			end)
@@ -205,8 +207,8 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.getAllForModCombo.OnChange = function()
 			Helpers:KillChildren(self.resultsGroup)
 			-- \[[[^_^]]]/
-			for _, templateName in ipairs(self.itemIndex.modIdAndTemplateName[self.itemIndex.mods[self.getAllForModCombo.Options[self.getAllForModCombo.SelectedIndex + 1]]]) do
-				self:DisplayResult(templateName, self.resultsGroup)
+			for _, templateId in ipairs(self.itemIndex.modIdAndTemplateIds[self.itemIndex.mods[self.getAllForModCombo.Options[self.getAllForModCombo.SelectedIndex + 1]]]) do
+				self:DisplayResult(templateId, self.resultsGroup)
 			end
 		end
 
@@ -234,7 +236,7 @@ function PickerBaseClass:RebuildDisplay()
 	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
 
 	for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
-		self:DisplayResult(templateName, self.favoritesGroup)
+		self:DisplayResult(templateId, self.favoritesGroup)
 	end
 
 	if #self.searchInput.Text >= 3 then
@@ -244,7 +246,7 @@ function PickerBaseClass:RebuildDisplay()
 	else
 		for templateName, templateId in TableUtils:OrderedPairs(self.itemIndex.templateNameAndId) do
 			if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
-				self:DisplayResult(templateName, self.resultsGroup)
+				self:DisplayResult(templateId, self.resultsGroup)
 			end
 		end
 	end
