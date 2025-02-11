@@ -16,7 +16,7 @@ VanityEffect = {
 		---@type string?
 		BeamEffect = "",
 		---@type string?
-		Material = "",
+		FormatColor = "",
 		---@type string?
 		MaterialType = "",
 		---@type string?
@@ -78,18 +78,24 @@ if Ext.IsClient() then
 		formPopup = parent.ParentElement:AddPopup("Create Effect Form")
 
 		---@type FormStructure[]
-		local formInputs = {{
+		local formInputs = { {
 			label = "Name",
 			type = "Text",
 			errorMessageIfEmpty = "Must provide a name"
-		}}
+		} }
 		for effectProp, value in TableUtils:OrderedPairs(self.effectProps) do
 			table.insert(formInputs, {
 				label = effectProp,
 				propertyField = effectProp,
 				type = type(value) == "number" and "NumericText" or "Text",
-				dependsOn = effectProp == "AuraRadius" and "AuraFX" or nil,
-				errorMessageIfEmpty = effectProp == "AuraRadius" and "AuraRadius is required if AuraFX is specified" or nil
+				dependsOn = (effectProp == "AuraRadius" and "AuraFX")
+					or (effectProp == "FormatColor" and "MaterialType")
+					or (effectProp == "MaterialType" and "FormatColor")
+					or nil,
+				errorMessageIfEmpty = (effectProp == "AuraRadius" and "AuraRadius is required if AuraFX is specified")
+					or (effectProp == "FormatColor" and "FormatColor is required if MaterialType is specified")
+					or (effectProp == "MaterialType" and "MaterialType is required if FormatColor is specified")
+					or nil
 			} --[[@as FormStructure]])
 		end
 
