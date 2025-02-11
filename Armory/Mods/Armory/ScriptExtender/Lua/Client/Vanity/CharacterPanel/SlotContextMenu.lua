@@ -1,3 +1,5 @@
+Ext.Require("Shared/Vanity/EffectManager.lua")
+
 SlotContextMenu = {}
 
 ---@type ExtuiPopup
@@ -46,6 +48,10 @@ function SlotContextMenu:buildMenuForSlot(outfitSlot, slotButton, buttonType, on
 
 					onCloseFunc()
 				end
+			end
+
+			if buttonType == "equipment" then
+				VanityEffect:buildSlotContextMenuEntries(self.Popup, outfitSlot[buttonType])
 			end
 
 			self.Popup:Open()

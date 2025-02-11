@@ -27,7 +27,7 @@ end
 function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 	Helpers:KillChildren(parent)
 
-	local formInputs = { ... }
+	local formInputs = type(...) == "table" and ... or { ... }
 
 	for _, formInput in pairs(formInputs) do
 		parent:AddText(formInput.label)
@@ -63,11 +63,30 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 		local inputs = {}
 		for _, formInput in pairs(formInputs) do
 			if formInput.authorError then
-				-- If it's empty
-				if formInput.input.Text and formInput.input.Text:match("^%s*$") then
-					formInput.authorError.Visible = true
-					hasErrors = true
-					goto continue
+				local dependsHasContent = nil
+				if formInput.dependsOn then
+					for _, inputToDependOn in pairs(formInputs) do
+						if inputToDependOn.label == formInput.dependsOn then
+							if inputToDependOn.input.Text and not inputToDependOn.input.Text:match("^%s*$") then
+								dependsHasContent = true
+							else
+								dependsHasContent = false
+							end
+							break
+						end
+					end
+					if dependsHasContent == true and (not formInput.input.Text or formInput.input.Text:match("^%s*$")) then
+						formInput.authorError.Visible = true
+						hasErrors = true
+						goto continue
+					end
+				else
+					-- If it's empty
+					if not formInput.input.Text or formInput.input.Text:match("^%s*$") then
+						formInput.authorError.Visible = true
+						hasErrors = true
+						goto continue
+					end
 				end
 			end
 			if formInput.type == "Text" or formInput.type == "NumericText" or formInput.type == "Multiline" then

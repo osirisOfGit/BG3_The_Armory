@@ -1,13 +1,18 @@
+local effectCollection = {}
+
+---@type ExtuiPopup
+local formPopup
+
 ---@class VanityEffect
 VanityEffect = {
 	---@type string
 	Name = "",
 	---@class VanityEffectProperties
 	effectProps = {
-		---@type integer?
-		AuraRadius = 0,
 		---@type string?
 		AuraFX = "",
+		---@type integer?
+		AuraRadius = 0,
 		---@type string?
 		BeamEffect = "",
 		---@type string?
@@ -44,6 +49,12 @@ function VanityEffect:new(instance, name, effectProps)
 	effectProps.Name = nil
 	instance.effectProps = TableUtils:DeeplyCopyTable(effectProps)
 
+	if not next(effectCollection) then
+		for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
+			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
+		end
+	end
+
 	return instance
 end
 
@@ -62,19 +73,70 @@ end
 if Ext.IsClient() then
 	Ext.Require("Client/_FormBuilder.lua")
 
-	function VanityEffect:buildForm(parent)
+	---@param parent ExtuiTreeParent
+	function VanityEffect:buildCreateEffectForm(parent)
+		formPopup = parent.ParentElement:AddPopup("Create Effect Form")
+
 		---@type FormStructure[]
-		local formInputs = {}
-		for effectProp, value in pairs(self.effectProps) do
+		local formInputs = {{
+			label = "Name",
+			type = "Text",
+			errorMessageIfEmpty = "Must provide a name"
+		}}
+		for effectProp, value in TableUtils:OrderedPairs(self.effectProps) do
 			table.insert(formInputs, {
 				label = effectProp,
-				type = type(value) == "number" and "NumericText" or "Text"
+				propertyField = effectProp,
+				type = type(value) == "number" and "NumericText" or "Text",
+				dependsOn = effectProp == "AuraRadius" and "AuraFX" or nil,
+				errorMessageIfEmpty = effectProp == "AuraRadius" and "AuraRadius is required if AuraFX is specified" or nil
 			} --[[@as FormStructure]])
 		end
 
-		FormBuilder:CreateForm(parent, function(inputs)
-			local newEffect = VanityEffect:new({}, inputs.Name, inputs)
-			ConfigurationStructure.config.vanity.effects[newEffect.Name] = newEffect
-		end)
+		FormBuilder:CreateForm(formPopup,
+			function(inputs)
+				local newEffect = VanityEffect:new({}, inputs.Name, inputs)
+				effectCollection[inputs.Name] = newEffect
+				ConfigurationStructure.config.vanity.effects[newEffect.Name] = newEffect
+			end,
+			formInputs)
+
+		formPopup:Open()
+	end
+
+	---@param parentPopup ExtuiPopup
+	---@param vanityOutfitItemEntry VanityOutfitItemEntry
+	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry)
+		---@type ExtuiMenu
+		local menu = parentPopup:AddMenu("Add Effects")
+		for effectName, vanityEffect in TableUtils:OrderedPairs(effectCollection) do
+			---@type ExtuiSelectable
+			local effectSelectable = menu:AddSelectable(string.sub(effectName, #"ARMORY_VANITY_EFFECT_"), "DontClosePopups")
+			effectSelectable.UserData = vanityEffect
+			local contains = TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName)
+			effectSelectable.Selected = contains
+
+			effectSelectable.OnClick = function()
+				if effectSelectable.Selected then
+					if not vanityOutfitItemEntry.effects then
+						vanityOutfitItemEntry.effects = {}
+					end
+					local tableCopy = {}
+					for _, effect in ipairs(vanityOutfitItemEntry.effects) do
+						if effect ~= effectName then
+							table.insert(tableCopy, effect)
+						end
+					end
+					vanityOutfitItemEntry.effects.delete = true
+					vanityOutfitItemEntry.effects = tableCopy
+				end
+			end
+		end
+
+		---@type ExtuiSelectable
+		local addNewEffectSelectable = menu:AddSelectable("Create New Effect")
+		addNewEffectSelectable.OnClick = function()
+			self:buildCreateEffectForm(parentPopup)
+		end
 	end
 end

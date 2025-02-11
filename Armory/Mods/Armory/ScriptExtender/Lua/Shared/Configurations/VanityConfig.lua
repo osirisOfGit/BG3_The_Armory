@@ -40,6 +40,8 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.outfitItemEntry = {
 	guid = nil,
 	---@type ModDependency
 	modDependency = nil,
+	---@type string[]
+	effects = nil
 }
 
 ---@class VanityOutfitSlot

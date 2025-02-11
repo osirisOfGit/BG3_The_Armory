@@ -121,11 +121,6 @@ function Transmogger:MogCharacter(character)
 	for actualSlot, outfitSlot in pairs(outfit) do
 		local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
 
-		if equippedItem then
-			Osi.ApplyStatus(equippedItem, "ARMORY_VANITY_BURNING_EQUIPMENT", -1, 1)
-			goto continue
-		end
-
 		---@type string
 		local vanityTemplate = outfitSlot.equipment and outfitSlot.equipment.guid or nil
 
