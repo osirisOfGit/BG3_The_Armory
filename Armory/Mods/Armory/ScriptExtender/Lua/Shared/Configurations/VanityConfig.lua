@@ -72,4 +72,6 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 ---@type {[Guid]: VanityPreset}
 ConfigurationStructure.config.vanity.presets = {}
 
+---@type {[string]: VanityEffect}
+ConfigurationStructure.config.vanity.effects = {}
 --#endregion

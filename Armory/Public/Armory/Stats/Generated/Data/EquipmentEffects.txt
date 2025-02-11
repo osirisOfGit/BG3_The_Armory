@@ -1,0 +1,35 @@
+new entry "ARMORY_VANITY_INVISIBLE_EQUIPMENT"
+type "StatusData"
+data "StatusType" "BOOST"
+// Invisible Weapon
+data "DisplayName" "hab3affb0f90242de9d2f98e47a3246b3788g;1"
+data "Description" "h990a64b1515b411ebfdbb47e9cafb93c73ef;1"
+data "Icon" "Status_Invisible"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator;ApplyToDead;IgnoreResting"
+data "StatusEffect" "d26436d4-d019-4dfc-b2f1-da0ac195575f"
+
+new entry "ARMORY_VANITY_BURNING_EQUIPMENT"
+type "StatusData"
+data "StatusType" "BOOST"
+// Invisible Weapon
+data "DisplayName" "hab3affb0f90242de9d2f98e47a3246b3788g;1"
+data "Icon" "Status_Invisible"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator;ApplyToDead;IgnoreResting"
+data "StatusEffect" "2156dd48-f83b-4060-9a4e-cab994da8857"
+
+new entry "ARMORY_VANITY_FROZEN_EQUIPMENT"
+type "StatusData"
+data "StatusType" "BOOST"
+// Invisible Weapon
+data "DisplayName" "hab3affb0f90242de9d2f98e47a3246b3788g;1"
+data "Icon" "Status_Invisible"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator;ApplyToDead;IgnoreResting"
+data "StatusEffect" "62318bbf-d36a-497c-91a4-bda8f7fb7af7"
+
+new entry "ARMORY_VANITY_LIGHTNING_EQUIPMENT"
+type "StatusData"
+data "StatusType" "BOOST"
+data "DisplayName" "h2f030fdfg9c24g4ffbg88a6gbad582d1eceb;1"
+data "Icon" "Status_Invisible"
+data "StatusPropertyFlags" "DisableOverhead;DisableCombatlog;DisablePortraitIndicator;ApplyToDead;IgnoreResting"
+data "StatusEffect" "ea04f6a3-5dda-4fc5-989f-6a3d5b4b315c"

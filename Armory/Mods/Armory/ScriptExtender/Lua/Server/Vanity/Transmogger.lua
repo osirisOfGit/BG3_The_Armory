@@ -29,7 +29,8 @@ local defaultPieces = {
 	Ring1 = "ecf4a8a4-7859-4a82-8c08-0c9526f29500",
 	Ring2 = "ecf4a8a4-7859-4a82-8c08-0c9526f29500",
 	LightSource = "50c43f27-a12e-412c-88f0-56e15eba692a",
-	MusicalInstrument = "848ad8dc-59f3-464b-b8b2-95eab6022446"
+	MusicalInstrument = "848ad8dc-59f3-464b-b8b2-95eab6022446",
+	HideTransmog = "cd6c6adc-8792-4378-8c63-8169cfad6c55"
 }
 
 -- Things that will cause me psychic damage: https://discord.com/channels/1174823496086470716/1193836567194771506/1327500800766771271
@@ -119,6 +120,11 @@ function Transmogger:MogCharacter(character)
 
 	for actualSlot, outfitSlot in pairs(outfit) do
 		local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
+
+		if equippedItem then
+			Osi.ApplyStatus(equippedItem, "ARMORY_VANITY_BURNING_EQUIPMENT", -1, 1)
+			goto continue
+		end
 
 		---@type string
 		local vanityTemplate = outfitSlot.equipment and outfitSlot.equipment.guid or nil
@@ -376,18 +382,18 @@ function Transmogger:ApplyDye(character)
 					if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
 						Logger:BasicDebug("%s in slot %s for %s doesn't have a corresponding outfit slot, so resetting the dye to %s", equippedItem, actualSlot,
 							character.DisplayName.Name:Get(), equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo)
-							if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo == "00000000-0000-0000-0000-000000000000" then
-								if equippedItemEntity.ItemDye then
-									equippedItemEntity:RemoveComponent("ItemDye")
-								end
-							else
-								if not equippedItemEntity.ItemDye then
-									equippedItemEntity:CreateComponent("ItemDye")
-								end
-								equippedItemEntity.ItemDye.Color = equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
+						if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo == "00000000-0000-0000-0000-000000000000" then
+							if equippedItemEntity.ItemDye then
+								equippedItemEntity:RemoveComponent("ItemDye")
 							end
-							equippedItemEntity:Replicate("ItemDye")
-							equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = nil
+						else
+							if not equippedItemEntity.ItemDye then
+								equippedItemEntity:CreateComponent("ItemDye")
+							end
+							equippedItemEntity.ItemDye.Color = equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
+						end
+						equippedItemEntity:Replicate("ItemDye")
+						equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = nil
 					end
 					goto continue
 				end
@@ -565,7 +571,8 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	else
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
 		Ext.Timer.WaitFor(100, function()
-			Logger:BasicDebug("Item %s was equipped on %s, executing transmog", itemEntity.DisplayName.Name:Get() or itemEntity.ServerItem.Template.Name, character)
+			Logger:BasicDebug("Item %s was equipped on %s, executing transmog", (itemEntity.DisplayName and itemEntity.DisplayName.Name:Get()) or itemEntity.ServerItem.Template
+			.Name, character)
 			Transmogger:MogCharacter(Ext.Entity.Get(character))
 		end)
 	end

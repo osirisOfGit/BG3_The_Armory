@@ -14,8 +14,9 @@ end
 ---@class FormStructure
 ---@field label string
 ---@field propertyField string?
----@field type "Text"|"Multiline"|"Checkbox"
+---@field type "Text"|"NumericText"|"Multiline"|"Checkbox"
 ---@field defaultValue string|boolean?
+---@field dependsOn string?
 ---@field errorMessageIfEmpty string?
 ---@field input ExtuiInputText|ExtuiCheckbox?
 ---@field authorError ExtuiText?
@@ -31,11 +32,14 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 	for _, formInput in pairs(formInputs) do
 		parent:AddText(formInput.label)
 		local input
-		if formInput.type == "Text" then
+		if formInput.type == "Text" or formInput.type == "NumericText" or formInput.type == "Multiline" then
 			input = parent:AddInputText("", formInput.defaultValue or "")
-		elseif formInput.type == "Multiline" then
-			input = parent:AddInputText("", formInput.defaultValue or "")
-			input.Multiline = true
+
+			if formInput.type == "NumericText" then
+				input.CharsDecimal = true
+			elseif formInput.type == "Multiline" then
+				input.Multiline = true
+			end
 		elseif formInput.type == "Checkbox" then
 			input = parent:AddCheckbox("", formInput.defaultValue or false)
 		end
@@ -66,7 +70,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 					goto continue
 				end
 			end
-			if formInput.type == "Text" or formInput.type == "Multiline" then
+			if formInput.type == "Text" or formInput.type == "NumericText" or formInput.type == "Multiline" then
 				inputs[formInput.propertyField or formInput.label] = formInput.input.Text
 			elseif formInput.type == "Checkbox" then
 				inputs[formInput.propertyField or formInput.label] = formInput.input.Checked
