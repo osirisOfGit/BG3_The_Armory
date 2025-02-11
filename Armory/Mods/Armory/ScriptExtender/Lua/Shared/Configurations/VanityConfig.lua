@@ -4,7 +4,9 @@ ConfigurationStructure.config.vanity = {}
 
 --#region User Settings
 ConfigurationStructure.config.vanity.settings = {
-	general = {},
+	general = {
+		showSlotContextMenuModifier = nil
+	},
 	---@class EquipmentSettings
 	equipment = {
 		---@type Guid[]
