@@ -1,6 +1,7 @@
 Ext.Require("Client/Vanity/CharacterPanel/PickerBaseClass.lua")
 Ext.Require("Client/Vanity/CharacterPanel/DyePicker.lua")
 Ext.Require("Client/Vanity/CharacterPanel/EquipmentPicker.lua")
+Ext.Require("Client/Vanity/CharacterPanel/SlotContextMenu.lua")
 
 ---@type {[ActualSlot] : string[][]}
 local weaponTypes = {
@@ -100,6 +101,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		return
 	end
 
+	SlotContextMenu:initialize(panelGroup)
+
 	---@cast criteriaCompositeKey string
 
 	panelGroup:AddSeparator()
@@ -187,8 +190,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		end
 	end
 
-	local customizePopup = panelGroup:AddPopup("CustomizePopup")
-
 	--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
 	--- so each weapon type can be configured separately as desired. Attaches the Equipment and Dye picker to each configurable slot
 	---@param parentContainer ExtuiTableCell|ExtuiGroup|ExtuiCollapsingHeader
@@ -267,29 +268,12 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 						end)
 				end
 
-				if imageButton.UserData then
-					local oldFunc = imageButton.OnClick
-					imageButton.OnClick = function()
-						Helpers:KillChildren(customizePopup)
-						customizePopup:AddSelectable("Edit").OnActivate = oldFunc
-						customizePopup:AddSelectable("Clear").OnActivate = function()
-							preset.Outfits[criteriaCompositeKey][itemSlot].equipment.delete = true
-							if not preset.Outfits[criteriaCompositeKey][itemSlot]() then
-								preset.Outfits[criteriaCompositeKey][itemSlot].delete = true
-							end
-							if not preset.Outfits[criteriaCompositeKey]() then
-								preset.Outfits[criteriaCompositeKey].delete = true
-							end
-
-							Ext.Timer.WaitFor(350, function()
-								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-							end)
-							BuildSlots(parentContainer, group, verticalSlots, slot)
-						end
-
-						customizePopup:Open()
-					end
-				end
+				SlotContextMenu:buildMenuForSlot(outfitSlotEntry, imageButton, "equipment", function()
+					Ext.Timer.WaitFor(350, function()
+						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+					end)
+					BuildSlots(parentContainer, group, verticalSlots, slot)
+				end)
 				--#endregion
 
 				--#region Dyes
@@ -323,29 +307,12 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 						end)
 				end
 
-				if dyeButton.UserData then
-					local oldFunc = dyeButton.OnClick
-					dyeButton.OnClick = function()
-						Helpers:KillChildren(customizePopup)
-						customizePopup:AddSelectable("Edit").OnActivate = oldFunc
-						customizePopup:AddSelectable("Clear").OnActivate = function()
-							preset.Outfits[criteriaCompositeKey][itemSlot].dye.delete = true
-							if not preset.Outfits[criteriaCompositeKey][itemSlot]() then
-								preset.Outfits[criteriaCompositeKey][itemSlot].delete = true
-							end
-							if not preset.Outfits[criteriaCompositeKey]() then
-								preset.Outfits[criteriaCompositeKey].delete = true
-							end
-
-							Ext.Timer.WaitFor(350, function()
-								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-							end)
-							BuildSlots(parentContainer, group, verticalSlots, slot)
-						end
-
-						customizePopup:Open()
-					end
-				end
+				SlotContextMenu:buildMenuForSlot(outfitSlotEntry, dyeButton, "dye", function()
+					Ext.Timer.WaitFor(350, function()
+						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+					end)
+					BuildSlots(parentContainer, group, verticalSlots, slot)
+				end)
 				--#endregion
 			end
 
