@@ -20,6 +20,7 @@ end
 ---@field errorMessageIfEmpty string?
 ---@field input ExtuiInputText|ExtuiCheckbox?
 ---@field authorError ExtuiText?
+---@field enumTable function?
 
 ---@param parent ExtuiTreeParent
 ---@param onSubmitFunc function
@@ -28,15 +29,15 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 	Helpers:KillChildren(parent)
 
 	local formInputs = type(...) == "table" and ... or { ... }
-
 	for _, formInput in pairs(formInputs) do
 		parent:AddText(formInput.label)
 		local input
 		if formInput.type == "Text" or formInput.type == "NumericText" or formInput.type == "Multiline" then
-			input = parent:AddInputText("", formInput.defaultValue or "")
+			input = parent:AddInputText("", formInput.defaultValue or nil)
 
 			if formInput.type == "NumericText" then
 				input.CharsDecimal = true
+				input.Hint = "Numeric only"
 			elseif formInput.type == "Multiline" then
 				input.Multiline = true
 			end
@@ -45,12 +46,54 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 		end
 		formInput.input = input
 
+		if formInput.enumTable then
+			formInput.input.Hint = (formInput.input.Hint and "; " or "") .. "Must select from the list that appears on focus"
+			local displayToKeyMap, displayOrderedMap = formInput.enumTable()
+
+			local resultsView = parent:AddChildWindow(formInput.propertyField or formInput.label)
+			resultsView.AutoResizeY = true
+			resultsView.NoSavedSettings = true
+			resultsView.Visible = false
+			formInput.input.OnChange = function()
+				formInput.input.UserData = nil
+
+				Helpers:KillChildren(resultsView)
+				resultsView.Visible = true
+				for _, enumValue in ipairs(displayOrderedMap or displayToKeyMap) do
+					if #input.Text == 0 or string.match(string.upper(enumValue), string.upper(input.Text)) then
+						---@type ExtuiSelectable
+						local enumSelectable = resultsView:AddSelectable(enumValue, "DontClosePopups")
+
+						enumSelectable.OnActivate = function()
+							formInput.input.UserData = displayOrderedMap and displayToKeyMap[enumSelectable.Label] or enumSelectable.Label
+							formInput.input.Text = enumSelectable.Label
+							resultsView.Visible = false
+						end
+					end
+				end
+			end
+
+			input.OnActivate = function()
+				formInput.input.OnChange()
+			end
+			input.OnDeactivate = function()
+				if formInput.input.UserData == nil then
+					formInput.input.Text = ""
+				end
+				resultsView.Visible = false
+			end
+		end
+
 		if formInput.errorMessageIfEmpty then
 			local authorError = parent:AddText(formInput.errorMessageIfEmpty)
 			authorError:SetColor("Text", { 1, 0.02, 0, 1 })
 			authorError.Visible = false
 
+			local oldOnChange = input.OnChange
 			input.OnChange = function()
+				if oldOnChange then
+					oldOnChange()
+				end
 				authorError.Visible = false
 			end
 			formInput.authorError = authorError
@@ -90,7 +133,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 				end
 			end
 			if formInput.type == "Text" or formInput.type == "NumericText" or formInput.type == "Multiline" then
-				inputs[formInput.propertyField or formInput.label] = formInput.input.Text
+				inputs[formInput.propertyField or formInput.label] = formInput.input.UserData or formInput.input.Text
 			elseif formInput.type == "Checkbox" then
 				inputs[formInput.propertyField or formInput.label] = formInput.input.Checked
 			end

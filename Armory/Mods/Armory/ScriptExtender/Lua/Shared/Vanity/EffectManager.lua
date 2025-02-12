@@ -1,7 +1,41 @@
+Ext.Require("Shared/Vanity/MissingEnums.lua")
+
+
 local effectCollection = {}
 
 ---@type ExtuiPopup
 local formPopup
+
+---@param extClass Ext_StaticData|Ext_Resource
+---@param type string
+local function buildEffectBankSupplier(extClass, type)
+	return function()
+		local displayOrderedMap = {}
+		local displayToKeyMap = {}
+		for _, key in ipairs(extClass.GetAll(type)) do
+			---@type ResourceMultiEffectInfo|ResourceSoundResource
+			local single = extClass.Get(key, type)
+			displayToKeyMap[type == "Sound" and key or single.Name] = key
+			table.insert(displayOrderedMap, type == "Sound" and key or single.Name)
+		end
+		table.sort(displayOrderedMap)
+		return displayToKeyMap, displayOrderedMap
+	end
+end
+
+local effectBanks = {
+	AuraFX = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+	BeamEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+	FormatColor = function() return FormatStringColor end,
+	MaterialType = function() return MaterialType end,
+	SoundLoop = buildEffectBankSupplier(Ext.Resource, "Sound"),
+	SoundStart = buildEffectBankSupplier(Ext.Resource, "Sound"),
+	SoundStop = buildEffectBankSupplier(Ext.Resource, "Sound"),
+	SoundVocalLoop = function() return SoundVocalType end,
+	SoundVocalStart = function() return SoundVocalType end,
+	SoundVocalEnd = function() return SoundVocalType end,
+	StatusEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+}
 
 ---@class VanityEffect
 VanityEffect = {
@@ -95,14 +129,16 @@ if Ext.IsClient() then
 				errorMessageIfEmpty = (effectProp == "AuraRadius" and "AuraRadius is required if AuraFX is specified")
 					or (effectProp == "FormatColor" and "FormatColor is required if MaterialType is specified")
 					or (effectProp == "MaterialType" and "MaterialType is required if FormatColor is specified")
-					or nil
+					or nil,
+				enumTable = effectBanks[effectProp]
+
 			} --[[@as FormStructure]])
 		end
 
 		FormBuilder:CreateForm(formPopup,
 			function(inputs)
 				local newEffect = VanityEffect:new({}, inputs.Name, inputs)
-				effectCollection[inputs.Name] = newEffect
+				effectCollection[newEffect.Name] = newEffect
 				ConfigurationStructure.config.vanity.effects[newEffect.Name] = newEffect
 			end,
 			formInputs)
