@@ -125,7 +125,6 @@ if Ext.IsClient() then
 					or (effectProp == "MaterialType" and "MaterialType is required if FormatColor is specified")
 					or nil,
 				enumTable = effectBanks[effectProp]
-
 			} --[[@as FormStructure]])
 		end
 

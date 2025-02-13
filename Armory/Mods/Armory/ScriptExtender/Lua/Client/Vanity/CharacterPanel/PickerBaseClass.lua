@@ -76,7 +76,7 @@ function PickerBaseClass:InitializeSearchBank()
 
 			if (stat.ModifierList == "Weapon" or stat.ModifierList == "Armor") then
 				indexShard = itemIndex.equipment
-			elseif stat.ObjectCategory == "Dye" then
+			elseif string.match(stat.ObjectCategory, "Dye") then
 				indexShard = itemIndex.dyes
 			else
 				return

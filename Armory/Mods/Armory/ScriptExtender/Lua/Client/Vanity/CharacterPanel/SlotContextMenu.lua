@@ -54,20 +54,6 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 
 			Helpers:KillChildren(self.Popup)
 
-			---@type ExtuiSelectable
-			local modifierSelectable = self.Popup:AddSelectable("Only show this menu when 'Left Shift' is pressed while clicking", "DontClosePopups")
-			modifierSelectable.Selected = settings.showSlotContextMenuModifier ~= nil
-			modifierSelectable.OnClick = function()
-				settings.showSlotContextMenuModifier = modifierSelectable.Selected and "LSHIFT" or nil
-				if not modifierSelectable.Selected then
-					Ext.Events.KeyInput:Unsubscribe(self.Subscription)
-					self.LastKeyPressed = nil
-					self.Subscription = nil
-				else
-					self:SubscribeToKeyEvents()
-				end
-			end
-
 			self.Popup:AddSelectable("Edit").OnActivate = defaultFunc
 
 			if slotButton.UserData then
@@ -105,5 +91,9 @@ function SlotContextMenu:SubscribeToKeyEvents()
 				self.LastKeyPressed = key.Key
 			end
 		end)
+	elseif self.Subscription then
+		Ext.Events.KeyInput:Unsubscribe(self.Subscription)
+		self.LastKeyPressed = nil
+		self.Subscription = nil
 	end
 end
