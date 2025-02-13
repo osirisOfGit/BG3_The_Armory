@@ -176,6 +176,7 @@ if Ext.IsClient() then
 					vanityOutfitItemEntry.effects.delete = true
 					vanityOutfitItemEntry.effects = tableCopy
 				end
+				onSubmitFunc()
 			end
 		end
 
