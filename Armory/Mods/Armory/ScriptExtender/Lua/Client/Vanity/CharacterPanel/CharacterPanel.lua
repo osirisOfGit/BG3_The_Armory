@@ -250,20 +250,21 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			--#endregion
 
 			--#region Dyes
+			local supplementaryGroup = parentContainer:AddGroup("Supplementary" .. itemSlotOrWeaponTypeEntry[1])
+			supplementaryGroup.SameLine = true
 			local dyeButton
 
 			if outfitSlotEntry and outfitSlotEntry.dye and outfitSlotEntry.dye.guid then
 				---@type ItemTemplate
 				local dyeTemplate = Ext.Template.GetTemplate(outfitSlotEntry.dye.guid)
-				dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
+				dyeButton = supplementaryGroup:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
 				dyeButton.UserData = dyeTemplate
 				Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
 			else
-				dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+				dyeButton = supplementaryGroup:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 			end
 
 			dyeButton.IDContext = itemSlotOrWeaponTypeEntry[1] .. " Dye"
-			dyeButton.SameLine = true
 
 			SlotContextMenu:buildMenuForSlot(itemSlot,
 				weaponType,
@@ -288,6 +289,15 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 					Vanity:UpdatePresetOnServer()
 					self:BuildSlots(parentContainer, group, verticalSlots, slot)
 				end)
+			--#endregion
+
+			--#region Effects
+			if outfitSlotEntry and outfitSlotEntry.equipment and (outfitSlotEntry.equipment.effects and outfitSlotEntry.equipment.effects()) then
+				local effectsText = supplementaryGroup:AddText("EFF")
+				effectsText.Font = "Tiny"
+				effectsText:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
+			end
+
 			--#endregion
 		end
 
