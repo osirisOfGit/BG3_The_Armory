@@ -52,8 +52,6 @@ end
 
 local initialized = false
 
-VanityCharacterPanel = {}
-
 ---@type ExtuiGroup
 local panelGroup
 
@@ -82,6 +80,13 @@ local weaponSlots = {
 	{ "Ranged Offhand Weapon", "c_slot_rangedOffHand" }
 }
 
+VanityCharacterPanel = {
+	---@type VanityPreset
+	activePreset = nil,
+	---@type VanityCriteriaCompositeKey
+	criteriaCompositeKey = nil
+}
+
 ---@param tabHeader ExtuiTreeParent
 ---@param preset VanityPreset?
 ---@param criteriaCompositeKey string?
@@ -100,6 +105,9 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	if not preset then
 		return
 	end
+
+	self.activePreset = preset
+	self.criteriaCompositeKey = criteriaCompositeKey
 
 	SlotContextMenu:initialize(panelGroup)
 
@@ -141,195 +149,190 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		weaponCols[weaponSlot[1]] = collapse
 	end
 
-	local function InitializeOutfitSlot(itemSlot, weaponType)
-		local outfitSlotEntryForItem
-		if not preset.Outfits[criteriaCompositeKey] then
-			preset.Outfits[criteriaCompositeKey] = {}
-		end
-		if not preset.Outfits[criteriaCompositeKey][itemSlot] then
-			preset.Outfits[criteriaCompositeKey][itemSlot] =
-				TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
-		end
-
-		outfitSlotEntryForItem = preset.Outfits[criteriaCompositeKey][itemSlot]
-
-		if weaponType then
-			if not outfitSlotEntryForItem.weaponTypes then
-				outfitSlotEntryForItem.weaponTypes = {}
-			end
-
-			if not outfitSlotEntryForItem.weaponTypes[weaponType] then
-				outfitSlotEntryForItem.weaponTypes[weaponType] =
-					TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
-			end
-			outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
-		end
-
-		return outfitSlotEntryForItem
-	end
-
-	---@param itemTemplate ItemTemplate
-	---@param outfitSlotEntryForItem VanityOutfitItemEntry
-	local function RecordModDependency(itemTemplate, outfitSlotEntryForItem)
-		outfitSlotEntryForItem.guid = itemTemplate.Id
-
-		if itemTemplate.Stats then
-			---@type Object
-			local stat = Ext.Stats.Get(itemTemplate.Stats)
-			local modInfo = Ext.Mod.GetMod(stat.ModId).Info
-			if modInfo then
-				outfitSlotEntryForItem.modDependency = {
-					Guid = modInfo.ModuleUUID,
-					Version = modInfo.ModVersion
-				}
-			end
-		else
-			Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
-				itemTemplate.DisplayName:Get() or itemTemplate.Name,
-				itemTemplate.Id)
-		end
-	end
-
-	--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
-	--- so each weapon type can be configured separately as desired. Attaches the Equipment and Dye picker to each configurable slot
-	---@param parentContainer ExtuiTableCell|ExtuiGroup|ExtuiCollapsingHeader
-	---@param group string[][]
-	---@param verticalSlots boolean
-	---@param slot string
-	local function BuildSlots(parentContainer, group, verticalSlots, slot)
-		for _, child in pairs(parentContainer.Children) do
-			if child.UserData ~= "keep" then
-				child:Destroy()
-			end
-		end
-
-		local outfit = preset.Outfits[criteriaCompositeKey]
-
-		for i, itemSlotOrWeaponTypeEntry in ipairs(group) do
-			local imageButton
-			if string.find(itemSlotOrWeaponTypeEntry[1], "Dummy") then
-				-- Dummy size math makes 0 sense to me
-				imageButton = parentContainer:AddDummy(164, 60)
-				imageButton.Label = itemSlotOrWeaponTypeEntry[2]
-			else
-				---@cast imageButton ExtuiImageButton
-
-				local itemSlot = slot or itemSlotOrWeaponTypeEntry[1]
-				local weaponType = itemSlot ~= itemSlotOrWeaponTypeEntry[1] and itemSlotOrWeaponTypeEntry[1] or nil
-				---@type VanityOutfitSlot?
-				local outfitSlotEntry
-
-				if outfit and outfit[itemSlot] then
-					if weaponType then
-						if outfit[itemSlot].weaponTypes and outfit[itemSlot].weaponTypes[weaponType] then
-							outfitSlotEntry = outfit[itemSlot].weaponTypes[weaponType]
-						end
-					else
-						outfitSlotEntry = outfit[itemSlot]
-					end
-				end
-
-				--#region Equipment
-				if outfitSlotEntry and outfitSlotEntry.equipment then
-					---@type ItemTemplate
-					local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
-
-					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
-					if imageButton.Image.Icon == "" then
-						imageButton:Destroy()
-						imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
-					end
-					imageButton.UserData = itemTemplate
-
-					Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
-				else
-					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
-					if weaponType then
-						imageButton.Background = { 0, 0, 0, 1 }
-						imageButton:Tooltip():AddText("\t " .. weaponType)
-					end
-				end
-				imageButton.Image.Size = { 60, 60 }
-				imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
-				imageButton.OnClick = function()
-					-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
-					EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
-						---@param itemTemplate ItemTemplate
-						function(itemTemplate)
-							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
-							outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
-
-							RecordModDependency(itemTemplate, outfitSlotEntryForItem.equipment)
-
-							Ext.Timer.WaitFor(350, function()
-								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-							end)
-							BuildSlots(parentContainer, group, verticalSlots, slot)
-						end)
-				end
-
-				SlotContextMenu:buildMenuForSlot(outfitSlotEntry, imageButton, "equipment", function()
-					Ext.Timer.WaitFor(350, function()
-						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-					end)
-					BuildSlots(parentContainer, group, verticalSlots, slot)
-				end)
-				--#endregion
-
-				--#region Dyes
-				local dyeButton
-
-				if outfitSlotEntry and outfitSlotEntry.dye then
-					---@type ItemTemplate
-					local dyeTemplate = Ext.Template.GetTemplate(outfitSlotEntry.dye.guid)
-					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
-					dyeButton.UserData = dyeTemplate
-					Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
-				else
-					dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
-				end
-				dyeButton.IDContext = itemSlotOrWeaponTypeEntry[1] .. " Dye"
-				dyeButton.SameLine = true
-				dyeButton.OnClick = function()
-					DyePicker:OpenWindow(imageButton.UserData, itemSlot,
-						---@param dyeTemplate ItemTemplate
-						function(dyeTemplate)
-							local outfitSlotEntryForItem = InitializeOutfitSlot(itemSlot, weaponType)
-
-							outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
-
-							RecordModDependency(dyeTemplate, outfitSlotEntryForItem.dye)
-
-							Ext.Timer.WaitFor(350, function()
-								Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-							end)
-							BuildSlots(parentContainer, group, verticalSlots, slot)
-						end)
-				end
-
-				SlotContextMenu:buildMenuForSlot(outfitSlotEntry, dyeButton, "dye", function()
-					Ext.Timer.WaitFor(350, function()
-						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-					end)
-					BuildSlots(parentContainer, group, verticalSlots, slot)
-				end)
-				--#endregion
-			end
-
-			imageButton.SameLine = not verticalSlots and i % 2 == 0
-		end
-	end
-	BuildSlots(equipmentCell, equipmentSlots, false)
+	self:BuildSlots(equipmentCell, equipmentSlots, false)
 
 	-- I'll have you know, i'm not proud of this. But the functionality inside of BuildSlots is identical -
 	-- it's just the friggen UI layout that changes
 	for i, slotEntry in pairs(weaponSlots) do
 		-- attaches the overall weapon slot to the group inside the respective column
-		BuildSlots(displayRow.Children[i + 1].Children[1], { slotEntry }, true)
+		self:BuildSlots(displayRow.Children[i + 1].Children[1], { slotEntry }, true)
 	end
 
 	for slot, group in pairs(weaponTypes) do
 		-- attaches the various weaponTypes to the Collapsing header inside the respective weapon slot column
-		BuildSlots(weaponCols[slot], group, true, slot)
+		self:BuildSlots(weaponCols[slot], group, true, slot)
 	end
+end
+
+--- Creates the replica of the Character Equip Screen, grouping Equipment in one column and each weapon slot into their own columns
+--- so each weapon type can be configured separately as desired. Attaches the Equipment and Dye picker to each configurable slot
+---@param parentContainer ExtuiTableCell|ExtuiGroup|ExtuiCollapsingHeader
+---@param group string[][]
+---@param verticalSlots boolean
+---@param slot string
+function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, slot)
+	for _, child in pairs(parentContainer.Children) do
+		if child.UserData ~= "keep" then
+			child:Destroy()
+		end
+	end
+
+	local outfit = self.activePreset.Outfits[self.criteriaCompositeKey]
+
+	for i, itemSlotOrWeaponTypeEntry in ipairs(group) do
+		local imageButton
+		if string.find(itemSlotOrWeaponTypeEntry[1], "Dummy") then
+			-- Dummy size math makes 0 sense to me
+			imageButton = parentContainer:AddDummy(164, 60)
+			imageButton.Label = itemSlotOrWeaponTypeEntry[2]
+		else
+			---@cast imageButton ExtuiImageButton
+
+			local itemSlot = slot or itemSlotOrWeaponTypeEntry[1]
+			local weaponType = itemSlot ~= itemSlotOrWeaponTypeEntry[1] and itemSlotOrWeaponTypeEntry[1] or nil
+			---@type VanityOutfitSlot?
+			local outfitSlotEntry
+
+			if outfit and outfit[itemSlot] then
+				if not outfit[itemSlot]() then
+					outfit[itemSlot].delete = true
+				elseif weaponType then
+					if outfit[itemSlot].weaponTypes and outfit[itemSlot].weaponTypes[weaponType] then
+						outfitSlotEntry = outfit[itemSlot].weaponTypes[weaponType]
+					end
+				else
+					outfitSlotEntry = outfit[itemSlot]
+				end
+			end
+
+			--#region Equipment
+			if outfitSlotEntry and outfitSlotEntry.equipment then
+				---@type ItemTemplate
+				local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
+
+				imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
+				if imageButton.Image.Icon == "" then
+					imageButton:Destroy()
+					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
+				end
+				imageButton.UserData = itemTemplate
+
+				Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
+			else
+				imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
+				if weaponType then
+					imageButton.Background = { 0, 0, 0, 1 }
+					imageButton:Tooltip():AddText("\t " .. weaponType)
+				end
+			end
+			imageButton.Image.Size = { 60, 60 }
+			imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
+			imageButton.OnClick = function()
+				-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
+				EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
+					---@param itemTemplate ItemTemplate
+					function(itemTemplate)
+						local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
+						outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
+
+						self:RecordModDependency(itemTemplate, outfitSlotEntryForItem.equipment)
+
+						Vanity:UpdatePresetOnServer()
+						self:BuildSlots(parentContainer, group, verticalSlots, slot)
+					end)
+			end
+
+			SlotContextMenu:buildMenuForSlot(outfitSlotEntry, imageButton, "equipment", function()
+				Vanity:UpdatePresetOnServer()
+				self:BuildSlots(parentContainer, group, verticalSlots, slot)
+			end)
+			--#endregion
+
+			--#region Dyes
+			local dyeButton
+
+			if outfitSlotEntry and outfitSlotEntry.dye then
+				---@type ItemTemplate
+				local dyeTemplate = Ext.Template.GetTemplate(outfitSlotEntry.dye.guid)
+				dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
+				dyeButton.UserData = dyeTemplate
+				Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
+			else
+				dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+			end
+			dyeButton.IDContext = itemSlotOrWeaponTypeEntry[1] .. " Dye"
+			dyeButton.SameLine = true
+			dyeButton.OnClick = function()
+				DyePicker:OpenWindow(imageButton.UserData, itemSlot,
+					---@param dyeTemplate ItemTemplate
+					function(dyeTemplate)
+						local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
+
+						outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
+
+						self:RecordModDependency(dyeTemplate, outfitSlotEntryForItem.dye)
+
+						Vanity:UpdatePresetOnServer()
+						self:BuildSlots(parentContainer, group, verticalSlots, slot)
+					end)
+			end
+
+			SlotContextMenu:buildMenuForSlot(outfitSlotEntry, dyeButton, "dye", function()
+				Vanity:UpdatePresetOnServer()
+				self:BuildSlots(parentContainer, group, verticalSlots, slot)
+			end)
+			--#endregion
+		end
+
+		imageButton.SameLine = not verticalSlots and i % 2 == 0
+	end
+end
+
+---@param itemTemplate ItemTemplate
+---@param outfitSlotEntryForItem VanityOutfitItemEntry
+function VanityCharacterPanel:RecordModDependency(itemTemplate, outfitSlotEntryForItem)
+	outfitSlotEntryForItem.guid = itemTemplate.Id
+
+	if itemTemplate.Stats then
+		---@type Object
+		local stat = Ext.Stats.Get(itemTemplate.Stats)
+		local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+		if modInfo then
+			outfitSlotEntryForItem.modDependency = {
+				Guid = modInfo.ModuleUUID,
+				Version = modInfo.ModVersion
+			}
+		end
+	else
+		Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
+			itemTemplate.DisplayName:Get() or itemTemplate.Name,
+			itemTemplate.Id)
+	end
+end
+
+function VanityCharacterPanel:InitializeOutfitSlot(itemSlot, weaponType)
+	local outfitSlotEntryForItem
+	if not self.activePreset.Outfits[self.criteriaCompositeKey] then
+		self.activePreset.Outfits[self.criteriaCompositeKey] = {}
+	end
+	if not self.activePreset.Outfits[self.criteriaCompositeKey][itemSlot] then
+		self.activePreset.Outfits[self.criteriaCompositeKey][itemSlot] =
+			TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+	end
+
+	outfitSlotEntryForItem = self.activePreset.Outfits[self.criteriaCompositeKey][itemSlot]
+
+	if weaponType then
+		if not outfitSlotEntryForItem.weaponTypes then
+			outfitSlotEntryForItem.weaponTypes = {}
+		end
+
+		if not outfitSlotEntryForItem.weaponTypes[weaponType] then
+			outfitSlotEntryForItem.weaponTypes[weaponType] =
+				TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot)
+		end
+		outfitSlotEntryForItem = outfitSlotEntryForItem.weaponTypes[weaponType]
+	end
+
+	return outfitSlotEntryForItem
 end

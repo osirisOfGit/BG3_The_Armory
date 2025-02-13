@@ -81,7 +81,7 @@ local criteriaGroup
 
 ---@param preset VanityPreset
 ---@param parent ExtuiTreeParent
----@param outfitToCopyTo VanityCriteriaCompositeKey
+---@param outfitToCopyTo VanityCriteriaCompositeKey?
 function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo)
 	local refreshButton = parent:AddButton("Refresh")
 
@@ -120,9 +120,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				deleteButton:SetColor("Text", { 1, 1, 1, 1 })
 				deleteButton.OnClick = function()
 					preset.Outfits[criteriaCompositeKey].delete = true
-					Ext.Timer.WaitFor(350, function()
-						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-					end)
+					Vanity:UpdatePresetOnServer()
 					row:Destroy()
 				end
 			else
@@ -138,9 +136,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					preset.Outfits[outfitToCopyTo] = TableUtils:DeeplyCopyTable(outfitToCopy)
 
 					VanityCharacterPanel:BuildModule(parent.ParentElement, preset, outfitToCopyTo)
-					Ext.Timer.WaitFor(350, function()
-						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
-					end)
+					Vanity:UpdatePresetOnServer()
 				end
 			end
 			::continue::

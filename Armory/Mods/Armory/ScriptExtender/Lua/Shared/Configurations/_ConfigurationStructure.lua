@@ -32,8 +32,6 @@ local function generate_recursive_metatable(proxy_table, real_table)
 				rawset(this_table._parent_proxy, this_table._parent_key, nil)
 				this_table._parent_table[this_table._parent_key] = nil
 			else
-				real_table[key] = value
-
 				if type(value) == "table" then
 					rawset(proxy_table, key, generate_recursive_metatable(
 						{
@@ -49,6 +47,7 @@ local function generate_recursive_metatable(proxy_table, real_table)
 						end
 					end
 				end
+				real_table[key] = value
 			end
 
 			if initialized then
@@ -63,11 +62,12 @@ local function generate_recursive_metatable(proxy_table, real_table)
 					FileUtils:SaveTableToFile("config.json", real_config_table)
 					Logger:BasicDebug("Configuration updates made - sending updated table to server")
 
-					if Ext.ClientNet.IsHost()  then
+					if Ext.ClientNet.IsHost() then
 						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_UpdateConfiguration", "")
 					elseif not informedUserOfHostRestriction then
 						informedUserOfHostRestriction = true
-						Logger:BasicWarning("You're not the host of this session, so not updating the server configs - your local config is still updated. This log will not appear again this session.")
+						Logger:BasicWarning(
+						"You're not the host of this session, so not updating the server configs - your local config is still updated. This log will not appear again this session.")
 					end
 				end)
 			end

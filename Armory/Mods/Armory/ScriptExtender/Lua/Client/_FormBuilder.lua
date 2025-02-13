@@ -34,6 +34,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 		local input
 		if formInput.type == "Text" or formInput.type == "NumericText" or formInput.type == "Multiline" then
 			input = parent:AddInputText("", formInput.defaultValue or nil)
+			input.AutoSelectAll = true
 
 			if formInput.type == "NumericText" then
 				input.CharsDecimal = true

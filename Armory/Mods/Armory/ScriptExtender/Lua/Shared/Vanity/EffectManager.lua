@@ -1,6 +1,5 @@
 Ext.Require("Shared/Vanity/MissingEnums.lua")
 
-
 local effectCollection = {}
 
 ---@type ExtuiPopup
@@ -83,12 +82,6 @@ function VanityEffect:new(instance, name, effectProps)
 	effectProps.Name = nil
 	instance.effectProps = TableUtils:DeeplyCopyTable(effectProps)
 
-	if not next(effectCollection) then
-		for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
-			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
-		end
-	end
-
 	return instance
 end
 
@@ -109,6 +102,7 @@ if Ext.IsClient() then
 
 	---@param parent ExtuiTreeParent
 	function VanityEffect:buildCreateEffectForm(parent)
+		---@type ExtuiPopup
 		formPopup = parent.ParentElement:AddPopup("Create Effect Form")
 
 		---@type FormStructure[]
@@ -140,6 +134,7 @@ if Ext.IsClient() then
 				local newEffect = VanityEffect:new({}, inputs.Name, inputs)
 				effectCollection[newEffect.Name] = newEffect
 				ConfigurationStructure.config.vanity.effects[newEffect.Name] = newEffect
+				formPopup:Destroy()
 			end,
 			formInputs)
 
@@ -149,14 +144,19 @@ if Ext.IsClient() then
 	---@param parentPopup ExtuiPopup
 	---@param vanityOutfitItemEntry VanityOutfitItemEntry
 	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry)
+		if not next(effectCollection) then
+			for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
+				effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
+			end
+		end
+
 		---@type ExtuiMenu
 		local menu = parentPopup:AddMenu("Add Effects")
 		for effectName, vanityEffect in TableUtils:OrderedPairs(effectCollection) do
 			---@type ExtuiSelectable
-			local effectSelectable = menu:AddSelectable(string.sub(effectName, #"ARMORY_VANITY_EFFECT_"), "DontClosePopups")
+			local effectSelectable = menu:AddSelectable(string.sub(effectName, #"ARMORY_VANITY_EFFECT_" + 1), "DontClosePopups")
 			effectSelectable.UserData = vanityEffect
-			local contains = TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName)
-			effectSelectable.Selected = contains
+			effectSelectable.Selected = vanityOutfitItemEntry.effects and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
 
 			effectSelectable.OnClick = function()
 				if effectSelectable.Selected then
