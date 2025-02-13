@@ -32,6 +32,7 @@ local function generate_recursive_metatable(proxy_table, real_table)
 				rawset(this_table._parent_proxy, this_table._parent_key, nil)
 				this_table._parent_table[this_table._parent_key] = nil
 			else
+				real_table[key] = value
 				if type(value) == "table" then
 					rawset(proxy_table, key, generate_recursive_metatable(
 						{
@@ -47,7 +48,6 @@ local function generate_recursive_metatable(proxy_table, real_table)
 						end
 					end
 				end
-				real_table[key] = value
 			end
 
 			if initialized then

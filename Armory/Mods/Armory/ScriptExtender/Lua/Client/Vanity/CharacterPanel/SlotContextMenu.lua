@@ -1,6 +1,11 @@
 Ext.Require("Shared/Vanity/EffectManager.lua")
 
-SlotContextMenu = {}
+SlotContextMenu = {
+	itemSlot = nil,
+	weaponType = nil,
+	outfitSlot = nil,
+	buttonType = nil
+}
 
 ---@type ExtuiPopup
 SlotContextMenu.Popup = nil
@@ -11,16 +16,42 @@ function SlotContextMenu:initialize(parent)
 	self:SubscribeToKeyEvents()
 end
 
----@param outfitSlot VanityOutfitSlot
+---@return VanityOutfitItemEntry
+function SlotContextMenu:GetOutfitSlot()
+	local outfitSlot = VanityCharacterPanel:InitializeOutfitSlot(self.itemSlot, self.weaponType)
+	if not outfitSlot[self.buttonType] then
+		outfitSlot[self.buttonType] = {}
+	end
+
+	return outfitSlot[self.buttonType]
+end
+
+---@param itemSlot string
+---@param weaponType string?
+---@param outfitSlot VanityOutfitSlot?
 ---@param slotButton ExtuiImageButton
 ---@param buttonType "dye"|"equipment"
+---@param defaultFunc function
 ---@param onCloseFunc function
-function SlotContextMenu:buildMenuForSlot(outfitSlot, slotButton, buttonType, onCloseFunc)
-	local oldFunc = slotButton.OnClick
-
+function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slotButton, buttonType, defaultFunc, onCloseFunc)
 	slotButton.OnClick = function()
 		local settings = ConfigurationStructure.config.vanity.settings.general
 		if self.LastKeyPressed == settings.showSlotContextMenuModifier then
+			if not outfitSlot then
+				local outfit = VanityCharacterPanel.activePreset.Outfits[VanityCharacterPanel.criteriaCompositeKey]
+				if outfit then
+					outfitSlot = outfit[itemSlot]
+					if weaponType and outfitSlot then
+						outfitSlot = outfitSlot[weaponType]
+					end
+				end
+			end
+
+			self.itemSlot = itemSlot
+			self.weaponType = weaponType
+			self.outfitSlot = outfitSlot
+			self.buttonType = buttonType
+
 			Helpers:KillChildren(self.Popup)
 
 			---@type ExtuiSelectable
@@ -37,7 +68,7 @@ function SlotContextMenu:buildMenuForSlot(outfitSlot, slotButton, buttonType, on
 				end
 			end
 
-			self.Popup:AddSelectable("Edit").OnActivate = oldFunc
+			self.Popup:AddSelectable("Edit").OnActivate = defaultFunc
 
 			if slotButton.UserData then
 				self.Popup:AddSelectable("Clear").OnActivate = function()
@@ -51,13 +82,17 @@ function SlotContextMenu:buildMenuForSlot(outfitSlot, slotButton, buttonType, on
 			end
 
 			if buttonType == "equipment" then
-				VanityEffect:buildSlotContextMenuEntries(self.Popup, outfitSlot[buttonType])
+				VanityEffect:buildSlotContextMenuEntries(self.Popup, outfitSlot and outfitSlot[buttonType] or nil, onCloseFunc)
 			end
 
 			self.Popup:Open()
 			self.LastKeyPressed = nil
 		else
-			oldFunc()
+			self.itemSlot = nil
+			self.weaponType = nil
+			self.outfitSlot = nil
+			self.buttonType = nil
+			defaultFunc()
 		end
 	end
 end

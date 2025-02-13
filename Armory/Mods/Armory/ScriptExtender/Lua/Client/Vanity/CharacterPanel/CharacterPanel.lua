@@ -171,11 +171,7 @@ end
 ---@param verticalSlots boolean
 ---@param slot string
 function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, slot)
-	for _, child in pairs(parentContainer.Children) do
-		if child.UserData ~= "keep" then
-			child:Destroy()
-		end
-	end
+	Helpers:KillChildren(parentContainer)
 
 	local outfit = self.activePreset.Outfits[self.criteriaCompositeKey]
 
@@ -206,7 +202,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			end
 
 			--#region Equipment
-			if outfitSlotEntry and outfitSlotEntry.equipment then
+			if outfitSlotEntry and outfitSlotEntry.equipment and outfitSlotEntry.equipment.guid then
 				---@type ItemTemplate
 				local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
 
@@ -227,31 +223,36 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			end
 			imageButton.Image.Size = { 60, 60 }
 			imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
-			imageButton.OnClick = function()
-				-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
-				EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
-					---@param itemTemplate ItemTemplate
-					function(itemTemplate)
-						local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
-						outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
 
-						self:RecordModDependency(itemTemplate, outfitSlotEntryForItem.equipment)
+			SlotContextMenu:buildMenuForSlot(itemSlot,
+				weaponType,
+				outfitSlotEntry,
+				imageButton,
+				"equipment",
+				function()
+					-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
+					EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
+						---@param itemTemplate ItemTemplate
+						function(itemTemplate)
+							local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
+							outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
 
-						Vanity:UpdatePresetOnServer()
-						self:BuildSlots(parentContainer, group, verticalSlots, slot)
-					end)
-			end
+							self:RecordModDependency(itemTemplate, outfitSlotEntryForItem.equipment)
 
-			SlotContextMenu:buildMenuForSlot(outfitSlotEntry, imageButton, "equipment", function()
-				Vanity:UpdatePresetOnServer()
-				self:BuildSlots(parentContainer, group, verticalSlots, slot)
-			end)
+							Vanity:UpdatePresetOnServer()
+							self:BuildSlots(parentContainer, group, verticalSlots, slot)
+						end)
+				end,
+				function()
+					Vanity:UpdatePresetOnServer()
+					self:BuildSlots(parentContainer, group, verticalSlots, slot)
+				end)
 			--#endregion
 
 			--#region Dyes
 			local dyeButton
 
-			if outfitSlotEntry and outfitSlotEntry.dye then
+			if outfitSlotEntry and outfitSlotEntry.dye and outfitSlotEntry.dye.guid then
 				---@type ItemTemplate
 				local dyeTemplate = Ext.Template.GetTemplate(outfitSlotEntry.dye.guid)
 				dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
@@ -260,27 +261,33 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			else
 				dyeButton = parentContainer:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 			end
+
 			dyeButton.IDContext = itemSlotOrWeaponTypeEntry[1] .. " Dye"
 			dyeButton.SameLine = true
-			dyeButton.OnClick = function()
-				DyePicker:OpenWindow(imageButton.UserData, itemSlot,
-					---@param dyeTemplate ItemTemplate
-					function(dyeTemplate)
-						local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
 
-						outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
+			SlotContextMenu:buildMenuForSlot(itemSlot,
+				weaponType,
+				outfitSlotEntry,
+				dyeButton,
+				"dye",
+				function()
+					DyePicker:OpenWindow(imageButton.UserData, itemSlot,
+						---@param dyeTemplate ItemTemplate
+						function(dyeTemplate)
+							local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
 
-						self:RecordModDependency(dyeTemplate, outfitSlotEntryForItem.dye)
+							outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
 
-						Vanity:UpdatePresetOnServer()
-						self:BuildSlots(parentContainer, group, verticalSlots, slot)
-					end)
-			end
+							self:RecordModDependency(dyeTemplate, outfitSlotEntryForItem.dye)
 
-			SlotContextMenu:buildMenuForSlot(outfitSlotEntry, dyeButton, "dye", function()
-				Vanity:UpdatePresetOnServer()
-				self:BuildSlots(parentContainer, group, verticalSlots, slot)
-			end)
+							Vanity:UpdatePresetOnServer()
+							self:BuildSlots(parentContainer, group, verticalSlots, slot)
+						end)
+				end,
+				function()
+					Vanity:UpdatePresetOnServer()
+					self:BuildSlots(parentContainer, group, verticalSlots, slot)
+				end)
 			--#endregion
 		end
 

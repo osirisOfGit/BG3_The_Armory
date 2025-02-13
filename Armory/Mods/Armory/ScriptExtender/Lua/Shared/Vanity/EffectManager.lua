@@ -77,7 +77,7 @@ function VanityEffect:new(instance, name, effectProps)
 	instance = instance or {}
 	setmetatable(instance, self)
 	self.__index = self
-	instance.Name = "ARMORY_VANITY_EFFECT_" .. name
+	instance.Name = "ARMORY_VANITY_EFFECT_" .. name:gsub("%s", "_")
 
 	effectProps.Name = nil
 	instance.effectProps = TableUtils:DeeplyCopyTable(effectProps)
@@ -142,8 +142,9 @@ if Ext.IsClient() then
 	end
 
 	---@param parentPopup ExtuiPopup
-	---@param vanityOutfitItemEntry VanityOutfitItemEntry
-	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry)
+	---@param vanityOutfitItemEntry VanityOutfitItemEntry?
+	---@param onSubmitFunc function
+	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc)
 		if not next(effectCollection) then
 			for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
 				effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
@@ -156,17 +157,20 @@ if Ext.IsClient() then
 			---@type ExtuiSelectable
 			local effectSelectable = menu:AddSelectable(string.sub(effectName, #"ARMORY_VANITY_EFFECT_" + 1), "DontClosePopups")
 			effectSelectable.UserData = vanityEffect
-			effectSelectable.Selected = vanityOutfitItemEntry.effects and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
+			effectSelectable.Selected = (vanityOutfitItemEntry and vanityOutfitItemEntry.effects) and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
 
 			effectSelectable.OnClick = function()
 				if effectSelectable.Selected then
+					vanityOutfitItemEntry = SlotContextMenu:GetOutfitSlot()
 					if not vanityOutfitItemEntry.effects then
 						vanityOutfitItemEntry.effects = {}
 					end
+					table.insert(vanityOutfitItemEntry.effects, effectName)
+				elseif vanityOutfitItemEntry and vanityOutfitItemEntry.effects and vanityOutfitItemEntry.effects() then
 					local tableCopy = {}
-					for _, effect in ipairs(vanityOutfitItemEntry.effects) do
-						if effect ~= effectName then
-							table.insert(tableCopy, effect)
+					for _, existingEffect in ipairs(vanityOutfitItemEntry.effects) do
+						if existingEffect ~= effectName then
+							table.insert(tableCopy, existingEffect)
 						end
 					end
 					vanityOutfitItemEntry.effects.delete = true
