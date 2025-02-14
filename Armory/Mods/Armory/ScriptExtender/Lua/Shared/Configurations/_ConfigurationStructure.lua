@@ -129,6 +129,8 @@ function ConfigurationStructure:InitializeConfig()
 		config = real_config_table
 		FileUtils:SaveTableToFile("config.json", config)
 	else
+		real_config_table = {}
+		ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
 		CopyConfigsIntoReal(config, ConfigurationStructure.config)
 	end
 

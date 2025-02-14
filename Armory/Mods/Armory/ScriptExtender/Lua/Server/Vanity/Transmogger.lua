@@ -350,20 +350,28 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 		for _, effectName in ipairs(outfitSlot.equipment.effects) do
 			local effectProps = ConfigCopy.vanity.effects[effectName]
 			if effectProps then
-				Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
-					effectName,
-					createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name,
-					Ext.Json.Stringify(effectProps))
+				if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 0 then
+					Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
+						effectName,
+						createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name,
+						Ext.Json.Stringify(effectProps))
 
-				local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
-				effect:buildStat()
-				Ext.Timer.WaitFor(50, function()
-					Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
-				end)
+					local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
+					effect:buildStat()
+					Ext.Timer.WaitFor(50, function()
+						Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
+					end)
+				end
 			else
 				Logger:BasicWarning("Definition for effect %s assigned to slot %s in outfit assigned to %s was not found in the configs", effectName, actualSlot,
 					characterEntity.DisplayName.Name:Get())
 			end
+		end
+	end
+
+	for effectName, _ in pairs(ConfigCopy.vanity.effects) do
+		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 and (not TableUtils:ListContains(outfitSlot.equipment.effects or {}, effectName)) then
+			Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
 		end
 	end
 end
