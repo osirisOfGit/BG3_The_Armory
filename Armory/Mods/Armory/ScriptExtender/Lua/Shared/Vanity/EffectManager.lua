@@ -23,17 +23,11 @@ local function buildEffectBankSupplier(extClass, type)
 end
 
 local effectBanks = {
-	AuraFX = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
-	BeamEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
-	FormatColor = function() return FormatStringColor end,
-	MaterialType = function() return MaterialType end,
-	SoundLoop = buildEffectBankSupplier(Ext.Resource, "Sound"),
-	SoundStart = buildEffectBankSupplier(Ext.Resource, "Sound"),
-	SoundStop = buildEffectBankSupplier(Ext.Resource, "Sound"),
-	SoundVocalLoop = function() return SoundVocalType end,
-	SoundVocalStart = function() return SoundVocalType end,
-	SoundVocalEnd = function() return SoundVocalType end,
-	StatusEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+	-- BeamEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+	-- FormatColor = function() return FormatStringColor end,
+	-- MaterialType = function() return MaterialType end,
+	-- StatusEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+	StatusEffectOnTurn = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
 }
 
 ---@class VanityEffect
@@ -44,28 +38,12 @@ VanityEffect = {
 	effectProps = {
 		---@type string?
 		StatusEffect = "",
-		---@type string?
-		AuraFX = "",
-		---@type integer?
-		AuraRadius = 0,
-		---@type string?
-		BeamEffect = "",
-		---@type string?
-		FormatColor = "",
-		---@type string?
-		MaterialType = "",
-		---@type string?
-		SoundLoop = "",
-		---@type string?
-		SoundStart = "",
-		---@type string?
-		SoundStop = "",
-		---@type string?
-		SoundVocalLoop = "",
-		---@type string?
-		SoundVocalStart = "",
-		---@type string?
-		SoundVocalEnd = "",
+		-- ---@type string?
+		-- StatusEffectOnTurn = "",
+		-- ---@type string?
+		-- FormatColor = "",
+		-- ---@type string?
+		-- MaterialType = "",
 	}
 }
 
@@ -95,8 +73,8 @@ if Ext.IsServer() then
 			---@type StatusData
 			local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
 			for key, value in pairs(self.effectProps) do
-				if value and (value ~= "" and value ~= 0) then
-					newStat[key] = tostring(value)
+				if value and value ~= "" then
+					newStat[key] = value
 				end
 			end
 			newStat.StackId = self.Name
@@ -129,14 +107,6 @@ if Ext.IsClient() then
 				label = effectProp,
 				propertyField = effectProp,
 				type = type(value) == "number" and "NumericText" or "Text",
-				dependsOn = (effectProp == "AuraRadius" and "AuraFX")
-					or (effectProp == "FormatColor" and "MaterialType")
-					or (effectProp == "MaterialType" and "FormatColor")
-					or nil,
-				errorMessageIfEmpty = (effectProp == "AuraRadius" and "AuraRadius is required if AuraFX is specified")
-					or (effectProp == "FormatColor" and "FormatColor is required if MaterialType is specified")
-					or (effectProp == "MaterialType" and "MaterialType is required if FormatColor is specified")
-					or nil,
 				enumTable = effectBanks[effectProp]
 			} --[[@as FormStructure]])
 		end
