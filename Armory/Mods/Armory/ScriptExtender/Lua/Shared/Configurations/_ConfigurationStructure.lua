@@ -50,7 +50,7 @@ local function generate_recursive_metatable(proxy_table, real_table)
 				end
 			end
 
-			if initialized then
+			if initialized and Ext.IsClient() then
 				if updateTimer then
 					Ext.Timer.Cancel(updateTimer)
 				end
@@ -67,7 +67,7 @@ local function generate_recursive_metatable(proxy_table, real_table)
 					elseif not informedUserOfHostRestriction then
 						informedUserOfHostRestriction = true
 						Logger:BasicWarning(
-						"You're not the host of this session, so not updating the server configs - your local config is still updated. This log will not appear again this session.")
+							"You're not the host of this session, so not updating the server configs - your local config is still updated. This log will not appear again this session.")
 					end
 				end)
 			end
@@ -133,15 +133,11 @@ function ConfigurationStructure:InitializeConfig()
 	end
 
 	initialized = true
-	Logger:BasicInfo("Successfully loaded the config!")
+	Logger:BasicDebug("Successfully loaded the config!")
 end
 
 function ConfigurationStructure:UpdateConfigForServer()
-	local config = FileUtils:LoadTableFile("config.json")
-	if config then
-		real_config_table = config
-		Logger:BasicDebug("Successfully updated config on server side!")
-	end
+	self:InitializeConfig()
 	return ConfigurationStructure:GetRealConfigCopy()
 end
 

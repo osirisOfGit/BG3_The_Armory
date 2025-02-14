@@ -1,5 +1,7 @@
 ---@diagnostic disable: missing-fields
 
+Ext.Require("Shared/Vanity/EffectManager.lua")
+
 Ext.Vars.RegisterUserVariable("TheArmory_Vanity_OriginalItemInfo", {
 	Server = true
 })
@@ -129,7 +131,8 @@ function Transmogger:MogCharacter(character)
 			local itemStat = Ext.Stats.Get(Ext.Entity.Get(equippedItem).Data.StatsId)
 			for _, proficiencyGroup in pairs(itemStat["Proficiency Group"]) do
 				if outfitSlot.weaponTypes[proficiencyGroup] then
-					vanityTemplate = outfitSlot.weaponTypes[proficiencyGroup].equipment.guid
+					outfitSlot = outfitSlot.weaponTypes[proficiencyGroup]
+					vanityTemplate = outfitSlot.equipment.guid
 					break
 				end
 			end
@@ -151,6 +154,7 @@ function Transmogger:MogCharacter(character)
 		else
 			if string.sub(Osi.GetTemplate(equippedItem), -36) == vanityTemplate then
 				Logger:BasicDebug("Equipped item %s is already the vanity item %s", equippedItem, vanityTemplate)
+				self:ApplyEffectStatus(outfitSlot, actualSlot, Ext.Entity.Get(equippedItem), character)
 				goto continue
 			end
 
@@ -317,6 +321,8 @@ function Transmogger:MogCharacter(character)
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
 			Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
 
+			self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
+
 			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
 				Ext.Utils.MonotonicTime() - startTime)
 		end)
@@ -333,6 +339,33 @@ function Transmogger:MogCharacter(character)
 	end
 
 	Transmogger:ApplyDye(character)
+end
+
+---@param outfitSlot VanityOutfitSlot
+---@param actualSlot ActualSlot
+---@param createdVanityEntity EntityHandle
+---@param characterEntity EntityHandle
+function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
+	if outfitSlot.equipment.effects then
+		for _, effectName in ipairs(outfitSlot.equipment.effects) do
+			local effectProps = ConfigCopy.vanity.effects[effectName]
+			if effectProps then
+				Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
+					effectName,
+					createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name,
+					Ext.Json.Stringify(effectProps))
+
+				local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
+				effect:buildStat()
+				Ext.Timer.WaitFor(50, function()
+					Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
+				end)
+			else
+				Logger:BasicWarning("Definition for effect %s assigned to slot %s in outfit assigned to %s was not found in the configs", effectName, actualSlot,
+					characterEntity.DisplayName.Name:Get())
+			end
+		end
+	end
 end
 
 ---@param character EntityHandle
@@ -567,7 +600,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
 		Ext.Timer.WaitFor(100, function()
 			Logger:BasicDebug("Item %s was equipped on %s, executing transmog", (itemEntity.DisplayName and itemEntity.DisplayName.Name:Get()) or itemEntity.ServerItem.Template
-			.Name, character)
+				.Name, character)
 			Transmogger:MogCharacter(Ext.Entity.Get(character))
 		end)
 	end

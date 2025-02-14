@@ -56,6 +56,7 @@ function PickerBaseClass:new(title, instance)
 end
 
 function PickerBaseClass:InitializeSearchBank()
+	local startTime = Ext.Utils.MonotonicTime()
 	local itemCount = 0
 	local modCount = 0
 
@@ -110,9 +111,6 @@ function PickerBaseClass:InitializeSearchBank()
 				end
 				indexShard.statAndModId[statString] = stat.ModId
 				table.insert(indexShard.modIdAndTemplateIds[stat.ModId], itemTemplate.Id)
-				table.sort(indexShard.modIdAndTemplateIds[stat.ModId], function(a, b)
-					return Ext.Template.GetRootTemplate(a).Name < Ext.Template.GetRootTemplate(b).Name
-				end)
 			end
 		end)
 
@@ -123,8 +121,16 @@ function PickerBaseClass:InitializeSearchBank()
 				error)
 		end
 	end
-
-	Logger:BasicInfo("Indexed %d armor/weapons and dyes from %d mods", itemCount, modCount)
+	for _, indexShard in pairs(itemIndex) do
+		for _, templateIds in pairs(indexShard.modIdAndTemplateIds) do
+			table.sort(templateIds, function(a, b)
+				local tempA = Ext.Template.GetRootTemplate(a)
+				local tempB = Ext.Template.GetRootTemplate(b)
+				return (tempA.DisplayName:Get() or tempA.Name) < (tempB.DisplayName:Get() or tempB.Name)
+			end)
+		end
+	end
+	Logger:BasicInfo("Indexed %d armor/weapons and dyes from %d mods in %dms", itemCount, modCount, Ext.Utils.MonotonicTime() - startTime)
 end
 
 function PickerBaseClass:DisplayResult(templateName, group) end

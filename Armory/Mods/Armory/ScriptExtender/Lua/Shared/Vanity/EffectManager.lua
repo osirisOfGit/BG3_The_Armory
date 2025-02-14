@@ -43,6 +43,8 @@ VanityEffect = {
 	---@class VanityEffectProperties
 	effectProps = {
 		---@type string?
+		StatusEffect = "",
+		---@type string?
 		AuraFX = "",
 		---@type integer?
 		AuraRadius = 0,
@@ -64,8 +66,6 @@ VanityEffect = {
 		SoundVocalStart = "",
 		---@type string?
 		SoundVocalEnd = "",
-		---@type string?
-		StatusEffect = "",
 	}
 }
 
@@ -77,7 +77,10 @@ function VanityEffect:new(instance, name, effectProps)
 	instance = instance or {}
 	setmetatable(instance, self)
 	self.__index = self
-	instance.Name = "ARMORY_VANITY_EFFECT_" .. name:gsub("%s", "_")
+	instance.Name = name:gsub("%s", "_")
+	if not string.match(instance.Name, "ARMORY_VANITY_EFFECT_") then
+		instance.Name = "ARMORY_VANITY_EFFECT_" .. instance.Name
+	end
 
 	effectProps.Name = nil
 	instance.effectProps = TableUtils:DeeplyCopyTable(effectProps)
@@ -88,10 +91,15 @@ end
 if Ext.IsServer() then
 	function VanityEffect:buildStat()
 		if not Ext.Stats.Get(self.Name) then
-			local newStat = Ext.Stats.Create(self.Name, "EFFECT", "_PASSIVES")
+			Logger:BasicDebug("Creating Effect %s", self.Name)
+			---@type StatusData
+			local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
 			for key, value in pairs(self.effectProps) do
-				newStat[key] = value
+				if value and (value ~= "" and value ~= 0) then
+					newStat[key] = tostring(value)
+				end
 			end
+			newStat.StackId = self.Name
 			newStat:Sync()
 		end
 	end
@@ -102,6 +110,11 @@ if Ext.IsClient() then
 
 	---@param parent ExtuiTreeParent
 	function VanityEffect:buildCreateEffectForm(parent)
+		if formPopup then
+			pcall(function(...)
+				formPopup:Destroy()
+			end)
+		end
 		---@type ExtuiPopup
 		formPopup = parent.ParentElement:AddPopup("Create Effect Form")
 
