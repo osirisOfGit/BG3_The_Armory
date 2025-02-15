@@ -374,10 +374,20 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 		end
 	end
 
+	local removeEffectMarker = true
+
 	for effectName, _ in pairs(ConfigCopy.vanity.effects) do
-		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 and (not TableUtils:ListContains(outfitSlot.equipment.effects or {}, effectName)) then
-			Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
+		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
+			if not TableUtils:ListContains(outfitSlot.equipment.effects or {}, effectName) then
+				Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
+			else
+				removeEffectMarker = false
+			end
 		end
+	end
+
+	if removeEffectMarker then
+		createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = nil
 	end
 end
 

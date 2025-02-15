@@ -201,7 +201,8 @@ if Ext.IsClient() then
 			label = "Name",
 			type = "Text",
 			errorMessageIfEmpty = "Must provide a name",
-			defaultValue = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1)
+			defaultValue = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1),
+			enabled = self.Name and self.Name ~= ""
 		} }
 		for effectProp, value in TableUtils:OrderedPairs(self.effectProps) do
 			table.insert(formInputs, {
@@ -209,7 +210,8 @@ if Ext.IsClient() then
 				defaultValue = self.effectProps and self.effectProps[effectProp] or nil,
 				propertyField = effectProp,
 				type = type(value) == "number" and "NumericText" or "Text",
-				enumTable = effectBanks[effectProp]
+				enumTable = effectBanks[effectProp],
+				errorMessageIfEmpty = "Must select a value"
 			} --[[@as FormStructure]])
 		end
 

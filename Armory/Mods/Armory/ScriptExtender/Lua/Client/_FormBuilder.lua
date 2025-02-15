@@ -15,6 +15,7 @@ end
 ---@field label string
 ---@field propertyField string?
 ---@field type "Text"|"NumericText"|"Multiline"|"Checkbox"
+---@field enabled boolean?
 ---@field defaultValue string|boolean?
 ---@field dependsOn string?
 ---@field errorMessageIfEmpty string?
@@ -45,6 +46,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 		elseif formInput.type == "Checkbox" then
 			input = parent:AddCheckbox("", formInput.defaultValue or false)
 		end
+		input.Disabled = formInput.enabled ~= nil and formInput.enabled or false
 		formInput.input = input
 
 		if formInput.enumTable then
