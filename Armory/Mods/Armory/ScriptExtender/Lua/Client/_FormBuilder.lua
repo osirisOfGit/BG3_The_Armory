@@ -68,12 +68,14 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 			resultsView.NoSavedSettings = true
 			resultsView.Visible = false
 			formInput.input.OnChange = function()
-				formInput.input.UserData = nil
+				formInput.input.UserData = (displayOrderedMap and displayToKeyMap[formInput.input.Text] or formInput.input.Text) == formInput.input.UserData
+					and formInput.input.UserData
+					or nil
 
 				Helpers:KillChildren(resultsView)
 				resultsView.Visible = true
 				for _, enumValue in ipairs(displayOrderedMap or displayToKeyMap) do
-					if #input.Text == 0 or string.match(string.upper(enumValue), string.upper(input.Text)) then
+					if #input.Text == 0 or input.UserData or string.match(string.upper(enumValue), string.upper(input.Text)) then
 						---@type ExtuiSelectable
 						local enumSelectable = resultsView:AddSelectable(enumValue, "DontClosePopups")
 
@@ -87,9 +89,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 			end
 
 			input.OnActivate = function()
-				local key = formInput.input.UserData
 				formInput.input.OnChange()
-				formInput.input.UserData = key
 			end
 			input.OnDeactivate = function()
 				if formInput.input.UserData == nil then
@@ -115,8 +115,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 		end
 	end
 
-	local submit = parent:AddButton("Submit")
-	submit.OnClick = function()
+	local function buildInputs()
 		local hasErrors
 		local inputs = {}
 		for _, formInput in pairs(formInputs) do
@@ -158,7 +157,13 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 		if hasErrors then
 			return
 		end
-
-		onSubmitFunc(inputs)
+		return inputs
 	end
+
+	local submit = parent:AddButton("Submit")
+	submit.OnClick = function()
+		onSubmitFunc(buildInputs())
+	end
+
+	return buildInputs
 end

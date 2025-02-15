@@ -79,6 +79,7 @@ if Ext.IsServer() then
 			end
 			newStat.StackId = self.Name
 			newStat:Sync()
+			return true
 		end
 	end
 
@@ -97,14 +98,17 @@ if Ext.IsServer() then
 			newStat.StackId = self.Name
 			newStat:Sync()
 
-			for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
-				if Osi.HasActiveStatus(entityId, self.Name) == 1 then
-					Osi.RemoveStatus(entityId, self.Name)
-					Ext.Timer.WaitFor(10, function()
-						Osi.ApplyStatus(entityId, self.Name, -1, 1)
-					end)
+			if self.Name ~= "TheArmory_Vanity_PreviewEffect" then
+				for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
+					if Osi.HasActiveStatus(entityId, self.Name) == 1 then
+						Osi.RemoveStatus(entityId, self.Name)
+						Ext.Timer.WaitFor(10, function()
+							Osi.ApplyStatus(entityId, self.Name, -1, 1)
+						end)
+					end
 				end
 			end
+			return true
 		end
 	end
 
@@ -113,9 +117,26 @@ if Ext.IsServer() then
 		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps):editStat()
 	end)
 
-
 	Ext.RegisterNetListener(ModuleUUID .. "_DeleteEffect", function(channel, effectName, user)
 		VanityEffect:deleteStat(effectName)
+	end)
+
+	Ext.RegisterNetListener(ModuleUUID .. "_PreviewEffect", function(channel, payload, user)
+		user = PeerToUserID(user)
+		local character = Osi.GetCurrentCharacter(user)
+
+		local effectRaw = Ext.Json.Parse(payload)
+		local slot = effectRaw.slot
+
+		local effect = VanityEffect:new({}, "TheArmory_Vanity_PreviewEffect", effectRaw.effectProps)
+		if not effect:editStat() then
+			effect:createStat()
+		end
+
+		local equippedItem = Osi.GetEquippedItem(character, slot)
+		if equippedItem then
+			Osi.ApplyStatus(Osi.GetEquippedItem(character, slot), effect.Name, 10)
+		end
 	end)
 end
 
@@ -215,7 +236,7 @@ if Ext.IsClient() then
 			} --[[@as FormStructure]])
 		end
 
-		FormBuilder:CreateForm(formPopup,
+		local inputSupplier = FormBuilder:CreateForm(formPopup,
 			function(inputs)
 				local initiateEdit = self.Name and self.Name ~= ""
 				local effectToModify
@@ -234,6 +255,18 @@ if Ext.IsClient() then
 				end
 			end,
 			formInputs)
+
+		local previewButton = formPopup:AddButton("Preview")
+		previewButton.SameLine = true
+		previewButton.OnClick = function()
+			local inputs = inputSupplier()
+			if inputs then
+				local effect = VanityEffect:new({}, inputs.Name, inputs)
+				effect.slot = SlotContextMenu.itemSlot
+				Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
+			end
+		end
+		previewButton:Tooltip():AddText("\t  Will use a reserved status to apply the selected effect(s) to the equipped item in the currently selected slot for 10 rounds").TextWrapPos = 600
 
 		formPopup:Open()
 	end
