@@ -23,11 +23,21 @@ end
 
 ---@param ... ExtuiTreeParent
 function Helpers:KillChildren(...)
-	for _, parent in pairs({...}) do
+	for _, parent in pairs({ ... }) do
 		for _, child in pairs(parent.Children) do
 			if child.UserData ~= "keep" then
 				child:Destroy()
 			end
+		end
+	end
+end
+
+function Helpers:ClearEmptyTablesInProxyTree(proxyTable)
+	local parentTable = proxyTable._parent_proxy
+	if not proxyTable() then
+		proxyTable.delete = true
+		if parentTable then
+			Helpers:ClearEmptyTablesInProxyTree(parentTable)
 		end
 	end
 end

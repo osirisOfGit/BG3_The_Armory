@@ -144,7 +144,10 @@ function Transmogger:MogCharacter(character)
 
 		if not vanityTemplate then
 			if equippedItem then
-				Transmogger:UnMogItem(equippedItem)
+				local newItem = Transmogger:UnMogItem(equippedItem)
+				if newItem then
+					self:ApplyEffectStatus(outfitSlot, actualSlot, Ext.Entity.Get(newItem), character)
+				end
 			end
 			goto continue
 		end

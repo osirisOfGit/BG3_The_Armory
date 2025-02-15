@@ -156,12 +156,14 @@ function VanityEffect:deleteStat(effectName)
 					end
 					local proxyTable = ConfigurationStructure.config.vanity.presets[presetName].Outfits[outfitKey][slot]
 					if weaponType then
-						proxyTable = proxyTable.weaponTypes[weaponType].equipment
+						proxyTable = proxyTable.weaponTypes[weaponType]
 					else
-						proxyTable = proxyTable.equipment
+						proxyTable = proxyTable
 					end
-					proxyTable.effects.delete = true
-					proxyTable.effects = tableCopy
+					proxyTable.equipment.effects.delete = true
+					proxyTable.equipment.effects = next(tableCopy) and tableCopy or nil
+
+					Helpers:ClearEmptyTablesInProxyTree(proxyTable)
 				end
 			end
 		end
@@ -315,7 +317,9 @@ if Ext.IsClient() then
 						end
 					end
 					vanityOutfitItemEntry.effects.delete = true
-					vanityOutfitItemEntry.effects = tableCopy
+					vanityOutfitItemEntry.effects = next(tableCopy) and tableCopy or nil
+
+					Helpers:ClearEmptyTablesInProxyTree(vanityOutfitItemEntry)
 				end
 				onSubmitFunc()
 				enableEffect.Label = enableEffect.Selected and "Disable" or "Enable"
