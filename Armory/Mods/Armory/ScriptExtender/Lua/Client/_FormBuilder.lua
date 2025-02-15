@@ -47,6 +47,10 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 			input = parent:AddCheckbox("", formInput.defaultValue or false)
 		end
 		input.Disabled = formInput.enabled ~= nil and formInput.enabled or false
+		if input.Disabled then
+			input:SetColor("Text", { 1, 1, 1, .5 })
+		end
+
 		formInput.input = input
 
 		if formInput.enumTable then

@@ -2,7 +2,7 @@ Ext.Require("Shared/Vanity/MissingEnums.lua")
 
 local effectCollection = {}
 
----@type ExtuiPopup
+---@type ExtuiWindow
 local formPopup
 
 ---@param extClass Ext_StaticData|Ext_Resource
@@ -214,8 +214,12 @@ if Ext.IsClient() then
 				formPopup:Destroy()
 			end)
 		end
-		---@type ExtuiPopup
-		formPopup = parent.ParentElement:AddPopup("Create Effect Form")
+
+		formPopup = Ext.IMGUI.NewWindow("Create Effect Form")
+		formPopup:SetFocus()
+		formPopup.Closeable = true
+		formPopup.NoCollapse = true
+		formPopup.AlwaysAutoResize = true
 
 		---@type FormStructure[]
 		local formInputs = { {
@@ -267,8 +271,6 @@ if Ext.IsClient() then
 			end
 		end
 		previewButton:Tooltip():AddText("\t  Will use a reserved status to apply the selected effect(s) to the equipped item in the currently selected slot for 10 rounds").TextWrapPos = 600
-
-		formPopup:Open()
 	end
 
 	---@param parentPopup ExtuiPopup
@@ -292,15 +294,20 @@ if Ext.IsClient() then
 			enableEffect.UserData = vanityEffect
 			enableEffect.Selected = (vanityOutfitItemEntry and vanityOutfitItemEntry.effects) and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
 			enableEffect.Label = enableEffect.Selected and "Disable" or "Enable"
+			if enableEffect.Selected then
+				effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
+			end
 
 			enableEffect.OnClick = function()
 				if enableEffect.Selected then
+					effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 					vanityOutfitItemEntry = SlotContextMenu:GetOutfitSlot()
 					if not vanityOutfitItemEntry.effects then
 						vanityOutfitItemEntry.effects = {}
 					end
 					table.insert(vanityOutfitItemEntry.effects, effectName)
 				elseif vanityOutfitItemEntry and vanityOutfitItemEntry.effects and vanityOutfitItemEntry.effects() then
+					effectMenu:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 					local tableCopy = {}
 					for _, existingEffect in ipairs(vanityOutfitItemEntry.effects) do
 						if existingEffect ~= effectName then
@@ -322,13 +329,17 @@ if Ext.IsClient() then
 			end
 
 			---@type ExtuiSelectable
-			local deleteSelectable = effectMenu:AddSelectable("Delete", "DontClosePopups")
-			deleteSelectable.IDContext = effectMenu.Label .. "Delete"
-			deleteSelectable.OnClick = function()
+			local deleteEffect = effectMenu:AddSelectable("Delete", "DontClosePopups")
+			deleteEffect.IDContext = effectMenu.Label .. "Delete"
+			deleteEffect.OnClick = function()
 				vanityEffect:deleteStat()
 				effectCollection[effectName] = nil
 				effectMenu:Destroy()
 			end
+
+			enableEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
+			editEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
+			deleteEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 		end
 
 		---@type ExtuiSelectable
