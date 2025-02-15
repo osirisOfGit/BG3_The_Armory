@@ -26,8 +26,8 @@ local effectBanks = {
 	-- BeamEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
 	-- FormatColor = function() return FormatStringColor end,
 	-- MaterialType = function() return MaterialType end,
-	-- StatusEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
-	StatusEffectOnTurn = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+	StatusEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
+	-- StatusEffectOnTurn = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
 }
 
 ---@class VanityEffect
@@ -67,7 +67,7 @@ function VanityEffect:new(instance, name, effectProps)
 end
 
 if Ext.IsServer() then
-	function VanityEffect:buildStat()
+	function VanityEffect:createStat()
 		if not Ext.Stats.Get(self.Name) then
 			Logger:BasicDebug("Creating Effect %s", self.Name)
 			---@type StatusData
@@ -81,13 +81,113 @@ if Ext.IsServer() then
 			newStat:Sync()
 		end
 	end
+
+	function VanityEffect:editStat()
+		if Ext.Stats.Get(self.Name) then
+			Logger:BasicDebug("Updating Effect %s to be %s", self.Name, Ext.Json.Stringify(self.effectProps))
+			---@type StatusData
+			local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
+			for key, value in pairs(self.effectProps) do
+				if value and value ~= "" then
+					newStat[key] = value
+				else
+					newStat[key] = nil
+				end
+			end
+			newStat.StackId = self.Name
+			newStat:Sync()
+
+			for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
+				if Osi.HasActiveStatus(entityId, self.Name) == 1 then
+					Osi.RemoveStatus(entityId, self.Name)
+					Ext.Timer.WaitFor(10, function()
+						Osi.ApplyStatus(entityId, self.Name, -1, 1)
+					end)
+				end
+			end
+		end
+	end
+
+	Ext.RegisterNetListener(ModuleUUID .. "_EditEffect", function(channel, payload, user)
+		local effectRaw = Ext.Json.Parse(payload)
+		VanityEffect:new({}, effectRaw.Name, effectRaw):editStat()
+	end)
+
+
+	Ext.RegisterNetListener(ModuleUUID .. "_DeleteEffect", function(channel, effectName, user)
+		VanityEffect:deleteStat(effectName)
+	end)
+end
+
+function VanityEffect:deleteStat(effectName)
+	if Ext.IsClient() then
+		effectName = self.Name
+		ConfigurationStructure.config.vanity.effects[effectName].delete = true
+
+		local function removeEffect(outfitSlot, presetName, outfitKey, slot, weaponType)
+			if outfitSlot.equipment and outfitSlot.equipment.effects then
+				if TableUtils:ListContains(outfitSlot.equipment.effects, effectName) then
+					local tableCopy = {}
+					for _, existingEffect in ipairs(outfitSlot.equipment.effects) do
+						if existingEffect ~= effectName then
+							table.insert(tableCopy, existingEffect)
+						end
+					end
+					local proxyTable = ConfigurationStructure.config.vanity.presets[presetName].Outfits[outfitKey][slot]
+					if weaponType then
+						proxyTable = proxyTable.weaponTypes[weaponType].equipment
+					else
+						proxyTable = proxyTable.equipment
+					end
+					proxyTable.effects.delete = true
+					proxyTable.effects = tableCopy
+				end
+			end
+		end
+
+		-- pairs returns the real table, not the proxy one
+		for presetName, preset in pairs(ConfigurationStructure.config.vanity.presets) do
+			for outfitKey, outfit in pairs(preset.Outfits) do
+				for slot, outfitSlot in pairs(outfit) do
+					removeEffect(outfitSlot, presetName, outfitKey, slot)
+					if outfitSlot.weaponTypes then
+						for weaponType, weaponTypeSlot in pairs(outfitSlot.weaponTypes) do
+							removeEffect(weaponTypeSlot, presetName, outfitKey, slot, weaponType)
+						end
+					end
+				end
+			end
+		end
+
+		Ext.Net.PostMessageToServer(ModuleUUID .. "_DeleteEffect", effectName)
+	else
+		for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
+			if Osi.HasActiveStatus(entityId, effectName) == 1 then
+				Osi.RemoveStatus(entityId, effectName)
+
+				local removeMarker = true
+				for otherEffectName in pairs(ConfigurationStructure.config.vanity.effects) do
+					if otherEffectName ~= effectName then
+						if Osi.HasActiveStatus(entityId, otherEffectName) == 1 then
+							removeMarker = false
+							break
+						end
+					end
+				end
+				if removeMarker then
+					Ext.Entity.Get(entityId).Vars.TheArmory_Vanity_EffectsMarker = nil
+				end
+			end
+		end
+	end
 end
 
 if Ext.IsClient() then
 	Ext.Require("Client/_FormBuilder.lua")
 
 	---@param parent ExtuiTreeParent
-	function VanityEffect:buildCreateEffectForm(parent)
+	---@param existingEffect VanityEffect?
+	function VanityEffect:buildCreateEffectForm(parent, existingEffect)
 		if formPopup then
 			pcall(function(...)
 				formPopup:Destroy()
@@ -105,6 +205,7 @@ if Ext.IsClient() then
 		for effectProp, value in TableUtils:OrderedPairs(self.effectProps) do
 			table.insert(formInputs, {
 				label = effectProp,
+				defaultValue = (existingEffect and existingEffect.effectProps) and existingEffect.effectProps[effectProp] or nil,
 				propertyField = effectProp,
 				type = type(value) == "number" and "NumericText" or "Text",
 				enumTable = effectBanks[effectProp]
@@ -117,6 +218,9 @@ if Ext.IsClient() then
 				effectCollection[newEffect.Name] = newEffect
 				ConfigurationStructure.config.vanity.effects[newEffect.Name] = newEffect
 				formPopup:Destroy()
+				if existingEffect then
+					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(existingEffect))
+				end
 			end,
 			formInputs)
 
@@ -136,13 +240,17 @@ if Ext.IsClient() then
 		---@type ExtuiMenu
 		local menu = parentPopup:AddMenu("Add Effects")
 		for effectName, vanityEffect in TableUtils:OrderedPairs(effectCollection) do
-			---@type ExtuiSelectable
-			local effectSelectable = menu:AddSelectable(string.sub(effectName, #"ARMORY_VANITY_EFFECT_" + 1), "DontClosePopups")
-			effectSelectable.UserData = vanityEffect
-			effectSelectable.Selected = (vanityOutfitItemEntry and vanityOutfitItemEntry.effects) and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
+			---@type ExtuiMenu
+			local effectMenu = menu:AddMenu(string.sub(effectName, #"ARMORY_VANITY_EFFECT_" + 1))
 
-			effectSelectable.OnClick = function()
-				if effectSelectable.Selected then
+			---@type ExtuiSelectable
+			local enableEffect = effectMenu:AddSelectable("", "DontClosePopups")
+			enableEffect.UserData = vanityEffect
+			enableEffect.Selected = (vanityOutfitItemEntry and vanityOutfitItemEntry.effects) and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
+			enableEffect.Label = enableEffect.Selected and "Disable" or "Enable"
+
+			enableEffect.OnClick = function()
+				if enableEffect.Selected then
 					vanityOutfitItemEntry = SlotContextMenu:GetOutfitSlot()
 					if not vanityOutfitItemEntry.effects then
 						vanityOutfitItemEntry.effects = {}
@@ -159,6 +267,21 @@ if Ext.IsClient() then
 					vanityOutfitItemEntry.effects = tableCopy
 				end
 				onSubmitFunc()
+			end
+
+			---@type ExtuiSelectable
+			local editEffect = effectMenu:AddSelectable("Edit")
+			editEffect.IDContext = effectMenu.Label .. "Edit"
+			editEffect.OnClick = function()
+				vanityEffect:buildCreateEffectForm(parentPopup)
+			end
+
+			---@type ExtuiSelectable
+			local deleteSelectable = effectMenu:AddSelectable("Delete", "DontClosePopups")
+			deleteSelectable.IDContext = effectMenu.Label .. "Delete"
+			deleteSelectable.OnClick = function()
+				vanityEffect:deleteStat()
+				effectMenu:Destroy()
 			end
 		end
 

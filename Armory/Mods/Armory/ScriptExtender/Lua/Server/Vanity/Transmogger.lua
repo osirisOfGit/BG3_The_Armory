@@ -10,6 +10,10 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_OriginalDyeInfo", {
 	Server = true
 })
 
+Ext.Vars.RegisterUserVariable("TheArmory_Vanity_EffectsMarker", {
+	Server = true
+})
+
 Ext.Vars.RegisterUserVariable("TheArmory_Vanity_Item_ReplicationComponents", {
 	Server = true
 })
@@ -357,9 +361,10 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 						Ext.Json.Stringify(effectProps))
 
 					local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
-					effect:buildStat()
+					effect:createStat()
 					Ext.Timer.WaitFor(50, function()
 						Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
+						createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = true
 					end)
 				end
 			else
@@ -607,8 +612,10 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	else
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
 		Ext.Timer.WaitFor(100, function()
-			Logger:BasicDebug("Item %s was equipped on %s, executing transmog", (itemEntity.DisplayName and itemEntity.DisplayName.Name:Get()) or itemEntity.ServerItem.Template
-				.Name, character)
+			Logger:BasicDebug("Item %s was equipped on %s, executing transmog",
+				(itemEntity.DisplayName and itemEntity.DisplayName.Name:Get()) or itemEntity.ServerItem.Template.Name,
+				character)
+
 			Transmogger:MogCharacter(Ext.Entity.Get(character))
 		end)
 	end
