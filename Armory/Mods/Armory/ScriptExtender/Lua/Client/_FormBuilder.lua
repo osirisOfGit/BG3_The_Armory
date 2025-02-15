@@ -51,6 +51,16 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 			formInput.input.Hint = (formInput.input.Hint and "; " or "") .. "Must select from the list that appears on focus"
 			local displayToKeyMap, displayOrderedMap = formInput.enumTable()
 
+			if formInput.defaultValue then
+				for displayName, key in pairs(displayToKeyMap) do
+					if formInput.defaultValue == key then
+						formInput.input.Text = displayName
+						formInput.input.UserData = key
+						break
+					end
+				end
+			end
+
 			local resultsView = parent:AddChildWindow(formInput.propertyField or formInput.label)
 			resultsView.AutoResizeY = true
 			resultsView.NoSavedSettings = true
@@ -75,7 +85,9 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
 			end
 
 			input.OnActivate = function()
+				local key = formInput.input.UserData
 				formInput.input.OnChange()
+				formInput.input.UserData = key
 			end
 			input.OnDeactivate = function()
 				if formInput.input.UserData == nil then

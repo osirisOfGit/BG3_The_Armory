@@ -83,10 +83,10 @@ if Ext.IsServer() then
 	end
 
 	function VanityEffect:editStat()
-		if Ext.Stats.Get(self.Name) then
+		---@type StatusData?
+		local newStat = Ext.Stats.Get(self.Name)
+		if newStat then
 			Logger:BasicDebug("Updating Effect %s to be %s", self.Name, Ext.Json.Stringify(self.effectProps))
-			---@type StatusData
-			local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
 			for key, value in pairs(self.effectProps) do
 				if value and value ~= "" then
 					newStat[key] = value
@@ -110,7 +110,7 @@ if Ext.IsServer() then
 
 	Ext.RegisterNetListener(ModuleUUID .. "_EditEffect", function(channel, payload, user)
 		local effectRaw = Ext.Json.Parse(payload)
-		VanityEffect:new({}, effectRaw.Name, effectRaw):editStat()
+		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps):editStat()
 	end)
 
 
@@ -187,7 +187,7 @@ if Ext.IsClient() then
 
 	---@param parent ExtuiTreeParent
 	---@param existingEffect VanityEffect?
-	function VanityEffect:buildCreateEffectForm(parent, existingEffect)
+	function VanityEffect:buildCreateEffectForm(parent)
 		if formPopup then
 			pcall(function(...)
 				formPopup:Destroy()
@@ -200,12 +200,13 @@ if Ext.IsClient() then
 		local formInputs = { {
 			label = "Name",
 			type = "Text",
-			errorMessageIfEmpty = "Must provide a name"
+			errorMessageIfEmpty = "Must provide a name",
+			defaultValue = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1)
 		} }
 		for effectProp, value in TableUtils:OrderedPairs(self.effectProps) do
 			table.insert(formInputs, {
 				label = effectProp,
-				defaultValue = (existingEffect and existingEffect.effectProps) and existingEffect.effectProps[effectProp] or nil,
+				defaultValue = self.effectProps and self.effectProps[effectProp] or nil,
 				propertyField = effectProp,
 				type = type(value) == "number" and "NumericText" or "Text",
 				enumTable = effectBanks[effectProp]
@@ -214,12 +215,20 @@ if Ext.IsClient() then
 
 		FormBuilder:CreateForm(formPopup,
 			function(inputs)
-				local newEffect = VanityEffect:new({}, inputs.Name, inputs)
-				effectCollection[newEffect.Name] = newEffect
-				ConfigurationStructure.config.vanity.effects[newEffect.Name] = newEffect
+				local initiateEdit = self.Name and self.Name ~= ""
+				local effectToModify
+				if initiateEdit then
+					effectToModify = self
+				else
+					effectToModify = VanityEffect:new({}, inputs.Name, inputs)
+				end
+				inputs.Name = nil
+				effectToModify.effectProps = inputs
+				effectCollection[effectToModify.Name] = effectToModify
+				ConfigurationStructure.config.vanity.effects[effectToModify.Name] = effectToModify
 				formPopup:Destroy()
-				if existingEffect then
-					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(existingEffect))
+				if initiateEdit then
+					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(self))
 				end
 			end,
 			formInputs)
@@ -267,6 +276,7 @@ if Ext.IsClient() then
 					vanityOutfitItemEntry.effects = tableCopy
 				end
 				onSubmitFunc()
+				enableEffect.Label = enableEffect.Selected and "Disable" or "Enable"
 			end
 
 			---@type ExtuiSelectable
@@ -281,6 +291,7 @@ if Ext.IsClient() then
 			deleteSelectable.IDContext = effectMenu.Label .. "Delete"
 			deleteSelectable.OnClick = function()
 				vanityEffect:deleteStat()
+				effectCollection[effectName] = nil
 				effectMenu:Destroy()
 			end
 		end
