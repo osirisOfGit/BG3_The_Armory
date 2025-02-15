@@ -157,11 +157,10 @@ function VanityEffect:deleteStat(effectName)
 					local proxyTable = ConfigurationStructure.config.vanity.presets[presetName].Outfits[outfitKey][slot]
 					if weaponType then
 						proxyTable = proxyTable.weaponTypes[weaponType]
-					else
-						proxyTable = proxyTable
 					end
-					proxyTable.equipment.effects.delete = true
-					proxyTable.equipment.effects = next(tableCopy) and tableCopy or nil
+					proxyTable = proxyTable.equipment
+					proxyTable.effects.delete = true
+					proxyTable.effects = next(tableCopy) and tableCopy or nil
 
 					Helpers:ClearEmptyTablesInProxyTree(proxyTable)
 				end
@@ -339,6 +338,7 @@ if Ext.IsClient() then
 				vanityEffect:deleteStat()
 				effectCollection[effectName] = nil
 				effectMenu:Destroy()
+				onSubmitFunc()
 			end
 
 			enableEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
