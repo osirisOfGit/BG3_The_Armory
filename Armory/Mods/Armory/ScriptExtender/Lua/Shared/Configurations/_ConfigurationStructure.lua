@@ -33,7 +33,6 @@ local function generate_recursive_metatable(proxy_table, real_table)
 				this_table._parent_table[this_table._parent_key] = nil
 			else
 				real_table[key] = value
-
 				if type(value) == "table" then
 					rawset(proxy_table, key, generate_recursive_metatable(
 						{
@@ -51,7 +50,7 @@ local function generate_recursive_metatable(proxy_table, real_table)
 				end
 			end
 
-			if initialized then
+			if initialized and Ext.IsClient() then
 				if updateTimer then
 					Ext.Timer.Cancel(updateTimer)
 				end
@@ -63,11 +62,12 @@ local function generate_recursive_metatable(proxy_table, real_table)
 					FileUtils:SaveTableToFile("config.json", real_config_table)
 					Logger:BasicDebug("Configuration updates made - sending updated table to server")
 
-					if Ext.ClientNet.IsHost()  then
+					if Ext.ClientNet.IsHost() then
 						Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_UpdateConfiguration", "")
 					elseif not informedUserOfHostRestriction then
 						informedUserOfHostRestriction = true
-						Logger:BasicWarning("You're not the host of this session, so not updating the server configs - your local config is still updated. This log will not appear again this session.")
+						Logger:BasicWarning(
+							"You're not the host of this session, so not updating the server configs - your local config is still updated. This log will not appear again this session.")
 					end
 				end)
 			end
@@ -127,21 +127,27 @@ function ConfigurationStructure:InitializeConfig()
 
 	if not config then
 		config = real_config_table
-		FileUtils:SaveTableToFile("config.json", config)
+		if Ext.IsClient() then
+			FileUtils:SaveTableToFile("config.json", config)
+		end
 	else
-		CopyConfigsIntoReal(config, ConfigurationStructure.config)
+		if Ext.IsClient() then
+			CopyConfigsIntoReal(config, ConfigurationStructure.config)
+			FileUtils:SaveTableToFile("config.json", real_config_table)
+		else
+			-- All config management is done on the client side - just want server to always use the full config file (instead of attempting to merge with defaults)
+			real_config_table = {}
+			ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+			CopyConfigsIntoReal(config, ConfigurationStructure.config)
+		end
 	end
 
 	initialized = true
-	Logger:BasicInfo("Successfully loaded the config!")
+	Logger:BasicDebug("Successfully loaded the config!")
 end
 
 function ConfigurationStructure:UpdateConfigForServer()
-	local config = FileUtils:LoadTableFile("config.json")
-	if config then
-		real_config_table = config
-		Logger:BasicDebug("Successfully updated config on server side!")
-	end
+	self:InitializeConfig()
 	return ConfigurationStructure:GetRealConfigCopy()
 end
 

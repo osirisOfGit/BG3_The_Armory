@@ -1,10 +1,16 @@
 ---@diagnostic disable: missing-fields
 
+Ext.Require("Shared/Vanity/EffectManager.lua")
+
 Ext.Vars.RegisterUserVariable("TheArmory_Vanity_OriginalItemInfo", {
 	Server = true
 })
 
 Ext.Vars.RegisterUserVariable("TheArmory_Vanity_OriginalDyeInfo", {
+	Server = true
+})
+
+Ext.Vars.RegisterUserVariable("TheArmory_Vanity_EffectsMarker", {
 	Server = true
 })
 
@@ -29,7 +35,8 @@ local defaultPieces = {
 	Ring1 = "ecf4a8a4-7859-4a82-8c08-0c9526f29500",
 	Ring2 = "ecf4a8a4-7859-4a82-8c08-0c9526f29500",
 	LightSource = "50c43f27-a12e-412c-88f0-56e15eba692a",
-	MusicalInstrument = "848ad8dc-59f3-464b-b8b2-95eab6022446"
+	MusicalInstrument = "848ad8dc-59f3-464b-b8b2-95eab6022446",
+	HideTransmog = "cd6c6adc-8792-4378-8c63-8169cfad6c55"
 }
 
 -- Things that will cause me psychic damage: https://discord.com/channels/1174823496086470716/1193836567194771506/1327500800766771271
@@ -128,7 +135,8 @@ function Transmogger:MogCharacter(character)
 			local itemStat = Ext.Stats.Get(Ext.Entity.Get(equippedItem).Data.StatsId)
 			for _, proficiencyGroup in pairs(itemStat["Proficiency Group"]) do
 				if outfitSlot.weaponTypes[proficiencyGroup] then
-					vanityTemplate = outfitSlot.weaponTypes[proficiencyGroup].equipment.guid
+					outfitSlot = outfitSlot.weaponTypes[proficiencyGroup]
+					vanityTemplate = outfitSlot.equipment.guid
 					break
 				end
 			end
@@ -136,7 +144,10 @@ function Transmogger:MogCharacter(character)
 
 		if not vanityTemplate then
 			if equippedItem then
-				Transmogger:UnMogItem(equippedItem)
+				local newItem = Transmogger:UnMogItem(equippedItem)
+				if newItem then
+					self:ApplyEffectStatus(outfitSlot, actualSlot, Ext.Entity.Get(newItem), character)
+				end
 			end
 			goto continue
 		end
@@ -150,6 +161,7 @@ function Transmogger:MogCharacter(character)
 		else
 			if string.sub(Osi.GetTemplate(equippedItem), -36) == vanityTemplate then
 				Logger:BasicDebug("Equipped item %s is already the vanity item %s", equippedItem, vanityTemplate)
+				self:ApplyEffectStatus(outfitSlot, actualSlot, Ext.Entity.Get(equippedItem), character)
 				goto continue
 			end
 
@@ -316,6 +328,8 @@ function Transmogger:MogCharacter(character)
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
 			Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
 
+			self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
+
 			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
 				Ext.Utils.MonotonicTime() - startTime)
 		end)
@@ -327,11 +341,59 @@ function Transmogger:MogCharacter(character)
 			local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
 			if equippedItem then
 				Transmogger:UnMogItem(equippedItem)
+				Transmogger:ApplyEffectStatus({}, actualSlot, Ext.Entity.Get(equippedItem), character)
 			end
 		end
 	end
 
 	Transmogger:ApplyDye(character)
+end
+
+---@param outfitSlot VanityOutfitSlot
+---@param actualSlot ActualSlot
+---@param createdVanityEntity EntityHandle
+---@param characterEntity EntityHandle
+function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
+	if outfitSlot.equipment and outfitSlot.equipment.effects then
+		for _, effectName in ipairs(outfitSlot.equipment.effects) do
+			local effectProps = ConfigCopy.vanity.effects[effectName]
+			if effectProps then
+				if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 0 then
+					Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
+						effectName,
+						createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name,
+						Ext.Json.Stringify(effectProps))
+
+					local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
+					effect:createStat()
+					Ext.Timer.WaitFor(50, function()
+						Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
+						createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = true
+					end)
+				end
+			else
+				Logger:BasicWarning("Definition for effect %s assigned to slot %s in outfit assigned to %s was not found in the configs", effectName, actualSlot,
+					characterEntity.DisplayName.Name:Get())
+			end
+		end
+	end
+
+	local removeEffectMarker = true
+
+	for effectName, _ in pairs(ConfigCopy.vanity.effects) do
+		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
+			if not TableUtils:ListContains((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, effectName) then
+				Logger:BasicDebug("Removing effect status %s from %s", effectName, createdVanityEntity.DisplayName and createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name)
+				Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
+			else
+				removeEffectMarker = false
+			end
+		end
+	end
+
+	if removeEffectMarker then
+		createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = nil
+	end
 end
 
 ---@param character EntityHandle
@@ -376,18 +438,18 @@ function Transmogger:ApplyDye(character)
 					if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo then
 						Logger:BasicDebug("%s in slot %s for %s doesn't have a corresponding outfit slot, so resetting the dye to %s", equippedItem, actualSlot,
 							character.DisplayName.Name:Get(), equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo)
-							if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo == "00000000-0000-0000-0000-000000000000" then
-								if equippedItemEntity.ItemDye then
-									equippedItemEntity:RemoveComponent("ItemDye")
-								end
-							else
-								if not equippedItemEntity.ItemDye then
-									equippedItemEntity:CreateComponent("ItemDye")
-								end
-								equippedItemEntity.ItemDye.Color = equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
+						if equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo == "00000000-0000-0000-0000-000000000000" then
+							if equippedItemEntity.ItemDye then
+								equippedItemEntity:RemoveComponent("ItemDye")
 							end
-							equippedItemEntity:Replicate("ItemDye")
-							equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = nil
+						else
+							if not equippedItemEntity.ItemDye then
+								equippedItemEntity:CreateComponent("ItemDye")
+							end
+							equippedItemEntity.ItemDye.Color = equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo
+						end
+						equippedItemEntity:Replicate("ItemDye")
+						equippedItemEntity.Vars.TheArmory_Vanity_OriginalDyeInfo = nil
 					end
 					goto continue
 				end
@@ -463,13 +525,19 @@ Ext.Events.SessionLoaded:Subscribe(function(e)
 end)
 
 function Transmogger:ClearOutfit(character)
+	---@type EntityHandle
+	local charEntity = Ext.Entity.Get(character)
+
 	for _, actualSlot in ipairs(SlotEnum) do
 		local equippedItem = Osi.GetEquippedItem(character, actualSlot)
 		if equippedItem then
-			Transmogger:UnMogItem(equippedItem)
+			local newItem = Transmogger:UnMogItem(equippedItem)
+			if newItem then
+				Transmogger:ApplyEffectStatus({}, actualSlot, Ext.Entity.Get(newItem), charEntity)
+			end
 		end
 	end
-	Transmogger:ApplyDye(Ext.Entity.Get(character))
+	Transmogger:ApplyDye(charEntity)
 end
 
 ---@param item any
@@ -545,6 +613,8 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 
 					return newItem
 				end
+			else 
+				return item
 			end
 		end
 	end
@@ -565,7 +635,10 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	else
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
 		Ext.Timer.WaitFor(100, function()
-			Logger:BasicDebug("Item %s was equipped on %s, executing transmog", itemEntity.DisplayName.Name:Get() or itemEntity.ServerItem.Template.Name, character)
+			Logger:BasicDebug("Item %s was equipped on %s, executing transmog",
+				(itemEntity.DisplayName and itemEntity.DisplayName.Name:Get()) or itemEntity.ServerItem.Template.Name,
+				character)
+
 			Transmogger:MogCharacter(Ext.Entity.Get(character))
 		end)
 	end

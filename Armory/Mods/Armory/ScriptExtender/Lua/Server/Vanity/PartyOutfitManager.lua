@@ -23,6 +23,9 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 ---@type VanityPreset
 ActiveVanityPreset = nil
 
+---@type Configuration
+ConfigCopy = nil
+
 Ext.Events.SessionLoaded:Subscribe(function(e)
 	ActiveVanityPreset = ConfigurationStructure:UpdateConfigForServer().vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
 end)
@@ -96,12 +99,12 @@ local function FindAndApplyOutfit(player, activeOutfits)
 end
 
 local function ApplyTransmogsPerPreset()
-	local config = ConfigurationStructure:UpdateConfigForServer()
+	ConfigCopy = ConfigurationStructure:UpdateConfigForServer()
 	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 	local activeOutfits
 	if activePresetId then
-		ActiveVanityPreset = config.vanity.presets[activePresetId]
+		ActiveVanityPreset = ConfigCopy.vanity.presets[activePresetId]
 
 		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", ActiveVanityPreset.Name, ActiveVanityPreset.Author, ActiveVanityPreset.Version)
 		activeOutfits = ActiveVanityPreset.Outfits
