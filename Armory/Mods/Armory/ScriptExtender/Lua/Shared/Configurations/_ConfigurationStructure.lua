@@ -127,11 +127,19 @@ function ConfigurationStructure:InitializeConfig()
 
 	if not config then
 		config = real_config_table
-		FileUtils:SaveTableToFile("config.json", config)
+		if Ext.IsClient() then
+			FileUtils:SaveTableToFile("config.json", config)
+		end
 	else
-		real_config_table = {}
-		ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
-		CopyConfigsIntoReal(config, ConfigurationStructure.config)
+		if Ext.IsClient() then
+			CopyConfigsIntoReal(config, ConfigurationStructure.config)
+			FileUtils:SaveTableToFile("config.json", real_config_table)
+		else
+			-- All config management is done on the client side - just want server to always use the full config file (instead of attempting to merge with defaults)
+			real_config_table = {}
+			ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+			CopyConfigsIntoReal(config, ConfigurationStructure.config)
+		end
 	end
 
 	initialized = true

@@ -208,7 +208,6 @@ if Ext.IsClient() then
 	Ext.Require("Client/_FormBuilder.lua")
 
 	---@param parent ExtuiTreeParent
-	---@param existingEffect VanityEffect?
 	function VanityEffect:buildCreateEffectForm(parent)
 		if formPopup then
 			pcall(function(...)
@@ -221,6 +220,12 @@ if Ext.IsClient() then
 		formPopup.Closeable = true
 		formPopup.NoCollapse = true
 		formPopup.AlwaysAutoResize = true
+
+		local warningText = formPopup:AddText(
+		"Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies")
+		warningText.UserData = "keep"
+		warningText.TextWrapPos = 0
+		warningText:SetStyle("Alpha", 0.65)
 
 		---@type FormStructure[]
 		local formInputs = { {
@@ -271,7 +276,7 @@ if Ext.IsClient() then
 				Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
 			end
 		end
-		previewButton:Tooltip():AddText("\t  Will use a reserved status to apply the selected effect(s) to the equipped item in the currently selected slot for 10 rounds").TextWrapPos = 600
+		previewButton:Tooltip():AddText(string.format("\t  Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds", SlotContextMenu.itemSlot)).TextWrapPos = 600
 	end
 
 	---@param parentPopup ExtuiPopup
