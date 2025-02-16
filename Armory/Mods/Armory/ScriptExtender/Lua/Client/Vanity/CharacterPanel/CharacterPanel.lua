@@ -314,7 +314,6 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 				effectsText.Font = "Tiny"
 				effectsText:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 			end
-
 			--#endregion
 		end
 

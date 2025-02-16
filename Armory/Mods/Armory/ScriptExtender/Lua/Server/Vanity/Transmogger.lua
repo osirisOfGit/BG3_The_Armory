@@ -341,6 +341,7 @@ function Transmogger:MogCharacter(character)
 			local equippedItem = Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)
 			if equippedItem then
 				Transmogger:UnMogItem(equippedItem)
+				Transmogger:ApplyEffectStatus({}, actualSlot, Ext.Entity.Get(equippedItem), character)
 			end
 		end
 	end
@@ -353,7 +354,7 @@ end
 ---@param createdVanityEntity EntityHandle
 ---@param characterEntity EntityHandle
 function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
-	if outfitSlot.equipment.effects then
+	if outfitSlot.equipment and outfitSlot.equipment.effects then
 		for _, effectName in ipairs(outfitSlot.equipment.effects) do
 			local effectProps = ConfigCopy.vanity.effects[effectName]
 			if effectProps then
@@ -381,7 +382,7 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 
 	for effectName, _ in pairs(ConfigCopy.vanity.effects) do
 		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
-			if not TableUtils:ListContains(outfitSlot.equipment.effects or {}, effectName) then
+			if not TableUtils:ListContains((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, effectName) then
 				Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
 			else
 				removeEffectMarker = false
@@ -523,13 +524,19 @@ Ext.Events.SessionLoaded:Subscribe(function(e)
 end)
 
 function Transmogger:ClearOutfit(character)
+	---@type EntityHandle
+	local charEntity = Ext.Entity.Get(character)
+
 	for _, actualSlot in ipairs(SlotEnum) do
 		local equippedItem = Osi.GetEquippedItem(character, actualSlot)
 		if equippedItem then
-			Transmogger:UnMogItem(equippedItem)
+			local newItem = Transmogger:UnMogItem(equippedItem)
+			if newItem then
+				Transmogger:ApplyEffectStatus({}, actualSlot, Ext.Entity.Get(newItem), charEntity)
+			end
 		end
 	end
-	Transmogger:ApplyDye(Ext.Entity.Get(character))
+	Transmogger:ApplyDye(charEntity)
 end
 
 ---@param item any
@@ -605,6 +612,8 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 
 					return newItem
 				end
+			else 
+				return item
 			end
 		end
 	end
