@@ -60,13 +60,6 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			generalSettings.showSlotContextMenuModifier = contextMenuSetting.Selected and "LSHIFT" or nil
 			SlotContextMenu:SubscribeToKeyEvents()
 		end
-
-		---@type ExtuiSelectable
-		local autoSwapCampInCombat = menuPopup:AddSelectable("Automatically swap to camp clothes outside of combat", "DontClosePopups")
-		autoSwapCampInCombat.Selected = generalSettings.autoSwapToCampOutfitOutOfCombat
-		autoSwapCampInCombat.OnClick = function ()
-			generalSettings.autoSwapToCampOutfitOutOfCombat = autoSwapCampInCombat.Selected
-		end
 		--#endregion
 
 		--#region Presets
