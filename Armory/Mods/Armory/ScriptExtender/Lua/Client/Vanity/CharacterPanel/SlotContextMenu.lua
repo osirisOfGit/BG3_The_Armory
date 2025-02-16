@@ -54,7 +54,7 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 
 			Helpers:KillChildren(self.Popup)
 
-			self.Popup:AddSelectable("Pick Vanity Item").OnActivate = defaultFunc
+			self.Popup:AddSelectable(buttonType == "equipment" and "Pick Vanity Item" or "Pick Dye").OnActivate = defaultFunc
 
 			if slotButton.UserData then
 				self.Popup:AddSelectable("Clear").OnActivate = function()

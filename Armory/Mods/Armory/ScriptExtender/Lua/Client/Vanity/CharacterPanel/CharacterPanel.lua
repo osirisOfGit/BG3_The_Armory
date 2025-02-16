@@ -102,21 +102,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		panelGroup.MenuBar = true
 
 		panelGroup:AddSeparator()
-
-		local menu = panelGroup:AddButton("Settings")
-		menu.UserData = "keep"
-		local menuPopup = panelGroup:AddPopup("PanelSettings")
-		menuPopup.UserData = "keep"
-		menu.OnClick = function() return menuPopup:Open() end
-
-		---@type ExtuiSelectable
-		local contextMenuSetting = menuPopup:AddSelectable("Show Slot Context Menu only when holding Left Shift", "DontClosePopups")
-		contextMenuSetting.Selected = ConfigurationStructure.config.vanity.settings.general.showSlotContextMenuModifier ~= nil
-		contextMenuSetting:Tooltip():AddText("If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it").TextWrapPos = 600
-		contextMenuSetting.OnClick = function()
-			ConfigurationStructure.config.vanity.settings.general.showSlotContextMenuModifier = contextMenuSetting.Selected and "LSHIFT" or nil
-			SlotContextMenu:SubscribeToKeyEvents()
-		end
 	else
 		Helpers:KillChildren(panelGroup)
 	end
