@@ -132,18 +132,18 @@ end)
 
 --#region Camp Outfit Autoswapper
 
-Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function (object, combatGuid)
-	if Osi.HasActiveStatus(object, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
-		if Osi.GetArmourSet(object) == 1 then
-			Osi.SetArmourSet(object, 0)
+Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function (character, combatGuid)
+	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
+		if Osi.GetArmourSet(character) == 1 then
+			Osi.SetArmourSet(character, 0)
 		end
 	end
 end)
 
-Ext.Osiris.RegisterListener("LeftCombat", 2, "after", function (object, combatGuid)
-	if Osi.HasActiveStatus(object, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
-		if Osi.GetArmourSet(object) == 0 then
-			Osi.SetArmourSet(object, 1)
+Ext.Osiris.RegisterListener("LeftCombat", 2, "after", function (character, combatGuid)
+	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
+		if Osi.GetArmourSet(character) == 0 then
+			Osi.SetArmourSet(character, 1)
 		end
 	end
 end)

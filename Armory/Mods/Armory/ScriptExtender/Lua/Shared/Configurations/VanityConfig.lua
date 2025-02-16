@@ -6,7 +6,6 @@ ConfigurationStructure.config.vanity = {}
 ConfigurationStructure.config.vanity.settings = {
 	general = {
 		showSlotContextMenuModifier = nil,
-		autoSwapToCampOutfitOutOfCombat = false
 	},
 	---@class EquipmentSettings
 	equipment = {
