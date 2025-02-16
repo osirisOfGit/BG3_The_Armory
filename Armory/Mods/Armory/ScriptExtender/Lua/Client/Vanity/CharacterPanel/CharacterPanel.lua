@@ -220,17 +220,24 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 
 			--#region Equipment
 			if outfitSlotEntry and outfitSlotEntry.equipment and outfitSlotEntry.equipment.guid then
-				---@type ItemTemplate
-				local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
-
-				imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
-				if imageButton.Image.Icon == "" then
-					imageButton:Destroy()
+				if outfitSlotEntry.equipment.guid == "Hide Appearance" then
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
-				end
-				imageButton.UserData = itemTemplate
+					imageButton.Background = { 0, 0, 0, 1 }
+					imageButton:SetColor("Button", { 0, 0, 0, 0.5 })
+					imageButton:Tooltip():AddText("Hiding Appearance")
+				else
+					---@type ItemTemplate
+					local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
 
-				Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
+					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
+					if imageButton.Image.Icon == "" then
+						imageButton:Destroy()
+						imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
+					end
+					imageButton.UserData = itemTemplate
+
+					Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
+				end
 			else
 				imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 				if weaponType then

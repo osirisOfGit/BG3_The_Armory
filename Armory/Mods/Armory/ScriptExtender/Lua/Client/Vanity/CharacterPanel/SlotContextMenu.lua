@@ -54,7 +54,7 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 
 			Helpers:KillChildren(self.Popup)
 
-			self.Popup:AddSelectable("Edit").OnActivate = defaultFunc
+			self.Popup:AddSelectable("Pick Vanity Item").OnActivate = defaultFunc
 
 			if slotButton.UserData then
 				self.Popup:AddSelectable("Clear").OnActivate = function()
@@ -68,6 +68,25 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 			end
 
 			if buttonType == "equipment" then
+				if not weaponType and not string.match(itemSlot, "Weapon") then
+					---@type ExtuiSelectable
+					local hideAppearanceSelectable = self.Popup:AddSelectable("Hide Appearance")
+					hideAppearanceSelectable.Selected = (outfitSlot and outfitSlot[buttonType]) and outfitSlot[buttonType].guid == "Hide Appearance" or false
+					if hideAppearanceSelectable.Selected then
+						hideAppearanceSelectable.Label = "Show Appearance"
+					end
+					hideAppearanceSelectable.OnActivate = function()
+						local outfitSlot = self:GetOutfitSlot()
+						if outfitSlot.guid == "Hide Appearance" then
+							outfitSlot.delete = true
+						else
+							outfitSlot.guid = "Hide Appearance"
+							outfitSlot.modDependency = nil
+						end
+
+						onCloseFunc()
+					end
+				end
 				VanityEffect:buildSlotContextMenuEntries(self.Popup, outfitSlot and outfitSlot[buttonType] or nil, onCloseFunc)
 			end
 

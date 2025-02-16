@@ -129,6 +129,9 @@ function Transmogger:MogCharacter(character)
 
 		---@type string
 		local vanityTemplate = outfitSlot.equipment and outfitSlot.equipment.guid or nil
+		if vanityTemplate == "Hide Appearance" then
+			vanityTemplate = defaultPieces["HideTransmog"]
+		end
 
 		if equippedItem and outfitSlot.weaponTypes then
 			---@type Weapon
