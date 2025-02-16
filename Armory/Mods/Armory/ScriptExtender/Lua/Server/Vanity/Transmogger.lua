@@ -358,8 +358,9 @@ end
 ---@param characterEntity EntityHandle
 function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
 	if outfitSlot.equipment and outfitSlot.equipment.effects then
+		local effects = ConfigurationStructure:GetRealConfigCopy().vanity.effects
 		for _, effectName in ipairs(outfitSlot.equipment.effects) do
-			local effectProps = ConfigurationStructure.config.vanity.effects[effectName]
+			local effectProps = effects[effectName]
 			if effectProps then
 				if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 0 then
 					Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
