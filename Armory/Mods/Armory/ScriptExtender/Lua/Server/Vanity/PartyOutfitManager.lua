@@ -23,9 +23,6 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 ---@type VanityPreset
 ActiveVanityPreset = nil
 
----@type Configuration
-ConfigCopy = nil
-
 Ext.Events.SessionLoaded:Subscribe(function(e)
 	ActiveVanityPreset = ConfigurationStructure:UpdateConfigForServer().vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
 end)
@@ -99,12 +96,11 @@ local function FindAndApplyOutfit(player, activeOutfits)
 end
 
 local function ApplyTransmogsPerPreset()
-	ConfigCopy = ConfigurationStructure:UpdateConfigForServer()
 	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 	local activeOutfits
 	if activePresetId then
-		ActiveVanityPreset = ConfigCopy.vanity.presets[activePresetId]
+		ActiveVanityPreset = ConfigurationStructure.config.vanity.presets[activePresetId]
 
 		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", ActiveVanityPreset.Name, ActiveVanityPreset.Author, ActiveVanityPreset.Version)
 		activeOutfits = ActiveVanityPreset.Outfits
@@ -133,3 +129,50 @@ Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(charact
 		FindAndApplyOutfit(character, ActiveVanityPreset.Outfits)
 	end
 end)
+
+--#region Camp Outfit Autoswapper
+
+Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function (object, combatGuid)
+	if Osi.HasActiveStatus(object, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
+		if Osi.GetArmourSet(object) == 1 then
+			Osi.SetArmourSet(object, 0)
+		end
+	end
+end)
+
+Ext.Osiris.RegisterListener("LeftCombat", 2, "after", function (object, combatGuid)
+	if Osi.HasActiveStatus(object, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
+		if Osi.GetArmourSet(object) == 0 then
+			Osi.SetArmourSet(object, 1)
+		end
+	end
+end)
+
+Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(level, _)
+	if level == "SYS_CC_I" then return end
+
+	for _, player_char in pairs(Osi.DB_Players:Get(nil)) do
+		local character = player_char[1]
+		if Osi.HasPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE") == 0 then
+			Osi.AddPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE")
+		end
+	end
+end)
+
+---@param character CHARACTER
+Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(character)
+	if Osi.IsSummon(character) == 1 or Osi.IsPartyFollower(character) == 1 then return end
+
+	if Osi.HasPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE") == 0 then
+		Osi.AddPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE")
+	end
+end)
+
+---@param character CHARACTER
+Ext.Osiris.RegisterListener("CharacterLeftParty", 1, "after", function(character)
+	if Osi.HasPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE") == 1 then
+		Osi.RemovePassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE")
+		Osi.RemoveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS")
+	end
+end)
+--#endregion

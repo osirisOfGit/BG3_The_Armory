@@ -44,6 +44,31 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		helpTooltip:AddText("When an outfit is matched to a character, all equipped items will be automatically transmogged and/or dyed according to the outfit (if a non-weapon slot is empty and a vanity item is defined, a junk item will spawn in that slot to allow the vanity item to show)").TextWrapPos = 0
 		helpTooltip:AddText("When an item is unequipped, it will be unmogged/undyed _unless_ it's not contained within an inventory (e.g. throwing or dropping). This is intentional while I figure out what the preferred behavior is").TextWrapPos = 0
 
+		--#region Settings
+		local generalSettings = ConfigurationStructure.config.vanity.settings.general
+		local menu = tabHeader:AddButton("Settings")
+		menu.UserData = "keep"
+		local menuPopup = tabHeader:AddPopup("PanelSettings")
+		menuPopup.UserData = "keep"
+		menu.OnClick = function() return menuPopup:Open() end
+
+		---@type ExtuiSelectable
+		local contextMenuSetting = menuPopup:AddSelectable("Show Slot Context Menu only when holding Left Shift", "DontClosePopups")
+		contextMenuSetting.Selected = generalSettings.showSlotContextMenuModifier ~= nil
+		contextMenuSetting:Tooltip():AddText("If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it").TextWrapPos = 600
+		contextMenuSetting.OnClick = function()
+			generalSettings.showSlotContextMenuModifier = contextMenuSetting.Selected and "LSHIFT" or nil
+			SlotContextMenu:SubscribeToKeyEvents()
+		end
+
+		---@type ExtuiSelectable
+		local autoSwapCampInCombat = menuPopup:AddSelectable("Automatically swap to camp clothes outside of combat", "DontClosePopups")
+		autoSwapCampInCombat.Selected = generalSettings.autoSwapToCampOutfitOutOfCombat
+		autoSwapCampInCombat.OnClick = function ()
+			generalSettings.autoSwapToCampOutfitOutOfCombat = autoSwapCampInCombat.Selected
+		end
+		--#endregion
+
 		--#region Presets
 		local presetPickerButton = tabHeader:AddButton("Preset Manager")
 		presetPickerButton.OnClick = function()

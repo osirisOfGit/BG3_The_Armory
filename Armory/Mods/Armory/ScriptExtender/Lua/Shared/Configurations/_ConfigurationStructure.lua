@@ -147,7 +147,6 @@ function ConfigurationStructure:InitializeConfig()
 end
 
 function ConfigurationStructure:UpdateConfigForServer()
-	self:InitializeConfig()
 	return ConfigurationStructure:GetRealConfigCopy()
 end
 
@@ -156,3 +155,7 @@ if Ext.IsClient() then
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_UpdateConfiguration", "")
 	end)
 end
+
+Ext.RegisterNetListener(ModuleUUID .. "_UpdateConfiguration", function (channel, payload, user)
+	ConfigurationStructure:InitializeConfig()
+end)
