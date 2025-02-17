@@ -46,27 +46,29 @@ local function buildPresetForm(parent, forPresetId)
 			VanityPresetManager:UpdatePresetView(presetID)
 		end,
 		{
-			label = "Author",
-			defaultValue = preset and preset.Author or VanityPresetManager.username,
-			type = "Text",
-			errorMessageIfEmpty = "This is a required field",
-		},
-		{
-			label = "Name",
-			defaultValue = preset and preset.Name or nil,
-			type = "Text",
-			errorMessageIfEmpty = "This is a required field",
-		},
-		{
-			label = "Version",
-			defaultValue = preset and preset.Version or "1.0.0",
-			type = "Text",
-			errorMessageIfEmpty = "This is a required field",
-		},
-		{
-			label = "NSFW",
-			defaultValue = preset and preset.NSFW or true,
-			type = "Checkbox",
+			{
+				label = "Author",
+				defaultValue = preset and preset.Author or VanityPresetManager.username,
+				type = "Text",
+				errorMessageIfEmpty = "This is a required field",
+			},
+			{
+				label = "Name",
+				defaultValue = preset and preset.Name or nil,
+				type = "Text",
+				errorMessageIfEmpty = "This is a required field",
+			},
+			{
+				label = "Version",
+				defaultValue = preset and preset.Version or "1.0.0",
+				type = "Text",
+				errorMessageIfEmpty = "This is a required field",
+			},
+			{
+				label = "NSFW",
+				defaultValue = preset and preset.NSFW or true,
+				type = "Checkbox",
+			}
 		}
 	)
 end

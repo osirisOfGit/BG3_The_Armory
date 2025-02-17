@@ -25,11 +25,10 @@ end
 
 ---@param parent ExtuiTreeParent
 ---@param onSubmitFunc function
----@param ... FormStructure
-function FormBuilder:CreateForm(parent, onSubmitFunc, ...)
+---@param formInputs FormStructure[]
+function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 	Helpers:KillChildren(parent)
 
-	local formInputs = type(...) == "table" and ... or { ... }
 	for _, formInput in pairs(formInputs) do
 		parent:AddText(formInput.label)
 		local input
