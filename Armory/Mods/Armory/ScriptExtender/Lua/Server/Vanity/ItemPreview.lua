@@ -52,7 +52,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 	Osi.SetArmourSet(character, correctArmorSet)
 
 	-- Otherwise the avatar doesn't show it in the inventory view
-	Ext.Timer.WaitFor(200, function()
+	Ext.Timer.WaitFor(50, function()
 		if userPreview.previewItem then
 			Ext.Entity.Get(userPreview.previewItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 			Osi.Equip(character, userPreview.previewItem, 1, 0)
