@@ -114,6 +114,14 @@ function Transmogger:MogCharacter(character)
 		return
 	end
 
+	-- characters that are wildshaped in a save when it's loaded will not start with their equipment, it gets added back by the game,
+	-- but Vanity triggers before that happens, giving the player default items and blocking the requipment of the original ones
+	-- Also, you can't change gear while whildshaped anyway
+	if character.ServerShapeshiftStates and character.ServerShapeshiftStates.States and character.ServerShapeshiftStates.States[1] then
+		Logger:BasicInfo("Skipping transmog on %s as they're currently wildshaped", character.Uuid.EntityUuid)
+		return
+	end
+
 	---@type VanityOutfit
 	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
 	if not outfit then
@@ -646,14 +654,13 @@ end)
 local transmoggingLock
 
 Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
+	Logger:BasicDebug("%s equipped %s", character, item)
 	---@type EntityHandle
 	local itemEntity = Ext.Entity.Get(item)
 	if itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging then
 		itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = nil
 		Transmogger:ApplyDye(Ext.Entity.Get(character))
 	else
-		Logger:BasicDebug("%s equipped %s", character, item)
-
 		-- When swapping weapons between slots multiple equip/unequip events fire in rapid succession, and since we mog the whole character at once
 		-- need to make sure we don't rapid fire a bunch of transmogs while timers are still processing
 		if transmoggingLock then
@@ -667,7 +674,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 			-- Weird bug when swapping dual wielded items between slots, Ext.Entity can't fully inspect somehow?
 			-- Causes a CTD anyway, but in case this ever happens again in any other situation
 			if not itemEntity.Uuid then
-				Logger:BasicDebug("Item %s is missing it's UUID - this indicates something weird, believe it or not, so giving delaying transmog to give game some breathing room",
+				Logger:BasicDebug("Item %s is missing it's UUID - this indicates something weird, believe it or not, so delaying transmog to give game some breathing room",
 					item)
 
 				transmoggingLock = Ext.Timer.WaitFor(300, function()
