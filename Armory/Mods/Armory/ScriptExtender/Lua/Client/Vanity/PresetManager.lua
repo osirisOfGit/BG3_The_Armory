@@ -163,7 +163,7 @@ local function buildDependencyTable(preset, parent)
 
 	---@param key string
 	---@param modlist ModDependency[]
-	local function buildDepTab(key, modlist)
+	local function buildDependencyTab(key, modlist)
 		parent:AddSeparatorText(key .. " Dependencies"):SetStyle("SeparatorTextAlign", 0.1)
 
 		local dependencyTable = parent:AddTable(key .. preset.Name .. preset.Author, 4)
@@ -197,9 +197,9 @@ local function buildDependencyTable(preset, parent)
 		end
 	end
 
-	buildDepTab("Dye", cachedDeps.dye)
+	buildDependencyTab("Dye", cachedDeps.dye)
 	parent:AddNewLine()
-	buildDepTab("Equipment", cachedDeps.equipment)
+	buildDependencyTab("Equipment", cachedDeps.equipment)
 end
 
 function VanityPresetManager:UpdatePresetView(presetID)
@@ -213,13 +213,17 @@ function VanityPresetManager:UpdatePresetView(presetID)
 	end
 
 	local activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-	for guid, preset in pairs(ConfigurationStructure.config.vanity.presets) do
+	for guid, preset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function (key)
+		return ConfigurationStructure.config.vanity.presets[key].Name
+	end) do
 		if preset.SFW then
 			preset.NSFW = preset.SFW
 			preset.SFW = nil
 		end
 
 		local presetButton = userPresetSection:AddButton(preset.Name)
+		presetButton.IDContext = guid
+		
 		presetButton.OnClick = function()
 			if presetActivelyViewing then
 				presetActivelyViewing:Destroy()
@@ -241,6 +245,13 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
+			presetGroup:AddButton("Duplicate").OnClick = function ()
+				local newGuid = FormBuilder:generateGUID()
+				ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
+				ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name .. " (Copy)"
+				VanityPresetManager:UpdatePresetView(presetID)
+			end
+
 			presetGroup:AddButton("Delete").OnClick = function()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
 				VanityPresetManager:UpdatePresetView()
@@ -249,7 +260,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			local editButton = presetGroup:AddButton("Edit")
+			local editButton = presetGroup:AddButton("Edit Info")
 
 			local infoGroup = presetGroup:AddGroup("info")
 			infoGroup:AddText("Name: " .. preset.Name)
