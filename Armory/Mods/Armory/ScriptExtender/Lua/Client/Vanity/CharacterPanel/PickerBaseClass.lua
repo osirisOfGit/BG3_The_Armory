@@ -151,7 +151,9 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window.OnClose = function()
 			self.searchInput.Text = ""
 			self.getAllForModCombo.SelectedIndex = -1
-			onCloseFunc()
+			Ext.Timer.WaitFor(60, function ()
+				onCloseFunc()
+			end)
 		end
 
 		self.settingsMenu = self.window:AddMainMenu():AddMenu("Settings")

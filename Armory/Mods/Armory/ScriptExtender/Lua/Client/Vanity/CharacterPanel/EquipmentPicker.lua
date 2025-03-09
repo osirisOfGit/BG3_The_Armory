@@ -40,17 +40,18 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 		function()
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		end)
-		
-		Helpers:KillChildren(self.warningGroup)
-		if string.match(self.slot, "Offhand") then
-			local warningButton = self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", {64, 64})
-			warningButton.Background = { 0, 0, 0, 1 }
-			warningButton:SetColor("Border", {0, 0, 0, 1})
-			
-			local warningText = warningButton:Tooltip():AddText("\t WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots")
-			warningText.TextWrapPos = 600
-			warningText:SetColor("Text", { 1, 0.02, 0, 1 })
-		end
+
+	Helpers:KillChildren(self.warningGroup)
+	if string.match(self.slot, "Offhand") then
+		local warningButton = self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 })
+		warningButton.Background = { 0, 0, 0, 1 }
+		warningButton:SetColor("Border", { 0, 0, 0, 1 })
+
+		local warningText = warningButton:Tooltip():AddText(
+		"\t WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots")
+		warningText.TextWrapPos = 600
+		warningText:SetColor("Text", { 1, 0.02, 0, 1 })
+	end
 end
 
 local equivalentSlots = {
@@ -170,7 +171,9 @@ function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 	end
 
 	icon.OnClick = function()
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		Ext.Timer.WaitFor(150, function ()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		end)
 		self.onSelectFunc(itemTemplate)
 		self.window.Open = false
 	end
