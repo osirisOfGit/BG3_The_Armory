@@ -68,7 +68,7 @@ local function FindAndApplyOutfit(player, activeOutfits)
 	if bodyShape == 1 then
 		bodyShape = 2
 	end
-		
+
 	criteriaTable["BodyType"] = bodyShape + bodyType
 
 	---@type ResourceOrigin
