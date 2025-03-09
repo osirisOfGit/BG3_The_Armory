@@ -667,7 +667,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 			-- Weird bug when swapping dual wielded items between slots, Ext.Entity can't fully inspect somehow?
 			-- Causes a CTD anyway, but in case this ever happens again in any other situation
 			if not itemEntity.Uuid then
-				Logger:BasicDebug("Item %s is missing it's UUID - this indicates something weird, believe it or not, so giving delaying transmog to give game some breathing room",
+				Logger:BasicDebug("Item %s is missing it's UUID - this indicates something weird, believe it or not, so delaying transmog to give game some breathing room",
 					item)
 
 				transmoggingLock = Ext.Timer.WaitFor(300, function()
