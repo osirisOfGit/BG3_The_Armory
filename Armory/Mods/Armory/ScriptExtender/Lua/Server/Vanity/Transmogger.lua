@@ -118,7 +118,7 @@ function Transmogger:MogCharacter(character)
 	-- but Vanity triggers before that happens, giving the player default items and blocking the requipment of the original ones
 	-- Also, you can't change gear while whildshaped anyway
 	if character.ServerShapeshiftStates and character.ServerShapeshiftStates.States and character.ServerShapeshiftStates.States[1] then
-		Logger:BasicInfo("Skipping transmog on %s as they're currently wildshaped", character.Uuid.EntityUuid)
+		Logger:BasicWarning("Skipping transmog on %s as they're currently shapeshifted", character.Uuid.EntityUuid)
 		return
 	end
 
@@ -164,7 +164,7 @@ function Transmogger:MogCharacter(character)
 		end
 
 		if not equippedItem then
-			if defaultPieces[actualSlot] then
+			if defaultPieces[actualSlot] and ConfigurationStructure.config.vanity.settings.general.fillEmptySlots then
 				equippedItem = Osi.CreateAt(defaultPieces[actualSlot], 0, 0, 0, 0, 0, "")
 			else
 				goto continue
