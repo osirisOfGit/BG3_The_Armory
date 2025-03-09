@@ -213,7 +213,6 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 				else
 					---@type ItemTemplate
 					local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
-
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
 					if imageButton.Image.Icon == "" then
 						imageButton:Destroy()

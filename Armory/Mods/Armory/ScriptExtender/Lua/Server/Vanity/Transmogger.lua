@@ -214,7 +214,8 @@ function Transmogger:MogCharacter(character)
 
 			createdVanityEntity.Vars.TheArmory_Vanity_OriginalItemInfo = {
 				["template"] = equippedItemEntity.ServerItem.Template.Id,
-				["stat"] = equippedItemEntity.Data.StatsId
+				["stat"] = equippedItemEntity.Data.StatsId,
+				["owner"] = character.Uuid.EntityUuid
 			}
 
 			local varComponentsToReplicateOnRefresh = {}
@@ -329,12 +330,22 @@ function Transmogger:MogCharacter(character)
 
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
-			Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
+			if Osi.IsWeapon(createdVanityEntity.Uuid.EntityUuid) == 1 and Osi.HasMeleeWeaponEquipped(character.Uuid.EntityUuid, "Any") == 1 then
+				Logger:BasicDebug("%s has a weapon equipped currently, giving game time to catch up", character.Uuid.EntityUuid)
+				Ext.Timer.WaitFor(100, function()
+					Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
+					self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
 
-			self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
+					Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItem, createdVanityEntity.Uuid.EntityUuid,
+						Ext.Utils.MonotonicTime() - startTime)
+				end)
+			else
+				Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
+				self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
 
-			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
-				Ext.Utils.MonotonicTime() - startTime)
+				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
+					Ext.Utils.MonotonicTime() - startTime)
+			end
 		end)
 		::continue::
 	end
@@ -387,7 +398,8 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 	for effectName, _ in pairs(ConfigurationStructure.config.vanity.effects) do
 		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
 			if not TableUtils:ListContains((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, effectName) then
-				Logger:BasicDebug("Removing effect status %s from %s", effectName, createdVanityEntity.DisplayName and createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name)
+				Logger:BasicDebug("Removing effect status %s from %s", effectName,
+					createdVanityEntity.DisplayName and createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name)
 				Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
 			else
 				removeEffectMarker = false
@@ -617,7 +629,7 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 
 					return newItem
 				end
-			else 
+			else
 				return item
 			end
 		end
@@ -625,10 +637,13 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 end
 
 Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
+	Logger:BasicDebug("%s unequipped %s", character, item)
 	Ext.Timer.WaitFor(20, function()
 		Transmogger:UnMogItem(item)
 	end)
 end)
+
+local transmoggingLock
 
 Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	---@type EntityHandle
@@ -637,13 +652,38 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 		itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = nil
 		Transmogger:ApplyDye(Ext.Entity.Get(character))
 	else
-		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
-		Ext.Timer.WaitFor(100, function()
-			Logger:BasicDebug("Item %s was equipped on %s, executing transmog",
-				(itemEntity.DisplayName and itemEntity.DisplayName.Name:Get()) or itemEntity.ServerItem.Template.Name,
-				character)
+		Logger:BasicDebug("%s equipped %s", character, item)
 
-			Transmogger:MogCharacter(Ext.Entity.Get(character))
+		-- When swapping weapons between slots multiple equip/unequip events fire in rapid succession, and since we mog the whole character at once
+		-- need to make sure we don't rapid fire a bunch of transmogs while timers are still processing
+		if transmoggingLock then
+			Ext.Timer.Cancel(transmoggingLock)
+		end
+
+		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
+		transmoggingLock = Ext.Timer.WaitFor(100, function()
+			transmoggingLock = nil
+
+			-- Weird bug when swapping dual wielded items between slots, Ext.Entity can't fully inspect somehow?
+			-- Causes a CTD anyway, but in case this ever happens again in any other situation
+			if not itemEntity.Uuid then
+				Logger:BasicDebug("Item %s is missing it's UUID - this indicates something weird, believe it or not, so giving delaying transmog to give game some breathing room",
+					item)
+
+				transmoggingLock = Ext.Timer.WaitFor(300, function()
+					Logger:BasicDebug("Item %s was equipped on %s, executing transmog",
+						item,
+						character)
+
+					Transmogger:MogCharacter(Ext.Entity.Get(character))
+				end)
+			else
+				Logger:BasicDebug("Item %s was equipped on %s, executing transmog",
+					item,
+					character)
+
+				Transmogger:MogCharacter(Ext.Entity.Get(character))
+			end
 		end)
 	end
 end)

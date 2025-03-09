@@ -31,7 +31,9 @@ PickerBaseClass = {
 	---@type string[]
 	blacklistedItems = {},
 	---@type SearchIndex
-	itemIndex = {}
+	itemIndex = {},
+	---@type ExtuiGroup
+	warningGroup = nil,
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -225,6 +227,8 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 				self:DisplayResult(templateId, self.resultsGroup)
 			end
 		end
+
+		self.warningGroup = self.window:AddGroup("WarningGroup")
 
 		self.favoritesGroup = self.window:AddCollapsingHeader("Favorites")
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
