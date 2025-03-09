@@ -55,10 +55,24 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		---@type ExtuiSelectable
 		local contextMenuSetting = menuPopup:AddSelectable("Show Slot Context Menu only when holding Left Shift", "DontClosePopups")
 		contextMenuSetting.Selected = generalSettings.showSlotContextMenuModifier ~= nil
-		contextMenuSetting:Tooltip():AddText("If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it").TextWrapPos = 600
+		contextMenuSetting:Tooltip():AddText("\t If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it").TextWrapPos = 600
 		contextMenuSetting.OnClick = function()
 			generalSettings.showSlotContextMenuModifier = contextMenuSetting.Selected and "LSHIFT" or nil
 			SlotContextMenu:SubscribeToKeyEvents()
+		end
+
+		menuPopup:AddSeparator()
+
+		---@type ExtuiSelectable
+		local placeholderItemSetting = menuPopup:AddSelectable("Generate Junk Items in Empty Slots For Transmog")
+		placeholderItemSetting.Selected = generalSettings.fillEmptySlots
+		placeholderItemSetting:Tooltip():AddText("\t When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur.")
+		placeholderItemSetting.OnClick = function ()
+			generalSettings.fillEmptySlots = placeholderItemSetting.Selected
+
+			if generalSettings.fillEmptySlots then
+				Vanity:UpdatePresetOnServer()
+			end
 		end
 		--#endregion
 

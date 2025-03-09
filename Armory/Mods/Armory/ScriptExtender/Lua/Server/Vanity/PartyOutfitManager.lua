@@ -56,14 +56,19 @@ local function FindAndApplyOutfit(player, activeOutfits)
 	--[[
 		 BodyType    BodyShape
 	1       1            0
-	2       1            1
-	3       0            0
+	2       0            0
+	3       1            1
 	4       0            1
 	]]
 	local bodyType = playerEntity.CharacterCreationStats.BodyType
 	local bodyShape = playerEntity.CharacterCreationStats.BodyShape
-	bodyShape = bodyType == 0 and bodyShape + 1 or bodyShape
-	bodyType = bodyType == 0 and 2 or bodyType
+	if bodyType == 0 then
+		bodyType = 2
+	end
+	if bodyShape == 1 then
+		bodyShape = 2
+	end
+
 	criteriaTable["BodyType"] = bodyShape + bodyType
 
 	---@type ResourceOrigin
@@ -132,7 +137,7 @@ end)
 
 --#region Camp Outfit Autoswapper
 
-Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function (character, combatGuid)
+Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function(character, combatGuid)
 	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
 		if Osi.GetArmourSet(character) == 1 then
 			Osi.SetArmourSet(character, 0)
@@ -140,7 +145,7 @@ Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function (character, co
 	end
 end)
 
-Ext.Osiris.RegisterListener("LeftCombat", 2, "after", function (character, combatGuid)
+Ext.Osiris.RegisterListener("LeftCombat", 2, "after", function(character, combatGuid)
 	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS") == 1 then
 		if Osi.GetArmourSet(character) == 0 then
 			Osi.SetArmourSet(character, 1)

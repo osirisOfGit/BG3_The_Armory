@@ -40,6 +40,18 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 		function()
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		end)
+
+	Helpers:KillChildren(self.warningGroup)
+	if string.match(self.slot, "Offhand") then
+		local warningButton = self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 })
+		warningButton.Background = { 0, 0, 0, 1 }
+		warningButton:SetColor("Border", { 0, 0, 0, 1 })
+
+		local warningText = warningButton:Tooltip():AddText(
+			"\t WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots")
+		warningText.TextWrapPos = 600
+		warningText:SetColor("Text", { 1, 0.02, 0, 1 })
+	end
 end
 
 local equivalentSlots = {
@@ -52,6 +64,7 @@ local equivalentSlots = {
 function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 	---@type ItemTemplate
 	local itemTemplate = Ext.Template.GetRootTemplate(itemTemplateId)
+
 
 	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, itemTemplateId)
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
@@ -159,7 +172,10 @@ function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 	end
 
 	icon.OnClick = function()
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		-- Covers scenario where user hovers over one item, then super quickly moves to another and instantly clicks on it
+		Ext.Timer.WaitFor(150, function()
+			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		end)
 		self.onSelectFunc(itemTemplate)
 		self.window.Open = false
 	end
@@ -168,5 +184,32 @@ function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 		itemGroup:AddText(itemTemplate.DisplayName:Get() or itemTemplate.Name).TextWrapPos = 0
 	end
 
-	Helpers:BuildTooltip(icon:Tooltip(), itemTemplate.DisplayName:Get() or itemTemplate.Name, itemStat)
+	local tooltip = icon:Tooltip()
+	Helpers:BuildTooltip(tooltip, itemTemplate.DisplayName:Get() or itemTemplate.Name, itemStat)
+
+	if itemTemplate.StatusList then
+		for _, templateStatus in ipairs(itemTemplate.StatusList) do
+			---@type StatusData
+			local status = Ext.Stats.Get(templateStatus)
+			if status and status.StatusEffect and status.StatusEffect ~= "" then
+				local success, error = pcall(function(...)
+					---@type ResourceMultiEffectInfo
+					local mei = Ext.StaticData.Get(status.StatusEffect, "MultiEffectInfo")
+					if mei then
+						tooltip:AddText("Status Effect: " .. mei.Name)
+					end
+				end)
+				if not success then
+					tooltip:AddText("Status Effect: " .. status.StatusEffect)
+
+					-- Logger:BasicWarning("Couldn't load the Status Effect %s from Stat %s on Item %s (from Mod '%s') due to %s - please contact the mod author to fix this issue",
+					-- status.StatusEffect,
+					-- status.Name,
+					-- itemTemplate.Name .. "_" .. itemTemplate.Id,
+					-- status.ModId ~= "" and Ext.Mod.GetMod(status.ModId).Info.Name or "Unknown",
+					-- error)
+				end
+			end
+		end
+	end
 end

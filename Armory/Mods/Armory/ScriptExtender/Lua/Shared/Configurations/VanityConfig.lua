@@ -6,6 +6,7 @@ ConfigurationStructure.config.vanity = {}
 ConfigurationStructure.config.vanity.settings = {
 	general = {
 		showSlotContextMenuModifier = nil,
+		fillEmptySlots = true
 	},
 	---@class EquipmentSettings
 	equipment = {

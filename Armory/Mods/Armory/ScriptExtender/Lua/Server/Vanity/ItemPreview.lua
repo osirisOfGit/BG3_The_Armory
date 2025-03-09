@@ -1,3 +1,7 @@
+Ext.Vars.RegisterUserVariable("TheArmory_Vanity_PreviewItem", {
+	Server = true
+})
+
 ---@class UserEntry
 ---@field previewItem Guid
 ---@field equippedItem GUIDSTRING
@@ -35,8 +39,13 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 		return
 	end
 
-	local stat = Osi.GetStatString(userPreview.previewItem)
+	local stat = Ext.Entity.Get(userPreview.previewItem).Data.StatsId
 	if not stat then
+		return
+	elseif not Ext.Stats.Get(stat) then
+		---@type ItemTemplate
+		local template = Ext.Template.GetTemplate(templateUUID)
+		Logger:BasicError("%s could not be previewed as it does not have a stats string associated to it?", template.Name .. "_" .. template.Id)
 		return
 	end
 
@@ -52,9 +61,13 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 	Osi.SetArmourSet(character, correctArmorSet)
 
 	-- Otherwise the avatar doesn't show it in the inventory view
-	Ext.Timer.WaitFor(200, function()
+	Ext.Timer.WaitFor(50, function()
 		if userPreview.previewItem then
-			Ext.Entity.Get(userPreview.previewItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+			---@type EntityHandle
+			local previewEntity = Ext.Entity.Get(userPreview.previewItem)
+			previewEntity.Vars.TheArmory_Vanity_PreviewItem = character
+			previewEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+
 			Osi.Equip(character, userPreview.previewItem, 1, 0)
 
 			if payload.dye then
@@ -81,7 +94,14 @@ end)
 
 local function DeleteItem(character, userPreview)
 	Logger:BasicDebug("%s stopped previewing %s", character, userPreview.previewItem)
-	Osi.RequestDelete(userPreview.previewItem)
+
+	for _, item in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_PreviewItem") or {}) do
+		local itemEntity = Ext.Entity.Get(item)
+		if itemEntity and itemEntity.Vars.TheArmory_Vanity_PreviewItem == character then
+			Osi.RequestDelete(item)
+		end
+	end
+
 	if userPreview.equippedItem then
 		Osi.Equip(character, userPreview.equippedItem)
 		userPreview.equippedItem = nil
@@ -95,16 +115,19 @@ Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, p
 	local character = Osi.GetCurrentCharacter(user)
 
 	local userPreview = previewingItemTable[user]
-	if userPreview and userPreview.previewItem then
-		if resetSetTimer then
-			Ext.Timer.Cancel(resetSetTimer)
-			resetSetTimer = nil
-		end
+	if userPreview then
+		if userPreview.armorSet then
+			if resetSetTimer then
+				Ext.Timer.Cancel(resetSetTimer)
+				resetSetTimer = nil
+			end
 
-		resetSetTimer = Ext.Timer.WaitFor(1000, function()
-			Osi.SetArmourSet(character, userPreview.armorSet)
-			userPreview.armorSet = nil
-		end)
+			resetSetTimer = Ext.Timer.WaitFor(1000, function()
+				Osi.SetArmourSet(character, userPreview.armorSet)
+				userPreview.armorSet = nil
+			end)
+		end
+		
 		DeleteItem(character, userPreview)
 	end
 end)
