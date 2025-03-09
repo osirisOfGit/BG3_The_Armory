@@ -636,17 +636,10 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 	end
 end
 
--- while dual wielding, if the user drags the weapons between the main and offhand slots a CTD can happen due to unmog and remog happening before the
--- game fully catches up - it also causes weirdness with Vanity spawning duplicate items. Since the Equipped event will fire when this happens, we have to
--- let the mogged item fully de-mog, then be equipped again via Vanity, then re-mog it
-local weaponLock = {}
-
 Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
 	Logger:BasicDebug("%s unequipped %s", character, item)
 	Ext.Timer.WaitFor(20, function()
-		if not weaponLock[item] then
-			Transmogger:UnMogItem(item)
-		end
+		Transmogger:UnMogItem(item)
 	end)
 end)
 
@@ -667,20 +660,16 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 			Ext.Timer.Cancel(transmoggingLock)
 		end
 
-		if Osi.IsWeapon(item) == 1 then
-			weaponLock[item] = true
-			Ext.Timer.WaitFor(200, function()
-				weaponLock[item] = nil
-			end)
-		end
-
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
 		transmoggingLock = Ext.Timer.WaitFor(100, function()
 			transmoggingLock = nil
 
 			-- Weird bug when swapping dual wielded items between slots, Ext.Entity can't fully inspect somehow?
+			-- Causes a CTD anyway, but in case this ever happens again in any other situation
 			if not itemEntity.Uuid then
-				Logger:BasicDebug("Looks like %s manually drag and dropped weapons between slots, delaying process again to ensure no CTD", character)
+				Logger:BasicDebug("Item %s is missing it's UUID - this indicates something weird, believe it or not, so giving delaying transmog to give game some breathing room",
+					item)
+
 				transmoggingLock = Ext.Timer.WaitFor(300, function()
 					Logger:BasicDebug("Item %s was equipped on %s, executing transmog",
 						item,
