@@ -192,10 +192,22 @@ function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 			---@type StatusData
 			local status = Ext.Stats.Get(templateStatus)
 			if status and status.StatusEffect and status.StatusEffect ~= "" then
-				---@type ResourceMultiEffectInfo
-				local mei = Ext.StaticData.Get(status.StatusEffect, "MultiEffectInfo")
-				if mei then
-					tooltip:AddText("Status Effect: " .. mei.Name)
+				local success, error = pcall(function(...)
+					---@type ResourceMultiEffectInfo
+					local mei = Ext.StaticData.Get(status.StatusEffect, "MultiEffectInfo")
+					if mei then
+						tooltip:AddText("Status Effect: " .. mei.Name)
+					end
+				end)
+				if not success then
+					tooltip:AddText("Status Effect: " .. status.StatusEffect)
+
+					-- Logger:BasicWarning("Couldn't load the Status Effect %s from Stat %s on Item %s (from Mod '%s') due to %s - please contact the mod author to fix this issue",
+					-- status.StatusEffect,
+					-- status.Name,
+					-- itemTemplate.Name .. "_" .. itemTemplate.Id,
+					-- status.ModId ~= "" and Ext.Mod.GetMod(status.ModId).Info.Name or "Unknown",
+					-- error)
 				end
 			end
 		end

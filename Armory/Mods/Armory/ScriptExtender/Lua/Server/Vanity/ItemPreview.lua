@@ -39,8 +39,13 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 		return
 	end
 
-	local stat = Osi.GetStatString(userPreview.previewItem)
+	local stat = Ext.Entity.Get(userPreview.previewItem).Data.StatsId
 	if not stat then
+		return
+	elseif not Ext.Stats.Get(stat) then
+		---@type ItemTemplate
+		local template = Ext.Template.GetTemplate(templateUUID)
+		Logger:BasicError("%s could not be previewed as it does not have a stats string associated to it?", template.Name .. "_" .. template.Id)
 		return
 	end
 
