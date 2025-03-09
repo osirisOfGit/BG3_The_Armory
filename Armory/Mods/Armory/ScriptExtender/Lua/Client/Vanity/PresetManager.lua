@@ -213,7 +213,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 	end
 
 	local activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-	for guid, preset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function (key)
+	for guid, preset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function(key)
 		return ConfigurationStructure.config.vanity.presets[key].Name
 	end) do
 		if preset.SFW then
@@ -223,7 +223,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 		local presetButton = userPresetSection:AddButton(preset.Name)
 		presetButton.IDContext = guid
-		
+
 		presetButton.OnClick = function()
 			if presetActivelyViewing then
 				presetActivelyViewing:Destroy()
@@ -245,7 +245,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			presetGroup:AddButton("Duplicate").OnClick = function ()
+			presetGroup:AddButton("Duplicate").OnClick = function()
 				local newGuid = FormBuilder:generateGUID()
 				ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
 				ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name .. " (Copy)"
