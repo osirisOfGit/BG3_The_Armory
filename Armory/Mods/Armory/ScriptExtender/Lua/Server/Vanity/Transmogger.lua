@@ -117,9 +117,16 @@ function Transmogger:MogCharacter(character)
 	-- characters that are wildshaped in a save when it's loaded will not start with their equipment, it gets added back by the game,
 	-- but Vanity triggers before that happens, giving the player default items and blocking the requipment of the original ones
 	-- Also, you can't change gear while whildshaped anyway
-	if character.ServerShapeshiftStates and character.ServerShapeshiftStates.States and character.ServerShapeshiftStates.States[1] then
-		Logger:BasicWarning("Skipping transmog on %s as they're currently shapeshifted", character.Uuid.EntityUuid)
-		return
+	if character.ServerShapeshiftStates
+		and character.ServerShapeshiftStates.States
+		and character.ServerShapeshiftStates.States[1]
+	then
+		for _, status in pairs(character.StatusContainer.Statuses) do
+			if Osi.IsStatusFromGroup(status, "SG_Polymorph") == 1 and Osi.IsStatusFromGroup(status, "SG_Disguise") == 0 then
+				Logger:BasicWarning("Skipping transmog on %s as they're currently affected by a SG_Polymorph (but not SG_Disguise) status", character.Uuid.EntityUuid)
+				return
+			end
+		end
 	end
 
 	---@type VanityOutfit
