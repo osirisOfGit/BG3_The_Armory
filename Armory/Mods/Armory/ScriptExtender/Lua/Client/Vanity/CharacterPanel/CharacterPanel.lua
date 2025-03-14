@@ -52,7 +52,7 @@ end
 
 local initialized = false
 
----@type ExtuiChildWindow
+---@type ExtuiGroup
 local panelGroup
 
 local equipmentSlots = {
@@ -97,9 +97,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	end
 
 	if not panelGroup then
-		panelGroup = tabHeader:AddChildWindow("CharacterPanel")
-		panelGroup.NoSavedSettings = true
-		panelGroup.MenuBar = true
+		panelGroup = tabHeader:AddGroup("CharacterPanel")
 
 		panelGroup:AddSeparator()
 	else
