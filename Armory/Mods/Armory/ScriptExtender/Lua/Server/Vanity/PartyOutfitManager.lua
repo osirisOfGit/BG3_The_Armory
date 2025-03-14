@@ -31,51 +31,62 @@ end)
 ---@param activeOutfits {[VanityCriteriaCompositeKey] : VanityOutfit}
 local function FindAndApplyOutfit(player, activeOutfits)
 	local startTime = Ext.Utils.MonotonicTime()
+
 	---@type {[VanityCharacterCriteriaType] : string}
 	local criteriaTable = {}
 
 	---@type EntityHandle
 	local playerEntity = Ext.Entity.Get(player)
 
-	criteriaTable["Race"] = playerEntity.CharacterCreationStats.Race
-	if playerEntity.CharacterCreationStats.SubRace ~= "00000000-0000-0000-0000-000000000000" then
-		criteriaTable["Subrace"] = playerEntity.CharacterCreationStats.SubRace
-	end
-
-	local highestClassLevel = 0
-	for _, classInfo in pairs(playerEntity.Classes.Classes) do
-		if classInfo.Level > highestClassLevel then -- TODO - handle equal case
-			highestClassLevel = classInfo.Level
-			criteriaTable["Class"] = classInfo.ClassUUID
-			if classInfo.SubClassUUID ~= "00000000-0000-0000-0000-000000000000" then
-				criteriaTable["Subclass"] = classInfo.SubClassUUID
+	if playerEntity.Classes and playerEntity.Classes.Classes then
+		local highestClassLevel = 0
+		for _, classInfo in pairs(playerEntity.Classes.Classes) do
+			if classInfo.Level > highestClassLevel then -- TODO - handle equal case
+				highestClassLevel = classInfo.Level
+				criteriaTable["Class"] = classInfo.ClassUUID
+				if classInfo.SubClassUUID ~= "00000000-0000-0000-0000-000000000000" then
+					criteriaTable["Subclass"] = classInfo.SubClassUUID
+				end
 			end
 		end
 	end
 
-	--[[
-		 BodyType    BodyShape
-	1       1            0
-	2       0            0
-	3       1            1
-	4       0            1
-	]]
-	local bodyType = playerEntity.CharacterCreationStats.BodyType
-	local bodyShape = playerEntity.CharacterCreationStats.BodyShape
-	if bodyType == 0 then
-		bodyType = 2
+	if playerEntity.CharacterCreationStats then
+		if playerEntity.CharacterCreationStats.Race then
+			criteriaTable["Race"] = playerEntity.CharacterCreationStats.Race
+			if playerEntity.CharacterCreationStats.SubRace ~= "00000000-0000-0000-0000-000000000000" then
+				criteriaTable["Subrace"] = playerEntity.CharacterCreationStats.SubRace
+			end
+		end
+
+		if playerEntity.CharacterCreationStats.BodyType then
+			--[[
+				BodyType    BodyShape
+			1       1            0
+			2       0            0
+			3       1            1
+			4       0            1
+			]]
+			local bodyType = playerEntity.CharacterCreationStats.BodyType
+			local bodyShape = playerEntity.CharacterCreationStats.BodyShape
+			if bodyType == 0 then
+				bodyType = 2
+			end
+			if bodyShape == 1 then
+				bodyShape = 2
+			end
+
+			criteriaTable["BodyType"] = bodyShape + bodyType
+		end
 	end
-	if bodyShape == 1 then
-		bodyShape = 2
+
+	if playerEntity.Origin and playerEntity.Origin.field_18 then
+		---@type ResourceOrigin
+		local originResource = Ext.StaticData.Get(playerEntity.Origin.field_18, "Origin")
+		if originResource then
+			criteriaTable[originResource.IsHenchman and "Hireling" or "Origin"] = originResource.ResourceUUID
+		end
 	end
-
-	criteriaTable["BodyType"] = bodyShape + bodyType
-
-	---@type ResourceOrigin
-	local originResource = Ext.StaticData.Get(playerEntity.Origin.field_18, "Origin")
-
-	criteriaTable[originResource.IsHenchman and "Hireling" or "Origin"] = originResource.ResourceUUID
-
 	Logger:BasicDebug("Player %s Criteria Table is: \n%s", player, Ext.Json.Stringify(ConvertCriteriaTableToDisplay(criteriaTable, true)))
 
 	---@type {[ActualSlot]: VanityOutfitSlot}
