@@ -6,7 +6,10 @@ ConfigurationStructure.config.vanity = {}
 ConfigurationStructure.config.vanity.settings = {
 	general = {
 		showSlotContextMenuModifier = nil,
-		fillEmptySlots = true
+		fillEmptySlots = true,
+		---@alias outfitAndDependencyView "universal"|"perOutfit"
+		---@type outfitAndDependencyView
+		outfitAndDependencyView = "universal"
 	},
 	---@class EquipmentSettings
 	equipment = {

@@ -15,27 +15,55 @@ function ModManager:GetModInfo(modDependency)
 	end
 end
 
+---@type ExtuiWindow
+local dependencyWindow
+
 ---@param preset VanityPreset
 ---@param criteriaCompositeKey VanityCriteriaCompositeKey?
-function ModManager:BuildOutfitDependencyWindow(preset, criteriaCompositeKey)
-	local dependencyWindow = Ext.IMGUI.NewWindow("Mod Dependencies")
-	dependencyWindow.AlwaysAutoResize = true
-	dependencyWindow.Closeable = true
+---@param parent ExtuiTreeParent?
+function ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
+	if not parent then
+		if not dependencyWindow then
+			dependencyWindow = Ext.IMGUI.NewWindow("Mod Dependencies")
+			dependencyWindow.AlwaysAutoResize = true
+			dependencyWindow.Closeable = true
+		else
+			dependencyWindow.Open = true
+			dependencyWindow:SetFocus()
+		end
 
-	Helpers:KillChildren(dependencyWindow)
-	if criteriaCompositeKey then
-		local criteraTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(criteriaCompositeKey))
+		parent = dependencyWindow
+	end
+
+	Helpers:KillChildren(parent)
+	parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
+	local function generateOutfitSection(compositeKey)
+		local criteraTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(compositeKey))
 		local displayTable = {}
 		for index, key in ipairs(VanityCharacterCriteriaType) do
 			displayTable[index] = criteraTable[key]
 		end
 
-		local header = dependencyWindow:AddSeparatorText(table.concat(displayTable, "|"))
-		header.Font = "Large"
+		local parent = parent
+		local header
+		if criteriaCompositeKey then
+			header = parent:AddSeparatorText(table.concat(displayTable, "|"))
+			header.Font = "Large"
+		else
+			header = parent:AddCollapsingHeader(table.concat(displayTable, "|"))
+			header.DefaultOpen = true
+			parent = header
+		end
 
-		local dependencyTable = dependencyWindow:AddTable("DependencyTable", 6)
+		local dependencyTable = parent:AddTable("DependencyTable" .. parent.IDContext, 6)
 		dependencyTable.Resizable = true
-		dependencyTable.SizingFixedSame = true
+
+		if dependencyWindow and dependencyWindow.Open then
+			dependencyTable.SizingFixedFit = true
+		else
+			dependencyTable.SizingStretchProp = true
+		end
+
 		dependencyTable.RowBg = true
 
 		local headerRow = dependencyTable:AddRow()
@@ -71,7 +99,7 @@ function ModManager:BuildOutfitDependencyWindow(preset, criteriaCompositeKey)
 			end
 		end
 
-		for slot, slotEntry in TableUtils:OrderedPairs(preset.Outfits[criteriaCompositeKey], function(key)
+		for slot, slotEntry in TableUtils:OrderedPairs(preset.Outfits[compositeKey], function(key)
 			return SlotEnum[key]
 		end) do
 			if (slotEntry.equipment and slotEntry.equipment.guid) or (slotEntry.dye and slotEntry.dye.guid) then
@@ -113,6 +141,15 @@ function ModManager:BuildOutfitDependencyWindow(preset, criteriaCompositeKey)
 					end
 				end
 			end
+		end
+	end
+
+	if criteriaCompositeKey then
+		generateOutfitSection(criteriaCompositeKey)
+	else
+		for compositeKey in TableUtils:OrderedPairs(preset.Outfits) do
+			generateOutfitSection(compositeKey)
+			parent:AddNewLine()
 		end
 	end
 end
