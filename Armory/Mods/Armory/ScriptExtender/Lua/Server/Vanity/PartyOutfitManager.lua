@@ -100,7 +100,7 @@ local function FindAndApplyOutfit(player, activeOutfits)
 	end
 
 	if playerOutfit then
-		Logger:BasicInfo("Player %s was matched to an outfit (in %dms) with Criteria Table: %s", player, Ext.Utils.MonotonicTime() - startTime,
+		Logger:BasicInfo("%s was matched to an outfit (in %dms) with Criteria Table: %s", player, Ext.Utils.MonotonicTime() - startTime,
 			Ext.Json.Stringify(ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(compositeKey), true)))
 		playerEntity.Vars.TheArmory_Vanity_ActiveOutfit = compositeKey
 		Transmogger:MogCharacter(playerEntity)

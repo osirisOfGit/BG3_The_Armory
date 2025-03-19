@@ -36,7 +36,7 @@ local defaultPieces = {
 	Ring2 = "ecf4a8a4-7859-4a82-8c08-0c9526f29500",
 	LightSource = "50c43f27-a12e-412c-88f0-56e15eba692a",
 	MusicalInstrument = "848ad8dc-59f3-464b-b8b2-95eab6022446",
-	HideTransmog = "cd6c6adc-8792-4378-8c63-8169cfad6c55"
+	HideTransmog = "173aad0e-0db4-4f2f-8f24-49e6898b8f90"
 }
 
 -- Things that will cause me psychic damage: https://discord.com/channels/1174823496086470716/1193836567194771506/1327500800766771271

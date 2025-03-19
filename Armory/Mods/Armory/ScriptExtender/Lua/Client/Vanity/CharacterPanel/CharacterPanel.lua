@@ -211,16 +211,22 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 				else
 					---@type ItemTemplate
 					local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
-					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
-					if imageButton.Image.Icon == "" then
-						imageButton:Destroy()
-						imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
-					end
-					imageButton.UserData = itemTemplate
+					if itemTemplate then
+						imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemTemplate.Icon)
+						if imageButton.Image.Icon == "" then
+							imageButton:Destroy()
+							imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
+						end
+						imageButton.UserData = itemTemplate
 
-					Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
+						Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
+					else
+						Logger:BasicWarning("%s could not be found - mod %s was likely uninstalled!", outfitSlotEntry.equipment.guid, outfitSlotEntry.equipment.modDependency.Guid)
+					end
 				end
-			else
+			end
+			
+			if not imageButton then
 				imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 				if weaponType then
 					imageButton.Background = { 0, 0, 0, 1 }
@@ -324,6 +330,16 @@ function VanityCharacterPanel:RecordModDependency(itemTemplate, outfitSlotEntryF
 				Guid = modInfo.ModuleUUID,
 				Version = modInfo.ModVersion
 			}
+
+			if stat.OriginalModId ~= "" and stat.OriginalModId ~= stat.ModId then
+				local originalModInfo = Ext.Mod.GetMod(stat.OriginalModId).Info
+				if originalModInfo then
+					outfitSlotEntryForItem.modDependency.OriginalMod = {
+						Guid = originalModInfo.ModuleUUID,
+						Version = originalModInfo.ModVersion
+					}
+				end
+			end
 		end
 	else
 		Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",

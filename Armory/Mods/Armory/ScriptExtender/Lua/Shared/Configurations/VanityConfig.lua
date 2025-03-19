@@ -33,7 +33,9 @@ ConfigurationStructure.DynamicClassDefinitions.vanity = {}
 ---@class ModDependency
 ConfigurationStructure.DynamicClassDefinitions.modDependency = {
 	Guid = nil,
-	Version = nil
+	Version = nil,
+	---@type ModDependency?
+	OriginalMod = nil
 }
 
 ---@class VanityOutfitItemEntry
