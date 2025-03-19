@@ -68,9 +68,11 @@ end
 
 --- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
 --- Optionally accepts a function to transform the key for sorting and returning
----@param t table
+---@generic K
+---@generic V
+---@param t table<K,V>
 ---@param keyTransformFunc function?
----@return function
+---@return fun(table: table<K, V>, index?: K):K, V
 function TableUtils:OrderedPairs(t, keyTransformFunc)
 	local keys = {}
 	for k in pairs(t) do
@@ -83,6 +85,7 @@ function TableUtils:OrderedPairs(t, keyTransformFunc)
 	end)
 
 	local i = 0
+
 	return function()
 		i = i + 1
 		if keys[i] then

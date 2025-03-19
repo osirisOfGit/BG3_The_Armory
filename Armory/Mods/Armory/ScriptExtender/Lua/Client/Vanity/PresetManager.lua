@@ -277,13 +277,33 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			presetGroup:AddSeparatorText("Mod Dependencies")
-			buildDependencyTable(preset, presetGroup)
+			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d")
+			swapViewButton:Tooltip():AddText("\t Swap between Overall and Per-Outfit view")
 
-			presetGroup:AddNewLine()
-			presetGroup:AddSeparatorText("Configured Outfits")
-			-- Need to pass the proxy value so it can get deleted properly
-			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], presetGroup)
+			local generalSettings = ConfigurationStructure.config.vanity.settings.general
+
+			local outfitsAndDependenciesGroup = presetGroup:AddGroup("OutfitsAndDeps")
+			local function swapView()
+				Helpers:KillChildren(outfitsAndDependenciesGroup)
+
+				if generalSettings.outfitAndDependencyView == "universal" then
+					outfitsAndDependenciesGroup:AddNewLine()
+					outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits")
+					-- Need to pass the proxy value so it can get deleted properly
+					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], outfitsAndDependenciesGroup)
+
+					outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies")
+					buildDependencyTable(preset, outfitsAndDependenciesGroup)
+				else
+					ModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
+				end
+			end
+			swapView()
+
+			swapViewButton.OnClick = function()
+				generalSettings.outfitAndDependencyView = generalSettings.outfitAndDependencyView == "universal" and "perOutfit" or "universal"
+				swapView()
+			end
 		end
 
 		if presetID == guid then

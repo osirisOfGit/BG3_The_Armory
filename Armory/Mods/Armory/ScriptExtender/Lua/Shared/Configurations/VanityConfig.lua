@@ -6,7 +6,10 @@ ConfigurationStructure.config.vanity = {}
 ConfigurationStructure.config.vanity.settings = {
 	general = {
 		showSlotContextMenuModifier = nil,
-		fillEmptySlots = true
+		fillEmptySlots = true,
+		---@alias outfitAndDependencyView "universal"|"perOutfit"
+		---@type outfitAndDependencyView
+		outfitAndDependencyView = "universal"
 	},
 	---@class EquipmentSettings
 	equipment = {
@@ -32,8 +35,14 @@ ConfigurationStructure.DynamicClassDefinitions.vanity = {}
 
 ---@class ModDependency
 ConfigurationStructure.DynamicClassDefinitions.modDependency = {
+	---@type string?
+	Name = nil,
+	---@type string
 	Guid = nil,
-	Version = nil
+	---@type number[]
+	Version = nil,
+	---@type ModDependency?
+	OriginalMod = nil
 }
 
 ---@class VanityOutfitItemEntry

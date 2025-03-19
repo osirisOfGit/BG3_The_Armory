@@ -52,6 +52,9 @@ function ParseCriteriaCompositeKey(compositeKey)
 	return criteriaTable
 end
 
+---@param criteriaTable table
+---@param includeUUIDS boolean?
+---@return {[VanityCharacterCriteriaType]: string}
 function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS)
 	local displayTable = {}
 	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
@@ -68,9 +71,13 @@ function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS)
 
 			---@type ResourceClassDescription|ResourceRace|ResourceOrigin
 			local resource = Ext.StaticData.Get(criteriaId, resourceType)
-			criteriaValue = resource.DisplayName:Get() or resource.Name
-			if includeUUIDS then
-				criteriaValue = string.format("%s (%s)", criteriaValue, criteriaId)
+			if resource then
+				criteriaValue = resource.DisplayName:Get() or resource.Name
+				if includeUUIDS then
+					criteriaValue = string.format("%s (%s)", criteriaValue, criteriaId)
+				end
+			else
+				criteriaValue = string.format("Not Found - Missing Mod? UUID: %s", criteriaId)
 			end
 		end
 		displayTable[criteriaType] = criteriaValue
