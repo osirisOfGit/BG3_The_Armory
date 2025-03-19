@@ -32,7 +32,6 @@ function ModManager:BuildOutfitDependencyWindow(preset, criteriaCompositeKey)
 
 		local header = dependencyWindow:AddSeparatorText(table.concat(displayTable, "|"))
 		header.Font = "Large"
-		header:SetStyle("SeparatorTextAlign", 0.1)
 
 		local dependencyTable = dependencyWindow:AddTable("DependencyTable", 6)
 		dependencyTable.Resizable = true
