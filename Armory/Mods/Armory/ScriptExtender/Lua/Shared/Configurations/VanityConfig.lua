@@ -32,7 +32,11 @@ ConfigurationStructure.DynamicClassDefinitions.vanity = {}
 
 ---@class ModDependency
 ConfigurationStructure.DynamicClassDefinitions.modDependency = {
+	---@type string?
+	Name = nil,
+	---@type string
 	Guid = nil,
+	---@type number[]
 	Version = nil,
 	---@type ModDependency?
 	OriginalMod = nil

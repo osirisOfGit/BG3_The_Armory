@@ -13,4 +13,5 @@ Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
 ConfigurationStructure:InitializeConfig()
 
 Ext.Require("Client/RandomHelpers.lua")
+Ext.Require("Client/Vanity/_ModManager.lua")
 Ext.Require("Client/Vanity/Main.lua")

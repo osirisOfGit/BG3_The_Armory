@@ -225,7 +225,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 					end
 				end
 			end
-			
+
 			if not imageButton then
 				imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], itemSlotOrWeaponTypeEntry[2])
 				if weaponType then
@@ -327,6 +327,7 @@ function VanityCharacterPanel:RecordModDependency(itemTemplate, outfitSlotEntryF
 		local modInfo = Ext.Mod.GetMod(stat.ModId).Info
 		if modInfo then
 			outfitSlotEntryForItem.modDependency = {
+				Name = modInfo.Name,
 				Guid = modInfo.ModuleUUID,
 				Version = modInfo.ModVersion
 			}
@@ -335,6 +336,7 @@ function VanityCharacterPanel:RecordModDependency(itemTemplate, outfitSlotEntryF
 				local originalModInfo = Ext.Mod.GetMod(stat.OriginalModId).Info
 				if originalModInfo then
 					outfitSlotEntryForItem.modDependency.OriginalMod = {
+						Name = originalModInfo.Name,
 						Guid = originalModInfo.ModuleUUID,
 						Version = originalModInfo.ModVersion
 					}
