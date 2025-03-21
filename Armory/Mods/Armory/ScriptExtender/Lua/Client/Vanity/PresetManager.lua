@@ -104,11 +104,17 @@ function VanityPresetManager:OpenManager()
 		selectionCell.NoSavedSettings = true
 
 		userPresetSection = selectionCell:AddGroup("User_Presets")
-		userPresetSection:AddSeparatorText("Your Presets").UserData = "keep"
+		local userHeader = userPresetSection:AddSeparatorText("Your Presets")
+		userHeader:SetStyle("SeparatorTextAlign", 0.5)
+		userHeader.Font = "Large"
+		userHeader.UserData = "keep"
 		
 		selectionCell:AddNewLine()
 		modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
-		modPresetSection:AddSeparatorText("Mod-Provided Presets").UserData = "keep"
+		local modHeader = modPresetSection:AddSeparatorText("Mod Presets")
+		modHeader:SetStyle("SeparatorTextAlign", 0.5)
+		modHeader.Font = "Large"
+		modHeader.UserData = "keep"
 
 		presetInfoSection = row:AddCell():AddChildWindow("Preset Information")
 		presetInfoSection.NoSavedSettings = true
