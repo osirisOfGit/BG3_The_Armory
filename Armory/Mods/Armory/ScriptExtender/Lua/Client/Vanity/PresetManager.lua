@@ -108,7 +108,7 @@ function VanityPresetManager:OpenManager()
 		userHeader:SetStyle("SeparatorTextAlign", 0.5)
 		userHeader.Font = "Large"
 		userHeader.UserData = "keep"
-		
+
 		selectionCell:AddNewLine()
 		modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
 		local modHeader = modPresetSection:AddSeparatorText("Mod Presets")
@@ -290,7 +290,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d")
+			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d", {32, 32})
 			swapViewButton:Tooltip():AddText("\t Swap between Overall and Per-Outfit view")
 
 			local generalSettings = ConfigurationStructure.config.vanity.settings.general
@@ -300,14 +300,14 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				Helpers:KillChildren(outfitsAndDependenciesGroup)
 
 				if generalSettings.outfitAndDependencyView == "universal" then
-					outfitsAndDependenciesGroup:AddNewLine()
 					outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits")
 					-- Need to pass the proxy value so it can get deleted properly
 					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], outfitsAndDependenciesGroup)
-
+					outfitsAndDependenciesGroup:AddNewLine()
 					outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies")
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
 				else
+					outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report")
 					ModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
 				end
 			end
