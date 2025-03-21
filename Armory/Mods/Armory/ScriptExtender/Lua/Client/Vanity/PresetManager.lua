@@ -10,13 +10,13 @@ end)
 ---@type ExtuiWindow
 local presetWindow
 
----@type ExtuiChildWindow
+---@type ExtuiGroup
 local userPresetSection
 
----@type ExtuiChildWindow
+---@type ExtuiGroup
 local modPresetSection
 
----@type ExtuiTableCell
+---@type ExtuiChildWindow
 local presetInfoSection
 
 ---@type ExtuiGroup?
@@ -100,17 +100,19 @@ function VanityPresetManager:OpenManager()
 
 		local row = presetTable:AddRow()
 
-		local selectionCell = row:AddCell()
+		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
+		selectionCell.NoSavedSettings = true
 
-		local userPresetHeader = selectionCell:AddCollapsingHeader("Your Presets")
-		userPresetSection = userPresetHeader:AddChildWindow("UserPresets")
-		userPresetSection.NoSavedSettings = true
+		userPresetSection = selectionCell:AddGroup("User_Presets")
+		userPresetSection:AddSeparatorText("Your Presets").UserData = "keep"
+		
+		selectionCell:AddNewLine()
+		modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
+		modPresetSection:AddSeparatorText("Mod-Provided Presets").UserData = "keep"
 
-		local modPresetHeader = selectionCell:AddCollapsingHeader("Mod-Provided Presets")
-		modPresetSection = modPresetHeader:AddChildWindow("ModPresets")
-		modPresetSection.NoSavedSettings = true
-
-		presetInfoSection = row:AddCell()
+		presetInfoSection = row:AddCell():AddChildWindow("Preset Information")
+		presetInfoSection.NoSavedSettings = true
+		presetInfoSection.HorizontalScrollbar = true
 
 		VanityPresetManager:UpdatePresetView()
 	end
@@ -203,9 +205,7 @@ local function buildDependencyTable(preset, parent)
 end
 
 function VanityPresetManager:UpdatePresetView(presetID)
-	for _, child in pairs(userPresetSection.Children) do
-		child:Destroy()
-	end
+	Helpers:KillChildren(userPresetSection)
 
 	if presetActivelyViewing then
 		presetActivelyViewing:Destroy()
@@ -221,12 +221,19 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
-		local presetButton = userPresetSection:AddButton(preset.Name)
-		presetButton.IDContext = guid
+		---@type ExtuiSelectable
+		local presetSelectable = userPresetSection:AddSelectable(preset.Name)
+		presetSelectable.IDContext = guid
 
-		presetButton.OnClick = function()
+		presetSelectable.OnClick = function()
 			if presetActivelyViewing then
 				presetActivelyViewing:Destroy()
+			end
+
+			for _, selectable in pairs(userPresetSection.Children) do
+				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData ~= "keep" then
+					selectable.Selected = false
+				end
 			end
 
 			local presetGroup = presetInfoSection:AddGroup(guid)
@@ -306,8 +313,9 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 		end
 
-		if presetID == guid then
-			presetButton.OnClick()
+		if (not presetID and guid == activePreset) or presetID == guid then
+			presetSelectable.OnClick()
+			presetSelectable.Selected = true
 		end
 	end
 end
