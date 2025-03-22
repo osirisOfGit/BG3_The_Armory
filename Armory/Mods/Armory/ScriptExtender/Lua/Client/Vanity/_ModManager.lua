@@ -15,6 +15,10 @@ function ModManager:GetModInfo(modDependency)
 	end
 end
 
+function ModManager:BuildCustomDependencyForm(preset, parent)
+	
+end
+
 ---@type ExtuiWindow
 local dependencyWindow
 

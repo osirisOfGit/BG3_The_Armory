@@ -290,7 +290,95 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d", {32, 32})
+			--#region Custom Dependencies
+			presetGroup:AddNewLine()
+			local customDependencyHeader = presetGroup:AddCollapsingHeader("Custom Dependencies")
+			local customDependencyButton = customDependencyHeader:AddButton("Add Custom Dependency")
+
+			local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
+			customDepFormGroup.Visible = false
+
+			FormBuilder:CreateForm(customDepFormGroup,
+				function(results)
+					customDepFormGroup.Visible = false
+
+					local versionString = results["Version"]
+					results["Version"] = {}
+					for versionPart in string.gmatch(versionString, "[^%.]+") do
+						table.insert(results["Version"], versionPart)
+					end
+
+					if not preset.CustomDependencies then
+						preset.CustomDependencies = {}
+					end
+
+					table.insert(preset.CustomDependencies, results)
+					VanityPresetManager:UpdatePresetView(presetID)
+				end,
+				{
+					{
+						["label"] = "Name",
+						["type"] = "Text",
+						["errorMessageIfEmpty"] = "Required Field"
+					},
+					{
+						["label"] = "Minimum Version",
+						["propertyField"] = "Version",
+						["type"] = "NumericText",
+						["errorMessageIfEmpty"] = "Required Field"
+					},
+					{
+						["label"] = "UUID",
+						["propertyField"] = "Guid",
+						["type"] = "Text"
+					},
+					{
+						["label"] = "Notes",
+						["type"] = "Multiline"
+					}
+				})
+
+			customDependencyButton.OnClick = function()
+				customDepFormGroup.Visible = not customDepFormGroup.Visible
+			end
+
+			if preset.CustomDependencies and preset.CustomDependencies() then
+				local customDependencyTable = customDependencyHeader:AddTable("CustomDependency", 5)
+				customDependencyTable.Resizable = true
+
+				local headerRow = customDependencyTable:AddRow()
+				headerRow.Headers = true
+				headerRow:AddCell():AddText("Name")
+				headerRow:AddCell():AddText("Minimum Version")
+				headerRow:AddCell():AddText("UUID")
+				headerRow:AddCell():AddText("Notes")
+
+				for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function (key)
+					return preset.CustomDependencies[key].Name
+				end) do
+					local row = customDependencyTable:AddRow()
+					row:AddCell():AddText(customDependency.Name)
+					row:AddCell():AddText(table.concat(customDependency.Version, "."))
+					row:AddCell():AddText(customDependency.Guid or "---")
+					row:AddCell():AddText(customDependency.Notes)
+
+					local actionCell = row:AddCell()
+					actionCell:AddButton("Edit")
+
+					local deleteButton = actionCell:AddButton("X")
+					deleteButton.SameLine = true
+					deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
+					deleteButton:SetColor("Text", { 1, 1, 1, 1 })
+					deleteButton.OnClick = function()
+						preset.CustomDependencies[index].delete = true
+						VanityPresetManager:UpdatePresetView(presetID)
+					end
+				end
+			end
+
+			--#endregion
+			presetGroup:AddNewLine()
+			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d", { 32, 32 })
 			swapViewButton:Tooltip():AddText("\t Swap between Overall and Per-Outfit view")
 
 			local generalSettings = ConfigurationStructure.config.vanity.settings.general
@@ -301,8 +389,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 				if generalSettings.outfitAndDependencyView == "universal" then
 					outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits")
-					-- Need to pass the proxy value so it can get deleted properly
-					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], outfitsAndDependenciesGroup)
+					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup)
 					outfitsAndDependenciesGroup:AddNewLine()
 					outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies")
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
