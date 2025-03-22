@@ -25,7 +25,7 @@ local function generate_recursive_metatable(proxy_table, real_table)
 			return #real_table
 		end,
 		__call = function(this_table, state, index)
-			return next(real_table, index)
+			return next(real_table, index) or #real_table > 0
 		end,
 		__newindex = function(this_table, key, value)
 			if key == "delete" then

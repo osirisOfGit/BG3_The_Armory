@@ -15,6 +15,10 @@ function ModManager:GetModInfo(modDependency)
 	end
 end
 
+function ModManager:BuildCustomDependencyForm(preset, parent)
+	
+end
+
 ---@type ExtuiWindow
 local dependencyWindow
 
@@ -33,9 +37,9 @@ function ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, pa
 		end
 
 		parent = dependencyWindow
+		Helpers:KillChildren(parent)
 	end
 
-	Helpers:KillChildren(parent)
 	parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
 	local function generateOutfitSection(compositeKey)
 		local criteraTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(compositeKey))

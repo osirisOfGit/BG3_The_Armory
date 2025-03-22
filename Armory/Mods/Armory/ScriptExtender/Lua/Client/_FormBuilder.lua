@@ -19,18 +19,22 @@ end
 ---@field defaultValue string|boolean?
 ---@field dependsOn string?
 ---@field errorMessageIfEmpty string?
----@field input ExtuiInputText|ExtuiCheckbox?
----@field authorError ExtuiText?
----@field enumTable function?
+---@field input ExtuiInputText|ExtuiCheckbox? Internal
+---@field authorError ExtuiText? Internal
+---@field enumTable function? Internal
 
 ---@param parent ExtuiTreeParent
----@param onSubmitFunc function
+---@param onSubmitFunc fun(formResults: table<string, string|boolean>)
 ---@param formInputs FormStructure[]
 function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 	Helpers:KillChildren(parent)
 
 	for _, formInput in pairs(formInputs) do
-		parent:AddText(formInput.label)
+		local label = parent:AddText(formInput.label)
+		if formInput.errorMessageIfEmpty then
+			label.Label = label.Label .. "*"
+		end
+
 		local input
 		if formInput.type == "Text" or formInput.type == "NumericText" or formInput.type == "Multiline" then
 			input = parent:AddInputText("", formInput.defaultValue or nil)
@@ -38,7 +42,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 
 			if formInput.type == "NumericText" then
 				input.CharsDecimal = true
-				input.Hint = "Numeric only"
+				input.Hint = "Numbers, periods, and slashes only"
 			elseif formInput.type == "Multiline" then
 				input.Multiline = true
 			end
@@ -165,7 +169,10 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 
 	local submit = parent:AddButton("Submit")
 	submit.OnClick = function()
-		onSubmitFunc(buildInputs())
+		local results = buildInputs()
+		if results then
+			onSubmitFunc(results)
+		end
 	end
 
 	return buildInputs

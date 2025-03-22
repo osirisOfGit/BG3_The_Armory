@@ -10,13 +10,13 @@ end)
 ---@type ExtuiWindow
 local presetWindow
 
----@type ExtuiChildWindow
+---@type ExtuiGroup
 local userPresetSection
 
----@type ExtuiChildWindow
+---@type ExtuiGroup
 local modPresetSection
 
----@type ExtuiTableCell
+---@type ExtuiChildWindow
 local presetInfoSection
 
 ---@type ExtuiGroup?
@@ -100,17 +100,25 @@ function VanityPresetManager:OpenManager()
 
 		local row = presetTable:AddRow()
 
-		local selectionCell = row:AddCell()
+		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
+		selectionCell.NoSavedSettings = true
 
-		local userPresetHeader = selectionCell:AddCollapsingHeader("Your Presets")
-		userPresetSection = userPresetHeader:AddChildWindow("UserPresets")
-		userPresetSection.NoSavedSettings = true
+		userPresetSection = selectionCell:AddGroup("User_Presets")
+		local userHeader = userPresetSection:AddSeparatorText("Your Presets")
+		userHeader:SetStyle("SeparatorTextAlign", 0.5)
+		userHeader.Font = "Large"
+		userHeader.UserData = "keep"
 
-		local modPresetHeader = selectionCell:AddCollapsingHeader("Mod-Provided Presets")
-		modPresetSection = modPresetHeader:AddChildWindow("ModPresets")
-		modPresetSection.NoSavedSettings = true
+		selectionCell:AddNewLine()
+		modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
+		local modHeader = modPresetSection:AddSeparatorText("Mod Presets")
+		modHeader:SetStyle("SeparatorTextAlign", 0.5)
+		modHeader.Font = "Large"
+		modHeader.UserData = "keep"
 
-		presetInfoSection = row:AddCell()
+		presetInfoSection = row:AddCell():AddChildWindow("Preset Information")
+		presetInfoSection.NoSavedSettings = true
+		presetInfoSection.HorizontalScrollbar = true
 
 		VanityPresetManager:UpdatePresetView()
 	end
@@ -203,9 +211,7 @@ local function buildDependencyTable(preset, parent)
 end
 
 function VanityPresetManager:UpdatePresetView(presetID)
-	for _, child in pairs(userPresetSection.Children) do
-		child:Destroy()
-	end
+	Helpers:KillChildren(userPresetSection)
 
 	if presetActivelyViewing then
 		presetActivelyViewing:Destroy()
@@ -221,12 +227,19 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
-		local presetButton = userPresetSection:AddButton(preset.Name)
-		presetButton.IDContext = guid
+		---@type ExtuiSelectable
+		local presetSelectable = userPresetSection:AddSelectable(preset.Name)
+		presetSelectable.IDContext = guid
 
-		presetButton.OnClick = function()
+		presetSelectable.OnClick = function()
 			if presetActivelyViewing then
 				presetActivelyViewing:Destroy()
+			end
+
+			for _, selectable in pairs(userPresetSection.Children) do
+				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData ~= "keep" then
+					selectable.Selected = false
+				end
 			end
 
 			local presetGroup = presetInfoSection:AddGroup(guid)
@@ -277,7 +290,113 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d")
+			--#region Custom Dependencies
+			presetGroup:AddNewLine()
+			local customDependencyHeader = presetGroup:AddCollapsingHeader("Custom Dependencies")
+			local customDependencyButton = customDependencyHeader:AddButton("Add Custom Dependency")
+
+			local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
+			customDepFormGroup.Visible = false
+
+			---@param existingCustomDependency ModDependency
+			local function buildCustomDepForm(existingCustomDependency)
+				FormBuilder:CreateForm(customDepFormGroup,
+					function(results)
+						customDepFormGroup.Visible = false
+
+						local versionString = results["Version"]
+						results["Version"] = {}
+						for versionPart in string.gmatch(versionString, "[^%.]+") do
+							table.insert(results["Version"], versionPart)
+						end
+
+						if not preset.CustomDependencies then
+							preset.CustomDependencies = {}
+						end
+
+						if existingCustomDependency then
+							existingCustomDependency["Version"].delete = true
+							for key, value in pairs(results) do
+								existingCustomDependency[key] = value
+							end
+						else
+							table.insert(preset.CustomDependencies, results)
+						end
+						VanityPresetManager:UpdatePresetView(presetID)
+					end,
+					{
+						{
+							["label"] = "Name",
+							["type"] = "Text",
+							["errorMessageIfEmpty"] = "Required Field",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Name
+						},
+						{
+							["label"] = "Minimum Version",
+							["propertyField"] = "Version",
+							["type"] = "NumericText",
+							["errorMessageIfEmpty"] = "Required Field",
+							["defaultValue"] = existingCustomDependency and table.concat(existingCustomDependency.Version, ".")
+						},
+						{
+							["label"] = "UUID",
+							["propertyField"] = "Guid",
+							["type"] = "Text",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Guid
+						},
+						{
+							["label"] = "Notes",
+							["type"] = "Multiline",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Notes
+						}
+					})
+			end
+			buildCustomDepForm()
+
+			customDependencyButton.OnClick = function()
+				customDepFormGroup.Visible = not customDepFormGroup.Visible
+			end
+
+			if preset.CustomDependencies and preset.CustomDependencies() then
+				local customDependencyTable = customDependencyHeader:AddTable("CustomDependency", 5)
+				customDependencyTable.Resizable = true
+
+				local headerRow = customDependencyTable:AddRow()
+				headerRow.Headers = true
+				headerRow:AddCell():AddText("Name")
+				headerRow:AddCell():AddText("Minimum Version")
+				headerRow:AddCell():AddText("UUID")
+				headerRow:AddCell():AddText("Notes")
+
+				for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function(key)
+					return preset.CustomDependencies[key].Name
+				end) do
+					local row = customDependencyTable:AddRow()
+					row:AddCell():AddText(customDependency.Name)
+					row:AddCell():AddText(table.concat(customDependency.Version, "."))
+					row:AddCell():AddText(customDependency.Guid or "---")
+					row:AddCell():AddText(customDependency.Notes)
+
+					local actionCell = row:AddCell()
+					actionCell:AddButton("Edit").OnClick = function()
+						buildCustomDepForm(customDependency)
+						customDepFormGroup.Visible = true
+					end
+
+					local deleteButton = actionCell:AddButton("X")
+					deleteButton.SameLine = true
+					deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
+					deleteButton:SetColor("Text", { 1, 1, 1, 1 })
+					deleteButton.OnClick = function()
+						preset.CustomDependencies[index].delete = true
+						VanityPresetManager:UpdatePresetView(presetID)
+					end
+				end
+			end
+
+			--#endregion
+			presetGroup:AddNewLine()
+			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d", { 32, 32 })
 			swapViewButton:Tooltip():AddText("\t Swap between Overall and Per-Outfit view")
 
 			local generalSettings = ConfigurationStructure.config.vanity.settings.general
@@ -287,14 +406,13 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				Helpers:KillChildren(outfitsAndDependenciesGroup)
 
 				if generalSettings.outfitAndDependencyView == "universal" then
-					outfitsAndDependenciesGroup:AddNewLine()
 					outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits")
-					-- Need to pass the proxy value so it can get deleted properly
-					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(ConfigurationStructure.config.vanity.presets[guid], outfitsAndDependenciesGroup)
-
+					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup)
+					outfitsAndDependenciesGroup:AddNewLine()
 					outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies")
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
 				else
+					outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report")
 					ModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
 				end
 			end
@@ -306,8 +424,9 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 		end
 
-		if presetID == guid then
-			presetButton.OnClick()
+		if (not presetID and guid == activePreset) or presetID == guid then
+			presetSelectable.OnClick()
+			presetSelectable.Selected = true
 		end
 	end
 end

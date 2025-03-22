@@ -41,8 +41,10 @@ ConfigurationStructure.DynamicClassDefinitions.modDependency = {
 	Guid = nil,
 	---@type number[]
 	Version = nil,
+	---@type string?
+	Notes = nil,
 	---@type ModDependency?
-	OriginalMod = nil
+	OriginalMod = nil,
 }
 
 ---@class VanityOutfitItemEntry
@@ -81,6 +83,8 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	ModSourced = nil,
 	---@type {[VanityCriteriaCompositeKey] : VanityOutfit}
 	Outfits = {},
+	---@type ModDependency[]
+	CustomDependencies = {}
 }
 
 ---@type {[Guid]: VanityPreset}
