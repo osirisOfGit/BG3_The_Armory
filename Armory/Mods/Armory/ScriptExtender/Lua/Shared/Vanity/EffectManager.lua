@@ -1,5 +1,6 @@
 Ext.Require("Shared/Vanity/MissingEnums.lua")
 
+---@type {[string]: VanityEffect}
 local effectCollection = {}
 
 ---@type ExtuiWindow
@@ -222,7 +223,7 @@ if Ext.IsClient() then
 		formPopup.AlwaysAutoResize = true
 
 		local warningText = formPopup:AddText(
-		"Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies")
+			"Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies")
 		warningText.UserData = "keep"
 		warningText.TextWrapPos = 0
 		warningText:SetStyle("Alpha", 0.65)
@@ -340,6 +341,8 @@ if Ext.IsClient() then
 			local deleteEffect = effectMenu:AddSelectable("Delete", "DontClosePopups")
 			deleteEffect.IDContext = effectMenu.Label .. "Delete"
 			deleteEffect.OnClick = function()
+				ConfigurationStructure.config.vanity.cachedDisplayValues[effectCollection[effectName].effectProps.StatusEffect] = nil
+				
 				vanityEffect:deleteStat()
 				effectCollection[effectName] = nil
 				effectMenu:Destroy()

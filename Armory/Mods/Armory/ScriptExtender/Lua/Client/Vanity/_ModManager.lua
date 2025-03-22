@@ -1,6 +1,7 @@
 ModManager = {}
 
 ---@param modDependency ModDependency
+---@return string, string
 function ModManager:GetModInfo(modDependency)
 	if modDependency.OriginalMod then
 		modDependency = modDependency.OriginalMod
@@ -32,48 +33,56 @@ function ModManager:DependencyValidator(preset)
 	---@type {string : ValidationError[]}
 	local validationErrors = {}
 
+	local cachedGuids = {}
+
 	---@param outfitItemEntry VanityOutfitItemEntry
 	---@param category "Equipment"|"Dye"
 	---@param criteriaKey VanityCriteriaCompositeKey
 	local function validateSlot(outfitItemEntry, category, criteriaKey)
-		---@type ItemTemplate
-		local template = Ext.Template.GetTemplate(outfitItemEntry.guid)
-		if not template then
-			if not validationErrors[criteriaKey] then
-				validationErrors[criteriaKey] = {}
-			end
+		if outfitItemEntry.guid ~= "Hide Appearance" and not cachedGuids[outfitItemEntry.guid] then
+			---@type ItemTemplate
+			local template = Ext.Template.GetTemplate(outfitItemEntry.guid)
+			if not template then
+				if not validationErrors[criteriaKey] then
+					validationErrors[criteriaKey] = {}
+				end
 
-			table.insert(validationErrors[criteriaKey],
-				{
-					resourceId = outfitItemEntry.guid,
-					displayValue = cachedDisplayValues[outfitItemEntry.guid],
-					category = category,
-					modInfo = outfitItemEntry.modDependency
-				} --[[@as ValidationError]])
-		else
-			cachedDisplayValues[outfitItemEntry.guid] = template.DisplayName:Get() or template.Name
+				table.insert(validationErrors[criteriaKey],
+					{
+						resourceId = outfitItemEntry.guid,
+						displayValue = cachedDisplayValues[outfitItemEntry.guid],
+						category = category,
+						modInfo = outfitItemEntry.modDependency
+					} --[[@as ValidationError]])
+			else
+				cachedDisplayValues[outfitItemEntry.guid] = template.DisplayName:Get() or template.Name
+			end
 		end
+		cachedGuids[outfitItemEntry.guid] = true
 
 		if outfitItemEntry.effects then
 			for _, effect in pairs(outfitItemEntry.effects) do
 				local effectInstance = ConfigurationStructure.config.vanity.effects[effect]
 
-				---@type ResourceMultiEffectInfo
-				local mei = Ext.StaticData.Get(effectInstance.effectProps.StatusEffect, "MultiEffectInfo")
-				if not mei then
-					if not validationErrors[criteriaKey] then
-						validationErrors[criteriaKey] = {}
-					end
+				if not cachedGuids[effectInstance.effectProps.StatusEffect] then
+					---@type ResourceMultiEffectInfo
+					local mei = Ext.StaticData.Get(effectInstance.effectProps.StatusEffect, "MultiEffectInfo")
+					if not mei then
+						if not validationErrors[criteriaKey] then
+							validationErrors[criteriaKey] = {}
+						end
 
-					table.insert(validationErrors[criteriaKey],
-						{
-							resourceId = effectInstance.effectProps.StatusEffect,
-							displayValue = cachedDisplayValues[effectInstance.effectProps.StatusEffect],
-							category = "Effect"
-						} --[[@as ValidationError]])
-				else
-					cachedDisplayValues[effectInstance.effectProps.StatusEffect] = mei.Name
+						table.insert(validationErrors[criteriaKey],
+							{
+								resourceId = effectInstance.effectProps.StatusEffect,
+								displayValue = cachedDisplayValues[effectInstance.effectProps.StatusEffect],
+								category = "Effect"
+							} --[[@as ValidationError]])
+					else
+						cachedDisplayValues[effectInstance.effectProps.StatusEffect] = mei.Name
+					end
 				end
+				cachedGuids[effectInstance.effectProps.StatusEffect] = true
 			end
 		end
 	end
@@ -81,42 +90,47 @@ function ModManager:DependencyValidator(preset)
 	for criteriaKey, outfit in pairs(preset.Outfits) do
 		local criteriaTable = ParseCriteriaCompositeKey(criteriaKey)
 		local displayCriteriaTable = ConvertCriteriaTableToDisplay(criteriaTable)
+		local displayCriteriaKey = CreateCriteriaCompositeKey(ConvertCriteriaTableToDisplay(criteriaTable, nil, true))
 
 		for criteria, value in pairs(displayCriteriaTable) do
-			if string.match(value, "Not Found - Missing Mod") then
-				if not validationErrors[criteriaKey] then
-					validationErrors[criteriaKey] = {}
-				end
+			if not cachedGuids[criteriaTable[criteria]] then
+				if string.match(value, "Not Found - Missing Mod") then
+					if not validationErrors[displayCriteriaKey] then
+						validationErrors[displayCriteriaKey] = {}
+					end
 
-				table.insert(validationErrors[criteriaKey],
-					{
-						resourceId = criteriaTable[criteria],
-						displayValue = cachedDisplayValues[criteriaTable[criteria]],
-						category = "Character Criteria"
-					} --[[@as ValidationError]])
-			else
-				cachedDisplayValues[criteriaTable[criteria]] = value
+					table.insert(validationErrors[displayCriteriaKey],
+						{
+							resourceId = criteriaTable[criteria],
+							displayValue = cachedDisplayValues[criteriaTable[criteria]],
+							category = "Character Criteria"
+						} --[[@as ValidationError]])
+				else
+					cachedDisplayValues[criteriaTable[criteria]] = value
+				end
 			end
+
+			cachedGuids[criteriaTable[criteria]] = true
 		end
 
 		for _, vanityOutfitSlot in pairs(outfit) do
 			if vanityOutfitSlot.dye and vanityOutfitSlot.dye.guid then
-				validateSlot(vanityOutfitSlot.dye, "Dye", criteriaKey)
+				validateSlot(vanityOutfitSlot.dye, "Dye", displayCriteriaKey)
 			end
 
 			if vanityOutfitSlot.equipment then
 				if vanityOutfitSlot.equipment.guid then
-					validateSlot(vanityOutfitSlot.equipment, "Equipment", criteriaKey)
+					validateSlot(vanityOutfitSlot.equipment, "Equipment", displayCriteriaKey)
 				end
 
 				if vanityOutfitSlot.weaponTypes then
 					for _, weaponOutfitSlot in pairs(vanityOutfitSlot.weaponTypes) do
 						if weaponOutfitSlot.dye and weaponOutfitSlot.dye.guid then
-							validateSlot(weaponOutfitSlot.dye, "Dye", criteriaKey)
+							validateSlot(weaponOutfitSlot.dye, "Dye", displayCriteriaKey)
 						end
 
 						if weaponOutfitSlot.equipment.guid then
-							validateSlot(weaponOutfitSlot.equipment, "Equipment", criteriaKey)
+							validateSlot(weaponOutfitSlot.equipment, "Equipment", displayCriteriaKey)
 						end
 					end
 				end

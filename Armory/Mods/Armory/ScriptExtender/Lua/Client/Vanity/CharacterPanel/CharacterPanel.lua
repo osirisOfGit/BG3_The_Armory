@@ -246,6 +246,8 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 					EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
 						---@param itemTemplate ItemTemplate
 						function(itemTemplate)
+							ConfigurationStructure.config.vanity.cachedDisplayValues[itemTemplate.Id] = itemTemplate.DisplayName:Get() or itemTemplate.Name
+
 							local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
 							outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
 
@@ -287,6 +289,8 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 					DyePicker:OpenWindow(imageButton.UserData, itemSlot,
 						---@param dyeTemplate ItemTemplate
 						function(dyeTemplate)
+							ConfigurationStructure.config.vanity.cachedDisplayValues[dyeTemplate.Id] = dyeTemplate.DisplayName:Get() or dyeTemplate.Name
+
 							local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
 
 							outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}

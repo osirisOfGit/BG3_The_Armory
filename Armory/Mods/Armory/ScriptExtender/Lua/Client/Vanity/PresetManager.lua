@@ -101,7 +101,7 @@ function VanityPresetManager:OpenManager()
 		local row = presetTable:AddRow()
 
 		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
-		selectionCell:SetSizeConstraints({200, 0})
+		selectionCell:SetSizeConstraints({ 200, 0 })
 
 		userPresetSection = selectionCell:AddGroup("User_Presets")
 		local userHeader = userPresetSection:AddSeparatorText("Your Presets")
@@ -210,6 +210,9 @@ local function buildDependencyTable(preset, parent)
 	buildDependencyTab("Equipment", cachedDeps.equipment)
 end
 
+---@type {[Guid]: {[string] : ValidationError[]}}
+local cachedValidationErrors = {}
+
 function VanityPresetManager:UpdatePresetView(presetID)
 	Helpers:KillChildren(userPresetSection)
 
@@ -289,6 +292,44 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					buildPresetForm(infoGroup, guid)
 				end
 			end
+
+			--#region Validation
+			if not cachedValidationErrors[guid] then
+				cachedValidationErrors[guid] = ModManager:DependencyValidator(preset)
+			end
+
+			if next(cachedValidationErrors[guid]) then
+				presetGroup:AddNewLine()
+
+				local validationFailureHeader = presetGroup:AddSeparatorText("Dependency Validation Failed!")
+				validationFailureHeader.Font = "Large"
+				validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
+
+				for outfitCriteria, validationErrors in TableUtils:OrderedPairs(cachedValidationErrors[guid]) do
+					presetGroup:AddSeparatorText(outfitCriteria)
+					local validationErrorTable = presetGroup:AddTable("ValidationErrors" .. outfitCriteria, 4)
+					local headerRow = validationErrorTable:AddRow()
+					headerRow.Headers = true
+					headerRow:AddCell():AddText("ResourceID")
+					headerRow:AddCell():AddText("Display Name")
+					headerRow:AddCell():AddText("Resource Category")
+					headerRow:AddCell():AddText("Mod Info")
+
+					for _, validationError in ipairs(validationErrors) do
+						local row = validationErrorTable:AddRow()
+						row:AddCell():AddText(validationError.resourceId)
+						row:AddCell():AddText(validationError.displayValue or "Unknown")
+						row:AddCell():AddText(validationError.category)
+						if validationError.modInfo then
+							row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(validationError.modInfo)))
+						else
+							row:AddCell():AddText("Unknown - check custom dependencies")
+						end
+					end
+				end
+			end
+
+			--#endregion
 
 			--#region Custom Dependencies
 			presetGroup:AddNewLine()

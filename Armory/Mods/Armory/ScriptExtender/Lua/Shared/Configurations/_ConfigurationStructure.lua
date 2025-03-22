@@ -32,19 +32,25 @@ local function generate_recursive_metatable(proxy_table, real_table)
 				rawset(this_table._parent_proxy, this_table._parent_key, nil)
 				this_table._parent_table[this_table._parent_key] = nil
 			else
-				real_table[key] = value
-				if type(value) == "table" then
-					rawset(proxy_table, key, generate_recursive_metatable(
-						{
-							_parent_key = key,
-							_parent_table = real_table,
-							_parent_proxy = proxy_table
-						},
-						real_table[key]))
-					-- Accounting for setting a table that has tables in one assignment operation
-					for child_key, child_value in pairs(value) do
-						if type(child_value) == "table" then
-							proxy_table[key][child_key] = child_value
+				if value == nil then
+					if real_table[key] then
+						real_table[key] = nil
+					end
+				else
+					real_table[key] = value
+					if type(value) == "table" then
+						rawset(proxy_table, key, generate_recursive_metatable(
+							{
+								_parent_key = key,
+								_parent_table = real_table,
+								_parent_proxy = proxy_table
+							},
+							real_table[key]))
+						-- Accounting for setting a table that has tables in one assignment operation
+						for child_key, child_value in pairs(value) do
+							if type(child_value) == "table" then
+								proxy_table[key][child_key] = child_value
+							end
 						end
 					end
 				end
@@ -156,6 +162,6 @@ if Ext.IsClient() then
 	end)
 end
 
-Ext.RegisterNetListener(ModuleUUID .. "_UpdateConfiguration", function (channel, payload, user)
+Ext.RegisterNetListener(ModuleUUID .. "_UpdateConfiguration", function(channel, payload, user)
 	ConfigurationStructure:InitializeConfig()
 end)
