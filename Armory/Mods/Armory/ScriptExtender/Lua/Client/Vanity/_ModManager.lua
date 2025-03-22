@@ -45,21 +45,23 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 	---@param category "Equipment"|"Dye"
 	---@param criteriaKey VanityCriteriaCompositeKey
 	local function validateSlot(outfitItemEntry, category, criteriaKey, cachedGuids)
-		if outfitItemEntry.guid ~= "Hide Appearance" and not cachedGuids[outfitItemEntry.guid] then
+		if outfitItemEntry.guid ~= "Hide Appearance" and (not outfitItemEntry.name or not cachedGuids[outfitItemEntry.guid]) then
 			---@type ItemTemplate
 			local template = Ext.Template.GetTemplate(outfitItemEntry.guid)
 			if not template then
-				if not validationErrors[criteriaKey] then
-					validationErrors[criteriaKey] = {}
-				end
+				if not cachedGuids[outfitItemEntry.guid] then
+					if not validationErrors[criteriaKey] then
+						validationErrors[criteriaKey] = {}
+					end
 
-				table.insert(validationErrors[criteriaKey],
-					{
-						resourceId = outfitItemEntry.guid,
-						displayValue = outfitItemEntry.name,
-						category = category,
-						modInfo = outfitItemEntry.modDependency
-					} --[[@as ValidationError]])
+					table.insert(validationErrors[criteriaKey],
+						{
+							resourceId = outfitItemEntry.guid,
+							displayValue = outfitItemEntry.name,
+							category = category,
+							modInfo = outfitItemEntry.modDependency
+						} --[[@as ValidationError]])
+				end
 			else
 				outfitItemEntry.name = template.DisplayName:Get() or template.Name
 			end
