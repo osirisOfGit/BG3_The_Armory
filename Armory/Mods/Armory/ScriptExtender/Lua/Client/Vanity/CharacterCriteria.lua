@@ -187,10 +187,10 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		return
 	end
 
-	local popupButton = criteriaGroup:AddButton("See Configured Character Criteria Combinations")
+	local popupButton = criteriaGroup:AddButton("See Configured Outfits")
 
 	if not popup then
-		popup = Ext.IMGUI.NewWindow("Configured Character Criteria Combinations")
+		popup = Ext.IMGUI.NewWindow("Configured Outfits")
 		popup.Closeable = true
 		popup.AlwaysAutoResize = true
 		popup.NoResize = true
