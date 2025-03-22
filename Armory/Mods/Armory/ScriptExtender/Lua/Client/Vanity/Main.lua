@@ -66,8 +66,9 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		---@type ExtuiSelectable
 		local placeholderItemSetting = menuPopup:AddSelectable("Generate Junk Items in Empty Slots For Transmog")
 		placeholderItemSetting.Selected = generalSettings.fillEmptySlots
-		placeholderItemSetting:Tooltip():AddText("\t When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur.")
-		placeholderItemSetting.OnClick = function ()
+		placeholderItemSetting:Tooltip():AddText(
+			"\t When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur.")
+		placeholderItemSetting.OnClick = function()
 			generalSettings.fillEmptySlots = placeholderItemSetting.Selected
 
 			if generalSettings.fillEmptySlots then
@@ -115,6 +116,33 @@ function Vanity:UpdatePresetOnServer()
 end
 
 local hasBeenActivated = false
+
+Ext.Events.GameStateChanged:Subscribe(function(e)
+	---@cast e EclLuaGameStateChangedEvent
+
+	if e.ToState == "Running" and not hasBeenActivated then
+		local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+
+		if presetId then
+			local preset = ConfigurationStructure.config.vanity.presets[presetId]
+			separator.Label = "Active Preset: " .. preset.Name
+			VanityCharacterCriteria:BuildModule(mainParent, preset)
+
+			ModManager:DependencyValidator(preset, function()
+				local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
+				validationErrorWindow.Closeable = true
+
+				validationErrorWindow:AddText("Please either clear/delete the relevant outfit/slots/effects or load the missing mods!")
+
+				validationErrorWindow:AddButton("Open Preset").OnClick = function()
+					Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
+				end
+
+				return validationErrorWindow
+			end)
+		end
+	end
+end)
 
 Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 	if not hasBeenActivated then

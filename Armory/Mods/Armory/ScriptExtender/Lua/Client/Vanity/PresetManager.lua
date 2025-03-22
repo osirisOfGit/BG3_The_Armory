@@ -293,45 +293,9 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			--#region Validation
-			local validationErrorsForPreset = ModManager:DependencyValidator(preset)
-			if next(validationErrorsForPreset) then
-				presetGroup:AddNewLine()
-
-				local validationFailureHeader = presetGroup:AddSeparatorText("Dependency Validation Failed!")
-
-				presetGroup:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
-
-				validationFailureHeader.Font = "Large"
-				validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
-
-				for outfitCriteria, validationErrors in TableUtils:OrderedPairs(validationErrorsForPreset) do
-					local header = presetGroup:AddCollapsingHeader(outfitCriteria)
-					header.DefaultOpen = true
-
-					local validationErrorTable = header:AddTable("ValidationErrors", 4)
-					validationErrorTable.Resizable = true
-					validationErrorTable.SizingStretchProp = true
-
-					local headerRow = validationErrorTable:AddRow()
-					headerRow.Headers = true
-					headerRow:AddCell():AddText("ResourceID")
-					headerRow:AddCell():AddText("Display Name")
-					headerRow:AddCell():AddText("Resource Category")
-					headerRow:AddCell():AddText("Mod Info")
-
-					for _, validationError in ipairs(validationErrors) do
-						local row = validationErrorTable:AddRow()
-						row:AddCell():AddText(validationError.resourceId)
-						row:AddCell():AddText(validationError.displayValue or "Unknown")
-						row:AddCell():AddText(validationError.category)
-						if validationError.modInfo then
-							row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(validationError.modInfo)))
-						else
-							row:AddCell():AddText("Unknown - check custom dependencies")
-						end
-					end
-				end
-			end
+			ModManager:DependencyValidator(preset, function()
+				return presetGroup
+			end)
 			--#endregion
 
 			--#region Custom Dependencies

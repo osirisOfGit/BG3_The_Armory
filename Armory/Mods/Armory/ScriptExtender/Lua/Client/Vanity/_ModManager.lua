@@ -31,8 +31,8 @@ end
 ---@field modInfo ModDependency?
 
 ---@param preset VanityPreset
----@return {string : ValidationError[]}
-function ModManager:DependencyValidator(preset)
+---@param parentSupplier fun():ExtuiTreeParent
+function ModManager:DependencyValidator(preset, parentSupplier)
 	if not ConfigurationStructure.config.vanity.miscNameCache then
 		ConfigurationStructure.config.vanity.miscNameCache = {}
 	end
@@ -87,7 +87,7 @@ function ModManager:DependencyValidator(preset)
 					else
 						if not effectInstance.cachedDisplayNames then
 							effectInstance.cachedDisplayNames = {}
-						end 
+						end
 						effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect] = mei.Name
 					end
 				end
@@ -149,7 +149,45 @@ function ModManager:DependencyValidator(preset)
 		end
 	end
 
-	return validationErrors
+	if next(validationErrors) then
+		local parent = parentSupplier()
+		parent:AddNewLine()
+
+		local validationFailureHeader = parent:AddSeparatorText("Dependency Validation Failed!")
+
+		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
+
+		validationFailureHeader.Font = "Large"
+		validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
+
+		for outfitCriteria, validationErrorList in TableUtils:OrderedPairs(validationErrors) do
+			local header = parent:AddCollapsingHeader(outfitCriteria)
+			header.DefaultOpen = true
+
+			local validationErrorTable = header:AddTable("ValidationErrors", 4)
+			validationErrorTable.Resizable = true
+			validationErrorTable.SizingStretchProp = true
+
+			local headerRow = validationErrorTable:AddRow()
+			headerRow.Headers = true
+			headerRow:AddCell():AddText("ResourceID")
+			headerRow:AddCell():AddText("Display Name")
+			headerRow:AddCell():AddText("Resource Category")
+			headerRow:AddCell():AddText("Mod Info")
+
+			for _, validationError in ipairs(validationErrorList) do
+				local row = validationErrorTable:AddRow()
+				row:AddCell():AddText(validationError.resourceId)
+				row:AddCell():AddText(validationError.displayValue or "Unknown")
+				row:AddCell():AddText(validationError.category)
+				if validationError.modInfo then
+					row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(validationError.modInfo)))
+				else
+					row:AddCell():AddText("Unknown - check custom dependencies")
+				end
+			end
+		end
+	end
 end
 
 ---@type ExtuiWindow
