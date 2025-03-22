@@ -10,6 +10,14 @@ function ModManager:GetModInfo(modDependency)
 	local mod = Ext.Mod.GetMod(modDependency.Guid)
 
 	if mod then
+		if not modDependency.Name then
+			modDependency.Name = mod.Info.Name
+		end
+
+		if not modDependency.Version then
+			modDependency.Version = mod.Info.ModVersion
+		end
+
 		return mod.Info.Name, ("v" .. table.concat(mod.Info.ModVersion, "."))
 	else
 		return string.format("%s (Not Loaded)", modDependency.Name or modDependency.Guid), ("v" .. table.concat(modDependency.Version, "."))

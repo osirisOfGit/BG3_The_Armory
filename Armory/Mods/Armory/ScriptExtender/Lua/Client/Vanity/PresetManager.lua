@@ -298,16 +298,16 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				presetGroup:AddNewLine()
 
 				local validationFailureHeader = presetGroup:AddSeparatorText("Dependency Validation Failed!")
-				
+
 				presetGroup:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
-				
+
 				validationFailureHeader.Font = "Large"
 				validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
 
 				for outfitCriteria, validationErrors in TableUtils:OrderedPairs(validationErrorsForPreset) do
 					local header = presetGroup:AddCollapsingHeader(outfitCriteria)
 					header.DefaultOpen = true
-					
+
 					local validationErrorTable = header:AddTable("ValidationErrors", 4)
 					validationErrorTable.Resizable = true
 					validationErrorTable.SizingStretchProp = true
