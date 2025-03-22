@@ -157,6 +157,8 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 
 		local validationFailureHeader = parent:AddSeparatorText("Dependency Validation Failed!")
 
+		parent:AddText("Please either clear/delete the relevant outfit/slots/effects or load the missing mods!")
+
 		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
 
 		validationFailureHeader.Font = "Large"

@@ -132,8 +132,6 @@ Ext.Events.GameStateChanged:Subscribe(function(e)
 				local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
 				validationErrorWindow.Closeable = true
 
-				validationErrorWindow:AddText("Please either clear/delete the relevant outfit/slots/effects or load the missing mods!")
-
 				validationErrorWindow:AddButton("Open Preset").OnClick = function()
 					Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
 				end
