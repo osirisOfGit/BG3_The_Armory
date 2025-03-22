@@ -77,14 +77,14 @@ function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS, usingCacheFo
 				if includeUUIDS then
 					criteriaValue = string.format("%s (%s)", criteriaValue, criteriaId)
 				end
-				ConfigurationStructure.config.vanity.cachedDisplayValues[criteriaId] = criteriaValue
+				ConfigurationStructure.config.vanity.miscNameCache[criteriaId] = criteriaValue
 			else
 				if not usingCacheForMissing then
 					criteriaValue = string.format("%s Not Found - Missing Mod? UUID: %s",
-						ConfigurationStructure.config.vanity.cachedDisplayValues[criteriaId] or "Unknown Name",
+						ConfigurationStructure.config.vanity.miscNameCache[criteriaId] or "Unknown Name",
 						criteriaId)
 				else
-					criteriaValue = ConfigurationStructure.config.vanity.cachedDisplayValues[criteriaId] or "Unknown Name"
+					criteriaValue = ConfigurationStructure.config.vanity.miscNameCache[criteriaId] or ("Unknown Name: " .. criteriaId)
 				end
 			end
 		end

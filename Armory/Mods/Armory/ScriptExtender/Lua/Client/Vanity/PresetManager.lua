@@ -101,7 +101,9 @@ function VanityPresetManager:OpenManager()
 		local row = presetTable:AddRow()
 
 		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
+		selectionCell.NoSavedSettings = true
 		selectionCell:SetSizeConstraints({ 200, 0 })
+		presetTable.ColumnDefs[1].Width = 200
 
 		userPresetSection = selectionCell:AddGroup("User_Presets")
 		local userHeader = userPresetSection:AddSeparatorText("Your Presets")
@@ -210,9 +212,6 @@ local function buildDependencyTable(preset, parent)
 	buildDependencyTab("Equipment", cachedDeps.equipment)
 end
 
----@type {[Guid]: {[string] : ValidationError[]}}
-local cachedValidationErrors = {}
-
 function VanityPresetManager:UpdatePresetView(presetID)
 	Helpers:KillChildren(userPresetSection)
 
@@ -294,20 +293,25 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			--#region Validation
-			if not cachedValidationErrors[guid] then
-				cachedValidationErrors[guid] = ModManager:DependencyValidator(preset)
-			end
-
-			if next(cachedValidationErrors[guid]) then
+			local validationErrorsForPreset = ModManager:DependencyValidator(preset)
+			if next(validationErrorsForPreset) then
 				presetGroup:AddNewLine()
 
 				local validationFailureHeader = presetGroup:AddSeparatorText("Dependency Validation Failed!")
+				
+				presetGroup:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
+				
 				validationFailureHeader.Font = "Large"
 				validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
 
-				for outfitCriteria, validationErrors in TableUtils:OrderedPairs(cachedValidationErrors[guid]) do
-					presetGroup:AddSeparatorText(outfitCriteria)
-					local validationErrorTable = presetGroup:AddTable("ValidationErrors" .. outfitCriteria, 4)
+				for outfitCriteria, validationErrors in TableUtils:OrderedPairs(validationErrorsForPreset) do
+					local header = presetGroup:AddCollapsingHeader(outfitCriteria)
+					header.DefaultOpen = true
+					
+					local validationErrorTable = header:AddTable("ValidationErrors", 4)
+					validationErrorTable.Resizable = true
+					validationErrorTable.SizingStretchProp = true
+
 					local headerRow = validationErrorTable:AddRow()
 					headerRow.Headers = true
 					headerRow:AddCell():AddText("ResourceID")
@@ -328,7 +332,6 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					end
 				end
 			end
-
 			--#endregion
 
 			--#region Custom Dependencies

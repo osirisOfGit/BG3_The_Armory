@@ -49,6 +49,7 @@ ConfigurationStructure.DynamicClassDefinitions.modDependency = {
 
 ---@class VanityOutfitItemEntry
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfitItemEntry = {
+	name = nil,
 	guid = nil,
 	---@type ModDependency
 	modDependency = nil,
@@ -87,11 +88,10 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	CustomDependencies = {}
 }
 
----@type {[Guid]: string}
-ConfigurationStructure.config.vanity.cachedDisplayValues = {}
-
 ---@type {[Guid]: VanityPreset}
 ConfigurationStructure.config.vanity.presets = {}
+
+ConfigurationStructure.config.vanity.miscNameCache = {}
 
 ---@type {[string]: VanityEffect}
 ConfigurationStructure.config.vanity.effects = {

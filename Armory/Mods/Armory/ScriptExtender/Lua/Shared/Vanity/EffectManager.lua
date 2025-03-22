@@ -45,7 +45,8 @@ VanityEffect = {
 		-- FormatColor = "",
 		-- ---@type string?
 		-- MaterialType = "",
-	}
+	},
+	cachedDisplayNames = {}
 }
 
 ---@param instance table

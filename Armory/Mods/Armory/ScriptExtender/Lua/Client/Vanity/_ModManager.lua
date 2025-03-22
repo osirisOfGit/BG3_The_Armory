@@ -25,20 +25,18 @@ end
 ---@param preset VanityPreset
 ---@return {string : ValidationError[]}
 function ModManager:DependencyValidator(preset)
-	if not ConfigurationStructure.config.vanity.cachedDisplayValues then
-		ConfigurationStructure.config.vanity.cachedDisplayValues = {}
+	if not ConfigurationStructure.config.vanity.miscNameCache then
+		ConfigurationStructure.config.vanity.miscNameCache = {}
 	end
-	local cachedDisplayValues = ConfigurationStructure.config.vanity.cachedDisplayValues
+	local miscNamCache = ConfigurationStructure.config.vanity.miscNameCache
 
 	---@type {string : ValidationError[]}
 	local validationErrors = {}
 
-	local cachedGuids = {}
-
 	---@param outfitItemEntry VanityOutfitItemEntry
 	---@param category "Equipment"|"Dye"
 	---@param criteriaKey VanityCriteriaCompositeKey
-	local function validateSlot(outfitItemEntry, category, criteriaKey)
+	local function validateSlot(outfitItemEntry, category, criteriaKey, cachedGuids)
 		if outfitItemEntry.guid ~= "Hide Appearance" and not cachedGuids[outfitItemEntry.guid] then
 			---@type ItemTemplate
 			local template = Ext.Template.GetTemplate(outfitItemEntry.guid)
@@ -50,12 +48,12 @@ function ModManager:DependencyValidator(preset)
 				table.insert(validationErrors[criteriaKey],
 					{
 						resourceId = outfitItemEntry.guid,
-						displayValue = cachedDisplayValues[outfitItemEntry.guid],
+						displayValue = outfitItemEntry.name,
 						category = category,
 						modInfo = outfitItemEntry.modDependency
 					} --[[@as ValidationError]])
 			else
-				cachedDisplayValues[outfitItemEntry.guid] = template.DisplayName:Get() or template.Name
+				outfitItemEntry.name = template.DisplayName:Get() or template.Name
 			end
 		end
 		cachedGuids[outfitItemEntry.guid] = true
@@ -75,11 +73,14 @@ function ModManager:DependencyValidator(preset)
 						table.insert(validationErrors[criteriaKey],
 							{
 								resourceId = effectInstance.effectProps.StatusEffect,
-								displayValue = cachedDisplayValues[effectInstance.effectProps.StatusEffect],
+								displayValue = effectInstance.cachedDisplayNames and effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect],
 								category = "Effect"
 							} --[[@as ValidationError]])
 					else
-						cachedDisplayValues[effectInstance.effectProps.StatusEffect] = mei.Name
+						if not effectInstance.cachedDisplayNames then
+							effectInstance.cachedDisplayNames = {}
+						end 
+						effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect] = mei.Name
 					end
 				end
 				cachedGuids[effectInstance.effectProps.StatusEffect] = true
@@ -88,13 +89,15 @@ function ModManager:DependencyValidator(preset)
 	end
 
 	for criteriaKey, outfit in pairs(preset.Outfits) do
+		local cachedGuids = {}
+
 		local criteriaTable = ParseCriteriaCompositeKey(criteriaKey)
 		local displayCriteriaTable = ConvertCriteriaTableToDisplay(criteriaTable)
 		local displayCriteriaKey = CreateCriteriaCompositeKey(ConvertCriteriaTableToDisplay(criteriaTable, nil, true))
 
 		for criteria, value in pairs(displayCriteriaTable) do
 			if not cachedGuids[criteriaTable[criteria]] then
-				if string.match(value, "Not Found - Missing Mod") then
+				if string.match(value, "Not Found") then
 					if not validationErrors[displayCriteriaKey] then
 						validationErrors[displayCriteriaKey] = {}
 					end
@@ -102,11 +105,11 @@ function ModManager:DependencyValidator(preset)
 					table.insert(validationErrors[displayCriteriaKey],
 						{
 							resourceId = criteriaTable[criteria],
-							displayValue = cachedDisplayValues[criteriaTable[criteria]],
-							category = "Character Criteria"
+							displayValue = miscNamCache[criteriaTable[criteria]],
+							category = "Character Criteria: " .. criteria
 						} --[[@as ValidationError]])
 				else
-					cachedDisplayValues[criteriaTable[criteria]] = value
+					miscNamCache[criteriaTable[criteria]] = value
 				end
 			end
 
@@ -115,22 +118,22 @@ function ModManager:DependencyValidator(preset)
 
 		for _, vanityOutfitSlot in pairs(outfit) do
 			if vanityOutfitSlot.dye and vanityOutfitSlot.dye.guid then
-				validateSlot(vanityOutfitSlot.dye, "Dye", displayCriteriaKey)
+				validateSlot(vanityOutfitSlot.dye, "Dye", displayCriteriaKey, cachedGuids)
 			end
 
 			if vanityOutfitSlot.equipment then
 				if vanityOutfitSlot.equipment.guid then
-					validateSlot(vanityOutfitSlot.equipment, "Equipment", displayCriteriaKey)
+					validateSlot(vanityOutfitSlot.equipment, "Equipment", displayCriteriaKey, cachedGuids)
 				end
 
 				if vanityOutfitSlot.weaponTypes then
 					for _, weaponOutfitSlot in pairs(vanityOutfitSlot.weaponTypes) do
 						if weaponOutfitSlot.dye and weaponOutfitSlot.dye.guid then
-							validateSlot(weaponOutfitSlot.dye, "Dye", displayCriteriaKey)
+							validateSlot(weaponOutfitSlot.dye, "Dye", displayCriteriaKey, cachedGuids)
 						end
 
 						if weaponOutfitSlot.equipment.guid then
-							validateSlot(weaponOutfitSlot.equipment, "Equipment", displayCriteriaKey)
+							validateSlot(weaponOutfitSlot.equipment, "Equipment", displayCriteriaKey, cachedGuids)
 						end
 					end
 				end
