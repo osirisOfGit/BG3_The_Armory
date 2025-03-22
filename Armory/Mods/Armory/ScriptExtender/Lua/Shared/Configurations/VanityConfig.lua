@@ -87,6 +87,9 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	CustomDependencies = {}
 }
 
+---@type {[Guid]: string}
+ConfigurationStructure.config.vanity.cachedDisplayValues = {}
+
 ---@type {[Guid]: VanityPreset}
 ConfigurationStructure.config.vanity.presets = {}
 

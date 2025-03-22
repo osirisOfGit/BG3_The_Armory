@@ -15,8 +15,116 @@ function ModManager:GetModInfo(modDependency)
 	end
 end
 
-function ModManager:BuildCustomDependencyForm(preset, parent)
-	
+---@class ValidationError
+---@field resourceId string
+---@field displayValue string
+---@field category "Character Criteria"|"Equipment"|"Dye"|"Effect"
+---@field modInfo ModDependency?
+
+---@param preset VanityPreset
+---@return {string : ValidationError[]}
+function ModManager:DependencyValidator(preset)
+	if not ConfigurationStructure.config.vanity.cachedDisplayValues then
+		ConfigurationStructure.config.vanity.cachedDisplayValues = {}
+	end
+	local cachedDisplayValues = ConfigurationStructure.config.vanity.cachedDisplayValues
+
+	---@type {string : ValidationError[]}
+	local validationErrors = {}
+
+	---@param outfitItemEntry VanityOutfitItemEntry
+	---@param category "Equipment"|"Dye"
+	---@param criteriaKey VanityCriteriaCompositeKey
+	local function validateSlot(outfitItemEntry, category, criteriaKey)
+		---@type ItemTemplate
+		local template = Ext.Template.GetTemplate(outfitItemEntry.guid)
+		if not template then
+			if not validationErrors[criteriaKey] then
+				validationErrors[criteriaKey] = {}
+			end
+
+			table.insert(validationErrors[criteriaKey],
+				{
+					resourceId = outfitItemEntry.guid,
+					displayValue = cachedDisplayValues[outfitItemEntry.guid],
+					category = category,
+					modInfo = outfitItemEntry.modDependency
+				} --[[@as ValidationError]])
+		else
+			cachedDisplayValues[outfitItemEntry.guid] = template.DisplayName:Get() or template.Name
+		end
+
+		if outfitItemEntry.effects then
+			for _, effect in pairs(outfitItemEntry.effects) do
+				local effectInstance = ConfigurationStructure.config.vanity.effects[effect]
+
+				---@type ResourceMultiEffectInfo
+				local mei = Ext.StaticData.Get(effectInstance.effectProps.StatusEffect, "MultiEffectInfo")
+				if not mei then
+					if not validationErrors[criteriaKey] then
+						validationErrors[criteriaKey] = {}
+					end
+
+					table.insert(validationErrors[criteriaKey],
+						{
+							resourceId = effectInstance.effectProps.StatusEffect,
+							displayValue = cachedDisplayValues[effectInstance.effectProps.StatusEffect],
+							category = "Effect"
+						} --[[@as ValidationError]])
+				else
+					cachedDisplayValues[effectInstance.effectProps.StatusEffect] = mei.Name
+				end
+			end
+		end
+	end
+
+	for criteriaKey, outfit in pairs(preset.Outfits) do
+		local criteriaTable = ParseCriteriaCompositeKey(criteriaKey)
+		local displayCriteriaTable = ConvertCriteriaTableToDisplay(criteriaTable)
+
+		for criteria, value in pairs(displayCriteriaTable) do
+			if string.match(value, "Not Found - Missing Mod") then
+				if not validationErrors[criteriaKey] then
+					validationErrors[criteriaKey] = {}
+				end
+
+				table.insert(validationErrors[criteriaKey],
+					{
+						resourceId = criteriaTable[criteria],
+						displayValue = cachedDisplayValues[criteriaTable[criteria]],
+						category = "Character Criteria"
+					} --[[@as ValidationError]])
+			else
+				cachedDisplayValues[criteriaTable[criteria]] = value
+			end
+		end
+
+		for _, vanityOutfitSlot in pairs(outfit) do
+			if vanityOutfitSlot.dye and vanityOutfitSlot.dye.guid then
+				validateSlot(vanityOutfitSlot.dye, "Dye", criteriaKey)
+			end
+
+			if vanityOutfitSlot.equipment then
+				if vanityOutfitSlot.equipment.guid then
+					validateSlot(vanityOutfitSlot.equipment, "Equipment", criteriaKey)
+				end
+
+				if vanityOutfitSlot.weaponTypes then
+					for _, weaponOutfitSlot in pairs(vanityOutfitSlot.weaponTypes) do
+						if weaponOutfitSlot.dye and weaponOutfitSlot.dye.guid then
+							validateSlot(weaponOutfitSlot.dye, "Dye", criteriaKey)
+						end
+
+						if weaponOutfitSlot.equipment.guid then
+							validateSlot(weaponOutfitSlot.equipment, "Equipment", criteriaKey)
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return validationErrors
 end
 
 ---@type ExtuiWindow
@@ -61,14 +169,13 @@ function ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, pa
 
 		local dependencyTable = parent:AddTable("DependencyTable" .. parent.IDContext, 6)
 		dependencyTable.Resizable = true
+		dependencyTable.RowBg = true
 
 		if dependencyWindow and dependencyWindow.Open then
 			dependencyTable.SizingFixedFit = true
 		else
 			dependencyTable.SizingStretchProp = true
 		end
-
-		dependencyTable.RowBg = true
 
 		local headerRow = dependencyTable:AddRow()
 		headerRow.Headers = true

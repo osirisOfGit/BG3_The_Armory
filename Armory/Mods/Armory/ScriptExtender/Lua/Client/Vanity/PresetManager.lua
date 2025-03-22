@@ -101,7 +101,7 @@ function VanityPresetManager:OpenManager()
 		local row = presetTable:AddRow()
 
 		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
-		selectionCell.NoSavedSettings = true
+		selectionCell:SetSizeConstraints({200, 0})
 
 		userPresetSection = selectionCell:AddGroup("User_Presets")
 		local userHeader = userPresetSection:AddSeparatorText("Your Presets")
@@ -298,7 +298,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
 			customDepFormGroup.Visible = false
 
-			---@param existingCustomDependency ModDependency
+			---@param existingCustomDependency ModDependency?
 			local function buildCustomDepForm(existingCustomDependency)
 				FormBuilder:CreateForm(customDepFormGroup,
 					function(results)
