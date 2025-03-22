@@ -298,45 +298,60 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
 			customDepFormGroup.Visible = false
 
-			FormBuilder:CreateForm(customDepFormGroup,
-				function(results)
-					customDepFormGroup.Visible = false
+			---@param existingCustomDependency ModDependency
+			local function buildCustomDepForm(existingCustomDependency)
+				FormBuilder:CreateForm(customDepFormGroup,
+					function(results)
+						customDepFormGroup.Visible = false
 
-					local versionString = results["Version"]
-					results["Version"] = {}
-					for versionPart in string.gmatch(versionString, "[^%.]+") do
-						table.insert(results["Version"], versionPart)
-					end
+						local versionString = results["Version"]
+						results["Version"] = {}
+						for versionPart in string.gmatch(versionString, "[^%.]+") do
+							table.insert(results["Version"], versionPart)
+						end
 
-					if not preset.CustomDependencies then
-						preset.CustomDependencies = {}
-					end
+						if not preset.CustomDependencies then
+							preset.CustomDependencies = {}
+						end
 
-					table.insert(preset.CustomDependencies, results)
-					VanityPresetManager:UpdatePresetView(presetID)
-				end,
-				{
+						if existingCustomDependency then
+							existingCustomDependency["Version"].delete = true
+							for key, value in pairs(results) do
+								existingCustomDependency[key] = value
+							end
+						else
+							table.insert(preset.CustomDependencies, results)
+						end
+						VanityPresetManager:UpdatePresetView(presetID)
+					end,
 					{
-						["label"] = "Name",
-						["type"] = "Text",
-						["errorMessageIfEmpty"] = "Required Field"
-					},
-					{
-						["label"] = "Minimum Version",
-						["propertyField"] = "Version",
-						["type"] = "NumericText",
-						["errorMessageIfEmpty"] = "Required Field"
-					},
-					{
-						["label"] = "UUID",
-						["propertyField"] = "Guid",
-						["type"] = "Text"
-					},
-					{
-						["label"] = "Notes",
-						["type"] = "Multiline"
-					}
-				})
+						{
+							["label"] = "Name",
+							["type"] = "Text",
+							["errorMessageIfEmpty"] = "Required Field",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Name
+						},
+						{
+							["label"] = "Minimum Version",
+							["propertyField"] = "Version",
+							["type"] = "NumericText",
+							["errorMessageIfEmpty"] = "Required Field",
+							["defaultValue"] = existingCustomDependency and table.concat(existingCustomDependency.Version, ".")
+						},
+						{
+							["label"] = "UUID",
+							["propertyField"] = "Guid",
+							["type"] = "Text",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Guid
+						},
+						{
+							["label"] = "Notes",
+							["type"] = "Multiline",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Notes
+						}
+					})
+			end
+			buildCustomDepForm()
 
 			customDependencyButton.OnClick = function()
 				customDepFormGroup.Visible = not customDepFormGroup.Visible
@@ -353,7 +368,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				headerRow:AddCell():AddText("UUID")
 				headerRow:AddCell():AddText("Notes")
 
-				for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function (key)
+				for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function(key)
 					return preset.CustomDependencies[key].Name
 				end) do
 					local row = customDependencyTable:AddRow()
@@ -363,7 +378,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					row:AddCell():AddText(customDependency.Notes)
 
 					local actionCell = row:AddCell()
-					actionCell:AddButton("Edit")
+					actionCell:AddButton("Edit").OnClick = function()
+						buildCustomDepForm(customDependency)
+						customDepFormGroup.Visible = true
+					end
 
 					local deleteButton = actionCell:AddButton("X")
 					deleteButton.SameLine = true
