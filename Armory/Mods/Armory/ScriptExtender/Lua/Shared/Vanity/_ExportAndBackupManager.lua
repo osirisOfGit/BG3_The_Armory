@@ -163,8 +163,8 @@ if Ext.IsClient() then
 	---@param presetId Guid
 	---@return VanityPresetExport
 	function VanityExportAndBackupManager:GetPresetFromBackup(presetId)
-		---@type VanityPresetExport
-		local presetBackup = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
+		-- Since we modify the effect names on each piece of equipment if they already exist in the current config and are different resources
+		local cloneOfBackup = TableUtils:DeeplyCopyTable(cachedBackup or Ext.Vars.GetModVariables(ModuleUUID).SavedPresets)
 
 		---@type VanityPresetExport
 		local export = {
@@ -173,28 +173,58 @@ if Ext.IsClient() then
 			miscNameCache = {}
 		}
 
-		local preset = presetBackup.presets[presetId]
+		local preset = cloneOfBackup.presets[presetId]
 
 		for criteraKey, outfit in pairs(preset.Outfits) do
 			local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
 			for _, resourceId in pairs(criteriaTable) do
-				if presetBackup.miscNameCache[resourceId] then
-					export.miscNameCache[resourceId] = presetBackup.miscNameCache[resourceId]
+				if cloneOfBackup.miscNameCache[resourceId] then
+					export.miscNameCache[resourceId] = cloneOfBackup.miscNameCache[resourceId]
 				end
 			end
 
 			for _, outfitSlot in pairs(outfit) do
 				if outfitSlot.equipment and outfitSlot.equipment.effects then
-					for _, effect in pairs(outfitSlot.equipment.effects) do
-						export.effects[effect] = TableUtils:DeeplyCopyTable(presetBackup.effects[effect])
+					for index, effect in pairs(outfitSlot.equipment.effects) do
+						if not export.effects[effect] then
+							if not export.effects[effect .. "_BACKUP"] then
+								if ConfigurationStructure.config.vanity.effects[effect] then
+									if not TableUtils:TablesAreEqual(ConfigurationStructure.config.vanity.effects[effect], cloneOfBackup.effects[effect]) then
+										outfitSlot.equipment.effects[index] = effect .. "_BACKUP"
+
+										export.effects[effect .. "_BACKUP"] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
+										export.effects[effect .. "_BACKUP"].Name = effect .. "_BACKUP"
+									end
+								else
+									export.effects[effect] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
+								end
+							else
+								outfitSlot.equipment.effects[index] = effect .. "_BACKUP"
+							end
+						end
 					end
 				end
 
 				if outfitSlot.weaponTypes then
 					for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
 						if weaponSlot.equipment and weaponSlot.equipment.effects then
-							for _, effect in pairs(weaponSlot.equipment.effects) do
-								export.effects[effect] = TableUtils:DeeplyCopyTable(presetBackup.effects[effect])
+							for index, effect in pairs(weaponSlot.equipment.effects) do
+								if not export.effects[effect] then
+									if not export.effects[effect .. "_BACKUP"] then
+										if ConfigurationStructure.config.vanity.effects[effect] then
+											if not TableUtils:TablesAreEqual(ConfigurationStructure.config.vanity.effects[effect], cloneOfBackup.effects[effect]) then
+												weaponSlot.equipment.effects[index] = effect .. "_BACKUP"
+
+												export.effects[effect .. "_BACKUP"] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
+												export.effects[effect .. "_BACKUP"].Name = effect .. "_BACKUP"
+											end
+										else
+											export.effects[effect] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
+										end
+									else
+										weaponSlot.equipment.effects[index] = effect .. "_BACKUP"
+									end
+								end
 							end
 						end
 					end
@@ -204,7 +234,39 @@ if Ext.IsClient() then
 			export.presets[presetId] = preset
 		end
 
-		return presetBackup
+		return export
+	end
+
+	---@param presetId Guid?
+	---@param presetBackup VanityPresetExport?
+	function VanityExportAndBackupManager:RestorePresetBackup(presetId, presetBackup)
+		if presetId then
+			if not presetBackup then
+				presetBackup = self:GetPresetFromBackup(presetId)
+			end
+
+			for resourceId, cachedName in pairs(presetBackup.miscNameCache) do
+				if not ConfigurationStructure.config.vanity.miscNameCache[resourceId] then
+					ConfigurationStructure.config.vanity.miscNameCache[resourceId] = cachedName
+				end
+			end
+
+			for effectName, effect in pairs(presetBackup.effects) do
+				if not ConfigurationStructure.config.vanity.effects[effectName] then
+					ConfigurationStructure.config.vanity.effects[effectName] = effect
+				end
+			end
+
+			ConfigurationStructure.config.vanity.presets[presetId] = presetBackup.presets[presetId]
+			Logger:BasicInfo("Restored preset '%s' from backup", presetBackup.presets[presetId].Name)
+		else
+			cachedBackup = cachedBackup or Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
+			for savedPresetId in pairs(cachedBackup.presets) do
+				if not ConfigurationStructure.config.vanity.presets[savedPresetId] then
+					self:RestorePresetBackup(savedPresetId)
+				end
+			end
+		end
 	end
 
 	---@param presetIds Guid[]

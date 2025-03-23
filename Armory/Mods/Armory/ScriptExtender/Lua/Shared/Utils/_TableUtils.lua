@@ -71,7 +71,7 @@ end
 ---@param first table
 ---@param second table
 ---@return boolean true if the tables are deeply equal
-function TableUtils:DeepCompareTables(first, second)
+function TableUtils:TablesAreEqual(first, second)
 	if first == second then
 		return true
 	end
@@ -83,7 +83,7 @@ function TableUtils:DeepCompareTables(first, second)
 	local seenKeys = {}
 
 	for key, value in pairs(first) do
-		if not self:DeepCompareTables(value, second[key]) then
+		if not self:TablesAreEqual(value, second[key]) then
 			return false
 		end
 		seenKeys[key] = true

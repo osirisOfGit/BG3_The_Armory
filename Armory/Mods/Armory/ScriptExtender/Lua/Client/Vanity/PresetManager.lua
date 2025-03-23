@@ -122,6 +122,8 @@ function VanityPresetManager:OpenManager()
 		presetInfoSection.NoSavedSettings = true
 		presetInfoSection.HorizontalScrollbar = true
 
+		VanityExportAndBackupManager:RestorePresetBackup()
+
 		VanityPresetManager:UpdatePresetView()
 	end
 end
@@ -411,7 +413,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 							local warningImage = nameCell:AddImage("tutorial_warning_yellow", { 32, 32 })
 							warningImage.SameLine = true
 							warningImage:Tooltip():AddText(
-							"\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
+								"\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
 						end
 					end
 

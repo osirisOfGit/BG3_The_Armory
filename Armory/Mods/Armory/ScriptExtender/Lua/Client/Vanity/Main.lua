@@ -175,58 +175,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					-- restoreButton:SetColor("Text", {0, 0, 0, 1})
 
 					restoreButton.OnClick = function()
-						for resourceId, cachedName in pairs(presetBackup.miscNameCache) do
-							if not ConfigurationStructure.config.vanity.miscNameCache[resourceId] then
-								ConfigurationStructure.config.vanity.miscNameCache[resourceId] = cachedName
-							end
-						end
-
-						local effectsToRename = {}
-						for effectName, effect in pairs(presetBackup.effects) do
-							if ConfigurationStructure.config.vanity.effects[effectName]
-								and TableUtils:DeepCompareTables(ConfigurationStructure.config.vanity.effects[effectName], presetBackup.effects[effectName])
-							then
-								presetBackup.effects[effectName].Name = effectName .. "_BACKUP"
-								ConfigurationStructure.config.vanity.effects[effectName .. "_BACKUP"] = presetBackup.effects[effectName]
-								table.insert(effectsToRename, effectName)
-							else
-								ConfigurationStructure.config.vanity.effects[effectName] = effect
-							end
-						end
-
-						if #effectsToRename > 0 then
-							for _, outfit in pairs(presetBackup.presets[presetId].Outfits) do
-								for _, outfitSlot in pairs(outfit) do
-									if outfitSlot.equipment and outfitSlot.equipment.effects then
-										for index, effect in pairs(outfitSlot.equipment.effects) do
-											for _, conflictedEffect in pairs(effectsToRename) do
-												if effect == conflictedEffect then
-													outfitSlot.equipment.effects[index] = effect .. "_BACKUP"
-													break
-												end
-											end
-										end
-									end
-
-									if outfitSlot.weaponTypes then
-										for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
-											if weaponSlot.equipment and weaponSlot.equipment.effects then
-												for index, effect in pairs(weaponSlot.equipment.effects) do
-													for _, conflictedEffect in pairs(effectsToRename) do
-														if effect == conflictedEffect then
-															weaponSlot.equipment.effects[index] = effect .. "_BACKUP"
-															break
-														end
-													end
-												end
-											end
-										end
-									end
-								end
-							end
-						end
-
-						ConfigurationStructure.config.vanity.presets[presetId] = presetBackup.presets[presetId]
+						VanityExportAndBackupManager:RestorePresetBackup(presetId, presetBackup)
 						restoreBackupWindow:Destroy()
 
 						Vanity:UpdatePresetOnServer()
