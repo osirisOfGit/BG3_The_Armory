@@ -229,13 +229,9 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
-		if guid == activePreset and VanityExportAndBackupManager:ShouldBackupPreset(guid) and not VanityExportAndBackupManager:IsPresetInBackup(guid) then
-			VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
-		end
+		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, VanityExportAndBackupManager:IsPresetInBackup(guid) and "ico_btn_load_d" or "ico_cancel_h", { 32, 32 })
 
-		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, VanityExportAndBackupManager:IsPresetInBackup(guid) and "ico_btn_load_d" or "ico_cancel_h", {32, 32})
-
-		syncButton.OnClick = function ()
+		syncButton.OnClick = function()
 			VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
 			VanityPresetManager:UpdatePresetView(guid)
 		end
@@ -412,9 +408,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					if customDependency.Guid and customDependency.Guid ~= "" then
 						local modInfo = Ext.Mod.GetMod(customDependency.Guid)
 						if not modInfo then
-							local warningImage = nameCell:AddImage("tutorial_warning_yellow", {32, 32})
+							local warningImage = nameCell:AddImage("tutorial_warning_yellow", { 32, 32 })
 							warningImage.SameLine = true
-							warningImage:Tooltip():AddText("\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
+							warningImage:Tooltip():AddText(
+							"\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
 						end
 					end
 

@@ -26,7 +26,10 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "PresetBackupRegistry", {
 
 VanityExportAndBackupManager = {}
 
-Ext.RegisterConsoleCommand("Armory_Vanity_SeePresetBackupRegistry", function (cmd, ...)
+---@type VanityPresetExport?
+local cachedBackup
+
+Ext.RegisterConsoleCommand("Armory_Vanity_SeePresetBackupRegistry", function(cmd, ...)
 	---@type VanityPresetBackupRegistry
 	local presetBackupRegistry = Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry
 
@@ -37,7 +40,7 @@ Ext.RegisterConsoleCommand("Armory_Vanity_SeePresetBackupRegistry", function (cm
 	end
 end)
 
-Ext.RegisterConsoleCommand("Armory_Vanity_SeeBackedUpPresets", function (cmd, ...)
+Ext.RegisterConsoleCommand("Armory_Vanity_SeeBackedUpPresets", function(cmd, ...)
 	---@type VanityPresetExport?
 	local savedPresets = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
 
@@ -48,13 +51,15 @@ Ext.RegisterConsoleCommand("Armory_Vanity_SeeBackedUpPresets", function (cmd, ..
 	end
 end)
 
+
 ---@param presetId Guid
 ---@return boolean
 function VanityExportAndBackupManager:IsPresetInBackup(presetId)
-	---@type VanityPresetExport?
-	local savedPresets = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
+	if not cachedBackup then
+		cachedBackup = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
+	end
 
-	return savedPresets and savedPresets.presets[presetId] ~= nil or false
+	return (cachedBackup and cachedBackup.presets[presetId] ~= nil) or false
 end
 
 if Ext.IsClient() then
@@ -109,33 +114,30 @@ if Ext.IsClient() then
 
 	--#region Backups
 
+	---@type VanityPresetBackupRegistry
+	local backupRegistry
+
 	---@param presetId Guid
 	---@return boolean
 	function VanityExportAndBackupManager:ShouldBackupPreset(presetId)
-		---@type VanityPresetBackupRegistry
-		local presetBackupRegistry = Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry
+		if not backupRegistry then
+			backupRegistry = Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry or {}
+		end
 
-		return presetBackupRegistry and presetBackupRegistry[presetId]
+		return backupRegistry[presetId]
 	end
 
 	---@param presetId Guid
 	function VanityExportAndBackupManager:FlipPresetBackupRegistration(presetId)
-		---@type VanityPresetBackupRegistry
-		local presetBackupRegistry = Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry
-
-		if not presetBackupRegistry then
-			presetBackupRegistry = {}
-		end
-
-		if not presetBackupRegistry[presetId] then
-			presetBackupRegistry[presetId] = true
+		if not VanityExportAndBackupManager:ShouldBackupPreset(presetId) then
+			backupRegistry[presetId] = true
 			VanityExportAndBackupManager:BackupPresets({ presetId })
 		else
-			presetBackupRegistry[presetId] = false
+			backupRegistry[presetId] = false
 			VanityExportAndBackupManager:RemovePresetsFromBackup({ presetId })
 		end
 
-		Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry = presetBackupRegistry
+		Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry = backupRegistry
 	end
 
 	---@param presetIds Guid[]
@@ -152,25 +154,31 @@ if Ext.IsClient() then
 			return
 		end
 
-		Ext.Vars.GetModVariables(ModuleUUID).SavedPresets = VanityExportAndBackupManager:ExportPresets(presetIds, Ext.Vars.GetModVariables(ModuleUUID).SavedPresets)
+		cachedBackup = VanityExportAndBackupManager:ExportPresets(presetIds, cachedBackup)
+
+		Ext.Vars.GetModVariables(ModuleUUID).SavedPresets = cachedBackup
 		Logger:BasicInfo("Selected presets backed up successfully")
 	end
 
 	---@param presetIds Guid[]
 	function VanityExportAndBackupManager:RemovePresetsFromBackup(presetIds)
-		---@type VanityPresetExport
-		local savedPresets = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
-
 		local presetsToKeep = {}
-		if savedPresets then
-			for _, presetId in pairs(presetIds) do
-				if not savedPresets.presets[presetId] then
-					table.insert(presetsToKeep, presetId)
+		if cachedBackup then
+			for savedPresetId in pairs(cachedBackup.presets) do
+				local keepPreset = true
+				for _, presetId in pairs(presetIds) do
+					if presetId == savedPresetId then
+						keepPreset = false
+					end
+				end
+				if keepPreset then
+					table.insert(presetsToKeep, savedPresetId)
 				end
 			end
 		end
 
-		Ext.Vars.GetModVariables(ModuleUUID).SavedPresets = VanityExportAndBackupManager:ExportPresets(presetsToKeep)
+		cachedBackup = VanityExportAndBackupManager:ExportPresets(presetsToKeep)
+		Ext.Vars.GetModVariables(ModuleUUID).SavedPresets = cachedBackup
 	end
 
 	--#endregion
