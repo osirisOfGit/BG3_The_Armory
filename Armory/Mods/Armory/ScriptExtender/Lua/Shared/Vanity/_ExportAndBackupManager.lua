@@ -160,6 +160,53 @@ if Ext.IsClient() then
 		Logger:BasicInfo("Selected presets backed up successfully")
 	end
 
+	---@param presetId Guid
+	---@return VanityPresetExport
+	function VanityExportAndBackupManager:GetPresetFromBackup(presetId)
+		---@type VanityPresetExport
+		local presetBackup = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
+
+		---@type VanityPresetExport
+		local export = {
+			presets = {},
+			effects = {},
+			miscNameCache = {}
+		}
+
+		local preset = presetBackup.presets[presetId]
+
+		for criteraKey, outfit in pairs(preset.Outfits) do
+			local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
+			for _, resourceId in pairs(criteriaTable) do
+				if presetBackup.miscNameCache[resourceId] then
+					export.miscNameCache[resourceId] = presetBackup.miscNameCache[resourceId]
+				end
+			end
+
+			for _, outfitSlot in pairs(outfit) do
+				if outfitSlot.equipment and outfitSlot.equipment.effects then
+					for _, effect in pairs(outfitSlot.equipment.effects) do
+						export.effects[effect] = TableUtils:DeeplyCopyTable(presetBackup.effects[effect])
+					end
+				end
+
+				if outfitSlot.weaponTypes then
+					for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
+						if weaponSlot.equipment and weaponSlot.equipment.effects then
+							for _, effect in pairs(weaponSlot.equipment.effects) do
+								export.effects[effect] = TableUtils:DeeplyCopyTable(presetBackup.effects[effect])
+							end
+						end
+					end
+				end
+			end
+
+			export.presets[presetId] = preset
+		end
+
+		return presetBackup
+	end
+
 	---@param presetIds Guid[]
 	function VanityExportAndBackupManager:RemovePresetsFromBackup(presetIds)
 		local presetsToKeep = {}

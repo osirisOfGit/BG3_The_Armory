@@ -342,8 +342,6 @@ if Ext.IsClient() then
 			local deleteEffect = effectMenu:AddSelectable("Delete", "DontClosePopups")
 			deleteEffect.IDContext = effectMenu.Label .. "Delete"
 			deleteEffect.OnClick = function()
-				ConfigurationStructure.config.vanity.cachedDisplayValues[effectCollection[effectName].effectProps.StatusEffect] = nil
-				
 				vanityEffect:deleteStat()
 				effectCollection[effectName] = nil
 				effectMenu:Destroy()

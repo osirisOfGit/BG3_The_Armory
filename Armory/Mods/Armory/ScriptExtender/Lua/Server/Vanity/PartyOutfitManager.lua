@@ -89,7 +89,7 @@ local function FindAndApplyOutfit(player, activeOutfits)
 	end
 	Logger:BasicDebug("Player %s Criteria Table is: \n%s", player, Ext.Json.Stringify(ConvertCriteriaTableToDisplay(criteriaTable, true)))
 
-	---@type {[ActualSlot]: VanityOutfitSlot}
+	---@type {[ActualSlot]: VanityOutfitSlot}?
 	local playerOutfit
 
 	local compositeKey = CreateCriteriaCompositeKey(criteriaTable)
@@ -115,7 +115,7 @@ local function ApplyTransmogsPerPreset()
 	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 	local activeOutfits
-	if activePresetId then
+	if activePresetId and ConfigurationStructure.config.vanity.presets[activePresetId] then
 		ActiveVanityPreset = ConfigurationStructure.config.vanity.presets[activePresetId]
 
 		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", ActiveVanityPreset.Name, ActiveVanityPreset.Author, ActiveVanityPreset.Version)
@@ -123,6 +123,7 @@ local function ApplyTransmogsPerPreset()
 	else
 		ActiveVanityPreset = nil
 	end
+
 	for _, player in pairs(Osi.DB_Players:Get(nil)) do
 		if activeOutfits and next(activeOutfits) then
 			FindAndApplyOutfit(player[1], activeOutfits)
