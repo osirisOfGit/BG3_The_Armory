@@ -2,7 +2,7 @@ ModManager = {}
 
 ---@param modDependency ModDependency
 ---@return string, string
-function ModManager:GetModInfo(modDependency)
+function ModManager:GetModInfo(modDependency, excludeNotLoadedMessage)
 	if modDependency.OriginalMod then
 		modDependency = modDependency.OriginalMod
 	end
@@ -20,7 +20,7 @@ function ModManager:GetModInfo(modDependency)
 
 		return mod.Info.Name, ("v" .. table.concat(mod.Info.ModVersion, "."))
 	else
-		return string.format("%s (Not Loaded)", modDependency.Name or modDependency.Guid), ("v" .. table.concat(modDependency.Version, "."))
+		return string.format("%s%s", modDependency.Name or modDependency.Guid, not excludeNotLoadedMessage and "(Not Loaded)" or ""), ("v" .. table.concat(modDependency.Version, "."))
 	end
 end
 
@@ -112,11 +112,26 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 						validationErrors[displayCriteriaKey] = {}
 					end
 
+					local modInfo
+					for _, customDependency in pairs(preset.CustomDependencies) do
+						if customDependency.Resources then
+							for resource in string.gmatch(customDependency.Resources, "[^\n]+") do
+								if string.gsub(resource, "%s+", "") == criteriaTable[criteria] then
+									modInfo = TableUtils:DeeplyCopyTable(customDependency)
+									modInfo.Name = modInfo.Name .. " (Custom Dependency)"
+									goto exit_loop
+								end
+							end
+						end
+					end
+					::exit_loop::
+
 					table.insert(validationErrors[displayCriteriaKey],
 						{
 							resourceId = criteriaTable[criteria],
 							displayValue = miscNamCache[criteriaTable[criteria]],
-							category = "Character Criteria: " .. criteria
+							category = "Character Criteria: " .. criteria,
+							modInfo = modInfo
 						} --[[@as ValidationError]])
 				else
 					miscNamCache[criteriaTable[criteria]] = value
@@ -157,7 +172,8 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 
 		local validationFailureHeader = parent:AddSeparatorText("Dependency Validation Failed!")
 
-		parent:AddText("Please either clear/delete the relevant outfit/slots/effects or load the missing mods!")
+		parent:AddText(
+		"Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)")
 
 		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
 
@@ -185,11 +201,12 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 				row:AddCell():AddText(validationError.displayValue or "Unknown")
 				row:AddCell():AddText(validationError.category)
 				if validationError.modInfo then
-					row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(validationError.modInfo)))
+					row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(validationError.modInfo, true)))
 				else
 					row:AddCell():AddText("Unknown - check custom dependencies")
 				end
 			end
+			parent:AddNewLine()
 		end
 	end
 end
@@ -234,7 +251,7 @@ function ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, pa
 			parent = header
 		end
 
-		local dependencyTable = parent:AddTable("DependencyTable" .. parent.IDContext, 6)
+		local dependencyTable = parent:AddTable("DependencyTable", 6)
 		dependencyTable.Resizable = true
 		dependencyTable.RowBg = true
 
@@ -266,7 +283,7 @@ function ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, pa
 					if template then
 						row:AddCell():AddText((template.DisplayName:Get() or template.Name) or template.Id)
 					else
-						row:AddCell():AddText(itemEntry.guid .. " (Not Found)")
+						row:AddCell():AddText((itemEntry.name or itemEntry.guid) .. " (Not Loaded)")
 					end
 
 					row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(itemEntry.modDependency)))

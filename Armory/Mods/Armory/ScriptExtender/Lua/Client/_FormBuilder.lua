@@ -16,7 +16,7 @@ end
 ---@field propertyField string?
 ---@field type "Text"|"NumericText"|"Multiline"|"Checkbox"
 ---@field enabled boolean?
----@field defaultValue string|boolean?
+---@field defaultValue string|string[]|boolean?
 ---@field dependsOn string?
 ---@field errorMessageIfEmpty string?
 ---@field input ExtuiInputText|ExtuiCheckbox? Internal

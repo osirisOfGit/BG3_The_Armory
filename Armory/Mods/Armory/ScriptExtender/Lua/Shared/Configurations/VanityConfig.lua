@@ -42,6 +42,8 @@ ConfigurationStructure.DynamicClassDefinitions.modDependency = {
 	---@type number[]
 	Version = nil,
 	---@type string?
+	Resources = nil,
+	---@type string?
 	Notes = nil,
 	---@type ModDependency?
 	OriginalMod = nil,
