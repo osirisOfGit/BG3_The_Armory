@@ -54,8 +54,9 @@ end
 
 ---@param criteriaTable table
 ---@param includeUUIDS boolean?
+---@param usingCacheForMissing boolean?
 ---@return {[VanityCharacterCriteriaType]: string}
-function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS)
+function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS, usingCacheForMissing)
 	local displayTable = {}
 	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
 		local criteriaId = criteriaTable[criteriaType]
@@ -76,8 +77,15 @@ function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS)
 				if includeUUIDS then
 					criteriaValue = string.format("%s (%s)", criteriaValue, criteriaId)
 				end
+				ConfigurationStructure.config.vanity.miscNameCache[criteriaId] = criteriaValue
 			else
-				criteriaValue = string.format("Not Found - Missing Mod? UUID: %s", criteriaId)
+				if not usingCacheForMissing then
+					criteriaValue = string.format("%s Not Found - Missing Mod? UUID: %s",
+						ConfigurationStructure.config.vanity.miscNameCache[criteriaId] or "Unknown Name",
+						criteriaId)
+				else
+					criteriaValue = ConfigurationStructure.config.vanity.miscNameCache[criteriaId] or ("Unknown Name: " .. criteriaId)
+				end
 			end
 		end
 		displayTable[criteriaType] = criteriaValue

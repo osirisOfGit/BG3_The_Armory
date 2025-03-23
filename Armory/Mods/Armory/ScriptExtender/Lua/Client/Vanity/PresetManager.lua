@@ -102,6 +102,8 @@ function VanityPresetManager:OpenManager()
 
 		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
 		selectionCell.NoSavedSettings = true
+		selectionCell:SetSizeConstraints({ 200, 0 })
+		presetTable.ColumnDefs[1].Width = 200
 
 		userPresetSection = selectionCell:AddGroup("User_Presets")
 		local userHeader = userPresetSection:AddSeparatorText("Your Presets")
@@ -290,6 +292,12 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
+			--#region Validation
+			ModManager:DependencyValidator(preset, function()
+				return presetGroup
+			end)
+			--#endregion
+
 			--#region Custom Dependencies
 			presetGroup:AddNewLine()
 			local customDependencyHeader = presetGroup:AddCollapsingHeader("Custom Dependencies")
@@ -298,7 +306,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
 			customDepFormGroup.Visible = false
 
-			---@param existingCustomDependency ModDependency
+			---@param existingCustomDependency ModDependency?
 			local function buildCustomDepForm(existingCustomDependency)
 				FormBuilder:CreateForm(customDepFormGroup,
 					function(results)
@@ -345,10 +353,16 @@ function VanityPresetManager:UpdatePresetView(presetID)
 							["defaultValue"] = existingCustomDependency and existingCustomDependency.Guid
 						},
 						{
+							["label"] = "UUIDs of Packaged Resources (i.e Classes, MultiEffect Info) - One UUID Per Line",
+							["propertyField"] = "Resources",
+							["type"] = "Multiline",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Resources,
+						},
+						{
 							["label"] = "Notes",
 							["type"] = "Multiline",
 							["defaultValue"] = existingCustomDependency and existingCustomDependency.Notes
-						}
+						},
 					})
 			end
 			buildCustomDepForm()
@@ -358,7 +372,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			if preset.CustomDependencies and preset.CustomDependencies() then
-				local customDependencyTable = customDependencyHeader:AddTable("CustomDependency", 5)
+				local customDependencyTable = customDependencyHeader:AddTable("CustomDependency", 6)
 				customDependencyTable.Resizable = true
 
 				local headerRow = customDependencyTable:AddRow()
@@ -366,16 +380,30 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				headerRow:AddCell():AddText("Name")
 				headerRow:AddCell():AddText("Minimum Version")
 				headerRow:AddCell():AddText("UUID")
+				headerRow:AddCell():AddText("Packaged Resource UUIDs")
 				headerRow:AddCell():AddText("Notes")
 
 				for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function(key)
 					return preset.CustomDependencies[key].Name
 				end) do
 					local row = customDependencyTable:AddRow()
-					row:AddCell():AddText(customDependency.Name)
+
+					local nameCell = row:AddCell()
+					nameCell:AddText(customDependency.Name)
+
 					row:AddCell():AddText(table.concat(customDependency.Version, "."))
 					row:AddCell():AddText(customDependency.Guid or "---")
+					row:AddCell():AddText(customDependency.Resources)
 					row:AddCell():AddText(customDependency.Notes)
+
+					if customDependency.Guid and customDependency.Guid ~= "" then
+						local modInfo = Ext.Mod.GetMod(customDependency.Guid)
+						if not modInfo then
+							local warningImage = nameCell:AddImage("tutorial_warning_yellow", {32, 32})
+							warningImage.SameLine = true
+							warningImage:Tooltip():AddText("\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
+						end
+					end
 
 					local actionCell = row:AddCell()
 					actionCell:AddButton("Edit").OnClick = function()

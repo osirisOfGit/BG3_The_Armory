@@ -206,6 +206,11 @@ function Transmogger:MogCharacter(character)
 		---@type ItemTemplate
 		local vanityPiece = Ext.Template.GetTemplate(vanityTemplate)
 
+		if not vanityPiece then
+			Logger:BasicWarning("Item %s does not exist - mod is likely not loaded. See Validation Errors in the Preset Manager!", vanityTemplate)
+			goto continue
+		end
+
 		local vanityGuid = Osi.CreateAt(vanityPiece.Id, 0, 0, 0, 0, 0, "")
 
 		-- Need to give the game enough time to set up the properties on the entity, otherwise things like ServerItem statuses don't show up
@@ -496,6 +501,11 @@ function Transmogger:ApplyDye(character)
 
 				---@type ItemTemplate
 				local itemDyeTemplate = Ext.Template.GetTemplate(dyeTemplate)
+
+				if not itemDyeTemplate then
+					Logger:BasicWarning("Dye %s does not exist - mod is likely not loaded. See Validation Errors in the Preset Manager!", dyeTemplate)
+					goto continue
+				end
 
 				---@type ResourceMaterialPresetResource
 				local materialPreset = Ext.Resource.Get(itemDyeTemplate.ColorPreset, "MaterialPreset")

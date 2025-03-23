@@ -42,6 +42,8 @@ ConfigurationStructure.DynamicClassDefinitions.modDependency = {
 	---@type number[]
 	Version = nil,
 	---@type string?
+	Resources = nil,
+	---@type string?
 	Notes = nil,
 	---@type ModDependency?
 	OriginalMod = nil,
@@ -49,6 +51,7 @@ ConfigurationStructure.DynamicClassDefinitions.modDependency = {
 
 ---@class VanityOutfitItemEntry
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfitItemEntry = {
+	name = nil,
 	guid = nil,
 	---@type ModDependency
 	modDependency = nil,
@@ -89,6 +92,8 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 
 ---@type {[Guid]: VanityPreset}
 ConfigurationStructure.config.vanity.presets = {}
+
+ConfigurationStructure.config.vanity.miscNameCache = {}
 
 ---@type {[string]: VanityEffect}
 ConfigurationStructure.config.vanity.effects = {

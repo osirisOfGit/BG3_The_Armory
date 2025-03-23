@@ -320,6 +320,7 @@ end
 ---@param outfitSlotEntryForItem VanityOutfitItemEntry
 function VanityCharacterPanel:RecordModDependency(itemTemplate, outfitSlotEntryForItem)
 	outfitSlotEntryForItem.guid = itemTemplate.Id
+	outfitSlotEntryForItem.name = itemTemplate.DisplayName:Get() or itemTemplate.Name
 
 	if itemTemplate.Stats then
 		---@type Object
