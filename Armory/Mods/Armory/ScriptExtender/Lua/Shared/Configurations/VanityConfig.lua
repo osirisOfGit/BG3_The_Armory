@@ -93,6 +93,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 ---@type {[Guid]: VanityPreset}
 ConfigurationStructure.config.vanity.presets = {}
 
+---@type {[Guid]: string}
 ConfigurationStructure.config.vanity.miscNameCache = {}
 
 ---@type {[string]: VanityEffect}

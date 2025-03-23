@@ -117,7 +117,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 			local seeDependencyReport = actionCell:AddImageButton("seeFullThingy" .. criteriaCompositeKey, "Spell_Divination_SeeInvisibility", {32, 32})
 			seeDependencyReport:Tooltip():AddText("\t  See full dependency report for this outfit")
 			seeDependencyReport.OnClick = function ()
-				ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
+				VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
 			end
 
 			if not outfitToCopyTo then

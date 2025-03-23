@@ -229,8 +229,13 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
+		-- userPresetSection:AddImageButton("Synced" .. guid, "ico_btn_load_d", {32, 32}).UserData = "keep"
+		-- userPresetSection:AddImageButton("Synced" .. guid, "ico_cancel_h", {32, 32}).UserData = "keep"
+
 		---@type ExtuiSelectable
 		local presetSelectable = userPresetSection:AddSelectable(preset.Name)
+		presetSelectable.UserData = "select"
+		presetSelectable.SameLine = true
 		presetSelectable.IDContext = guid
 
 		presetSelectable.OnClick = function()
@@ -239,7 +244,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			for _, selectable in pairs(userPresetSection.Children) do
-				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData ~= "keep" then
+				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData == "select" then
 					selectable.Selected = false
 				end
 			end
@@ -293,7 +298,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			--#region Validation
-			ModManager:DependencyValidator(preset, function()
+			VanityModManager:DependencyValidator(preset, function()
 				return presetGroup
 			end)
 			--#endregion
@@ -441,7 +446,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
 				else
 					outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report")
-					ModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
+					VanityModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
 				end
 			end
 			swapView()

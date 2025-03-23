@@ -128,7 +128,7 @@ Ext.Events.GameStateChanged:Subscribe(function(e)
 			separator.Label = "Active Preset: " .. preset.Name
 			VanityCharacterCriteria:BuildModule(mainParent, preset)
 
-			ModManager:DependencyValidator(preset, function()
+			VanityModManager:DependencyValidator(preset, function()
 				local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
 				validationErrorWindow.Closeable = true
 
