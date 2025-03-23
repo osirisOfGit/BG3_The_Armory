@@ -109,9 +109,19 @@ function Vanity:ActivatePreset(presetId, initializing)
 	end
 end
 
+local updatePresetOnServerTimer
+
 function Vanity:UpdatePresetOnServer()
-	Ext.Timer.WaitFor(350, function()
+	if updatePresetOnServerTimer then
+		Ext.Timer.Cancel(updatePresetOnServerTimer)
+	end
+
+	updatePresetOnServerTimer = Ext.Timer.WaitFor(350, function()
+		updatePresetOnServerTimer = nil
+
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+
+		VanityExportAndBackupManager:BackupPresets({ Ext.Vars.GetModVariables(ModuleUUID).ActivePreset })
 	end)
 end
 

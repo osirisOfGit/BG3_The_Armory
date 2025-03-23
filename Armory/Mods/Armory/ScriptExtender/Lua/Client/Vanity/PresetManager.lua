@@ -229,8 +229,16 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
-		-- userPresetSection:AddImageButton("Synced" .. guid, "ico_btn_load_d", {32, 32}).UserData = "keep"
-		-- userPresetSection:AddImageButton("Synced" .. guid, "ico_cancel_h", {32, 32}).UserData = "keep"
+		if guid == activePreset and VanityExportAndBackupManager:ShouldBackupPreset(guid) and not VanityExportAndBackupManager:IsPresetInBackup(guid) then
+			VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
+		end
+
+		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, VanityExportAndBackupManager:IsPresetInBackup(guid) and "ico_btn_load_d" or "ico_cancel_h", {32, 32})
+
+		syncButton.OnClick = function ()
+			VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
+			VanityPresetManager:UpdatePresetView(guid)
+		end
 
 		---@type ExtuiSelectable
 		local presetSelectable = userPresetSection:AddSelectable(preset.Name)

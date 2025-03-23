@@ -92,8 +92,8 @@ function VanityModManager:DependencyValidator(preset, parentSupplier)
 						end
 						effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect] = mei.Name
 					end
+					cachedGuids[effectInstance.effectProps.StatusEffect] = true
 				end
-				cachedGuids[effectInstance.effectProps.StatusEffect] = true
 			end
 		end
 	end
@@ -146,8 +146,8 @@ function VanityModManager:DependencyValidator(preset, parentSupplier)
 				validateSlot(vanityOutfitSlot.dye, "Dye", displayCriteriaKey, cachedGuids)
 			end
 
-			if vanityOutfitSlot.equipment then
-				if vanityOutfitSlot.equipment.guid then
+			if vanityOutfitSlot.equipment or vanityOutfitSlot.weaponTypes then
+				if vanityOutfitSlot.equipment and vanityOutfitSlot.equipment.guid then
 					validateSlot(vanityOutfitSlot.equipment, "Equipment", displayCriteriaKey, cachedGuids)
 				end
 
@@ -157,7 +157,7 @@ function VanityModManager:DependencyValidator(preset, parentSupplier)
 							validateSlot(weaponOutfitSlot.dye, "Dye", displayCriteriaKey, cachedGuids)
 						end
 
-						if weaponOutfitSlot.equipment.guid then
+						if weaponOutfitSlot.equipment and weaponOutfitSlot.equipment.guid then
 							validateSlot(weaponOutfitSlot.equipment, "Equipment", displayCriteriaKey, cachedGuids)
 						end
 					end

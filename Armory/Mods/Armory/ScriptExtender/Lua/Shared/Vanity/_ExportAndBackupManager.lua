@@ -20,18 +20,41 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "PresetBackupRegistry", {
 	WriteableOnServer = true,
 	WriteableOnClient = true,
 	SyncToClient = true,
-	SyncToServer = true
+	SyncToServer = true,
+	SyncOnWrite = true
 })
 
 VanityExportAndBackupManager = {}
 
+Ext.RegisterConsoleCommand("Armory_Vanity_SeePresetBackupRegistry", function (cmd, ...)
+	---@type VanityPresetBackupRegistry
+	local presetBackupRegistry = Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry
+
+	if presetBackupRegistry then
+		_D(presetBackupRegistry)
+	else
+		_D("Registry is nil!")
+	end
+end)
+
+Ext.RegisterConsoleCommand("Armory_Vanity_SeeBackedUpPresets", function (cmd, ...)
+	---@type VanityPresetExport?
+	local savedPresets = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
+
+	if savedPresets then
+		_D(savedPresets)
+	else
+		_D("No backed up presets!")
+	end
+end)
+
 ---@param presetId Guid
 ---@return boolean
 function VanityExportAndBackupManager:IsPresetInBackup(presetId)
-	---@type VanityPresetExport
+	---@type VanityPresetExport?
 	local savedPresets = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
 
-	return savedPresets.presets[presetId] ~= nil
+	return savedPresets and savedPresets.presets[presetId] ~= nil or false
 end
 
 if Ext.IsClient() then
@@ -87,6 +110,15 @@ if Ext.IsClient() then
 	--#region Backups
 
 	---@param presetId Guid
+	---@return boolean
+	function VanityExportAndBackupManager:ShouldBackupPreset(presetId)
+		---@type VanityPresetBackupRegistry
+		local presetBackupRegistry = Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry
+
+		return presetBackupRegistry and presetBackupRegistry[presetId]
+	end
+
+	---@param presetId Guid
 	function VanityExportAndBackupManager:FlipPresetBackupRegistration(presetId)
 		---@type VanityPresetBackupRegistry
 		local presetBackupRegistry = Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry
@@ -97,8 +129,10 @@ if Ext.IsClient() then
 
 		if not presetBackupRegistry[presetId] then
 			presetBackupRegistry[presetId] = true
+			VanityExportAndBackupManager:BackupPresets({ presetId })
 		else
 			presetBackupRegistry[presetId] = false
+			VanityExportAndBackupManager:RemovePresetsFromBackup({ presetId })
 		end
 
 		Ext.Vars.GetModVariables(ModuleUUID).PresetBackupRegistry = presetBackupRegistry
@@ -106,7 +140,20 @@ if Ext.IsClient() then
 
 	---@param presetIds Guid[]
 	function VanityExportAndBackupManager:BackupPresets(presetIds)
+		for i, id in ipairs(presetIds) do
+			if not VanityExportAndBackupManager:ShouldBackupPreset(id) then
+				Logger:BasicDebug("Preset %s should not be backed up, and will be excluded", id)
+				presetIds[i] = nil
+			end
+		end
+
+		if #presetIds == 0 then
+			Logger:BasicDebug("None of the provided presets are eligible for backup - skipping.")
+			return
+		end
+
 		Ext.Vars.GetModVariables(ModuleUUID).SavedPresets = VanityExportAndBackupManager:ExportPresets(presetIds, Ext.Vars.GetModVariables(ModuleUUID).SavedPresets)
+		Logger:BasicInfo("Selected presets backed up successfully")
 	end
 
 	---@param presetIds Guid[]
