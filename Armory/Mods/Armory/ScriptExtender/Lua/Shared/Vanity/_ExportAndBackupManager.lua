@@ -266,6 +266,10 @@ if Ext.IsClient() then
 					self:RestorePresetBackup(savedPresetId)
 				end
 			end
+
+			for presetIdToUpdate in pairs(ConfigurationStructure.config.vanity.presets) do
+				self:BackupPresets({ presetIdToUpdate })
+			end
 		end
 	end
 

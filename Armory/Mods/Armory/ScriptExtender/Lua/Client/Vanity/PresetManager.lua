@@ -231,7 +231,19 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
-		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, VanityExportAndBackupManager:IsPresetInBackup(guid) and "ico_btn_load_d" or "ico_cancel_h", { 32, 32 })
+		local isPresetInBackup = VanityExportAndBackupManager:IsPresetInBackup(guid)
+		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_btn_load_d" or "ico_cancel_h", { 26, 26 })
+
+		local tooltip = syncButton:Tooltip()
+		tooltip:AddText(string.format(
+			"\t  This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.",
+			isPresetInBackup and "is" or "is not")).TextWrapPos = 1000
+
+		tooltip:AddText(
+			"Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.\nBackup will be removed if this option is disabled or the preset is deleted via this UI").TextWrapPos = 1000
+
+		tooltip:AddText(
+			"You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console").TextWrapPos = 1000
 
 		syncButton.OnClick = function()
 			VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
@@ -280,6 +292,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 			presetGroup:AddButton("Delete").OnClick = function()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
+				if VanityExportAndBackupManager:IsPresetInBackup(guid) then
+					VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
+				end
+
 				VanityPresetManager:UpdatePresetView()
 				if activePreset == guid then
 					Vanity:ActivatePreset()
