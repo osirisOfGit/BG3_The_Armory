@@ -9,6 +9,7 @@ end)
 
 Ext.Require("Shared/Translator.lua")
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
+Ext.Require("Shared/Vanity/_ExportAndBackupManager.lua")
 
 ConfigurationStructure:InitializeConfig()
 

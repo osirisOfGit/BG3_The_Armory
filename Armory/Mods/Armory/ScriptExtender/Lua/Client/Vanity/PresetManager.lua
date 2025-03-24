@@ -122,6 +122,8 @@ function VanityPresetManager:OpenManager()
 		presetInfoSection.NoSavedSettings = true
 		presetInfoSection.HorizontalScrollbar = true
 
+		VanityExportAndBackupManager:RestorePresetBackup()
+
 		VanityPresetManager:UpdatePresetView()
 	end
 end
@@ -229,8 +231,29 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
+		local isPresetInBackup = VanityExportAndBackupManager:IsPresetInBackup(guid)
+		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_btn_load_d" or "ico_cancel_h", { 26, 26 })
+
+		local tooltip = syncButton:Tooltip()
+		tooltip:AddText(string.format(
+			"\t  This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.",
+			isPresetInBackup and "is" or "is not")).TextWrapPos = 1000
+
+		tooltip:AddText(
+			"Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.\nBackup will be removed if this option is disabled or the preset is deleted via this UI").TextWrapPos = 1000
+
+		tooltip:AddText(
+			"You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console").TextWrapPos = 1000
+
+		syncButton.OnClick = function()
+			VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
+			VanityPresetManager:UpdatePresetView(guid)
+		end
+
 		---@type ExtuiSelectable
 		local presetSelectable = userPresetSection:AddSelectable(preset.Name)
+		presetSelectable.UserData = "select"
+		presetSelectable.SameLine = true
 		presetSelectable.IDContext = guid
 
 		presetSelectable.OnClick = function()
@@ -239,7 +262,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			for _, selectable in pairs(userPresetSection.Children) do
-				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData ~= "keep" then
+				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData == "select" then
 					selectable.Selected = false
 				end
 			end
@@ -269,6 +292,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 			presetGroup:AddButton("Delete").OnClick = function()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
+				if VanityExportAndBackupManager:IsPresetInBackup(guid) then
+					VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
+				end
+
 				VanityPresetManager:UpdatePresetView()
 				if activePreset == guid then
 					Vanity:ActivatePreset()
@@ -293,7 +320,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			--#region Validation
-			ModManager:DependencyValidator(preset, function()
+			VanityModManager:DependencyValidator(preset, function()
 				return presetGroup
 			end)
 			--#endregion
@@ -399,9 +426,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					if customDependency.Guid and customDependency.Guid ~= "" then
 						local modInfo = Ext.Mod.GetMod(customDependency.Guid)
 						if not modInfo then
-							local warningImage = nameCell:AddImage("tutorial_warning_yellow", {32, 32})
+							local warningImage = nameCell:AddImage("tutorial_warning_yellow", { 32, 32 })
 							warningImage.SameLine = true
-							warningImage:Tooltip():AddText("\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
+							warningImage:Tooltip():AddText(
+								"\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
 						end
 					end
 
@@ -441,7 +469,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
 				else
 					outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report")
-					ModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
+					VanityModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
 				end
 			end
 			swapView()

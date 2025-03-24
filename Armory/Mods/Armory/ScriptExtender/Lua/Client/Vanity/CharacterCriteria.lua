@@ -117,7 +117,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 			local seeDependencyReport = actionCell:AddImageButton("seeFullThingy" .. criteriaCompositeKey, "Spell_Divination_SeeInvisibility", {32, 32})
 			seeDependencyReport:Tooltip():AddText("\t  See full dependency report for this outfit")
 			seeDependencyReport.OnClick = function ()
-				ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
+				VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
 			end
 
 			if not outfitToCopyTo then
@@ -349,8 +349,10 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 				criteriaTableCopy[column.UserData] = otherSelectable.UserData or nil
 
 				if preset.Outfits[CreateCriteriaCompositeKey(criteriaTableCopy)] then
+					-- Green
 					otherSelectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 				else
+					-- Default
 					otherSelectable:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 				end
 			end

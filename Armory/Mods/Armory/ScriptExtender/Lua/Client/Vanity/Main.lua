@@ -109,36 +109,102 @@ function Vanity:ActivatePreset(presetId, initializing)
 	end
 end
 
+local updatePresetOnServerTimer
+
 function Vanity:UpdatePresetOnServer()
-	Ext.Timer.WaitFor(350, function()
+	if updatePresetOnServerTimer then
+		Ext.Timer.Cancel(updatePresetOnServerTimer)
+	end
+
+	updatePresetOnServerTimer = Ext.Timer.WaitFor(350, function()
+		updatePresetOnServerTimer = nil
+
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
+
+		VanityExportAndBackupManager:BackupPresets({ Ext.Vars.GetModVariables(ModuleUUID).ActivePreset })
 	end)
 end
 
 local hasBeenActivated = false
 
-Ext.Events.GameStateChanged:Subscribe(function(e)
-	---@cast e EclLuaGameStateChangedEvent
+local validationCheck
+validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
+	if Ext.ClientNet.IsHost() then
+		---@cast e EclLuaGameStateChangedEvent
 
-	if e.ToState == "Running" and not hasBeenActivated then
-		local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+		if e.ToState == "Running" and not hasBeenActivated then
+			Logger:BasicDebug("User is the host and has started running game - running check")
 
-		if presetId then
-			local preset = ConfigurationStructure.config.vanity.presets[presetId]
-			separator.Label = "Active Preset: " .. preset.Name
-			VanityCharacterCriteria:BuildModule(mainParent, preset)
+			local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
-			ModManager:DependencyValidator(preset, function()
-				local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
-				validationErrorWindow.Closeable = true
+			if presetId then
+				local function validatePreset()
+					local preset = ConfigurationStructure.config.vanity.presets[presetId]
 
-				validationErrorWindow:AddButton("Open Preset").OnClick = function()
-					Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
+					VanityModManager:DependencyValidator(preset, function()
+						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
+						validationErrorWindow.Closeable = true
+
+						validationErrorWindow:AddButton("Open Preset").OnClick = function()
+							separator.Label = "Active Preset: " .. preset.Name
+							VanityCharacterCriteria:BuildModule(mainParent, preset)
+
+							Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
+						end
+
+						return validationErrorWindow
+					end)
 				end
 
-				return validationErrorWindow
-			end)
+				if not ConfigurationStructure.config.vanity.presets[presetId] and VanityExportAndBackupManager:IsPresetInBackup(presetId) then
+					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
+
+					local presetBackup = TableUtils:DeeplyCopyTable(VanityExportAndBackupManager:GetPresetFromBackup(presetId))
+					local restoreBackupWindow = Ext.IMGUI.NewWindow("Armory: Restore Backed Up Preset")
+					restoreBackupWindow.NoCollapse = true
+					restoreBackupWindow.AlwaysAutoResize = true
+
+					restoreBackupWindow:AddText(string.format(
+						"Preset '%s' was detected as the active preset for this save, but is not loaded in the config - however, a backup was found. Restore?",
+						presetBackup.presets[presetId].Name)).TextWrapPos = 0
+
+					local restoreButton = restoreBackupWindow:AddButton("Restore Preset")
+					restoreButton.PositionOffset = { 300, 0 }
+					-- Green
+					restoreButton:SetColor("Button", { 144 / 255, 238 / 255, 144 / 255, .5 })
+					-- restoreButton:SetColor("Text", {0, 0, 0, 1})
+
+					restoreButton.OnClick = function()
+						VanityExportAndBackupManager:RestorePresetBackup(presetId, presetBackup)
+						restoreBackupWindow:Destroy()
+
+						Vanity:UpdatePresetOnServer()
+
+						validatePreset()
+					end
+
+					local removeButton = restoreBackupWindow:AddButton("Delete Backup and Deactivate Preset")
+					removeButton.SameLine = true
+					removeButton.PositionOffset = { 200, 0 }
+					-- Red
+					removeButton:SetColor("Button", { 1, 0.02, 0, 0.5 })
+					-- removeButton:SetColor("Text", {0, 0, 0, 1})
+
+					removeButton.OnClick = function()
+						Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = nil
+						VanityExportAndBackupManager:RemovePresetsFromBackup({ presetId })
+						restoreBackupWindow:Destroy()
+					end
+				else
+					validatePreset()
+				end
+			end
+
+			Ext.Events.GameStateChanged:Unsubscribe(validationCheck)
 		end
+	else
+		Logger:BasicDebug("User is not the host - skipping initial check")
+		Ext.Events.GameStateChanged:Unsubscribe(validationCheck)
 	end
 end)
 

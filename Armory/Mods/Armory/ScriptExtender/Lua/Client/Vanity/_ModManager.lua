@@ -1,8 +1,8 @@
-ModManager = {}
+VanityModManager = {}
 
 ---@param modDependency ModDependency
 ---@return string, string
-function ModManager:GetModInfo(modDependency, excludeNotLoadedMessage)
+function VanityModManager:GetModInfo(modDependency, excludeNotLoadedMessage)
 	if modDependency.OriginalMod then
 		modDependency = modDependency.OriginalMod
 	end
@@ -32,7 +32,7 @@ end
 
 ---@param preset VanityPreset
 ---@param parentSupplier fun():ExtuiTreeParent
-function ModManager:DependencyValidator(preset, parentSupplier)
+function VanityModManager:DependencyValidator(preset, parentSupplier)
 	if not ConfigurationStructure.config.vanity.miscNameCache then
 		ConfigurationStructure.config.vanity.miscNameCache = {}
 	end
@@ -92,8 +92,8 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 						end
 						effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect] = mei.Name
 					end
+					cachedGuids[effectInstance.effectProps.StatusEffect] = true
 				end
-				cachedGuids[effectInstance.effectProps.StatusEffect] = true
 			end
 		end
 	end
@@ -146,8 +146,8 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 				validateSlot(vanityOutfitSlot.dye, "Dye", displayCriteriaKey, cachedGuids)
 			end
 
-			if vanityOutfitSlot.equipment then
-				if vanityOutfitSlot.equipment.guid then
+			if vanityOutfitSlot.equipment or vanityOutfitSlot.weaponTypes then
+				if vanityOutfitSlot.equipment and vanityOutfitSlot.equipment.guid then
 					validateSlot(vanityOutfitSlot.equipment, "Equipment", displayCriteriaKey, cachedGuids)
 				end
 
@@ -157,7 +157,7 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 							validateSlot(weaponOutfitSlot.dye, "Dye", displayCriteriaKey, cachedGuids)
 						end
 
-						if weaponOutfitSlot.equipment.guid then
+						if weaponOutfitSlot.equipment and weaponOutfitSlot.equipment.guid then
 							validateSlot(weaponOutfitSlot.equipment, "Equipment", displayCriteriaKey, cachedGuids)
 						end
 					end
@@ -201,7 +201,7 @@ function ModManager:DependencyValidator(preset, parentSupplier)
 				row:AddCell():AddText(validationError.displayValue or "Unknown")
 				row:AddCell():AddText(validationError.category)
 				if validationError.modInfo then
-					row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(validationError.modInfo, true)))
+					row:AddCell():AddText(string.format("%s (%s)", VanityModManager:GetModInfo(validationError.modInfo, true)))
 				else
 					row:AddCell():AddText("Unknown - check custom dependencies")
 				end
@@ -217,7 +217,7 @@ local dependencyWindow
 ---@param preset VanityPreset
 ---@param criteriaCompositeKey VanityCriteriaCompositeKey?
 ---@param parent ExtuiTreeParent?
-function ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
+function VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
 	if not parent then
 		if not dependencyWindow then
 			dependencyWindow = Ext.IMGUI.NewWindow("Mod Dependencies")
@@ -286,7 +286,7 @@ function ModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, pa
 						row:AddCell():AddText((itemEntry.name or itemEntry.guid) .. " (Not Loaded)")
 					end
 
-					row:AddCell():AddText(string.format("%s (%s)", ModManager:GetModInfo(itemEntry.modDependency)))
+					row:AddCell():AddText(string.format("%s (%s)", VanityModManager:GetModInfo(itemEntry.modDependency)))
 				end
 			else
 				row:AddCell():AddText("---")

@@ -108,6 +108,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 
 		if formInput.errorMessageIfEmpty then
 			local authorError = parent:AddText(formInput.errorMessageIfEmpty)
+			-- Red
 			authorError:SetColor("Text", { 1, 0.02, 0, 1 })
 			authorError.Visible = false
 

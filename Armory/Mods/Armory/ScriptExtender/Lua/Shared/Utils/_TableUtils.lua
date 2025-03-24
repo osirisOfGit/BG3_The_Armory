@@ -67,6 +67,38 @@ function TableUtils:CompareLists(first, second)
 	return true
 end
 
+--- Deeply compare two tables for equality
+---@param first table
+---@param second table
+---@return boolean true if the tables are deeply equal
+function TableUtils:TablesAreEqual(first, second)
+	if first == second then
+		return true
+	end
+
+	if type(first) ~= "table" or type(second) ~= "table" then
+		return false
+	end
+
+	local seenKeys = {}
+
+	for key, value in pairs(first) do
+		if not self:TablesAreEqual(value, second[key]) then
+			return false
+		end
+		seenKeys[key] = true
+	end
+
+	for key, value in pairs(second) do
+		if not seenKeys[key] then
+			return false
+		end
+	end
+
+	return true
+end
+
+
 --- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
 --- Optionally accepts a function to transform the key for sorting and returning
 ---@generic K
