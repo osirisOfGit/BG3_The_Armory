@@ -36,7 +36,7 @@ function FileUtils:SaveTableToFile(filepath, content)
 	end)
 
 	if not jsonSuccess then
-		Ext.Utils.PrintError("Failed to convert content %s for file %s to JSON due to error \n\t%s",
+		Logger:BasicError("Failed to convert content %s for file %s to JSON due to error \n\t%s",
 			content,
 			filepath,
 			response)
@@ -70,8 +70,6 @@ function FileUtils:LoadTableFile(filepath)
 		local fileContent = FileUtils:LoadFile(filepath)
 		if fileContent then
 			return Ext.Json.Parse(fileContent)
-		else
-			return false
 		end
 	end)
 
@@ -79,7 +77,6 @@ function FileUtils:LoadTableFile(filepath)
 		Logger:BasicError("Failed to parse contents of file %s due to error \n\t%s",
 			FileUtils:BuildAbsoluteFileTargetPath(filepath),
 			result)
-		return false
 	else
 		return result
 	end

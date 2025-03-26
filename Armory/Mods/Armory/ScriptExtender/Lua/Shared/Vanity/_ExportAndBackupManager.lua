@@ -175,6 +175,9 @@ if Ext.IsClient() then
 
 		local preset = cloneOfBackup.presets[presetId]
 
+		-- Remove any non-alpabetical and space characters so it can be used as a Status name if necessary
+		local sanitizedPresetName = preset.Name:gsub("[^%a%s]", ""):gsub("%s", "_")
+
 		for criteraKey, outfit in pairs(preset.Outfits) do
 			local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
 			for _, resourceId in pairs(criteriaTable) do
@@ -187,19 +190,19 @@ if Ext.IsClient() then
 				if outfitSlot.equipment and outfitSlot.equipment.effects then
 					for index, effect in pairs(outfitSlot.equipment.effects) do
 						if not export.effects[effect] then
-							if not export.effects[effect .. "_BACKUP"] then
+							if not export.effects[effect .. sanitizedPresetName] then
 								if ConfigurationStructure.config.vanity.effects[effect] then
 									if not TableUtils:TablesAreEqual(ConfigurationStructure.config.vanity.effects[effect], cloneOfBackup.effects[effect]) then
-										outfitSlot.equipment.effects[index] = effect .. "_BACKUP"
+										outfitSlot.equipment.effects[index] = effect .. sanitizedPresetName
 
-										export.effects[effect .. "_BACKUP"] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
-										export.effects[effect .. "_BACKUP"].Name = effect .. "_BACKUP"
+										export.effects[effect .. sanitizedPresetName] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
+										export.effects[effect .. sanitizedPresetName].Name = effect .. sanitizedPresetName
 									end
 								else
 									export.effects[effect] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
 								end
 							else
-								outfitSlot.equipment.effects[index] = effect .. "_BACKUP"
+								outfitSlot.equipment.effects[index] = effect .. sanitizedPresetName
 							end
 						end
 					end
@@ -210,19 +213,19 @@ if Ext.IsClient() then
 						if weaponSlot.equipment and weaponSlot.equipment.effects then
 							for index, effect in pairs(weaponSlot.equipment.effects) do
 								if not export.effects[effect] then
-									if not export.effects[effect .. "_BACKUP"] then
+									if not export.effects[effect .. sanitizedPresetName] then
 										if ConfigurationStructure.config.vanity.effects[effect] then
 											if not TableUtils:TablesAreEqual(ConfigurationStructure.config.vanity.effects[effect], cloneOfBackup.effects[effect]) then
-												weaponSlot.equipment.effects[index] = effect .. "_BACKUP"
+												weaponSlot.equipment.effects[index] = effect .. sanitizedPresetName
 
-												export.effects[effect .. "_BACKUP"] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
-												export.effects[effect .. "_BACKUP"].Name = effect .. "_BACKUP"
+												export.effects[effect .. sanitizedPresetName] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
+												export.effects[effect .. sanitizedPresetName].Name = effect .. sanitizedPresetName
 											end
 										else
 											export.effects[effect] = TableUtils:DeeplyCopyTable(cloneOfBackup.effects[effect])
 										end
 									else
-										weaponSlot.equipment.effects[index] = effect .. "_BACKUP"
+										weaponSlot.equipment.effects[index] = effect .. sanitizedPresetName
 									end
 								end
 							end

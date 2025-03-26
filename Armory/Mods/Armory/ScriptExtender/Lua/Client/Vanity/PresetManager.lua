@@ -84,6 +84,8 @@ function VanityPresetManager:OpenManager()
 		presetWindow.Closeable = true
 
 		local createNewPresetButton = presetWindow:AddButton("Create a New Preset")
+		local openExportManagerButton = presetWindow:AddButton("Open Export Manager")
+
 		local presetForm = presetWindow:AddGroup("NewPresetForm")
 		presetForm.Visible = false
 
@@ -91,6 +93,8 @@ function VanityPresetManager:OpenManager()
 			buildPresetForm(presetForm)
 			presetForm.Visible = not presetForm.Visible
 		end
+
+		openExportManagerButton.SameLine = true
 
 		local presetTable = presetWindow:AddTable("PresetTable", 2)
 		presetTable.NoSavedSettings = true
@@ -320,7 +324,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			--#region Validation
-			VanityModManager:DependencyValidator(preset, function()
+			VanityModDependencyManager:DependencyValidator(preset, function()
 				return presetGroup
 			end)
 			--#endregion
@@ -469,7 +473,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
 				else
 					outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report")
-					VanityModManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
+					VanityModDependencyManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
 				end
 			end
 			swapView()

@@ -1,8 +1,8 @@
-VanityModManager = {}
+VanityModDependencyManager = {}
 
 ---@param modDependency ModDependency
 ---@return string, string
-function VanityModManager:GetModInfo(modDependency, excludeNotLoadedMessage)
+function VanityModDependencyManager:GetModInfo(modDependency, excludeNotLoadedMessage)
 	if modDependency.OriginalMod then
 		modDependency = modDependency.OriginalMod
 	end
@@ -32,7 +32,7 @@ end
 
 ---@param preset VanityPreset
 ---@param parentSupplier fun():ExtuiTreeParent
-function VanityModManager:DependencyValidator(preset, parentSupplier)
+function VanityModDependencyManager:DependencyValidator(preset, parentSupplier)
 	if not ConfigurationStructure.config.vanity.miscNameCache then
 		ConfigurationStructure.config.vanity.miscNameCache = {}
 	end
@@ -201,7 +201,7 @@ function VanityModManager:DependencyValidator(preset, parentSupplier)
 				row:AddCell():AddText(validationError.displayValue or "Unknown")
 				row:AddCell():AddText(validationError.category)
 				if validationError.modInfo then
-					row:AddCell():AddText(string.format("%s (%s)", VanityModManager:GetModInfo(validationError.modInfo, true)))
+					row:AddCell():AddText(string.format("%s (%s)", VanityModDependencyManager:GetModInfo(validationError.modInfo, true)))
 				else
 					row:AddCell():AddText("Unknown - check custom dependencies")
 				end
@@ -217,7 +217,7 @@ local dependencyWindow
 ---@param preset VanityPreset
 ---@param criteriaCompositeKey VanityCriteriaCompositeKey?
 ---@param parent ExtuiTreeParent?
-function VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
+function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
 	if not parent then
 		if not dependencyWindow then
 			dependencyWindow = Ext.IMGUI.NewWindow("Mod Dependencies")
@@ -286,7 +286,7 @@ function VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeK
 						row:AddCell():AddText((itemEntry.name or itemEntry.guid) .. " (Not Loaded)")
 					end
 
-					row:AddCell():AddText(string.format("%s (%s)", VanityModManager:GetModInfo(itemEntry.modDependency)))
+					row:AddCell():AddText(string.format("%s (%s)", VanityModDependencyManager:GetModInfo(itemEntry.modDependency)))
 				end
 			else
 				row:AddCell():AddText("---")
@@ -348,3 +348,5 @@ function VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeK
 		end
 	end
 end
+
+
