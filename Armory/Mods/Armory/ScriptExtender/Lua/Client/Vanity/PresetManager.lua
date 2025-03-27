@@ -1,4 +1,5 @@
 Ext.Require("Client/_FormBuilder.lua")
+Ext.Require("Client/Vanity/_ModPresetManager.lua")
 
 VanityPresetManager = {}
 VanityPresetManager.userName = ""
@@ -83,8 +84,17 @@ function VanityPresetManager:OpenManager()
 		presetWindow = Ext.IMGUI.NewWindow("Vanity Preset Manager")
 		presetWindow.Closeable = true
 
-		local createNewPresetButton = presetWindow:AddButton("Create a New Preset")
-		local openExportManagerButton = presetWindow:AddButton("Open Export Manager")
+		presetWindow.MenuBar = true
+		local menu = presetWindow:AddMainMenu()
+		---@type ExtuiMenu
+		local presetMenu = menu:AddMenu("Presets")
+		
+		local createNewPresetButton = presetMenu:AddButton("Create a New Preset")
+		local openExportManagerButton = presetMenu:AddButton("Open Export Manager")
+
+		openExportManagerButton.OnClick = function ()
+			VanityModPresetManager:BuildExportManagerWindow()
+		end
 
 		local presetForm = presetWindow:AddGroup("NewPresetForm")
 		presetForm.Visible = false
@@ -93,8 +103,6 @@ function VanityPresetManager:OpenManager()
 			buildPresetForm(presetForm)
 			presetForm.Visible = not presetForm.Visible
 		end
-
-		openExportManagerButton.SameLine = true
 
 		local presetTable = presetWindow:AddTable("PresetTable", 2)
 		presetTable.NoSavedSettings = true

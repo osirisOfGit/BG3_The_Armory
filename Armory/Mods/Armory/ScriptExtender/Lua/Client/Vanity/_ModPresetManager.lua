@@ -58,7 +58,7 @@ function VanityModPresetManager:BuildExportManagerWindow()
 			end
 		end
 
-		local success = FileUtils:SaveTableToFile(FileUtils:BuildAbsoluteFileTargetPath(self.ExportFilename), VanityExportAndBackupManager:ExportPresets(toExport))
+		local success = FileUtils:SaveTableToFile(self.ExportFilename, VanityExportAndBackupManager:ExportPresets(toExport))
 		errorText.Visible = not success
 		successText.Visible = success
 	end
