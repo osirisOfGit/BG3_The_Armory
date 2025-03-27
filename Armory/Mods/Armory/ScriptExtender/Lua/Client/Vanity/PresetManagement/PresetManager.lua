@@ -290,6 +290,27 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local presetGroup = presetInfoSection:AddGroup(guid)
 			presetActivelyViewing = presetGroup
 
+			local nameHeader = presetGroup:AddSeparatorText(preset.Name)
+			nameHeader.Font = "Large"
+			nameHeader:SetStyle("SeparatorTextAlign", 0.5)
+
+			-- Cheap hack for dynamically center-aligned text
+			local metadataTable = presetGroup:AddTable("metadata", 3)
+			local metadataRow = metadataTable:AddRow()
+			metadataRow:AddCell()
+			metadataRow:AddCell():AddText(string.format("v%s by %s (%s)", preset.Version, preset.Author, preset.NSFW and "NSFW" or "SFW"))
+			metadataRow:AddCell()
+
+			local actionRow = metadataTable:AddRow()
+			actionRow:AddCell()
+			local actionCell = actionRow:AddCell()
+			actionRow:AddCell()
+
+			actionCell:AddImageButton("Edit", "ico_proficiency_battleAxe", { 32, 32 })
+			actionCell:AddImageButton("Activate", activePreset ~= guid and "icons8-toggle-on-48" or "icons8-toggle-off-48", { 32, 32 })
+			actionCell:AddImageButton("Delete", "icons8-delete-48", { 32, 32 })
+			actionCell:AddImageButton("Copy", "icons8-copy-48", { 32, 32 })
+
 			if activePreset ~= guid then
 				presetGroup:AddButton("Activate (Save After)").OnClick = function()
 					Vanity:ActivatePreset(guid)
@@ -325,10 +346,6 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local editButton = presetGroup:AddButton("Edit Info")
 
 			local infoGroup = presetGroup:AddGroup("info")
-			infoGroup:AddText("Name: " .. preset.Name)
-			infoGroup:AddText("Author: " .. preset.Author)
-			infoGroup:AddText("Version: " .. preset.Version)
-			infoGroup:AddText("Contains Skimpy Outfits/Nudity? " .. (preset.NSFW and "Yes" or "No"))
 
 			editButton.OnClick = function()
 				if editButton.UserData then
@@ -339,11 +356,9 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			--#region Validation
 			VanityModDependencyManager:DependencyValidator(preset, function()
 				return presetGroup
 			end)
-			--#endregion
 
 			--#region Custom Dependencies
 			presetGroup:AddNewLine()

@@ -74,9 +74,11 @@ function FileUtils:LoadTableFile(filepath)
 	end)
 
 	if not success then
-		Logger:BasicError("Failed to parse contents of file %s due to error \n\t%s",
-			FileUtils:BuildAbsoluteFileTargetPath(filepath),
-			result)
+		if result then
+			Logger:BasicError("Failed to parse contents of file %s due to error \n\t%s",
+				FileUtils:BuildAbsoluteFileTargetPath(filepath),
+				result)
+		end
 	else
 		return result
 	end
@@ -91,10 +93,11 @@ function FileUtils:LoadFile(filepath)
 	end)
 
 	if not success then
-		Logger:BasicError("Failed to load %s due to error\n\t%s",
-			FileUtils:BuildAbsoluteFileTargetPath(filepath),
-			result)
-		return nil
+		if result then
+			Logger:BasicError("Failed to load %s due to error\n\t%s",
+				FileUtils:BuildAbsoluteFileTargetPath(filepath),
+				result)
+		end
 	else
 		return result
 	end

@@ -145,7 +145,11 @@ function VanityModPresetManager:ImportPresetsFromMods()
     for _, uuid in ipairs(Ext.Mod.GetLoadOrder()) do
 		local mod = Ext.Mod.GetMod(uuid)
 		if mod then
-			local presetFile = string.format("Mods/%s/%s", mod.Info.Directory, self.ExportFilename)
+			---@type VanityPresetExport?
+			local presetFile = FileUtils:LoadTableFile(string.format("Mods/%s/%s", mod.Info.Directory, self.ExportFilename))
+			if presetFile then
+				
+			end
 		end
     end
 end
