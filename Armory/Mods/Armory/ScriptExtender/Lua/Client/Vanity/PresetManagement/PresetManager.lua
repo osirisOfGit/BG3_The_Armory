@@ -91,12 +91,17 @@ function VanityPresetManager:OpenManager()
 		local menu = presetWindow:AddMainMenu()
 		---@type ExtuiMenu
 		local presetMenu = menu:AddMenu("Presets")
-		
+
 		local createNewPresetButton = presetMenu:AddButton("Create a New Preset")
 		local openExportManagerButton = presetMenu:AddButton("Open Export Manager")
+		local importPresetsFromFileButton = presetMenu:AddButton("Import Presets from File")
 
-		openExportManagerButton.OnClick = function ()
+		openExportManagerButton.OnClick = function()
 			VanityModPresetManager:BuildExportManagerWindow()
+		end
+
+		importPresetsFromFileButton.OnClick = function()
+			VanityModPresetManager:BuildImportManagerWindow()
 		end
 
 		local presetForm = presetWindow:AddGroup("NewPresetForm")
@@ -306,10 +311,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			presetGroup:AddButton("Delete").OnClick = function()
-				ConfigurationStructure.config.vanity.presets[guid].delete = true
 				if VanityBackupManager:IsPresetInBackup(guid) then
 					VanityBackupManager:FlipPresetBackupRegistration(guid)
 				end
+				ConfigurationStructure.config.vanity.presets[guid].delete = true
 
 				VanityPresetManager:UpdatePresetView()
 				if activePreset == guid then

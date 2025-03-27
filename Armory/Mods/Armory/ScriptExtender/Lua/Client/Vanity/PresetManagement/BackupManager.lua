@@ -110,7 +110,7 @@ function VanityBackupManager:RestorePresetBackup(presetId, presetBackup)
 		if not presetBackup then
 			presetBackup = cachedBackup or Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
 		end
-		presetBackup = VanityExportManager:ImportPresetFromExport({ presetId }, presetBackup)
+		presetBackup = VanityExportManager:ImportPreset({ presetId }, presetBackup)
 	else
 		cachedBackup = cachedBackup or Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
 		for savedPresetId in pairs(cachedBackup.presets) do

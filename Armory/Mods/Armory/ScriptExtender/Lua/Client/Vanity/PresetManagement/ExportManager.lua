@@ -55,7 +55,7 @@ function VanityExportManager:ExportPresets(presetIds, existingExport)
 end
 
 ---@param presetIds Guid[]
-function VanityExportManager:ImportPresetFromExport(presetIds, exportToExtractFrom)
+function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom)
 	-- Since we modify the effect names on each piece of equipment if they already exist in the current config and are different resources
 	exportToExtractFrom = TableUtils:DeeplyCopyTable(exportToExtractFrom)
 
@@ -146,6 +146,6 @@ function VanityExportManager:ImportPresetFromExport(presetIds, exportToExtractFr
 
 	for presetId, preset in pairs(importedPreset.presets) do
 		ConfigurationStructure.config.vanity.presets[presetId] = preset
-		Logger:BasicInfo("Restored preset '%s' from backup", preset.Name)
+		Logger:BasicInfo("Restored preset '%s' from export", preset.Name)
 	end
 end
