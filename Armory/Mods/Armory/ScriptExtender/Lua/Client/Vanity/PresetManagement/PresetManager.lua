@@ -1,5 +1,8 @@
 Ext.Require("Client/_FormBuilder.lua")
-Ext.Require("Client/Vanity/_ModPresetManager.lua")
+Ext.Require("Client/Vanity/PresetManagement/ModPresetManager.lua")
+Ext.Require("Client/Vanity/PresetManagement/ExportManager.lua")
+Ext.Require("Client/Vanity/PresetManagement/BackupManager.lua")
+Ext.Require("Client/Vanity/PresetManagement/ModDependencyManager.lua")
 
 VanityPresetManager = {}
 VanityPresetManager.userName = ""
@@ -134,7 +137,7 @@ function VanityPresetManager:OpenManager()
 		presetInfoSection.NoSavedSettings = true
 		presetInfoSection.HorizontalScrollbar = true
 
-		VanityExportAndBackupManager:RestorePresetBackup()
+		VanityBackupManager:RestorePresetBackup()
 
 		VanityPresetManager:UpdatePresetView()
 	end
@@ -243,7 +246,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			preset.SFW = nil
 		end
 
-		local isPresetInBackup = VanityExportAndBackupManager:IsPresetInBackup(guid)
+		local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
 		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_btn_load_d" or "ico_cancel_h", { 26, 26 })
 
 		local tooltip = syncButton:Tooltip()
@@ -258,7 +261,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			"You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console").TextWrapPos = 1000
 
 		syncButton.OnClick = function()
-			VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
+			VanityBackupManager:FlipPresetBackupRegistration(guid)
 			VanityPresetManager:UpdatePresetView(guid)
 		end
 
@@ -304,8 +307,8 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 			presetGroup:AddButton("Delete").OnClick = function()
 				ConfigurationStructure.config.vanity.presets[guid].delete = true
-				if VanityExportAndBackupManager:IsPresetInBackup(guid) then
-					VanityExportAndBackupManager:FlipPresetBackupRegistration(guid)
+				if VanityBackupManager:IsPresetInBackup(guid) then
+					VanityBackupManager:FlipPresetBackupRegistration(guid)
 				end
 
 				VanityPresetManager:UpdatePresetView()

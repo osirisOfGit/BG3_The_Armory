@@ -17,7 +17,7 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 	SyncOnWrite = true
 })
 
-Ext.Require("Client/Vanity/PresetManager.lua")
+Ext.Require("Client/Vanity/PresetManagement/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 
 Vanity = {}
@@ -121,7 +121,7 @@ function Vanity:UpdatePresetOnServer()
 
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 
-		VanityExportAndBackupManager:BackupPresets({ Ext.Vars.GetModVariables(ModuleUUID).ActivePreset })
+		VanityBackupManager:BackupPresets({ Ext.Vars.GetModVariables(ModuleUUID).ActivePreset })
 	end)
 end
 
@@ -156,10 +156,10 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					end)
 				end
 
-				if not ConfigurationStructure.config.vanity.presets[presetId] and VanityExportAndBackupManager:IsPresetInBackup(presetId) then
+				if not ConfigurationStructure.config.vanity.presets[presetId] and VanityBackupManager:IsPresetInBackup(presetId) then
 					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
 
-					local presetBackup = TableUtils:DeeplyCopyTable(VanityExportAndBackupManager:GetPresetFromBackup(presetId))
+					local presetBackup = TableUtils:DeeplyCopyTable(VanityBackupManager:RestorePresetFromExport(presetId))
 					local restoreBackupWindow = Ext.IMGUI.NewWindow("Armory: Restore Backed Up Preset")
 					restoreBackupWindow.NoCollapse = true
 					restoreBackupWindow.AlwaysAutoResize = true
@@ -175,7 +175,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					-- restoreButton:SetColor("Text", {0, 0, 0, 1})
 
 					restoreButton.OnClick = function()
-						VanityExportAndBackupManager:RestorePresetBackup(presetId, presetBackup)
+						VanityBackupManager:RestorePresetBackup(presetId, presetBackup)
 						restoreBackupWindow:Destroy()
 
 						Vanity:UpdatePresetOnServer()
@@ -192,7 +192,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 
 					removeButton.OnClick = function()
 						Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = nil
-						VanityExportAndBackupManager:RemovePresetsFromBackup({ presetId })
+						VanityBackupManager:RemovePresetsFromBackup({ presetId })
 						restoreBackupWindow:Destroy()
 					end
 				else
