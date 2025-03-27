@@ -139,3 +139,13 @@ function VanityModPresetManager:BuildImportManagerWindow()
 		end
 	end
 end
+
+---Based off of Volitio's MCM approach - thx M8
+function VanityModPresetManager:ImportPresetsFromMods()
+    for _, uuid in ipairs(Ext.Mod.GetLoadOrder()) do
+		local mod = Ext.Mod.GetMod(uuid)
+		if mod then
+			local presetFile = string.format("Mods/%s/%s", mod.Info.Directory, self.ExportFilename)
+		end
+    end
+end
