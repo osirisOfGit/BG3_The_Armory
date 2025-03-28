@@ -13,3 +13,23 @@ Ext.Require("Server/Vanity/DyePreview.lua")
 
 Ext.Require("Server/Vanity/PartyOutfitManager.lua")
 Ext.Require("Server/Vanity/Transmogger.lua")
+
+
+Ext.Vars.RegisterModVariable(ModuleUUID, "SavedPresets", {
+	Server = true,
+	Client = true,
+	WriteableOnServer = true,
+	WriteableOnClient = true,
+	SyncToClient = true,
+	SyncToServer = true
+})
+
+Ext.Vars.RegisterModVariable(ModuleUUID, "PresetBackupRegistry", {
+	Server = true,
+	Client = true,
+	WriteableOnServer = true,
+	WriteableOnClient = true,
+	SyncToClient = true,
+	SyncToServer = true,
+	SyncOnWrite = true
+})

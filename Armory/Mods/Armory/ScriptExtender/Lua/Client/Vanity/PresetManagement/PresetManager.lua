@@ -252,7 +252,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 		end
 
 		local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
-		local syncButton = userPresetSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_btn_load_d" or "ico_cancel_h", { 26, 26 })
+		local syncButton = Styler:ImageButton(userPresetSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
 
 		local tooltip = syncButton:Tooltip()
 		tooltip:AddText(string.format(
@@ -290,15 +290,25 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local presetGroup = presetInfoSection:AddGroup(guid)
 			presetActivelyViewing = presetGroup
 
-			local nameHeader = presetGroup:AddSeparatorText(preset.Name)
-			nameHeader.Font = "Large"
-			nameHeader:SetStyle("SeparatorTextAlign", 0.5)
-
-			-- Cheap hack for dynamically center-aligned text
+			-- Formatting the page into columns
 			local metadataTable = presetGroup:AddTable("metadata", 3)
+			metadataTable.SizingStretchSame = true
+
+			local titleRow = metadataTable:AddRow()
+			titleRow:AddCell()
+			local titleText = titleRow:AddCell():AddSelectable(preset.Name)
+			-- There was no way of aligning pure text as of writing this
+			titleText:SetStyle("SelectableTextAlign", 0.5)
+			titleText.Disabled = true
+			titleText.Font = "Large"
+			titleRow:AddCell()
+
 			local metadataRow = metadataTable:AddRow()
 			metadataRow:AddCell()
-			metadataRow:AddCell():AddText(string.format("v%s by %s (%s)", preset.Version, preset.Author, preset.NSFW and "NSFW" or "SFW"))
+			local metadataText = metadataRow:AddCell():AddSelectable(string.format("v%s | %s | %s", preset.Version, preset.Author, preset.NSFW and "NSFW" or "SFW"))
+			metadataText:SetStyle("SelectableTextAlign", 0.5)
+			metadataText.Disabled = true
+			
 			metadataRow:AddCell()
 
 			local actionRow = metadataTable:AddRow()
@@ -306,10 +316,19 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local actionCell = actionRow:AddCell()
 			actionRow:AddCell()
 
-			actionCell:AddImageButton("Edit", "ico_proficiency_battleAxe", { 32, 32 })
-			actionCell:AddImageButton("Activate", activePreset ~= guid and "icons8-toggle-on-48" or "icons8-toggle-off-48", { 32, 32 })
-			actionCell:AddImageButton("Delete", "icons8-delete-48", { 32, 32 })
-			actionCell:AddImageButton("Copy", "icons8-copy-48", { 32, 32 })
+			local activateButton = Styler:ImageButton(actionCell:AddImageButton("Activate", activePreset == guid and "ico_active_button" or "ico_inactive_button", { 32, 32 }))
+			actionCell:AddDummy(16, 32).SameLine = true
+
+			local editButton = Styler:ImageButton(actionCell:AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
+			editButton.SameLine = true
+			actionCell:AddDummy(16, 32).SameLine = true
+
+			local deleteButton = Styler:ImageButton(actionCell:AddImageButton("Delete", "ico_red_x", { 32, 32 }))
+			deleteButton.SameLine = true
+			actionCell:AddDummy(16, 32).SameLine = true
+
+			local copyButton = Styler:ImageButton(actionCell:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
+			copyButton.SameLine = true
 
 			if activePreset ~= guid then
 				presetGroup:AddButton("Activate (Save After)").OnClick = function()
@@ -487,7 +506,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 			--#endregion
 			presetGroup:AddNewLine()
-			local swapViewButton = presetGroup:AddImageButton("swap_view", "ico_randomize_d", { 32, 32 })
+			local swapViewButton = Styler:ImageButton(presetGroup:AddImageButton("swap_view", "ico_randomize_d", { 32, 32 }))
 			swapViewButton:Tooltip():AddText("\t Swap between Overall and Per-Outfit view")
 
 			local generalSettings = ConfigurationStructure.config.vanity.settings.general
