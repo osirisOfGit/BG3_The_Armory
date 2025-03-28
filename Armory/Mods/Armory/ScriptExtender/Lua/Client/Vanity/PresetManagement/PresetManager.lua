@@ -308,7 +308,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local metadataText = metadataRow:AddCell():AddSelectable(string.format("%s | v%s | %s", preset.NSFW and "NSFW" or "SFW", preset.Version, preset.Author))
 			metadataText:SetStyle("SelectableTextAlign", 0.5)
 			metadataText.Disabled = true
-			
+
 			metadataRow:AddCell()
 
 			local actionContainerRow = metadataTable:AddRow()
@@ -319,38 +319,43 @@ function VanityPresetManager:UpdatePresetView(presetID)
 			local actionTable = actionContainer:AddTable("ActionTable", 4)
 			local actionRow = actionTable:AddRow()
 
-			local activateButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Activate", activePreset ~= guid and "ico_active_button" or "ico_inactive_button", { 32, 32 }))
-
-			local editButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
-			editButton.SameLine = true
-
-			local deleteButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Delete", "ico_red_x", { 32, 32 }))
-			deleteButton.SameLine = true
-
-			local copyButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
-			copyButton.SameLine = true
+			local activateButton = Styler:ImageButton(
+				actionRow:AddCell():AddImageButton("Activate", activePreset ~= guid and "ico_active_button" or "ico_inactive_button", { 32, 32 })
+			)
 
 			if activePreset ~= guid then
-				presetGroup:AddButton("Activate (Save After)").OnClick = function()
+				activateButton:Tooltip():AddText("\t Activate this preset (deactivates the active preset if there is one)")
+				activateButton.OnClick = function()
 					Vanity:ActivatePreset(guid)
 					VanityPresetManager:UpdatePresetView(guid)
 					presetWindow.Open = false
 				end
 			else
-				presetGroup:AddButton("Deactivate (Save After)").OnClick = function()
+				activateButton:Tooltip():AddText("\t Deactivate this preset")
+				activateButton.OnClick = function()
 					Vanity:ActivatePreset()
 					VanityPresetManager:UpdatePresetView(guid)
 				end
 			end
 
-			presetGroup:AddButton("Duplicate").OnClick = function()
-				local newGuid = FormBuilder:generateGUID()
-				ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
-				ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name .. " (Copy)"
-				VanityPresetManager:UpdatePresetView(presetID)
+			local editButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
+			editButton:Tooltip():AddText("\t Edit this preset's name/author/version/SFW flag")
+			editButton.SameLine = true
+
+			local infoGroup = presetGroup:AddGroup("info")
+			editButton.OnClick = function()
+				if editButton.UserData then
+					VanityPresetManager:UpdatePresetView(guid)
+				else
+					editButton.UserData = true
+					buildPresetForm(infoGroup, guid)
+				end
 			end
 
-			presetGroup:AddButton("Delete").OnClick = function()
+			local deleteButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Delete", "ico_red_x", { 32, 32 }))
+			deleteButton:Tooltip():AddText("\t Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled").TextWrapPos = 600
+			deleteButton.SameLine = true
+			deleteButton.OnClick = function()
 				if VanityBackupManager:IsPresetInBackup(guid) then
 					VanityBackupManager:FlipPresetBackupRegistration(guid)
 				end
@@ -362,17 +367,14 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 			end
 
-			local editButton = presetGroup:AddButton("Edit Info")
-
-			local infoGroup = presetGroup:AddGroup("info")
-
-			editButton.OnClick = function()
-				if editButton.UserData then
-					VanityPresetManager:UpdatePresetView(guid)
-				else
-					editButton.UserData = true
-					buildPresetForm(infoGroup, guid)
-				end
+			local copyButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
+			copyButton:Tooltip():AddText("\t Duplicate this preset")
+			copyButton.SameLine = true
+			copyButton.OnClick = function()
+				local newGuid = FormBuilder:generateGUID()
+				ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
+				ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name .. " (Copy)"
+				VanityPresetManager:UpdatePresetView(presetID)
 			end
 
 			VanityModDependencyManager:DependencyValidator(preset, function()
