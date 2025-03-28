@@ -1,17 +1,12 @@
----@class VanityPresetExport
----@field effects {[string]: VanityEffect}
----@field miscNameCache {[Guid]: string}
----@field presets {[Guid]: VanityPreset}
-
 VanityExportManager = {}
 
 ---@param presetIds Guid[]
----@param existingExport VanityPresetExport?
----@return VanityPresetExport
+---@param existingExport Vanity?
+---@return Vanity
 function VanityExportManager:ExportPresets(presetIds, existingExport)
 	local realConfig = ConfigurationStructure:GetRealConfigCopy()
 
-	---@type VanityPresetExport
+	---@type Vanity
 	local export = existingExport or {
 		presets = {},
 		effects = {},
@@ -55,11 +50,15 @@ function VanityExportManager:ExportPresets(presetIds, existingExport)
 end
 
 ---@param presetIds Guid[]
-function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom)
+function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom, targetTable)
+	---@type Vanity
+	local vanityConfig = targetTable or ConfigurationStructure.config.vanity
+
 	-- Since we modify the effect names on each piece of equipment if they already exist in the current config and are different resources
 	exportToExtractFrom = TableUtils:DeeplyCopyTable(exportToExtractFrom)
 
-	---@type VanityPresetExport
+	---@type Vanity
+	---@diagnostic disable-next-line: missing-fields
 	local importedPreset = {
 		presets = {},
 		effects = {},
@@ -85,8 +84,8 @@ function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom)
 					for index, effect in pairs(outfitSlot.equipment.effects) do
 						if not importedPreset.effects[effect] then
 							if not importedPreset.effects[effect .. sanitizedPresetName] then
-								if ConfigurationStructure.config.vanity.effects[effect] then
-									if not TableUtils:TablesAreEqual(ConfigurationStructure.config.vanity.effects[effect], exportToExtractFrom.effects[effect]) then
+								if vanityConfig.effects[effect] and not targetTable then
+									if not TableUtils:TablesAreEqual(vanityConfig.effects[effect], exportToExtractFrom.effects[effect]) then
 										outfitSlot.equipment.effects[index] = effect .. sanitizedPresetName
 
 										importedPreset.effects[effect .. sanitizedPresetName] = TableUtils:DeeplyCopyTable(exportToExtractFrom.effects[effect])
@@ -108,8 +107,8 @@ function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom)
 							for index, effect in pairs(weaponSlot.equipment.effects) do
 								if not importedPreset.effects[effect] then
 									if not importedPreset.effects[effect .. sanitizedPresetName] then
-										if ConfigurationStructure.config.vanity.effects[effect] then
-											if not TableUtils:TablesAreEqual(ConfigurationStructure.config.vanity.effects[effect], exportToExtractFrom.effects[effect]) then
+										if vanityConfig.effects[effect] and not targetTable then
+											if not TableUtils:TablesAreEqual(vanityConfig.effects[effect], exportToExtractFrom.effects[effect]) then
 												weaponSlot.equipment.effects[index] = effect .. sanitizedPresetName
 
 												importedPreset.effects[effect .. sanitizedPresetName] = TableUtils:DeeplyCopyTable(exportToExtractFrom.effects[effect])
@@ -133,19 +132,19 @@ function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom)
 	end
 
 	for resourceId, cachedName in pairs(importedPreset.miscNameCache) do
-		if not ConfigurationStructure.config.vanity.miscNameCache[resourceId] then
-			ConfigurationStructure.config.vanity.miscNameCache[resourceId] = cachedName
+		if not vanityConfig.miscNameCache[resourceId] then
+			vanityConfig.miscNameCache[resourceId] = cachedName
 		end
 	end
 
 	for effectName, effect in pairs(importedPreset.effects) do
-		if not ConfigurationStructure.config.vanity.effects[effectName] then
-			ConfigurationStructure.config.vanity.effects[effectName] = effect
+		if not vanityConfig.effects[effectName] then
+			vanityConfig.effects[effectName] = effect
 		end
 	end
 
 	for presetId, preset in pairs(importedPreset.presets) do
-		ConfigurationStructure.config.vanity.presets[presetId] = preset
+		vanityConfig.presets[presetId] = preset
 		Logger:BasicInfo("Restored preset '%s' from export", preset.Name)
 	end
 end

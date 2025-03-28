@@ -8,6 +8,7 @@ Ext.Events.StatsLoaded:Subscribe(function()
 end)
 
 Ext.Require("Shared/Translator.lua")
+Ext.Require("Shared/Vanity/PresetProxy.lua")
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
 
 ConfigurationStructure:InitializeConfig()

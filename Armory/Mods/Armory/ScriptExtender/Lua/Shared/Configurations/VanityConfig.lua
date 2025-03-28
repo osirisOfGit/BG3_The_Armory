@@ -1,5 +1,6 @@
 -- Can't use variables to shortcut as that breaks type hints by the lua extension
 
+---@class Vanity
 ConfigurationStructure.config.vanity = {}
 
 --#region User Settings
@@ -31,6 +32,7 @@ ConfigurationStructure.config.vanity.settings = {
 --#endregion
 
 --#region Presets
+
 ConfigurationStructure.DynamicClassDefinitions.vanity = {}
 
 ---@class ModDependency

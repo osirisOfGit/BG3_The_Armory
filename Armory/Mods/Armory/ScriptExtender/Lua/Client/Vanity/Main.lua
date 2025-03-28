@@ -138,6 +138,8 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 			local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 			if presetId then
+				VanityModPresetManager:ImportPresetsFromMods()
+
 				local function validatePreset()
 					local preset = ConfigurationStructure.config.vanity.presets[presetId]
 
@@ -213,6 +215,8 @@ Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 		-- Mod variables load in after the InsertModMenuTab function runs
 		if ModuleUUID == payload.modUUID then
 			hasBeenActivated = true
+			
+			VanityModPresetManager:ImportPresetsFromMods()
 			local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
 				Vanity:ActivatePreset(activePresetUUID, true)

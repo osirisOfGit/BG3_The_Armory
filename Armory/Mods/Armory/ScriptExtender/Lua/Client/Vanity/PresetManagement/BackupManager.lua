@@ -21,7 +21,7 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "PresetBackupRegistry", {
 
 VanityBackupManager = {}
 
----@type VanityPresetExport?
+---@type Vanity?
 local cachedBackup
 
 Ext.RegisterConsoleCommand("Armory_Vanity_SeePresetBackupRegistry", function(cmd, ...)
@@ -36,7 +36,7 @@ Ext.RegisterConsoleCommand("Armory_Vanity_SeePresetBackupRegistry", function(cmd
 end)
 
 Ext.RegisterConsoleCommand("Armory_Vanity_SeeBackedUpPresets", function(cmd, ...)
-	---@type VanityPresetExport?
+	---@type Vanity?
 	local savedPresets = Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
 
 	if savedPresets then
@@ -104,7 +104,7 @@ function VanityBackupManager:BackupPresets(presetIds)
 end
 
 ---@param presetId Guid?
----@param presetBackup VanityPresetExport?
+---@param presetBackup Vanity?
 function VanityBackupManager:RestorePresetBackup(presetId, presetBackup)
 	if presetId then
 		if not presetBackup then

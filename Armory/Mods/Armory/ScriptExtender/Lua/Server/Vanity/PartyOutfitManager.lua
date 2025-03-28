@@ -24,6 +24,8 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 ActiveVanityPreset = nil
 
 Ext.Events.SessionLoaded:Subscribe(function(e)
+	VanityModPresetManager:ImportPresetsFromMods()
+	
 	ActiveVanityPreset = ConfigurationStructure:UpdateConfigForServer().vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
 end)
 

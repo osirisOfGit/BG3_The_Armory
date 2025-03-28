@@ -12,7 +12,7 @@ local informedUserOfHostRestriction = false
 -- reference any slice of this table and allow their IMGUI elements to modify the table without
 -- any additional logic for letting the server know there were changes. Only works for this implementation -
 -- too fragile for general use
-local function generate_recursive_metatable(proxy_table, real_table)
+function ConfigurationStructure:generate_recursive_metatable(proxy_table, real_table)
 	return setmetatable(proxy_table, {
 		-- don't use the proxy table during pairs() so we don't have to exclude any proxy fields
 		__pairs = function(this_table)
@@ -84,7 +84,7 @@ end
 ConfigurationStructure.DynamicClassDefinitions = {}
 
 --- @class Configuration
-ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+ConfigurationStructure.config = ConfigurationStructure:generate_recursive_metatable({}, real_config_table)
 
 Ext.Require("Shared/RarityEnum.lua")
 Ext.Require("Shared/SlotEnum.lua")
