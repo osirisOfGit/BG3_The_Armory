@@ -305,29 +305,29 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 			local metadataRow = metadataTable:AddRow()
 			metadataRow:AddCell()
-			local metadataText = metadataRow:AddCell():AddSelectable(string.format("v%s | %s | %s", preset.Version, preset.Author, preset.NSFW and "NSFW" or "SFW"))
+			local metadataText = metadataRow:AddCell():AddSelectable(string.format("%s | v%s | %s", preset.NSFW and "NSFW" or "SFW", preset.Version, preset.Author))
 			metadataText:SetStyle("SelectableTextAlign", 0.5)
 			metadataText.Disabled = true
 			
 			metadataRow:AddCell()
 
-			local actionRow = metadataTable:AddRow()
-			actionRow:AddCell()
-			local actionCell = actionRow:AddCell()
-			actionRow:AddCell()
+			local actionContainerRow = metadataTable:AddRow()
+			actionContainerRow:AddCell()
+			local actionContainer = actionContainerRow:AddCell()
+			actionContainerRow:AddCell()
 
-			local activateButton = Styler:ImageButton(actionCell:AddImageButton("Activate", activePreset == guid and "ico_active_button" or "ico_inactive_button", { 32, 32 }))
-			actionCell:AddDummy(16, 32).SameLine = true
+			local actionTable = actionContainer:AddTable("ActionTable", 4)
+			local actionRow = actionTable:AddRow()
 
-			local editButton = Styler:ImageButton(actionCell:AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
+			local activateButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Activate", activePreset ~= guid and "ico_active_button" or "ico_inactive_button", { 32, 32 }))
+
+			local editButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
 			editButton.SameLine = true
-			actionCell:AddDummy(16, 32).SameLine = true
 
-			local deleteButton = Styler:ImageButton(actionCell:AddImageButton("Delete", "ico_red_x", { 32, 32 }))
+			local deleteButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Delete", "ico_red_x", { 32, 32 }))
 			deleteButton.SameLine = true
-			actionCell:AddDummy(16, 32).SameLine = true
 
-			local copyButton = Styler:ImageButton(actionCell:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
+			local copyButton = Styler:ImageButton(actionRow:AddCell():AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
 			copyButton.SameLine = true
 
 			if activePreset ~= guid then
@@ -516,13 +516,13 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				Helpers:KillChildren(outfitsAndDependenciesGroup)
 
 				if generalSettings.outfitAndDependencyView == "universal" then
-					outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits")
+					outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits"):SetStyle("SeparatorTextAlign", 0.5)
 					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup)
 					outfitsAndDependenciesGroup:AddNewLine()
-					outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies")
+					outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies"):SetStyle("SeparatorTextAlign", 0.5)
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
 				else
-					outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report")
+					outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report"):SetStyle("SeparatorTextAlign", 0.5)
 					VanityModDependencyManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
 				end
 			end

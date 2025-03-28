@@ -20,7 +20,8 @@ function VanityModDependencyManager:GetModInfo(modDependency, excludeNotLoadedMe
 
 		return mod.Info.Name, ("v" .. table.concat(mod.Info.ModVersion, "."))
 	else
-		return string.format("%s%s", modDependency.Name or modDependency.Guid, not excludeNotLoadedMessage and "(Not Loaded)" or ""), ("v" .. table.concat(modDependency.Version, "."))
+		return string.format("%s%s", modDependency.Name or modDependency.Guid, not excludeNotLoadedMessage and "(Not Loaded)" or ""),
+			("v" .. table.concat(modDependency.Version, "."))
 	end
 end
 
@@ -171,14 +172,14 @@ function VanityModDependencyManager:DependencyValidator(preset, parentSupplier)
 		parent:AddNewLine()
 
 		local validationFailureHeader = parent:AddSeparatorText("Dependency Validation Failed!")
-
-		parent:AddText(
-		"Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)")
-
-		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
-
+		validationFailureHeader:SetStyle("SeparatorTextAlign", 0.5)
 		validationFailureHeader.Font = "Large"
 		validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
+
+		parent:AddText(
+			"Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)").TextWrapPos = 0
+
+		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
 
 		for outfitCriteria, validationErrorList in TableUtils:OrderedPairs(validationErrors) do
 			local header = parent:AddCollapsingHeader(outfitCriteria)
@@ -348,5 +349,3 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 		end
 	end
 end
-
-
