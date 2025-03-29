@@ -39,7 +39,7 @@ function ConfigurationStructure:generate_recursive_metatable(proxy_table, real_t
 				else
 					real_table[key] = value
 					if type(value) == "table" then
-						rawset(proxy_table, key, generate_recursive_metatable(
+						rawset(proxy_table, key, self:generate_recursive_metatable(
 							{
 								_parent_key = key,
 								_parent_table = real_table,
@@ -143,7 +143,7 @@ function ConfigurationStructure:InitializeConfig()
 		else
 			-- All config management is done on the client side - just want server to always use the full config file (instead of attempting to merge with defaults)
 			real_config_table = {}
-			ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+			ConfigurationStructure.config = self:generate_recursive_metatable({}, real_config_table)
 			CopyConfigsIntoReal(config, ConfigurationStructure.config)
 		end
 	end

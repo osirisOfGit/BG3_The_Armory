@@ -1,5 +1,5 @@
 Ext.Require("Client/_FormBuilder.lua")
-Ext.Require("Shared/Vanity/PresetManagement/ModPresetManager.lua")
+Ext.Require("Shared/Vanity/ModPresetManager.lua")
 Ext.Require("Client/Vanity/PresetManagement/ExportManager.lua")
 Ext.Require("Client/Vanity/PresetManagement/BackupManager.lua")
 Ext.Require("Client/Vanity/PresetManagement/ModDependencyManager.lua")
@@ -97,11 +97,11 @@ function VanityPresetManager:OpenManager()
 		local importPresetsFromFileButton = presetMenu:AddButton("Import Presets from File")
 
 		openExportManagerButton.OnClick = function()
-			VanityModPresetManager:BuildExportManagerWindow()
+			VanityExportManager:BuildExportManagerWindow()
 		end
 
 		importPresetsFromFileButton.OnClick = function()
-			VanityModPresetManager:BuildImportManagerWindow()
+			VanityExportManager:BuildImportManagerWindow()
 		end
 
 		local presetForm = presetWindow:AddGroup("NewPresetForm")
