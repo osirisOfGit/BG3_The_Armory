@@ -305,6 +305,9 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 				-- Formatting the page into columns
 				local metadataTable = presetGroup:AddTable("metadata", 3)
+				metadataTable:AddColumn("", "WidthStretch")
+				metadataTable:AddColumn("", "WidthFixed")
+				metadataTable:AddColumn("", "WidthStretch")
 				metadataTable.SizingStretchSame = true
 
 				local titleRow = metadataTable:AddRow()
@@ -332,7 +335,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					local text = modRow:AddCell():AddSelectable(string.format("Copied from %s v%s by %s", mod.Name, table.concat(mod.ModVersion or mod.Version, "."), mod.Author))
 					text.Disabled = true
 					text:SetStyle("SelectableTextAlign", 0.5)
-					text:SetStyle("Alpha", 0.7)
+					text:SetStyle("Alpha", 0.8)
 				end
 
 				local actionContainerRow = metadataTable:AddRow()
