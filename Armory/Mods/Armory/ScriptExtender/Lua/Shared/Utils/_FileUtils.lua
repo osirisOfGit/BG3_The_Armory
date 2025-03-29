@@ -65,9 +65,9 @@ function FileUtils:SaveStringContentToFile(filepath, content)
 	return true
 end
 
-function FileUtils:LoadTableFile(filepath)
+function FileUtils:LoadTableFile(filepath, addlArg)
 	local success, result = pcall(function()
-		local fileContent = FileUtils:LoadFile(filepath)
+		local fileContent = FileUtils:LoadFile(filepath, addlArg)
 		if fileContent then
 			return Ext.Json.Parse(fileContent)
 		end
@@ -87,9 +87,9 @@ end
 --- Convenience for loading a file under the AIM mod directory
 ---@param filepath string relative to the mod directory
 ---@return string|nil
-function FileUtils:LoadFile(filepath)
+function FileUtils:LoadFile(filepath, addlArg)
 	local success, result = pcall(function()
-		return Ext.IO.LoadFile(FileUtils:BuildAbsoluteFileTargetPath(filepath))
+		return Ext.IO.LoadFile(addlArg and filepath or FileUtils:BuildAbsoluteFileTargetPath(filepath), addlArg)
 	end)
 
 	if not success then

@@ -4,7 +4,7 @@ Ext.Require("Shared/Utils/_Logger.lua")
 Ext.Require("Shared/Utils/_TableUtils.lua")
 
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
-Ext.Require("Shared/Vanity/PresetManagement/ModPresetManager.lua")
+Ext.Require("Shared/Vanity/ModPresetManager.lua")
 Ext.Require("Shared/Vanity/PresetProxy.lua")
 
 Ext.Require("Server/Utility.lua")

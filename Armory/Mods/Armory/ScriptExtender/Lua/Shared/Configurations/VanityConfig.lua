@@ -41,6 +41,8 @@ ConfigurationStructure.DynamicClassDefinitions.modDependency = {
 	Name = nil,
 	---@type string
 	Guid = nil,
+	---@type string?
+	Author = nil,
 	---@type number[]
 	Version = nil,
 	---@type string?

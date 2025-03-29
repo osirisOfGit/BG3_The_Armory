@@ -1,5 +1,16 @@
 VanityModDependencyManager = {}
 
+---@param mod Module
+---@return ModDependency
+function VanityModDependencyManager:RecordDependency(mod)
+	return {
+		Name = mod.Info.Name,
+		Author = mod.Info.Author,
+		Guid = mod.Info.ModuleUUID,
+		Version = mod.Info.ModVersion
+	} --[[@as ModDependency]]
+end
+
 ---@param modDependency ModDependency
 ---@return string, string
 function VanityModDependencyManager:GetModInfo(modDependency, excludeNotLoadedMessage)
@@ -16,6 +27,10 @@ function VanityModDependencyManager:GetModInfo(modDependency, excludeNotLoadedMe
 
 		if not modDependency.Version then
 			modDependency.Version = mod.Info.ModVersion
+		end
+
+		if not modDependency.Author then
+			modDependency.Author = mod.Info.Author
 		end
 
 		return mod.Info.Name, ("v" .. table.concat(mod.Info.ModVersion, "."))

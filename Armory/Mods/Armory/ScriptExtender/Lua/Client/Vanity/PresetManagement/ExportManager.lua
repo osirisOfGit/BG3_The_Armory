@@ -4,8 +4,9 @@ VanityExportManager.ExportFilename = "Armory_Vanity_Mod_Presets.json"
 
 ---@param presetIds Guid[]
 ---@param existingExport Vanity?
+---@param newIds boolean?
 ---@return Vanity
-function VanityExportManager:ExportPresets(presetIds, existingExport)
+function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 	local realConfig = ConfigurationStructure:GetRealConfigCopy()
 
 	---@type Vanity
@@ -43,6 +44,10 @@ function VanityExportManager:ExportPresets(presetIds, existingExport)
 					end
 				end
 			end
+		end
+
+		if newIds then
+			presetId = FormBuilder:generateGUID()
 		end
 
 		export.presets[presetId] = preset
@@ -210,7 +215,7 @@ function VanityExportManager:BuildExportManagerWindow()
 			end
 		end
 
-		local success = FileUtils:SaveTableToFile(self.ExportFilename, VanityExportManager:ExportPresets(toExport))
+		local success = FileUtils:SaveTableToFile(self.ExportFilename, VanityExportManager:ExportPresets(toExport, nil, true))
 		errorText.Visible = not success
 		successText.Visible = success
 	end
