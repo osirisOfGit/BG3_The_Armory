@@ -395,11 +395,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(owningMod and preset or
 						ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
 
+					ConfigurationStructure.config.vanity.presets[newGuid].isModPreset = false
+
 					if not owningMod then
 						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name .. " (Copy)"
-						ConfigurationStructure.config.vanity.presets[newGuid].isModPreset = false
-					else
-						ConfigurationStructure.config.vanity.presets[newGuid].isModPreset = true
 					end
 					VanityPresetManager:UpdatePresetView(presetID)
 				end
