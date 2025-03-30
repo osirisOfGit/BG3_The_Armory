@@ -33,10 +33,6 @@ local function buildPresetForm(parent, forPresetId)
 	local preset
 	if forPresetId then
 		preset = ConfigurationStructure.config.vanity.presets[forPresetId]
-	else
-		local txt = parent:AddText("Create a New Preset")
-		txt.UserData = "keep"
-		txt.Font = "Large"
 	end
 
 	FormBuilder:CreateForm(parent, function(values)
@@ -94,14 +90,14 @@ function VanityPresetManager:OpenManager()
 		presetWindow.MenuBar = true
 		local menu = presetWindow:AddMainMenu()
 		---@type ExtuiMenu
-		local presetMenu = menu:AddMenu("Presets")
+		local presetMenu = menu:AddMenu("Manage Presets")
 
 		---@type ExtuiSelectable
-		local createNewPresetButton = presetMenu:AddSelectable("Create a New Preset")
+		local createNewPresetButton = presetMenu:AddSelectable("Create")
 		---@type ExtuiSelectable
-		local openExportManagerButton = presetMenu:AddSelectable("Export Presets")
+		local openExportManagerButton = presetMenu:AddSelectable("Export")
 		---@type ExtuiSelectable
-		local importPresetsFromFileButton = presetMenu:AddSelectable("Import Presets From File")
+		local importPresetsFromFileButton = presetMenu:AddSelectable("Import")
 
 		openExportManagerButton.OnClick = function()
 			openExportManagerButton.Selected = false
@@ -122,7 +118,7 @@ function VanityPresetManager:OpenManager()
 			presetForm.Visible = not presetForm.Visible
 		end
 
-		if not Ext.Vars.GetModVariables(ModuleUUID).ActivePreset then
+		if not Ext.Vars.GetModVariables(ModuleUUID).ActivePreset and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
 			createNewPresetButton.OnClick()
 		end
 
