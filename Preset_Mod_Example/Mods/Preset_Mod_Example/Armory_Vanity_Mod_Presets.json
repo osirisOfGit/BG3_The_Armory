@@ -1,42 +1,6 @@
 {
 	"effects" : 
 	{
-		"ARMORY_VANITY_EFFECT_Burning" : 
-		{
-			"Name" : "ARMORY_VANITY_EFFECT_Burning",
-			"cachedDisplayNames" : 
-			{
-				"2156dd48-f83b-4060-9a4e-cab994da8857" : "BURNING_StatusEffect"
-			},
-			"effectProps" : 
-			{
-				"StatusEffect" : "2156dd48-f83b-4060-9a4e-cab994da8857"
-			}
-		},
-		"ARMORY_VANITY_EFFECT_Crystal_Skin" : 
-		{
-			"Name" : "ARMORY_VANITY_EFFECT_Crystal_Skin",
-			"cachedDisplayNames" : 
-			{
-				"a522953e-74e1-447e-88c8-323d549c801f" : "CRYSTALSKIN_StatusEffect"
-			},
-			"effectProps" : 
-			{
-				"StatusEffect" : "a522953e-74e1-447e-88c8-323d549c801f"
-			}
-		},
-		"ARMORY_VANITY_EFFECT_Dark_Cloud" : 
-		{
-			"Name" : "ARMORY_VANITY_EFFECT_Dark_Cloud",
-			"cachedDisplayNames" : 
-			{
-				"a9fea626-0c13-4cea-a947-954f7084dbf7" : "DARK_JUSTICIAR_VFX_StatusEffect"
-			},
-			"effectProps" : 
-			{
-				"StatusEffect" : "a9fea626-0c13-4cea-a947-954f7084dbf7"
-			}
-		},
 		"ARMORY_VANITY_EFFECT_Psychic" : 
 		{
 			"Name" : "ARMORY_VANITY_EFFECT_Psychic",
@@ -60,18 +24,6 @@
 			{
 				"StatusEffect" : "8cea0ee8-9b2b-47bc-882a-9b508a6367a3"
 			}
-		},
-		"ARMORY_VANITY_EFFECT_Running_Blood" : 
-		{
-			"Name" : "ARMORY_VANITY_EFFECT_Running_Blood",
-			"cachedDisplayNames" : 
-			{
-				"6a8e81d8-dda5-438d-8414-01db0dc1f2ff" : "HAG_FLESHROT_StatusEffect"
-			},
-			"effectProps" : 
-			{
-				"StatusEffect" : "6a8e81d8-dda5-438d-8414-01db0dc1f2ff"
-			}
 		}
 	},
 	"miscNameCache" : 
@@ -80,19 +32,1042 @@
 		"2bb39cf2-4649-4238-8d0c-44f62b5a3dfd" : "Shadowheart",
 		"35c3caad-5543-4593-be75-e7deba30f062" : "Gale",
 		"3780c689-d903-41c2-bf64-1e6ec6a8e1e5" : "Astarion",
-		"5af0f42c-9b32-4c3c-b108-46c44196081b" : "The Dark Urge",
 		"84bfb42b-7200-4eda-aabc-d4273da53bc2" : "Blood Hunter",
 		"a4b56492-d5ac-4a84-8e45-5437cd9da7f3" : "Custom",
 		"a81ab143-b680-4c97-b267-a1a03b494361" : "Baalzebul Tiefling",
 		"b6dccbed-30f3-424b-a181-c4540cf38197" : "Tiefling",
-		"b8b4a974-b045-45f6-9516-b457b8773abd" : "Karlach",
-		"f8170505-1e7b-436e-a577-e7449f487779" : "The Dark Urge",
 		"fb3bc4c3-49eb-4944-b714-d0cb357bb635" : "Lae'zel",
 		"fcd08908-a761-4dad-874f-ee27441547bd" : "Sina'zith"
 	},
 	"presets" : 
 	{
-		"091986cc-2c28-42e1-be21-95d402ebc25c" : 
+		"2f929551-930e-4a8a-b1dc-a15b30a31d14" : 
+		{
+			"Author" : "diimmortalisdiimmortalisdiimmortalis",
+			"NSFW" : true,
+			"Name" : "Necro",
+			"Outfits" : 
+			{
+				"2bb39cf2-4649-4238-8d0c-44f62b5a3dfd||||||" : 
+				{
+					"Boots" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "bc97de4a-7a98-4383-817b-3120217c533f",
+							"modDependency" : 
+							{
+								"Guid" : "666afdba-fbd7-4a3c-b5a7-abc97ed552f9",
+								"Name" : "Tasha's Cauldron of Outfits",
+								"Version" : 
+								[
+									1,
+									7,
+									0,
+									0
+								]
+							},
+							"name" : "Shadow Striders"
+						}
+					},
+					"Breast" : 
+					{
+						"dye" : 
+						{
+							"guid" : "e2b1fdf1-b7e1-4320-8c72-355f59cb0e99",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Starry Night   "
+						},
+						"equipment" : 
+						{
+							"guid" : "c1f00286-c2a3-4dac-9d25-a8a1d93ead26",
+							"modDependency" : 
+							{
+								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
+								"Name" : "Final Fantasy XIV Gear Pack 3",
+								"Version" : 
+								[
+									1,
+									5,
+									0,
+									0
+								]
+							},
+							"name" : "YoRHa Type-53 Cyclas"
+						}
+					},
+					"Cloak" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "Hide Appearance",
+							"modDependency" : 
+							{
+								"Guid" : "633fde91-01d6-482e-9ee6-273a30be594c",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							}
+						}
+					},
+					"Gloves" : 
+					{
+						"dye" : 
+						{
+							"guid" : "e2b1fdf1-b7e1-4320-8c72-355f59cb0e99",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Starry Night   "
+						},
+						"equipment" : 
+						{
+							"guid" : "65820cc7-2160-4149-936e-409466387965",
+							"modDependency" : 
+							{
+								"Guid" : "3224cf9e-ac53-445a-9c8f-fc117668337a",
+								"Name" : "Scantily Outfit Separator",
+								"Version" : 
+								[
+									1,
+									7,
+									0,
+									130
+								]
+							},
+							"name" : "Sleeves of Lunar Devotion (with Gloves)"
+						}
+					},
+					"Helmet" : 
+					{
+						"dye" : 
+						{
+							"guid" : "e2b1fdf1-b7e1-4320-8c72-355f59cb0e99",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Starry Night   "
+						},
+						"equipment" : 
+						{
+							"guid" : "ac1f5f9f-db51-4e84-9067-4dab29d6d79d",
+							"modDependency" : 
+							{
+								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
+								"Name" : "Final Fantasy XIV Gear Pack 3",
+								"Version" : 
+								[
+									1,
+									5,
+									0,
+									0
+								]
+							},
+							"name" : "YoRHa Type-53 Headband"
+						}
+					},
+					"Melee Main Weapon" : 
+					{
+						"weaponTypes" : 
+						{
+							"Maces" : 
+							{
+								"equipment" : 
+								{
+									"guid" : "ca462ee9-10e6-4141-b932-af9d5e003efd",
+									"modDependency" : 
+									{
+										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
+										"Name" : "BasketEquipmentNSFW",
+										"Version" : 
+										[
+											1,
+											1,
+											5,
+											0
+										]
+									},
+									"name" : "Dark Mace"
+								}
+							}
+						}
+					},
+					"Melee Offhand Weapon" : 
+					{
+						"weaponTypes" : 
+						{
+							"Shields" : 
+							{
+								"equipment" : 
+								{
+									"guid" : "53f0f714-2698-472e-836e-6d348375272b",
+									"modDependency" : 
+									{
+										"Guid" : "957f4912-8d5e-4ad2-8add-a7f7ed7caa71",
+										"Name" : "ParryingWeapons",
+										"Version" : 
+										[
+											1,
+											4,
+											2,
+											0
+										]
+									},
+									"name" : "Parrying Staff"
+								}
+							}
+						}
+					},
+					"VanityBody" : 
+					{
+						"dye" : 
+						{
+							"guid" : "1fedcfd7-3b66-4e23-83a6-6a8fb6e3c1d6",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Sunset Dream  "
+						},
+						"equipment" : 
+						{
+							"guid" : "fcf53885-7aa4-412a-8228-4f499b8bc294",
+							"modDependency" : 
+							{
+								"Guid" : "e3613101-b534-429a-9a2c-4fb3b57ea9b5",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "BloomCore Outfit"
+						}
+					},
+					"VanityBoots" : 
+					{
+						"dye" : 
+						{
+							"guid" : "1fedcfd7-3b66-4e23-83a6-6a8fb6e3c1d6",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Sunset Dream  "
+						},
+						"equipment" : 
+						{
+							"guid" : "a50c627c-a872-4dd9-9ab5-aa590475c924",
+							"modDependency" : 
+							{
+								"Guid" : "756a07de-5290-4491-bd47-06c0e11d2da1",
+								"Name" : "BloomCore Outfit",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "BloomCore Shoes"
+						}
+					}
+				},
+				"35c3caad-5543-4593-be75-e7deba30f062||||||" : 
+				{
+					"Breast" : 
+					{
+						"dye" : 
+						{
+							"guid" : "24ba9b59-ef6c-422f-84f4-83475c7037f8",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Coral Moonstone  "
+						},
+						"equipment" : 
+						{
+							"guid" : "3454e7f8-f9e0-4934-b01b-3be07427492b",
+							"modDependency" : 
+							{
+								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
+								"Name" : "Final Fantasy XIV Gear Pack 2",
+								"Version" : 
+								[
+									1,
+									4,
+									0,
+									0
+								]
+							},
+							"name" : "Bihu Jacket"
+						}
+					}
+				},
+				"3780c689-d903-41c2-bf64-1e6ec6a8e1e5||||||" : 
+				{
+					"Boots" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "fc78d64f-a2b1-4390-8054-3f5889aeafb7",
+							"modDependency" : 
+							{
+								"Guid" : "414e7743-25e5-44ff-9445-94dc790c1a07",
+								"Name" : "Final Fantasy XIV Gear Pack 4",
+								"Version" : 
+								[
+									1,
+									1,
+									0,
+									0
+								]
+							},
+							"name" : "Augmented Neo-Ishgardian Boots"
+						}
+					},
+					"Breast" : 
+					{
+						"dye" : 
+						{
+							"guid" : "71b91d23-a6eb-441a-aca7-e9954297bb0b",
+							"modDependency" : 
+							{
+								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
+								"Name" : "TC_Dyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "Aeolian v3 Dye"
+						},
+						"equipment" : 
+						{
+							"guid" : "246ef9f7-c47a-4f7e-be62-9dfd380648a3",
+							"modDependency" : 
+							{
+								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
+								"Name" : "Final Fantasy XIV Gear Pack 2",
+								"Version" : 
+								[
+									1,
+									4,
+									0,
+									0
+								]
+							},
+							"name" : "Assassin's Coat"
+						}
+					},
+					"Cloak" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "711f1f43-50e0-4a2b-90f5-93091fc68672",
+							"modDependency" : 
+							{
+								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
+								"Name" : "MIXARMOUR",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "QUIVER Cloak Slot"
+						}
+					},
+					"Gloves" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "656de64f-9554-4a04-90a3-a07d9f6434b9",
+							"modDependency" : 
+							{
+								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
+								"Name" : "Final Fantasy XIV Gear Pack 3",
+								"Version" : 
+								[
+									1,
+									5,
+									0,
+									0
+								]
+							},
+							"name" : "Appointed Gloves"
+						}
+					},
+					"Helmet" : 
+					{
+						"dye" : 
+						{
+							"guid" : "71b91d23-a6eb-441a-aca7-e9954297bb0b",
+							"modDependency" : 
+							{
+								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
+								"Name" : "TC_Dyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "Aeolian v3 Dye"
+						},
+						"equipment" : 
+						{
+							"guid" : "3af850e5-0d9b-4e0f-85ed-9992c4916e90",
+							"modDependency" : 
+							{
+								"Guid" : "414e7743-25e5-44ff-9445-94dc790c1a07",
+								"Name" : "Final Fantasy XIV Gear Pack 4",
+								"Version" : 
+								[
+									1,
+									1,
+									0,
+									0
+								]
+							},
+							"name" : "Warg Pelt B"
+						}
+					},
+					"Ranged Main Weapon" : 
+					{
+						"weaponTypes" : 
+						{
+							"Shortbows" : 
+							{
+								"equipment" : 
+								{
+									"guid" : "a2de77a8-c868-48b4-bd8a-c1687e02f1e5",
+									"modDependency" : 
+									{
+										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
+										"Name" : "BasketEquipmentNSFW",
+										"Version" : 
+										[
+											1,
+											1,
+											5,
+											0
+										]
+									},
+									"name" : "Dark Shortbow"
+								}
+							}
+						}
+					}
+				},
+				"a4b56492-d5ac-4a84-8e45-5437cd9da7f3||||||" : 
+				{
+					"Boots" : 
+					{
+						"dye" : 
+						{
+							"guid" : "50cc045b-ab8e-4599-89f3-6496d196cb07",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Hex   "
+						},
+						"equipment" : 
+						{
+							"guid" : "6122528d-1570-4c39-a545-6ac7d12f0cae",
+							"modDependency" : 
+							{
+								"Guid" : "22308960-d1cd-49ae-ac9c-d7336de7a586",
+								"Name" : "InfernalIntimates",
+								"Version" : 
+								[
+									1,
+									1,
+									0,
+									0
+								]
+							},
+							"name" : "Lucretian Heels"
+						}
+					},
+					"Breast" : 
+					{
+						"dye" : 
+						{
+							"guid" : "35ce72b4-7764-4584-abf3-e148b89bc576",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "Benthos v3 Dye"
+						},
+						"equipment" : 
+						{
+							"guid" : "92c29729-b172-4660-8482-ce752475d69e",
+							"modDependency" : 
+							{
+								"Guid" : "428d65d4-3e4a-470d-b49a-dd171c181285",
+								"Name" : "DAV Crow Outfit",
+								"Version" : 
+								[
+									1,
+									3,
+									0,
+									0
+								]
+							},
+							"name" : "Mars Attire"
+						}
+					},
+					"Cloak" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "Hide Appearance",
+							"modDependency" : 
+							{
+								"Guid" : "430eb583-84b3-4a45-9f78-303a731b3ff8",
+								"Version" : 
+								[
+									0,
+									0,
+									0,
+									40
+								]
+							}
+						}
+					},
+					"Gloves" : 
+					{
+						"dye" : 
+						{
+							"guid" : "08bc23be-cfa0-4fce-ad9b-c159b266fca7",
+							"modDependency" : 
+							{
+								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
+								"Name" : "TC_Dyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "Abscindere v3 Dye"
+						},
+						"equipment" : 
+						{
+							"guid" : "b68a9f7d-183b-4091-8c7d-34d15f7a6946",
+							"modDependency" : 
+							{
+								"Guid" : "646fabe1-8b5a-4399-923d-db440ddaca2c",
+								"Name" : "HW_BloodmoonArmour",
+								"Version" : 
+								[
+									3,
+									2,
+									0,
+									0
+								]
+							},
+							"name" : "Bloodmoon Gloves A"
+						}
+					},
+					"Helmet" : 
+					{
+						"dye" : 
+						{
+							"guid" : "50cc045b-ab8e-4599-89f3-6496d196cb07",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Hex   "
+						},
+						"equipment" : 
+						{
+							"guid" : "09e63b2b-9e5c-4c45-a31e-0b9aebcb45a7",
+							"modDependency" : 
+							{
+								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
+								"Name" : "MIXARMOUR",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "Witch Hat"
+						}
+					},
+					"Melee Main Weapon" : 
+					{
+						"weaponTypes" : 
+						{
+							"Quarterstaffs" : 
+							{
+								"equipment" : 
+								{
+									"effects" : 
+									[
+										"ARMORY_VANITY_EFFECT_Red_Ghost"
+									],
+									"guid" : "cf42b0d0-89d8-4756-b6d7-1e258dceeab0",
+									"modDependency" : 
+									{
+										"Guid" : "8a3a7cd5-b863-47a7-88d6-aa0d72b589ef",
+										"OriginalMod" : 
+										{
+											"Guid" : "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8",
+											"Name" : "GustavDev",
+											"Version" : 
+											[
+												4,
+												7,
+												200,
+												6009851
+											]
+										},
+										"Version" : 
+										[
+											1,
+											0,
+											0,
+											0
+										]
+									},
+									"name" : "Woe"
+								}
+							}
+						}
+					},
+					"VanityBody" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "f5f378d1-97bd-4279-91b1-c95c2f64dcf9",
+							"modDependency" : 
+							{
+								"Guid" : "428d65d4-3e4a-470d-b49a-dd171c181285",
+								"Name" : "DAV Crow Outfit",
+								"Version" : 
+								[
+									1,
+									3,
+									0,
+									0
+								]
+							},
+							"name" : "Crow Armour"
+						}
+					},
+					"VanityBoots" : 
+					{
+						"equipment" : 
+						{
+							"guid" : "956e71c2-6eaf-407e-8470-e334a2952982",
+							"modDependency" : 
+							{
+								"Guid" : "3ddd8e03-320e-4842-89cc-1cacdd6bd9e5",
+								"Name" : "Fancy noble gear",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "Noble dancing shoes"
+						}
+					}
+				},
+				"fb3bc4c3-49eb-4944-b714-d0cb357bb635||||||" : 
+				{
+					"Boots" : 
+					{
+						"dye" : 
+						{
+							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Dragon Inferno   "
+						},
+						"equipment" : 
+						{
+							"effects" : 
+							[
+								"ARMORY_VANITY_EFFECT_Psychic"
+							],
+							"guid" : "b9f1b05d-d95b-4284-8bcc-1b6957bfe80b",
+							"modDependency" : 
+							{
+								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
+								"Name" : "Final Fantasy XIV Gear Pack 2",
+								"Version" : 
+								[
+									1,
+									4,
+									0,
+									0
+								]
+							},
+							"name" : "Riversbreath Boots"
+						}
+					},
+					"Breast" : 
+					{
+						"dye" : 
+						{
+							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Dragon Inferno   "
+						},
+						"equipment" : 
+						{
+							"effects" : 
+							[
+								"ARMORY_VANITY_EFFECT_Psychic"
+							],
+							"guid" : "d76dd47b-e1bf-4e30-b366-6069d9eb9e22",
+							"modDependency" : 
+							{
+								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
+								"OriginalMod" : 
+								{
+									"Guid" : "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8",
+									"Name" : "GustavDev",
+									"Version" : 
+									[
+										4,
+										7,
+										200,
+										6009851
+									]
+								},
+								"Version" : 
+								[
+									4,
+									0,
+									4,
+									206
+								]
+							},
+							"name" : "Hellgloom Armour "
+						}
+					},
+					"Cloak" : 
+					{
+						"dye" : 
+						{
+							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Dragon Inferno   "
+						},
+						"equipment" : 
+						{
+							"effects" : 
+							[
+								"ARMORY_VANITY_EFFECT_Psychic"
+							],
+							"guid" : "711f1f43-50e0-4a2b-90f5-93091fc68672",
+							"modDependency" : 
+							{
+								"Guid" : "ed68e79c-86db-4f4f-bcd8-2f22ae778920",
+								"Name" : "The Valkyrie Armor By REN",
+								"Version" : 
+								[
+									1,
+									0,
+									233,
+									3395918
+								]
+							},
+							"name" : "QUIVER Cloak Slot"
+						}
+					},
+					"Gloves" : 
+					{
+						"dye" : 
+						{
+							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Dragon Inferno   "
+						},
+						"equipment" : 
+						{
+							"effects" : 
+							[
+								"ARMORY_VANITY_EFFECT_Psychic"
+							],
+							"guid" : "cb9d9410-1951-425a-bbff-47b1279a60dd",
+							"modDependency" : 
+							{
+								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
+								"Name" : "Final Fantasy XIV Gear Pack 2",
+								"Version" : 
+								[
+									1,
+									4,
+									0,
+									0
+								]
+							},
+							"name" : "Light-Heavy Gloves"
+						}
+					},
+					"Helmet" : 
+					{
+						"dye" : 
+						{
+							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Dragon Inferno   "
+						},
+						"equipment" : 
+						{
+							"effects" : 
+							[
+								"ARMORY_VANITY_EFFECT_Psychic"
+							],
+							"guid" : "bf7d7488-5efc-4427-843a-be8f10ae3b24",
+							"modDependency" : 
+							{
+								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
+								"Name" : "MIXARMOUR",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : "Metal Visor"
+						}
+					},
+					"Melee Main Weapon" : 
+					{
+						"weaponTypes" : 
+						{
+							"Longswords" : 
+							{
+								"equipment" : 
+								{
+									"effects" : 
+									[
+										"ARMORY_VANITY_EFFECT_Psychic"
+									],
+									"guid" : "e26f6186-405d-4da4-839f-aa5958584fd5",
+									"modDependency" : 
+									{
+										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
+										"Name" : "BasketEquipmentNSFW",
+										"Version" : 
+										[
+											1,
+											1,
+											5,
+											0
+										]
+									},
+									"name" : "Longsword of Lae'zel"
+								}
+							}
+						}
+					},
+					"VanityBody" : 
+					{
+						"dye" : 
+						{
+							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
+							"modDependency" : 
+							{
+								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
+								"Name" : "EngelsDyes",
+								"Version" : 
+								[
+									1,
+									0,
+									0,
+									0
+								]
+							},
+							"name" : " Dragon Inferno   "
+						},
+						"equipment" : 
+						{
+							"guid" : "97d59a0d-2ff4-42f3-a8ae-d4e2a8840fd2",
+							"modDependency" : 
+							{
+								"Guid" : "831f1b5d-8837-4cf7-87aa-3c48885e81c4",
+								"Name" : "jerinski_gothyanki-gear",
+								"Version" : 
+								[
+									1,
+									0,
+									9,
+									0
+								]
+							},
+							"name" : "Barbarianki"
+						}
+					}
+				}
+			},
+			"Version" : "1.0.0"
+		},
+		"d9a6dcad-d8bc-4e5d-abca-a1b68e6a91bb" : 
 		{
 			"Author" : "diimmortalis",
 			"CustomDependencies" : 
@@ -1178,4128 +2153,6 @@
 				}
 			},
 			"Version" : "1.0.0"
-		},
-		"52df636f-5a01-4f75-8564-d5dcfb157452" : 
-		{
-			"Author" : "diimmortalis",
-			"NSFW" : true,
-			"Name" : "Durge Dragon",
-			"Outfits" : 
-			{
-				"2bb39cf2-4649-4238-8d0c-44f62b5a3dfd||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "294c9c24-17c5-46a7-a17b-935f68f3cad6",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Mondrian  "
-						},
-						"equipment" : 
-						{
-							"guid" : "fbab7765-e04a-4c88-bbb9-558fb3e94b92",
-							"modDependency" : 
-							{
-								"Guid" : "df35c952-9f35-4cb8-ba78-fc00a7005c84",
-								"Name" : "lokelani's lavish livery",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Nocturne Elegant Boots"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "7a6a1d46-ef89-48c3-bf5e-4bdee33132ce",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Astarion: Vampire Lord"
-						},
-						"equipment" : 
-						{
-							"guid" : "f86dab3d-9c1a-4104-9f15-63c611448ce3",
-							"modDependency" : 
-							{
-								"Guid" : "e3613101-b534-429a-9a2c-4fb3b57ea9b5",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Elven Crescent Bikini Armor"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "294c9c24-17c5-46a7-a17b-935f68f3cad6",
-							"modDependency" : 
-							{
-								"Guid" : "dba7c6a7-2e5d-426c-ac8b-804b93515b35",
-								"Name" : "ColorPresetsAsDyes",
-								"Version" : 
-								[
-									3,
-									2,
-									0,
-									0
-								]
-							},
-							"name" : " Mondrian  "
-						},
-						"equipment" : 
-						{
-							"guid" : "8298426a-8cf8-4d4d-8ad6-d62e3fe71c7c",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Red Pareo 1A"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Psychic"
-							]
-						}
-					},
-					"Melee Offhand Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Shields" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "021da683-f1e8-4787-a56e-0cac92d889d0",
-									"modDependency" : 
-									{
-										"Guid" : "09ae2205-4f66-6848-ab32-bf8fa0c084f0",
-										"Name" : "More_Shields_by_Guigodead",
-										"Version" : 
-										[
-											1,
-											0,
-											0,
-											16
-										]
-									},
-									"name" : "Dagon's Scale Shield"
-								}
-							}
-						}
-					},
-					"Ranged Main Weapon" : 
-					{
-						"weaponTypes" : []
-					},
-					"Underwear" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4bcac305-0e88-4caf-9f4c-6d2fb72d8841",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Crimson Abyss   "
-						},
-						"equipment" : 
-						{
-							"guid" : "92ab840c-5bd5-4871-bd44-13a0e324e1f6",
-							"modDependency" : 
-							{
-								"Guid" : "527d29db-ba55-4d77-a275-0f38ea6c8d02",
-								"Name" : "MIXARMOURII",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Cleric Hood Underwear Slot"
-						}
-					},
-					"VanityBody" : 
-					{
-						"dye" : 
-						{
-							"guid" : "ada9bd66-d487-4f8b-8c19-22c78fdc9be2",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Bloody Snow  "
-						},
-						"equipment" : 
-						{
-							"guid" : "ebddd329-f94d-42b3-97b4-94b4351af9eb",
-							"modDependency" : 
-							{
-								"Guid" : "4c33ca00-7668-4c41-97a4-5572950da4a6",
-								"Name" : "Enchanted Threads",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Atlantis Dress"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"guid" : "ad6cd3fe-7ed1-489f-9a5a-f76154d6d0c4",
-							"modDependency" : 
-							{
-								"Guid" : "3224cf9e-ac53-445a-9c8f-fc117668337a",
-								"Name" : "Scantily Outfit Separator",
-								"Version" : 
-								[
-									1,
-									7,
-									0,
-									130
-								]
-							},
-							"name" : "Bhaalist Heels"
-						}
-					}
-				},
-				"3780c689-d903-41c2-bf64-1e6ec6a8e1e5||||||" : 
-				{
-					"Boots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "17bd6927-2c86-4a94-ac23-d4edf00e4e9a",
-							"modDependency" : 
-							{
-								"Guid" : "414e7743-25e5-44ff-9445-94dc790c1a07",
-								"Name" : "Final Fantasy XIV Gear Pack 4",
-								"Version" : 
-								[
-									1,
-									1,
-									0,
-									0
-								]
-							},
-							"name" : "Landsaint's Boots"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "50cc045b-ab8e-4599-89f3-6496d196cb07",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Hex   "
-						},
-						"equipment" : 
-						{
-							"guid" : "877ad2c9-3159-44ff-98a1-6562f18ab069",
-							"modDependency" : 
-							{
-								"Guid" : "f662fd33-3fad-4e2c-8d69-335de21bda13",
-								"Name" : "AuraOfMurderRebalance",
-								"Version" : 
-								[
-									1,
-									0,
-									1,
-									0
-								]
-							},
-							"name" : "Fallen's Armour"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "Hide Appearance"
-						}
-					},
-					"Gloves" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "ce92a056-0754-4e8a-b3b7-5d6cbb844c65",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Raven Gloves"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "07a4c4cf-370b-4490-af55-0c055042ec40",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Astarion: Hero & Adventurer"
-						},
-						"equipment" : 
-						{
-							"guid" : "3af850e5-0d9b-4e0f-85ed-9992c4916e90",
-							"modDependency" : 
-							{
-								"Guid" : "6607e6cf-ba48-4d97-9a48-aeaad79ea0bc",
-								"Name" : "Elden Ring Gear",
-								"Version" : 
-								[
-									1,
-									8,
-									0,
-									0
-								]
-							},
-							"name" : "Warg Pelt B"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Daggers" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "9f26b2e2-e6e3-435a-a543-d1e11a17c08f",
-									"modDependency" : 
-									{
-										"Guid" : "43a6a201-0bd5-3f0f-6f1f-280165719f89",
-										"Name" : "Veil and Venom: Rogue Equipment",
-										"Version" : 
-										[
-											1,
-											0,
-											0,
-											2
-										]
-									},
-									"name" : "The Backstabber's Blade"
-								}
-							}
-						}
-					},
-					"Ranged Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Shortbows" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Dark_Cloud"
-									],
-									"guid" : "a2de77a8-c868-48b4-bd8a-c1687e02f1e5",
-									"modDependency" : 
-									{
-										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-										"Name" : "BasketEquipmentNSFW",
-										"Version" : 
-										[
-											1,
-											1,
-											5,
-											0
-										]
-									},
-									"name" : "Dark Shortbow"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "246ef9f7-c47a-4f7e-be62-9dfd380648a3",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "Assassin's Coat"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "cb0a1e8c-58be-4dff-b962-797f6b36c3d0",
-							"modDependency" : 
-							{
-								"Guid" : "73928ffc-07c0-46ac-8cf4-86a693b0cd92",
-								"Name" : "Scantily Camp Outfit",
-								"Version" : 
-								[
-									2,
-									0,
-									83,
-									2
-								]
-							},
-							"name" : "Bhaalist Mask"
-						}
-					}
-				},
-				"5af0f42c-9b32-4c3c-b108-46c44196081b||||||" : 
-				{
-					"Boots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "Hide Appearance"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4bcac305-0e88-4caf-9f4c-6d2fb72d8841",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Crimson Abyss   "
-						},
-						"equipment" : 
-						{
-							"guid" : "f34a9751-13e3-452e-8781-454d12624cf1",
-							"modDependency" : 
-							{
-								"Guid" : "ed539163-bb70-431b-96a7-f5b2eda5376b",
-								"Name" : "Shared",
-								"Version" : 
-								[
-									1,
-									0,
-									233,
-									5703452
-								]
-							},
-							"name" : "Oathbreaker Armor"
-						}
-					},
-					"Cloak" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4bcac305-0e88-4caf-9f4c-6d2fb72d8841",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Crimson Abyss   "
-						},
-						"equipment" : 
-						{
-							"guid" : "072f39ee-d42a-43e2-b860-2a3269b9766e",
-							"modDependency" : 
-							{
-								"Guid" : "057cb283-8dfa-4f3f-b8d1-a2f854c18dff",
-								"Name" : "CloaksOfFaerun",
-								"Version" : 
-								[
-									2,
-									2,
-									0,
-									0
-								]
-							},
-							"name" : "Bhaalist Cloak"
-						}
-					},
-					"Gloves" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "Hide Appearance"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4bcac305-0e88-4caf-9f4c-6d2fb72d8841",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Crimson Abyss   "
-						},
-						"equipment" : 
-						{
-							"guid" : "139b28dc-7db0-40b2-a383-3a4ce4c09812",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Sarevok's Horned Helmet"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Greataxes" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "7bbc2408-14de-4129-bab0-db29927b7f43",
-									"modDependency" : 
-									{
-										"Guid" : "8a3a7cd5-b863-47a7-88d6-aa0d72b589ef",
-										"Name" : "VanillaOverhaulArsenalCompat",
-										"Version" : 
-										[
-											1,
-											0,
-											0,
-											0
-										]
-									},
-									"name" : "Sethan"
-								}
-							},
-							"Greatclubs" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "7ee0b513-403b-4fe3-a445-b599defa9331",
-									"modDependency" : 
-									{
-										"Guid" : "8a3a7cd5-b863-47a7-88d6-aa0d72b589ef",
-										"Name" : "VanillaOverhaulArsenalCompat",
-										"Version" : 
-										[
-											1,
-											0,
-											0,
-											0
-										]
-									},
-									"name" : "Rat Bat"
-								}
-							},
-							"Greatswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Running_Blood"
-									],
-									"guid" : "3725479a-8752-4bc3-9736-5f663b716810",
-									"modDependency" : 
-									{
-										"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
-										"Name" : "Final Fantasy XIV Gear Pack 2",
-										"Version" : 
-										[
-											1,
-											4,
-											0,
-											0
-										]
-									},
-									"name" : "Maleficus"
-								}
-							},
-							"Longswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Red_Ghost",
-										"ARMORY_VANITY_EFFECT_Running_Blood"
-									],
-									"guid" : "02b28591-6c44-495f-bdc2-a5488d25799f",
-									"modDependency" : 
-									{
-										"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-										"Name" : "Final Fantasy XIV Gear Pack 3",
-										"Version" : 
-										[
-											1,
-											5,
-											0,
-											0
-										]
-									},
-									"name" : "Sword of Light"
-								}
-							}
-						}
-					},
-					"Ranged Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"LightCrossbows" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "c1cfc0d3-1007-5af3-b015-0000000fea12",
-									"modDependency" : 
-									{
-										"Guid" : "396c5966-09b0-40a1-af3f-93a5e9ce71c0",
-										"Name" : "CommunityLibrary",
-										"Version" : 
-										[
-											2,
-											2,
-											8,
-											5
-										]
-									},
-									"name" : "Light Crossbow of Terror"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4bcac305-0e88-4caf-9f4c-6d2fb72d8841",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Crimson Abyss   "
-						},
-						"equipment" : 
-						{
-							"guid" : "c67137ac-4ece-4652-aaab-14615aa25b20",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Oathbreaker Knight Armour"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4bcac305-0e88-4caf-9f4c-6d2fb72d8841",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Crimson Abyss   "
-						},
-						"equipment" : 
-						{
-							"guid" : "b82190bb-e237-4cbb-a94c-ee624bae32b2",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Steel White Leather Footwear E"
-						}
-					}
-				},
-				"f8170505-1e7b-436e-a577-e7449f487779||||||" : [],
-				"fb3bc4c3-49eb-4944-b714-d0cb357bb635||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4244baa5-c9d9-4c0e-a83d-306dcd863c17",
-							"modDependency" : 
-							{
-								"Guid" : "6dff611f-9f2e-45b1-b43e-06b62753cff9",
-								"Name" : "HW_BoringDyes",
-								"Version" : 
-								[
-									1,
-									9,
-									1,
-									0
-								]
-							},
-							"name" : "Animals Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "b2a1ca45-edd7-4977-9cbc-1225466fa8c1",
-							"modDependency" : 
-							{
-								"Guid" : "831f1b5d-8837-4cf7-87aa-3c48885e81c4",
-								"Name" : "jerinski_gothyanki-gear",
-								"Version" : 
-								[
-									1,
-									0,
-									9,
-									0
-								]
-							},
-							"name" : "Classy Gith Boots"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4244baa5-c9d9-4c0e-a83d-306dcd863c17",
-							"modDependency" : 
-							{
-								"Guid" : "6dff611f-9f2e-45b1-b43e-06b62753cff9",
-								"Name" : "HW_BoringDyes",
-								"Version" : 
-								[
-									1,
-									9,
-									1,
-									0
-								]
-							},
-							"name" : "Animals Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "a97e6b3d-8c69-469c-9ac2-120d30d8383b",
-							"modDependency" : 
-							{
-								"Guid" : "666afdba-fbd7-4a3c-b5a7-abc97ed552f9",
-								"Name" : "Tasha's Cauldron of Outfits",
-								"Version" : 
-								[
-									1,
-									7,
-									0,
-									0
-								]
-							},
-							"name" : "Berserker"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "Hide Appearance"
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "4244baa5-c9d9-4c0e-a83d-306dcd863c17",
-							"modDependency" : 
-							{
-								"Guid" : "6dff611f-9f2e-45b1-b43e-06b62753cff9",
-								"Name" : "HW_BoringDyes",
-								"Version" : 
-								[
-									1,
-									9,
-									1,
-									0
-								]
-							},
-							"name" : "Animals Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "85865321-5feb-447f-92e7-5c04359fe3af",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Gauntlets of the Warmaster"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "bed40498-8dfc-44b1-8ede-613ba514c4d4",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Limonite  "
-						},
-						"equipment" : 
-						{
-							"guid" : "ac1f5f9f-db51-4e84-9067-4dab29d6d79d",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "YoRHa Type-53 Headband"
-						}
-					}
-				}
-			},
-			"Version" : "1.0.0"
-		},
-		"994ad540-0113-41a8-9c77-99143b291606" : 
-		{
-			"Author" : "diimmortalis",
-			"NSFW" : true,
-			"Name" : "Wizardo c2",
-			"Outfits" : 
-			{
-				"2bb39cf2-4649-4238-8d0c-44f62b5a3dfd||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "f5d84410-8a16-48d0-9f0f-dac28c7fa45b",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Pretty in Pink Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "95510492-f8a1-4edb-bd7d-150c9ebd4f67",
-							"modDependency" : 
-							{
-								"Guid" : "ed539163-bb70-431b-96a7-f5b2eda5376b",
-								"Name" : "Shared",
-								"Version" : 
-								[
-									1,
-									0,
-									233,
-									5703452
-								]
-							},
-							"name" : "Necromancer Parka"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "f5d84410-8a16-48d0-9f0f-dac28c7fa45b",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Pretty in Pink Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "75b5a8c1-dee5-4bc6-85e9-601d58a6050f",
-							"modDependency" : 
-							{
-								"Guid" : "ed539163-bb70-431b-96a7-f5b2eda5376b",
-								"Name" : "Shared",
-								"Version" : 
-								[
-									1,
-									0,
-									233,
-									5703452
-								]
-							},
-							"name" : "Necromancer Attire"
-						}
-					},
-					"Cloak" : 
-					{
-						"dye" : 
-						{
-							"guid" : "db9af542-23ff-4fea-861f-da63aee10415",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Blooming Rust Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "4eec1835-80f0-4392-94fd-f9551269cd91",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Black Barbarian Bra"
-						}
-					},
-					"Gloves" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "95e2c9bd-1258-4074-bf85-8e8440815d9a",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "Archmage's Hand Runes"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "f5d84410-8a16-48d0-9f0f-dac28c7fa45b",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Pretty in Pink Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "abde88fd-6f01-440d-8f62-ca16f17d3929",
-							"modDependency" : 
-							{
-								"Guid" : "756a07de-5290-4491-bd47-06c0e11d2da1",
-								"Name" : "BloomCore Outfit",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "BloomCore Mask"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Maces" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "c31d6b30-2377-4e3c-a602-d5d527defc11",
-									"modDependency" : 
-									{
-										"Guid" : "4c628a1a-34d9-4362-8459-2c2bb3b8e5fb",
-										"Name" : "DIQ Misc Patches",
-										"Version" : 
-										[
-											1,
-											3,
-											1,
-											0
-										]
-									},
-									"name" : "Handmaiden's Mace"
-								}
-							},
-							"Spears" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "9ea23ff5-4032-4a0e-9540-3abe6cdd4217",
-									"modDependency" : 
-									{
-										"Guid" : "d4d885b7-061d-4ca4-ab2b-77eb0af8555c",
-										"Name" : "BetterGear_MoonDruid",
-										"Version" : 
-										[
-											1,
-											4,
-											4,
-											0
-										]
-									},
-									"name" : "Spear of Stars"
-								}
-							}
-						}
-					},
-					"Melee Offhand Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Shields" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "7e03c3a5-35d4-449d-8c60-32a5e7431777",
-									"modDependency" : 
-									{
-										"Guid" : "957f4912-8d5e-4ad2-8add-a7f7ed7caa71",
-										"Name" : "ParryingWeapons",
-										"Version" : 
-										[
-											1,
-											4,
-											2,
-											0
-										]
-									},
-									"name" : "Warding Wand"
-								}
-							}
-						}
-					},
-					"Underwear" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "94029e23-05d3-4474-a3db-4623dd3329ea",
-							"modDependency" : 
-							{
-								"Guid" : "a5afa0cb-6ec5-409c-a6ee-ed3409321ecc",
-								"Name" : "Mythral accessories",
-								"Version" : 
-								[
-									0,
-									0,
-									0,
-									268435456
-								]
-							},
-							"name" : "Choker E"
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "857a33cc-8df7-415c-abee-2fd573655b55",
-							"modDependency" : 
-							{
-								"Guid" : "e3613101-b534-429a-9a2c-4fb3b57ea9b5",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							}
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "870bd4eb-c302-41f3-8080-ece21dc577a8",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Tomb  "
-						},
-						"equipment" : 
-						{
-							"guid" : "d4d4d11a-4078-4bc3-919a-0d929360d8a3",
-							"modDependency" : 
-							{
-								"Guid" : "73928ffc-07c0-46ac-8cf4-86a693b0cd92",
-								"Name" : "Scantily Camp Outfit",
-								"Version" : 
-								[
-									2,
-									0,
-									83,
-									2
-								]
-							},
-							"name" : "Mizora Crown"
-						}
-					}
-				},
-				"a4b56492-d5ac-4a84-8e45-5437cd9da7f3||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "e5f75373-20cd-4914-bbab-1f034df680cc",
-							"modDependency" : 
-							{
-								"Guid" : "991c9c7a-fb80-40cb-8f0d-b92d4e80e9b1",
-								"Name" : "Gustav",
-								"Version" : 
-								[
-									1,
-									0,
-									235,
-									5703452
-								]
-							},
-							"name" : "Bloodflower Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "d39eb4e4-f7b9-4819-ba94-fcda49c2797e",
-							"modDependency" : 
-							{
-								"Guid" : "7c3bf56c-32f9-3db5-7d24-3624dab8ec46",
-								"Name" : "Song and Steel: Bard Equipment",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									4
-								]
-							},
-							"name" : "Boots of the Springing Step"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "dfb0bd5d-e4ed-4bd3-bcfe-45195260e7dc",
-							"modDependency" : 
-							{
-								"Guid" : "991c9c7a-fb80-40cb-8f0d-b92d4e80e9b1",
-								"Name" : "Gustav",
-								"Version" : 
-								[
-									1,
-									0,
-									235,
-									5703452
-								]
-							},
-							"name" : "Drake General Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "756772f7-2fdb-497c-9acc-4b989c021e78",
-							"modDependency" : 
-							{
-								"Guid" : "2db780a6-6906-48f9-8dc8-50e8dc043b86",
-								"Name" : "Final Fantasy XIV Gear",
-								"Version" : 
-								[
-									1,
-									1,
-									0,
-									0
-								]
-							},
-							"name" : "Chivalrous Surcoat"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "6bd420f5-9dbe-4b24-abc7-84161fce7ba5",
-							"modDependency" : 
-							{
-								"Guid" : "057cb283-8dfa-4f3f-b8d1-a2f854c18dff",
-								"Name" : "CloaksOfFaerun",
-								"Version" : 
-								[
-									2,
-									2,
-									0,
-									0
-								]
-							},
-							"name" : "Cloak of the Serene Monk"
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "dfb0bd5d-e4ed-4bd3-bcfe-45195260e7dc",
-							"modDependency" : 
-							{
-								"Guid" : "991c9c7a-fb80-40cb-8f0d-b92d4e80e9b1",
-								"Name" : "Gustav",
-								"Version" : 
-								[
-									1,
-									0,
-									235,
-									5703452
-								]
-							},
-							"name" : "Drake General Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "656de64f-9554-4a04-90a3-a07d9f6434b9",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "Appointed Gloves"
-						}
-					},
-					"Helmet" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "66efb63c-f506-435d-b2cc-618b6695972b",
-							"modDependency" : 
-							{
-								"Guid" : "d66abcbf-b16e-da04-6f4c-73be042935e7",
-								"Name" : "Wands and Weave: Wizard Equipment",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									3
-								]
-							},
-							"name" : "Hood of the Archmage"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Quarterstaffs" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Red_Ghost"
-									],
-									"guid" : "c1cfc0d3-1007-5af3-b023-000000b16b01",
-									"modDependency" : 
-									{
-										"Guid" : "396c5966-09b0-40a1-af3f-93a5e9ce71c0",
-										"Name" : "CommunityLibrary",
-										"Version" : 
-										[
-											2,
-											2,
-											8,
-											5
-										]
-									},
-									"name" : "Quarterstaff of Hill Giant Strength"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "fcf53885-7aa4-412a-8228-4f499b8bc294",
-							"modDependency" : 
-							{
-								"Guid" : "756a07de-5290-4491-bd47-06c0e11d2da1",
-								"Name" : "BloomCore Outfit",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "BloomCore Outfit"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "ba57085c-5f7b-4646-9349-fd8fb2c2f6ff",
-							"modDependency" : 
-							{
-								"Guid" : "6dff611f-9f2e-45b1-b43e-06b62753cff9",
-								"Name" : "HW_BoringDyes",
-								"Version" : 
-								[
-									1,
-									9,
-									1,
-									0
-								]
-							},
-							"name" : "Dayseeker Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "9580b8ae-4126-40ab-9c82-aaaf64e8e6ac",
-							"modDependency" : 
-							{
-								"Guid" : "00581072-8d71-fc79-b793-d4492cf7aa41",
-								"Name" : "Unarmed and Upgraded: Monk Equipment",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									6
-								]
-							},
-							"name" : "Selune Boots"
-						}
-					}
-				},
-				"b8b4a974-b045-45f6-9516-b457b8773abd||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "6c68de25-37eb-47eb-b263-5c993410d62d",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Imbroglio v2 Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "48408219-2ab9-4f08-8cb8-2d955fb3dae8",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Tyrannical Jackboots"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"guid" : "44e6ee11-ec56-496e-a40c-839e9e6633ac",
-							"modDependency" : 
-							{
-								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
-								"Name" : "Final Fantasy XIV Gear Pack 2",
-								"Version" : 
-								[
-									1,
-									4,
-									0,
-									0
-								]
-							},
-							"name" : "Light-Heavy Jacket"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "e374f6fd-975c-416f-8f2a-48a8167c8c31",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Dark Dog Collar"
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "8507a9bc-df88-4184-b5d7-22c868f0c4e8",
-							"modDependency" : 
-							{
-								"Guid" : "278aafb1-e408-4f47-af04-3f27dc5157a1",
-								"Name" : "Psychotter's Gothic Dyes - Dark Metal Version",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Black and Teal"
-						},
-						"equipment" : 
-						{
-							"guid" : "b337cd63-d206-4229-84fd-4b77809f7eb3",
-							"modDependency" : 
-							{
-								"Guid" : "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8",
-								"Name" : "GustavDev",
-								"Version" : 
-								[
-									4,
-									7,
-									200,
-									6009851
-								]
-							},
-							"name" : "Unwanted Masterwork Gauntlets"
-						}
-					},
-					"Helmet" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "d2a4e407-b5de-4f0b-ab7a-75f9bf5041dd",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Circle of Bones"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Longswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Crystal_Skin"
-									],
-									"guid" : "b56162cc-e99c-4cac-88d3-614b45df0702",
-									"modDependency" : 
-									{
-										"Guid" : "2db780a6-6906-48f9-8dc8-50e8dc043b86",
-										"Name" : "Final Fantasy XIV Gear",
-										"Version" : 
-										[
-											1,
-											1,
-											0,
-											0
-										]
-									},
-									"name" : "Curtana Zenith"
-								}
-							},
-							"Tridents" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Burning",
-										"ARMORY_VANITY_EFFECT_Running_Blood"
-									],
-									"guid" : "c635d594-7cd4-48a1-a88f-feb25f57a3b2",
-									"modDependency" : 
-									{
-										"Guid" : "73707e2a-b358-aa93-fe6e-de6764489833",
-										"Name" : "Features from DnD 5E Planescape",
-										"Version" : 
-										[
-											2,
-											1,
-											2,
-											256
-										]
-									},
-									"name" : "Electrified Mancatcher"
-								}
-							}
-						}
-					},
-					"Melee Offhand Weapon" : 
-					{
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Burning"
-							]
-						},
-						"weaponTypes" : []
-					},
-					"VanityBody" : 
-					{
-						"dye" : 
-						{
-							"guid" : "96b13ae0-9321-493d-a060-1ea8471965fd",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Cartouche Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "792b9672-ec75-40d6-9339-81a01d42b79b",
-							"modDependency" : 
-							{
-								"Guid" : "fa25335f-1ff0-47ee-8bbe-683281991da2",
-								"Name" : "\u2727 Blossom's Shunned and Forgotten Collection Vol. 2 \u2727",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Asmodeus' Wrath"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "96b13ae0-9321-493d-a060-1ea8471965fd",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Cartouche Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "23806fd3-f5f6-4ff3-826d-054afe03b7c0",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Bonespike Boots"
-						}
-					}
-				},
-				"fb3bc4c3-49eb-4944-b714-d0cb357bb635||||||" : 
-				{
-					"Boots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "fff78909-8f53-40ef-bcb0-76680f4eb27b",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Elven Armored Boots"
-						}
-					},
-					"Breast" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "d9db43f5-c7ef-47b9-8517-e859ee2be212",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Nightsong's Arrogance"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "711f1f43-50e0-4a2b-90f5-93091fc68672",
-							"modDependency" : 
-							{
-								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
-								"Name" : "MIXARMOUR",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "QUIVER Cloak Slot"
-						}
-					},
-					"Gloves" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "a3710254-aec1-41da-904f-7f3221c8edef",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Nightsong's Strength"
-						}
-					},
-					"Helmet" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "ce69c435-085b-4ab2-9fe3-d39e51da8550",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Nightsong's Blindness"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Greatswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Psychic"
-									],
-									"guid" : "0f683670-944a-4f12-845a-b5b9e3904720",
-									"modDependency" : 
-									{
-										"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-										"Name" : "Final Fantasy XIV Gear Pack 3",
-										"Version" : 
-										[
-											1,
-											5,
-											0,
-											0
-										]
-									},
-									"name" : "The Mythgraven Blade"
-								}
-							},
-							"Longswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Psychic"
-									],
-									"guid" : "e26f6186-405d-4da4-839f-aa5958584fd5",
-									"modDependency" : 
-									{
-										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-										"Name" : "BasketEquipmentNSFW",
-										"Version" : 
-										[
-											1,
-											1,
-											5,
-											0
-										]
-									},
-									"name" : "Longsword of Lae'zel"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "9306cf4a-e47e-4aa1-af1f-04948f2fe831",
-							"modDependency" : 
-							{
-								"Guid" : "666afdba-fbd7-4a3c-b5a7-abc97ed552f9",
-								"Name" : "Tasha's Cauldron of Outfits",
-								"Version" : 
-								[
-									1,
-									7,
-									0,
-									0
-								]
-							},
-							"name" : "Gith Mash-Up V4"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "03855492-12d7-42bf-866f-8aeb8eae176f",
-							"modDependency" : 
-							{
-								"Guid" : "391ebb1f-c243-c5c6-6024-7ac8f9289780",
-								"Name" : "Simple Sorting Bags",
-								"Version" : 
-								[
-									1,
-									4,
-									6,
-									0
-								]
-							},
-							"name" : "Worn Slashstrip Sandals"
-						}
-					}
-				}
-			},
-			"Version" : "1.0.0"
-		},
-		"bd3ac496-38cb-4288-a459-53a53a4ad79a" : 
-		{
-			"Author" : "diimmortalisdiimmortalisdiimmortalis",
-			"NSFW" : true,
-			"Name" : "Necro",
-			"Outfits" : 
-			{
-				"2bb39cf2-4649-4238-8d0c-44f62b5a3dfd||||||" : 
-				{
-					"Boots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "bc97de4a-7a98-4383-817b-3120217c533f",
-							"modDependency" : 
-							{
-								"Guid" : "666afdba-fbd7-4a3c-b5a7-abc97ed552f9",
-								"Name" : "Tasha's Cauldron of Outfits",
-								"Version" : 
-								[
-									1,
-									7,
-									0,
-									0
-								]
-							},
-							"name" : "Shadow Striders"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "e2b1fdf1-b7e1-4320-8c72-355f59cb0e99",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Starry Night   "
-						},
-						"equipment" : 
-						{
-							"guid" : "c1f00286-c2a3-4dac-9d25-a8a1d93ead26",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "YoRHa Type-53 Cyclas"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "Hide Appearance",
-							"modDependency" : 
-							{
-								"Guid" : "633fde91-01d6-482e-9ee6-273a30be594c",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							}
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "e2b1fdf1-b7e1-4320-8c72-355f59cb0e99",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Starry Night   "
-						},
-						"equipment" : 
-						{
-							"guid" : "65820cc7-2160-4149-936e-409466387965",
-							"modDependency" : 
-							{
-								"Guid" : "3224cf9e-ac53-445a-9c8f-fc117668337a",
-								"Name" : "Scantily Outfit Separator",
-								"Version" : 
-								[
-									1,
-									7,
-									0,
-									130
-								]
-							},
-							"name" : "Sleeves of Lunar Devotion (with Gloves)"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "e2b1fdf1-b7e1-4320-8c72-355f59cb0e99",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Starry Night   "
-						},
-						"equipment" : 
-						{
-							"guid" : "ac1f5f9f-db51-4e84-9067-4dab29d6d79d",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "YoRHa Type-53 Headband"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Maces" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "ca462ee9-10e6-4141-b932-af9d5e003efd",
-									"modDependency" : 
-									{
-										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-										"Name" : "BasketEquipmentNSFW",
-										"Version" : 
-										[
-											1,
-											1,
-											5,
-											0
-										]
-									},
-									"name" : "Dark Mace"
-								}
-							}
-						}
-					},
-					"Melee Offhand Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Shields" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "53f0f714-2698-472e-836e-6d348375272b",
-									"modDependency" : 
-									{
-										"Guid" : "957f4912-8d5e-4ad2-8add-a7f7ed7caa71",
-										"Name" : "ParryingWeapons",
-										"Version" : 
-										[
-											1,
-											4,
-											2,
-											0
-										]
-									},
-									"name" : "Parrying Staff"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"dye" : 
-						{
-							"guid" : "1fedcfd7-3b66-4e23-83a6-6a8fb6e3c1d6",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Sunset Dream  "
-						},
-						"equipment" : 
-						{
-							"guid" : "fcf53885-7aa4-412a-8228-4f499b8bc294",
-							"modDependency" : 
-							{
-								"Guid" : "e3613101-b534-429a-9a2c-4fb3b57ea9b5",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "BloomCore Outfit"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "1fedcfd7-3b66-4e23-83a6-6a8fb6e3c1d6",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Sunset Dream  "
-						},
-						"equipment" : 
-						{
-							"guid" : "a50c627c-a872-4dd9-9ab5-aa590475c924",
-							"modDependency" : 
-							{
-								"Guid" : "756a07de-5290-4491-bd47-06c0e11d2da1",
-								"Name" : "BloomCore Outfit",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "BloomCore Shoes"
-						}
-					}
-				},
-				"35c3caad-5543-4593-be75-e7deba30f062||||||" : 
-				{
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "24ba9b59-ef6c-422f-84f4-83475c7037f8",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Coral Moonstone  "
-						},
-						"equipment" : 
-						{
-							"guid" : "3454e7f8-f9e0-4934-b01b-3be07427492b",
-							"modDependency" : 
-							{
-								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
-								"Name" : "Final Fantasy XIV Gear Pack 2",
-								"Version" : 
-								[
-									1,
-									4,
-									0,
-									0
-								]
-							},
-							"name" : "Bihu Jacket"
-						}
-					}
-				},
-				"3780c689-d903-41c2-bf64-1e6ec6a8e1e5||||||" : 
-				{
-					"Boots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "fc78d64f-a2b1-4390-8054-3f5889aeafb7",
-							"modDependency" : 
-							{
-								"Guid" : "414e7743-25e5-44ff-9445-94dc790c1a07",
-								"Name" : "Final Fantasy XIV Gear Pack 4",
-								"Version" : 
-								[
-									1,
-									1,
-									0,
-									0
-								]
-							},
-							"name" : "Augmented Neo-Ishgardian Boots"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "71b91d23-a6eb-441a-aca7-e9954297bb0b",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Aeolian v3 Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "246ef9f7-c47a-4f7e-be62-9dfd380648a3",
-							"modDependency" : 
-							{
-								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
-								"Name" : "Final Fantasy XIV Gear Pack 2",
-								"Version" : 
-								[
-									1,
-									4,
-									0,
-									0
-								]
-							},
-							"name" : "Assassin's Coat"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "711f1f43-50e0-4a2b-90f5-93091fc68672",
-							"modDependency" : 
-							{
-								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
-								"Name" : "MIXARMOUR",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "QUIVER Cloak Slot"
-						}
-					},
-					"Gloves" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "656de64f-9554-4a04-90a3-a07d9f6434b9",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "Appointed Gloves"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "71b91d23-a6eb-441a-aca7-e9954297bb0b",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Aeolian v3 Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "3af850e5-0d9b-4e0f-85ed-9992c4916e90",
-							"modDependency" : 
-							{
-								"Guid" : "414e7743-25e5-44ff-9445-94dc790c1a07",
-								"Name" : "Final Fantasy XIV Gear Pack 4",
-								"Version" : 
-								[
-									1,
-									1,
-									0,
-									0
-								]
-							},
-							"name" : "Warg Pelt B"
-						}
-					},
-					"Ranged Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Shortbows" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "a2de77a8-c868-48b4-bd8a-c1687e02f1e5",
-									"modDependency" : 
-									{
-										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-										"Name" : "BasketEquipmentNSFW",
-										"Version" : 
-										[
-											1,
-											1,
-											5,
-											0
-										]
-									},
-									"name" : "Dark Shortbow"
-								}
-							}
-						}
-					}
-				},
-				"a4b56492-d5ac-4a84-8e45-5437cd9da7f3||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "50cc045b-ab8e-4599-89f3-6496d196cb07",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Hex   "
-						},
-						"equipment" : 
-						{
-							"guid" : "6122528d-1570-4c39-a545-6ac7d12f0cae",
-							"modDependency" : 
-							{
-								"Guid" : "22308960-d1cd-49ae-ac9c-d7336de7a586",
-								"Name" : "InfernalIntimates",
-								"Version" : 
-								[
-									1,
-									1,
-									0,
-									0
-								]
-							},
-							"name" : "Lucretian Heels"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "35ce72b4-7764-4584-abf3-e148b89bc576",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Benthos v3 Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "92c29729-b172-4660-8482-ce752475d69e",
-							"modDependency" : 
-							{
-								"Guid" : "428d65d4-3e4a-470d-b49a-dd171c181285",
-								"Name" : "DAV Crow Outfit",
-								"Version" : 
-								[
-									1,
-									3,
-									0,
-									0
-								]
-							},
-							"name" : "Mars Attire"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "Hide Appearance",
-							"modDependency" : 
-							{
-								"Guid" : "430eb583-84b3-4a45-9f78-303a731b3ff8",
-								"Version" : 
-								[
-									0,
-									0,
-									0,
-									40
-								]
-							}
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "08bc23be-cfa0-4fce-ad9b-c159b266fca7",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Abscindere v3 Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "b68a9f7d-183b-4091-8c7d-34d15f7a6946",
-							"modDependency" : 
-							{
-								"Guid" : "646fabe1-8b5a-4399-923d-db440ddaca2c",
-								"Name" : "HW_BloodmoonArmour",
-								"Version" : 
-								[
-									3,
-									2,
-									0,
-									0
-								]
-							},
-							"name" : "Bloodmoon Gloves A"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "50cc045b-ab8e-4599-89f3-6496d196cb07",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Hex   "
-						},
-						"equipment" : 
-						{
-							"guid" : "09e63b2b-9e5c-4c45-a31e-0b9aebcb45a7",
-							"modDependency" : 
-							{
-								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
-								"Name" : "MIXARMOUR",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Witch Hat"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Quarterstaffs" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Red_Ghost"
-									],
-									"guid" : "cf42b0d0-89d8-4756-b6d7-1e258dceeab0",
-									"modDependency" : 
-									{
-										"Guid" : "8a3a7cd5-b863-47a7-88d6-aa0d72b589ef",
-										"OriginalMod" : 
-										{
-											"Guid" : "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8",
-											"Name" : "GustavDev",
-											"Version" : 
-											[
-												4,
-												7,
-												200,
-												6009851
-											]
-										},
-										"Version" : 
-										[
-											1,
-											0,
-											0,
-											0
-										]
-									},
-									"name" : "Woe"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "f5f378d1-97bd-4279-91b1-c95c2f64dcf9",
-							"modDependency" : 
-							{
-								"Guid" : "428d65d4-3e4a-470d-b49a-dd171c181285",
-								"Name" : "DAV Crow Outfit",
-								"Version" : 
-								[
-									1,
-									3,
-									0,
-									0
-								]
-							},
-							"name" : "Crow Armour"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "956e71c2-6eaf-407e-8470-e334a2952982",
-							"modDependency" : 
-							{
-								"Guid" : "3ddd8e03-320e-4842-89cc-1cacdd6bd9e5",
-								"Name" : "Fancy noble gear",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Noble dancing shoes"
-						}
-					}
-				},
-				"fb3bc4c3-49eb-4944-b714-d0cb357bb635||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Psychic"
-							],
-							"guid" : "b9f1b05d-d95b-4284-8bcc-1b6957bfe80b",
-							"modDependency" : 
-							{
-								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
-								"Name" : "Final Fantasy XIV Gear Pack 2",
-								"Version" : 
-								[
-									1,
-									4,
-									0,
-									0
-								]
-							},
-							"name" : "Riversbreath Boots"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Psychic"
-							],
-							"guid" : "d76dd47b-e1bf-4e30-b366-6069d9eb9e22",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"OriginalMod" : 
-								{
-									"Guid" : "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8",
-									"Name" : "GustavDev",
-									"Version" : 
-									[
-										4,
-										7,
-										200,
-										6009851
-									]
-								},
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Hellgloom Armour "
-						}
-					},
-					"Cloak" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Psychic"
-							],
-							"guid" : "711f1f43-50e0-4a2b-90f5-93091fc68672",
-							"modDependency" : 
-							{
-								"Guid" : "ed68e79c-86db-4f4f-bcd8-2f22ae778920",
-								"Name" : "The Valkyrie Armor By REN",
-								"Version" : 
-								[
-									1,
-									0,
-									233,
-									3395918
-								]
-							},
-							"name" : "QUIVER Cloak Slot"
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Psychic"
-							],
-							"guid" : "cb9d9410-1951-425a-bbff-47b1279a60dd",
-							"modDependency" : 
-							{
-								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
-								"Name" : "Final Fantasy XIV Gear Pack 2",
-								"Version" : 
-								[
-									1,
-									4,
-									0,
-									0
-								]
-							},
-							"name" : "Light-Heavy Gloves"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Psychic"
-							],
-							"guid" : "bf7d7488-5efc-4427-843a-be8f10ae3b24",
-							"modDependency" : 
-							{
-								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
-								"Name" : "MIXARMOUR",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Metal Visor"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Longswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Psychic"
-									],
-									"guid" : "e26f6186-405d-4da4-839f-aa5958584fd5",
-									"modDependency" : 
-									{
-										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-										"Name" : "BasketEquipmentNSFW",
-										"Version" : 
-										[
-											1,
-											1,
-											5,
-											0
-										]
-									},
-									"name" : "Longsword of Lae'zel"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"guid" : "97d59a0d-2ff4-42f3-a8ae-d4e2a8840fd2",
-							"modDependency" : 
-							{
-								"Guid" : "831f1b5d-8837-4cf7-87aa-3c48885e81c4",
-								"Name" : "jerinski_gothyanki-gear",
-								"Version" : 
-								[
-									1,
-									0,
-									9,
-									0
-								]
-							},
-							"name" : "Barbarianki"
-						}
-					}
-				}
-			},
-			"Version" : "1.0.0"
-		},
-		"c224630a-9c61-48c2-91cb-008f3ea3ffc0" : 
-		{
-			"Author" : "diimmortalis",
-			"NSFW" : true,
-			"Name" : "Wizardo (Copy)",
-			"Outfits" : 
-			{
-				"2bb39cf2-4649-4238-8d0c-44f62b5a3dfd||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "f5d84410-8a16-48d0-9f0f-dac28c7fa45b",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Pretty in Pink Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "95510492-f8a1-4edb-bd7d-150c9ebd4f67",
-							"modDependency" : 
-							{
-								"Guid" : "ed539163-bb70-431b-96a7-f5b2eda5376b",
-								"Name" : "Shared",
-								"Version" : 
-								[
-									1,
-									0,
-									233,
-									5703452
-								]
-							},
-							"name" : "Necromancer Parka"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "f5d84410-8a16-48d0-9f0f-dac28c7fa45b",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Pretty in Pink Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "75b5a8c1-dee5-4bc6-85e9-601d58a6050f",
-							"modDependency" : 
-							{
-								"Guid" : "ed539163-bb70-431b-96a7-f5b2eda5376b",
-								"Name" : "Shared",
-								"Version" : 
-								[
-									1,
-									0,
-									233,
-									5703452
-								]
-							},
-							"name" : "Necromancer Attire"
-						}
-					},
-					"Cloak" : 
-					{
-						"dye" : 
-						{
-							"guid" : "db9af542-23ff-4fea-861f-da63aee10415",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Blooming Rust Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "4eec1835-80f0-4392-94fd-f9551269cd91",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Black Barbarian Bra"
-						}
-					},
-					"Gloves" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "95e2c9bd-1258-4074-bf85-8e8440815d9a",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "Archmage's Hand Runes"
-						}
-					},
-					"Helmet" : 
-					{
-						"dye" : 
-						{
-							"guid" : "f5d84410-8a16-48d0-9f0f-dac28c7fa45b",
-							"modDependency" : 
-							{
-								"Guid" : "255b2fda-2e05-4dad-b5e6-28587cea4854",
-								"Name" : "AS_ExtraDyes_Bundle",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Pretty in Pink Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "abde88fd-6f01-440d-8f62-ca16f17d3929",
-							"modDependency" : 
-							{
-								"Guid" : "756a07de-5290-4491-bd47-06c0e11d2da1",
-								"Name" : "BloomCore Outfit",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "BloomCore Mask"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Maces" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "c31d6b30-2377-4e3c-a602-d5d527defc11",
-									"modDependency" : 
-									{
-										"Guid" : "4c628a1a-34d9-4362-8459-2c2bb3b8e5fb",
-										"Name" : "DIQ Misc Patches",
-										"Version" : 
-										[
-											1,
-											3,
-											1,
-											0
-										]
-									},
-									"name" : "Handmaiden's Mace"
-								}
-							},
-							"Spears" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "9ea23ff5-4032-4a0e-9540-3abe6cdd4217",
-									"modDependency" : 
-									{
-										"Guid" : "d4d885b7-061d-4ca4-ab2b-77eb0af8555c",
-										"Name" : "BetterGear_MoonDruid",
-										"Version" : 
-										[
-											1,
-											4,
-											4,
-											0
-										]
-									},
-									"name" : "Spear of Stars"
-								}
-							}
-						}
-					},
-					"Melee Offhand Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Shields" : 
-							{
-								"equipment" : 
-								{
-									"guid" : "7e03c3a5-35d4-449d-8c60-32a5e7431777",
-									"modDependency" : 
-									{
-										"Guid" : "957f4912-8d5e-4ad2-8add-a7f7ed7caa71",
-										"Name" : "ParryingWeapons",
-										"Version" : 
-										[
-											1,
-											4,
-											2,
-											0
-										]
-									},
-									"name" : "Warding Wand"
-								}
-							}
-						}
-					},
-					"Underwear" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "94029e23-05d3-4474-a3db-4623dd3329ea",
-							"modDependency" : 
-							{
-								"Guid" : "a5afa0cb-6ec5-409c-a6ee-ed3409321ecc",
-								"Name" : "Mythral accessories",
-								"Version" : 
-								[
-									0,
-									0,
-									0,
-									268435456
-								]
-							},
-							"name" : "Choker E"
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "857a33cc-8df7-415c-abee-2fd573655b55",
-							"modDependency" : 
-							{
-								"Guid" : "e3613101-b534-429a-9a2c-4fb3b57ea9b5",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							}
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "870bd4eb-c302-41f3-8080-ece21dc577a8",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Tomb  "
-						},
-						"equipment" : 
-						{
-							"guid" : "d4d4d11a-4078-4bc3-919a-0d929360d8a3",
-							"modDependency" : 
-							{
-								"Guid" : "73928ffc-07c0-46ac-8cf4-86a693b0cd92",
-								"Name" : "Scantily Camp Outfit",
-								"Version" : 
-								[
-									2,
-									0,
-									83,
-									2
-								]
-							},
-							"name" : "Mizora Crown"
-						}
-					}
-				},
-				"a4b56492-d5ac-4a84-8e45-5437cd9da7f3||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "e5f75373-20cd-4914-bbab-1f034df680cc",
-							"modDependency" : 
-							{
-								"Guid" : "991c9c7a-fb80-40cb-8f0d-b92d4e80e9b1",
-								"Name" : "Gustav",
-								"Version" : 
-								[
-									1,
-									0,
-									235,
-									5703452
-								]
-							},
-							"name" : "Bloodflower Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "d39eb4e4-f7b9-4819-ba94-fcda49c2797e",
-							"modDependency" : 
-							{
-								"Guid" : "7c3bf56c-32f9-3db5-7d24-3624dab8ec46",
-								"Name" : "Song and Steel: Bard Equipment",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									4
-								]
-							},
-							"name" : "Boots of the Springing Step"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "dfb0bd5d-e4ed-4bd3-bcfe-45195260e7dc",
-							"modDependency" : 
-							{
-								"Guid" : "991c9c7a-fb80-40cb-8f0d-b92d4e80e9b1",
-								"Name" : "Gustav",
-								"Version" : 
-								[
-									1,
-									0,
-									235,
-									5703452
-								]
-							},
-							"name" : "Drake General Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "756772f7-2fdb-497c-9acc-4b989c021e78",
-							"modDependency" : 
-							{
-								"Guid" : "2db780a6-6906-48f9-8dc8-50e8dc043b86",
-								"Name" : "Final Fantasy XIV Gear",
-								"Version" : 
-								[
-									1,
-									1,
-									0,
-									0
-								]
-							},
-							"name" : "Chivalrous Surcoat"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "6bd420f5-9dbe-4b24-abc7-84161fce7ba5",
-							"modDependency" : 
-							{
-								"Guid" : "057cb283-8dfa-4f3f-b8d1-a2f854c18dff",
-								"Name" : "CloaksOfFaerun",
-								"Version" : 
-								[
-									2,
-									2,
-									0,
-									0
-								]
-							},
-							"name" : "Cloak of the Serene Monk"
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "dfb0bd5d-e4ed-4bd3-bcfe-45195260e7dc",
-							"modDependency" : 
-							{
-								"Guid" : "991c9c7a-fb80-40cb-8f0d-b92d4e80e9b1",
-								"Name" : "Gustav",
-								"Version" : 
-								[
-									1,
-									0,
-									235,
-									5703452
-								]
-							},
-							"name" : "Drake General Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "656de64f-9554-4a04-90a3-a07d9f6434b9",
-							"modDependency" : 
-							{
-								"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-								"Name" : "Final Fantasy XIV Gear Pack 3",
-								"Version" : 
-								[
-									1,
-									5,
-									0,
-									0
-								]
-							},
-							"name" : "Appointed Gloves"
-						}
-					},
-					"Helmet" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "66efb63c-f506-435d-b2cc-618b6695972b",
-							"modDependency" : 
-							{
-								"Guid" : "d66abcbf-b16e-da04-6f4c-73be042935e7",
-								"Name" : "Wands and Weave: Wizard Equipment",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									3
-								]
-							},
-							"name" : "Hood of the Archmage"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Quarterstaffs" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Red_Ghost"
-									],
-									"guid" : "c1cfc0d3-1007-5af3-b023-000000b16b01",
-									"modDependency" : 
-									{
-										"Guid" : "396c5966-09b0-40a1-af3f-93a5e9ce71c0",
-										"Name" : "CommunityLibrary",
-										"Version" : 
-										[
-											2,
-											2,
-											8,
-											5
-										]
-									},
-									"name" : "Quarterstaff of Hill Giant Strength"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "fcf53885-7aa4-412a-8228-4f499b8bc294",
-							"modDependency" : 
-							{
-								"Guid" : "756a07de-5290-4491-bd47-06c0e11d2da1",
-								"Name" : "BloomCore Outfit",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "BloomCore Outfit"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "ba57085c-5f7b-4646-9349-fd8fb2c2f6ff",
-							"modDependency" : 
-							{
-								"Guid" : "6dff611f-9f2e-45b1-b43e-06b62753cff9",
-								"Name" : "HW_BoringDyes",
-								"Version" : 
-								[
-									1,
-									9,
-									1,
-									0
-								]
-							},
-							"name" : "Dayseeker Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "9580b8ae-4126-40ab-9c82-aaaf64e8e6ac",
-							"modDependency" : 
-							{
-								"Guid" : "00581072-8d71-fc79-b793-d4492cf7aa41",
-								"Name" : "Unarmed and Upgraded: Monk Equipment",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									6
-								]
-							},
-							"name" : "Selune Boots"
-						}
-					}
-				},
-				"b8b4a974-b045-45f6-9516-b457b8773abd||||||" : 
-				{
-					"Boots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "6c68de25-37eb-47eb-b263-5c993410d62d",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Imbroglio v2 Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "48408219-2ab9-4f08-8cb8-2d955fb3dae8",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Tyrannical Jackboots"
-						}
-					},
-					"Breast" : 
-					{
-						"dye" : 
-						{
-							"guid" : "d29ed401-c3cc-4d70-bd87-3ce5ef3d9201",
-							"modDependency" : 
-							{
-								"Guid" : "c3c39d3a-56a7-4d24-a335-4fe5505e3bbe",
-								"Name" : "EngelsDyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : " Dragon Inferno   "
-						},
-						"equipment" : 
-						{
-							"guid" : "44e6ee11-ec56-496e-a40c-839e9e6633ac",
-							"modDependency" : 
-							{
-								"Guid" : "28c40116-07b3-4f1f-82e1-a7c4e7934fec",
-								"Name" : "Final Fantasy XIV Gear Pack 2",
-								"Version" : 
-								[
-									1,
-									4,
-									0,
-									0
-								]
-							},
-							"name" : "Light-Heavy Jacket"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "e374f6fd-975c-416f-8f2a-48a8167c8c31",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Dark Dog Collar"
-						}
-					},
-					"Gloves" : 
-					{
-						"dye" : 
-						{
-							"guid" : "8507a9bc-df88-4184-b5d7-22c868f0c4e8",
-							"modDependency" : 
-							{
-								"Guid" : "278aafb1-e408-4f47-af04-3f27dc5157a1",
-								"Name" : "Psychotter's Gothic Dyes - Dark Metal Version",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Black and Teal"
-						},
-						"equipment" : 
-						{
-							"guid" : "b337cd63-d206-4229-84fd-4b77809f7eb3",
-							"modDependency" : 
-							{
-								"Guid" : "28ac9ce2-2aba-8cda-b3b5-6e922f71b6b8",
-								"Name" : "GustavDev",
-								"Version" : 
-								[
-									4,
-									7,
-									200,
-									6009851
-								]
-							},
-							"name" : "Unwanted Masterwork Gauntlets"
-						}
-					},
-					"Helmet" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "d2a4e407-b5de-4f0b-ab7a-75f9bf5041dd",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Circle of Bones"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Longswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Crystal_Skin"
-									],
-									"guid" : "b56162cc-e99c-4cac-88d3-614b45df0702",
-									"modDependency" : 
-									{
-										"Guid" : "2db780a6-6906-48f9-8dc8-50e8dc043b86",
-										"Name" : "Final Fantasy XIV Gear",
-										"Version" : 
-										[
-											1,
-											1,
-											0,
-											0
-										]
-									},
-									"name" : "Curtana Zenith"
-								}
-							},
-							"Tridents" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Burning",
-										"ARMORY_VANITY_EFFECT_Running_Blood"
-									],
-									"guid" : "c635d594-7cd4-48a1-a88f-feb25f57a3b2",
-									"modDependency" : 
-									{
-										"Guid" : "73707e2a-b358-aa93-fe6e-de6764489833",
-										"Name" : "Features from DnD 5E Planescape",
-										"Version" : 
-										[
-											2,
-											1,
-											2,
-											256
-										]
-									},
-									"name" : "Electrified Mancatcher"
-								}
-							}
-						}
-					},
-					"Melee Offhand Weapon" : 
-					{
-						"equipment" : 
-						{
-							"effects" : 
-							[
-								"ARMORY_VANITY_EFFECT_Burning"
-							]
-						},
-						"weaponTypes" : []
-					},
-					"VanityBody" : 
-					{
-						"dye" : 
-						{
-							"guid" : "96b13ae0-9321-493d-a060-1ea8471965fd",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Cartouche Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "792b9672-ec75-40d6-9339-81a01d42b79b",
-							"modDependency" : 
-							{
-								"Guid" : "fa25335f-1ff0-47ee-8bbe-683281991da2",
-								"Name" : "\u2727 Blossom's Shunned and Forgotten Collection Vol. 2 \u2727",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Asmodeus' Wrath"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"dye" : 
-						{
-							"guid" : "96b13ae0-9321-493d-a060-1ea8471965fd",
-							"modDependency" : 
-							{
-								"Guid" : "011d7668-c586-4104-8a14-89c46adcfc74",
-								"Name" : "TC_Dyes",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "Cartouche Dye"
-						},
-						"equipment" : 
-						{
-							"guid" : "23806fd3-f5f6-4ff3-826d-054afe03b7c0",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Bonespike Boots"
-						}
-					}
-				},
-				"fb3bc4c3-49eb-4944-b714-d0cb357bb635||||||" : 
-				{
-					"Boots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "fff78909-8f53-40ef-bcb0-76680f4eb27b",
-							"modDependency" : 
-							{
-								"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-								"Name" : "BasketEquipmentNSFW",
-								"Version" : 
-								[
-									1,
-									1,
-									5,
-									0
-								]
-							},
-							"name" : "Elven Armored Boots"
-						}
-					},
-					"Breast" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "d9db43f5-c7ef-47b9-8517-e859ee2be212",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Nightsong's Arrogance"
-						}
-					},
-					"Cloak" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "711f1f43-50e0-4a2b-90f5-93091fc68672",
-							"modDependency" : 
-							{
-								"Guid" : "5f313ebd-b214-4f64-8255-ae4a3acb2624",
-								"Name" : "MIXARMOUR",
-								"Version" : 
-								[
-									1,
-									0,
-									0,
-									0
-								]
-							},
-							"name" : "QUIVER Cloak Slot"
-						}
-					},
-					"Gloves" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "a3710254-aec1-41da-904f-7f3221c8edef",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Nightsong's Strength"
-						}
-					},
-					"Helmet" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "ce69c435-085b-4ab2-9fe3-d39e51da8550",
-							"modDependency" : 
-							{
-								"Guid" : "4236545d-216a-463d-9bbc-135e2c22bb7c",
-								"Name" : "VanillaEquipmentOverhaul",
-								"Version" : 
-								[
-									4,
-									0,
-									4,
-									206
-								]
-							},
-							"name" : "Nightsong's Blindness"
-						}
-					},
-					"Melee Main Weapon" : 
-					{
-						"weaponTypes" : 
-						{
-							"Greatswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Psychic"
-									],
-									"guid" : "0f683670-944a-4f12-845a-b5b9e3904720",
-									"modDependency" : 
-									{
-										"Guid" : "0572c1c8-14f2-493a-9865-cd56113925c3",
-										"Name" : "Final Fantasy XIV Gear Pack 3",
-										"Version" : 
-										[
-											1,
-											5,
-											0,
-											0
-										]
-									},
-									"name" : "The Mythgraven Blade"
-								}
-							},
-							"Longswords" : 
-							{
-								"equipment" : 
-								{
-									"effects" : 
-									[
-										"ARMORY_VANITY_EFFECT_Psychic"
-									],
-									"guid" : "e26f6186-405d-4da4-839f-aa5958584fd5",
-									"modDependency" : 
-									{
-										"Guid" : "a9e98a1f-7a59-4b70-be39-1f69924c0b80",
-										"Name" : "BasketEquipmentNSFW",
-										"Version" : 
-										[
-											1,
-											1,
-											5,
-											0
-										]
-									},
-									"name" : "Longsword of Lae'zel"
-								}
-							}
-						}
-					},
-					"VanityBody" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "9306cf4a-e47e-4aa1-af1f-04948f2fe831",
-							"modDependency" : 
-							{
-								"Guid" : "666afdba-fbd7-4a3c-b5a7-abc97ed552f9",
-								"Name" : "Tasha's Cauldron of Outfits",
-								"Version" : 
-								[
-									1,
-									7,
-									0,
-									0
-								]
-							},
-							"name" : "Gith Mash-Up V4"
-						}
-					},
-					"VanityBoots" : 
-					{
-						"equipment" : 
-						{
-							"guid" : "03855492-12d7-42bf-866f-8aeb8eae176f",
-							"modDependency" : 
-							{
-								"Guid" : "391ebb1f-c243-c5c6-6024-7ac8f9289780",
-								"Name" : "Simple Sorting Bags",
-								"Version" : 
-								[
-									1,
-									4,
-									6,
-									0
-								]
-							},
-							"name" : "Worn Slashstrip Sandals"
-						}
-					}
-				}
-			},
-			"Version" : "1.0.5"
 		}
 	}
 }

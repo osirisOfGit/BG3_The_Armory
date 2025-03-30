@@ -47,7 +47,7 @@ function VanityModPresetManager:GetExportFromMod(modId)
 	local mod = Ext.Mod.GetMod(modId)
 	if mod then
 		---@type Vanity?
-		local presetFile = FileUtils:LoadTableFile(string.format("Mods/%s/%s", mod.Info.Directory, VanityExportManager.ExportFilename), "data")
+		local presetFile = FileUtils:LoadTableFile(string.format("Mods/%s/%s", mod.Info.Directory, "Armory_Vanity_Mod_Presets.json"), "data")
 		if presetFile then
 			return presetFile, mod
 		end
@@ -62,9 +62,14 @@ function VanityModPresetManager:ImportPresetsFromMods()
 				table.insert(modList, uuid)
 				Logger:BasicDebug("Found preset file in %s", uuid)
 				self.ModPresetIndex[uuid] = presetExport
+
 				for presetId, preset in pairs(presetExport.presets) do
-					preset.ModSourced = VanityModDependencyManager:RecordDependency(mod)
 					self.PresetModIndex[presetId] = uuid
+
+					if Ext.IsClient() then
+						preset.ModSourced = VanityModDependencyManager:RecordDependency(mod)
+						preset.isModPreset = true
+					end
 				end
 			end
 		end

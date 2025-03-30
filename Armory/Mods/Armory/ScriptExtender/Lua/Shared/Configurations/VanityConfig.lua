@@ -88,6 +88,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	NSFW = true,
 	---@type ModDependency?
 	ModSourced = nil,
+	isModPreset = false,
 	---@type {[VanityCriteriaCompositeKey] : VanityOutfit}
 	Outfits = {},
 	---@type ModDependency[]

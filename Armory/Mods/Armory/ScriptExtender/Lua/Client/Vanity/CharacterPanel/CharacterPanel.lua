@@ -120,13 +120,18 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		return
 	end
 
-	local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
-	copyOutfitFromButton:Tooltip():AddText("\t  This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)").TextWrapPos = 600
-	local copyPopup = panelGroup:AddPopup("CopyOutfit")
-	copyOutfitFromButton.OnClick = function()
-		Helpers:KillChildren(copyPopup)
-		VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, copyPopup, criteriaCompositeKey)
-		copyPopup:Open()
+	if preset.isModPreset then
+		panelGroup:AddText("Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first").Font =
+		"Large"
+	else
+		local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
+		copyOutfitFromButton:Tooltip():AddText("\t  This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)").TextWrapPos = 600
+		local copyPopup = panelGroup:AddPopup("CopyOutfit")
+		copyOutfitFromButton.OnClick = function()
+			Helpers:KillChildren(copyPopup)
+			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, copyPopup, criteriaCompositeKey)
+			copyPopup:Open()
+		end
 	end
 
 	local displayTable = panelGroup:AddTable("SlotDisplayTable", 5)
@@ -190,7 +195,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			local outfitSlotEntry
 
 			if outfit and outfit[itemSlot] then
-				if not outfit[itemSlot]() then
+				if (outfit[itemSlot].__call and not outfit[itemSlot]() or not next(outfit[itemSlot])) then
 					outfit[itemSlot].delete = true
 				elseif weaponType then
 					if outfit[itemSlot].weaponTypes and outfit[itemSlot].weaponTypes[weaponType] then
@@ -236,29 +241,33 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			imageButton.Image.Size = { 60, 60 }
 			imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 
-			SlotContextMenu:buildMenuForSlot(itemSlot,
-				weaponType,
-				outfitSlotEntry,
-				imageButton,
-				"equipment",
-				function()
-					-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
-					EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
-						---@param itemTemplate ItemTemplate
-						function(itemTemplate)
-							local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
-							outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
+			if not self.activePreset.isModPreset then
+				SlotContextMenu:buildMenuForSlot(itemSlot,
+					weaponType,
+					outfitSlotEntry,
+					imageButton,
+					"equipment",
+					function()
+						-- Third param allows us to send the weaponType and the associated slot at the same time when applicable, filtering results
+						EquipmentPicker:OpenWindow(itemSlot, weaponType, outfitSlotEntry,
+							---@param itemTemplate ItemTemplate
+							function(itemTemplate)
+								local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
+								outfitSlotEntryForItem.equipment = outfitSlotEntryForItem.equipment or {}
 
-							self:RecordModDependency(itemTemplate, outfitSlotEntryForItem.equipment)
+								self:RecordModDependency(itemTemplate, outfitSlotEntryForItem.equipment)
 
-							Vanity:UpdatePresetOnServer()
-							self:BuildSlots(parentContainer, group, verticalSlots, slot)
-						end)
-				end,
-				function()
-					Vanity:UpdatePresetOnServer()
-					self:BuildSlots(parentContainer, group, verticalSlots, slot)
-				end)
+								Vanity:UpdatePresetOnServer()
+								self:BuildSlots(parentContainer, group, verticalSlots, slot)
+							end)
+					end,
+					function()
+						Vanity:UpdatePresetOnServer()
+						self:BuildSlots(parentContainer, group, verticalSlots, slot)
+					end)
+			else
+				imageButton.Disabled = true
+			end
 			--#endregion
 
 			--#region Dyes
@@ -278,29 +287,33 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 
 			dyeButton.IDContext = itemSlotOrWeaponTypeEntry[1] .. " Dye"
 
-			SlotContextMenu:buildMenuForSlot(itemSlot,
-				weaponType,
-				outfitSlotEntry,
-				dyeButton,
-				"dye",
-				function()
-					DyePicker:OpenWindow(imageButton.UserData, itemSlot,
-						---@param dyeTemplate ItemTemplate
-						function(dyeTemplate)
-							local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
+			if not self.activePreset.isModPreset then
+				SlotContextMenu:buildMenuForSlot(itemSlot,
+					weaponType,
+					outfitSlotEntry,
+					dyeButton,
+					"dye",
+					function()
+						DyePicker:OpenWindow(imageButton.UserData, itemSlot,
+							---@param dyeTemplate ItemTemplate
+							function(dyeTemplate)
+								local outfitSlotEntryForItem = self:InitializeOutfitSlot(itemSlot, weaponType)
 
-							outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
+								outfitSlotEntryForItem.dye = outfitSlotEntryForItem.dye or {}
 
-							self:RecordModDependency(dyeTemplate, outfitSlotEntryForItem.dye)
+								self:RecordModDependency(dyeTemplate, outfitSlotEntryForItem.dye)
 
-							Vanity:UpdatePresetOnServer()
-							self:BuildSlots(parentContainer, group, verticalSlots, slot)
-						end)
-				end,
-				function()
-					Vanity:UpdatePresetOnServer()
-					self:BuildSlots(parentContainer, group, verticalSlots, slot)
-				end)
+								Vanity:UpdatePresetOnServer()
+								self:BuildSlots(parentContainer, group, verticalSlots, slot)
+							end)
+					end,
+					function()
+						Vanity:UpdatePresetOnServer()
+						self:BuildSlots(parentContainer, group, verticalSlots, slot)
+					end)
+			else
+				dyeButton.Disabled = true
+			end
 			--#endregion
 
 			--#region Effects

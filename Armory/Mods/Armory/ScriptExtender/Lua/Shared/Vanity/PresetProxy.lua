@@ -12,10 +12,16 @@ PresetProxy = {
 			local presetExport = VanityModPresetManager:GetPresetFromMod(k)
 
 			if not presetExport and ConfigurationStructure.config.vanity.presets[k] then
-				presetExport = ConfigurationStructure.config.vanity
+				-- don't need to make changes on the server, so get the real table for easier iterating
+				if Ext.IsServer() then
+					presetExport = ConfigurationStructure:GetRealConfigCopy().vanity
+				else
+					presetExport = ConfigurationStructure.config.vanity
+				end
 			end
 
 			if presetExport then
+				Logger:BasicDebug("Found preset %s, loading into proxy", k)
 				PresetProxy.effects = presetExport.effects
 				PresetProxy.miscNameCache = presetExport.miscNameCache
 
@@ -29,6 +35,8 @@ PresetProxy = {
 				end
 
 				return rawget(t, k)
+			else
+				Logger:BasicDebug("Preset %s was requested but could not be found", k)
 			end
 		end
 	})

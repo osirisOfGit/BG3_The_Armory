@@ -100,7 +100,7 @@ function Vanity:ActivatePreset(presetId, initializing)
 	end
 
 	if presetId then
-		local preset = ConfigurationStructure.config.vanity.presets[presetId]
+		local preset = PresetProxy.presets[presetId]
 		separator.Label = "Active Preset: " .. preset.Name
 		VanityCharacterCriteria:BuildModule(mainParent, preset)
 	else
@@ -133,15 +133,15 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 		---@cast e EclLuaGameStateChangedEvent
 
 		if e.ToState == "Running" and not hasBeenActivated then
+			VanityModPresetManager:ImportPresetsFromMods()
+			
 			Logger:BasicDebug("User is the host and has started running game - running check")
 
 			local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 			if presetId then
-				VanityModPresetManager:ImportPresetsFromMods()
-
 				local function validatePreset()
-					local preset = ConfigurationStructure.config.vanity.presets[presetId]
+					local preset = PresetProxy.presets[presetId]
 
 					VanityModDependencyManager:DependencyValidator(preset, function()
 						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
@@ -158,7 +158,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					end)
 				end
 
-				if not ConfigurationStructure.config.vanity.presets[presetId] and VanityBackupManager:IsPresetInBackup(presetId) then
+				if not PresetProxy.presets[presetId] and VanityBackupManager:IsPresetInBackup(presetId) then
 					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
 
 					local presetBackup = TableUtils:DeeplyCopyTable(VanityBackupManager:RestorePresetFromExport(presetId))
@@ -218,7 +218,7 @@ Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 			
 			VanityModPresetManager:ImportPresetsFromMods()
 			local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
+			if activePresetUUID and PresetProxy.presets[activePresetUUID] then
 				Vanity:ActivatePreset(activePresetUUID, true)
 			end
 		end

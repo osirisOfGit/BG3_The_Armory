@@ -25,8 +25,9 @@ ActiveVanityPreset = nil
 
 Ext.Events.SessionLoaded:Subscribe(function(e)
 	VanityModPresetManager:ImportPresetsFromMods()
-	
-	ActiveVanityPreset = ConfigurationStructure:UpdateConfigForServer().vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
+	ConfigurationStructure:UpdateConfigForServer()
+
+	ActiveVanityPreset = PresetProxy.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
 end)
 
 ---@param player string
@@ -117,8 +118,8 @@ local function ApplyTransmogsPerPreset()
 	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 	local activeOutfits
-	if activePresetId and ConfigurationStructure.config.vanity.presets[activePresetId] then
-		ActiveVanityPreset = ConfigurationStructure.config.vanity.presets[activePresetId]
+	if activePresetId and PresetProxy.presets[activePresetId] then
+		ActiveVanityPreset = PresetProxy.presets[activePresetId]
 
 		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", ActiveVanityPreset.Name, ActiveVanityPreset.Author, ActiveVanityPreset.Version)
 		activeOutfits = ActiveVanityPreset.Outfits
