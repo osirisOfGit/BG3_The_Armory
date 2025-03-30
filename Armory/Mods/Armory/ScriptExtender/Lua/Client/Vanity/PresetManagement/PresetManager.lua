@@ -320,7 +320,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				-- Formatting the page into columns
 				local metadataTable = presetGroup:AddTable("metadata", 3)
 				metadataTable:AddColumn("", "WidthStretch")
-				metadataTable:AddColumn("", "WidthFixed")
+				metadataTable:AddColumn("", "WidthFixed", 400)
 				metadataTable:AddColumn("", "WidthStretch")
 				metadataTable.SizingStretchSame = true
 

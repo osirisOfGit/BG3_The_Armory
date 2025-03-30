@@ -136,9 +136,12 @@ local function ApplyTransmogsPerPreset()
 end
 
 Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function(channel, payload, user)
-	-- Force the proxy to update the preset on next access
-	PresetProxy.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset] = nil
-	
+	local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+	if presetId then
+		-- Force the proxy to update the preset on next access
+		PresetProxy.presets[presetId] = nil
+	end
+
 	ApplyTransmogsPerPreset()
 end)
 
