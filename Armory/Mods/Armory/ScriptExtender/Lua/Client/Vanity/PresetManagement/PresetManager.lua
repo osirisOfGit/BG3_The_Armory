@@ -33,6 +33,10 @@ local function buildPresetForm(parent, forPresetId)
 	local preset
 	if forPresetId then
 		preset = ConfigurationStructure.config.vanity.presets[forPresetId]
+	else
+		local txt = parent:AddText("Create a New Preset")
+		txt.UserData = "keep"
+		txt.Font = "Large"
 	end
 
 	FormBuilder:CreateForm(parent, function(values)
@@ -116,6 +120,10 @@ function VanityPresetManager:OpenManager()
 			createNewPresetButton.Selected = false
 			buildPresetForm(presetForm)
 			presetForm.Visible = not presetForm.Visible
+		end
+
+		if not Ext.Vars.GetModVariables(ModuleUUID).ActivePreset then
+			createNewPresetButton.OnClick()
 		end
 
 		local presetTable = presetWindow:AddTable("PresetTable", 2)
