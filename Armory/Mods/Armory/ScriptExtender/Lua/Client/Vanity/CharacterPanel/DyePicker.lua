@@ -66,14 +66,11 @@ function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
 		return
 	end
 
-	local favoriteButton = displayGroup:AddImageButton("Favorite" .. dyeTemplateId, isFavorited and "star_fileld" or "star_empty", { 26, 26 })
-	favoriteButton.Background = { 0, 0, 0, 0.5 }
-	favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
+	local favoriteButton = Styler:ImageButton(displayGroup:AddImageButton("Favorite" .. dyeTemplateId, isFavorited and "star_fileld" or "star_empty", { 26, 26 }))
 
-	local dyeImageButton = displayGroup:AddImageButton(dyeTemplateId, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize })
+	local dyeImageButton = Styler:ImageButton(displayGroup:AddImageButton(dyeTemplateId, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize }))
 	dyeImageButton.UserData = materialPreset.Guid
 	dyeImageButton.SameLine = true
-	dyeImageButton.Background = { 0, 0, 0, 0.5 }
 
 	if self.settings.showNames then
 		displayGroup:AddText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name).SameLine = true

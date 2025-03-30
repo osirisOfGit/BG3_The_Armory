@@ -17,7 +17,7 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 	SyncOnWrite = true
 })
 
-Ext.Require("Client/Vanity/PresetManager.lua")
+Ext.Require("Client/Vanity/PresetManagement/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
 
 Vanity = {}
@@ -100,7 +100,7 @@ function Vanity:ActivatePreset(presetId, initializing)
 	end
 
 	if presetId then
-		local preset = ConfigurationStructure.config.vanity.presets[presetId]
+		local preset = PresetProxy.presets[presetId]
 		separator.Label = "Active Preset: " .. preset.Name
 		VanityCharacterCriteria:BuildModule(mainParent, preset)
 	else
@@ -121,7 +121,7 @@ function Vanity:UpdatePresetOnServer()
 
 		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PresetUpdated", "")
 
-		VanityExportAndBackupManager:BackupPresets({ Ext.Vars.GetModVariables(ModuleUUID).ActivePreset })
+		VanityBackupManager:BackupPresets({ Ext.Vars.GetModVariables(ModuleUUID).ActivePreset })
 	end)
 end
 
@@ -133,15 +133,17 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 		---@cast e EclLuaGameStateChangedEvent
 
 		if e.ToState == "Running" and not hasBeenActivated then
+			VanityModPresetManager:ImportPresetsFromMods()
+			
 			Logger:BasicDebug("User is the host and has started running game - running check")
 
 			local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
 			if presetId then
 				local function validatePreset()
-					local preset = ConfigurationStructure.config.vanity.presets[presetId]
+					local preset = PresetProxy.presets[presetId]
 
-					VanityModManager:DependencyValidator(preset, function()
+					VanityModDependencyManager:DependencyValidator(preset, function()
 						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
 						validationErrorWindow.Closeable = true
 
@@ -156,10 +158,10 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					end)
 				end
 
-				if not ConfigurationStructure.config.vanity.presets[presetId] and VanityExportAndBackupManager:IsPresetInBackup(presetId) then
+				if not PresetProxy.presets[presetId] and VanityBackupManager:IsPresetInBackup(presetId) then
 					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
 
-					local presetBackup = TableUtils:DeeplyCopyTable(VanityExportAndBackupManager:GetPresetFromBackup(presetId))
+					local presetBackup = TableUtils:DeeplyCopyTable(VanityBackupManager:RestorePresetFromExport(presetId))
 					local restoreBackupWindow = Ext.IMGUI.NewWindow("Armory: Restore Backed Up Preset")
 					restoreBackupWindow.NoCollapse = true
 					restoreBackupWindow.AlwaysAutoResize = true
@@ -175,7 +177,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					-- restoreButton:SetColor("Text", {0, 0, 0, 1})
 
 					restoreButton.OnClick = function()
-						VanityExportAndBackupManager:RestorePresetBackup(presetId, presetBackup)
+						VanityBackupManager:RestorePresetBackup(presetId, presetBackup)
 						restoreBackupWindow:Destroy()
 
 						Vanity:UpdatePresetOnServer()
@@ -192,7 +194,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 
 					removeButton.OnClick = function()
 						Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = nil
-						VanityExportAndBackupManager:RemovePresetsFromBackup({ presetId })
+						VanityBackupManager:RemovePresetsFromBackup({ presetId })
 						restoreBackupWindow:Destroy()
 					end
 				else
@@ -213,8 +215,10 @@ Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 		-- Mod variables load in after the InsertModMenuTab function runs
 		if ModuleUUID == payload.modUUID then
 			hasBeenActivated = true
+			
+			VanityModPresetManager:ImportPresetsFromMods()
 			local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-			if activePresetUUID and ConfigurationStructure.config.vanity.presets[activePresetUUID] then
+			if activePresetUUID and PresetProxy.presets[activePresetUUID] then
 				Vanity:ActivatePreset(activePresetUUID, true)
 			end
 		end

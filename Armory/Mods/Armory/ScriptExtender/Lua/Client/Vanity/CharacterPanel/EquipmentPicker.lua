@@ -43,9 +43,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 
 	Helpers:KillChildren(self.warningGroup)
 	if string.match(self.slot, "Offhand") then
-		local warningButton = self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 })
-		warningButton.Background = { 0, 0, 0, 1 }
-		warningButton:SetColor("Border", { 0, 0, 0, 1 })
+		local warningButton = Styler:ImageButton(self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 }))
 
 		local warningText = warningButton:Tooltip():AddText(
 			"\t WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots")
@@ -125,26 +123,22 @@ function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 
 	local favoriteButtonAnchor = itemGroup:AddGroup("favoriteAnchor" .. itemTemplate.Id .. itemStat.Name)
 	favoriteButtonAnchor.SameLine = true
-	local favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id .. itemStat.Name,
+	local favoriteButton = Styler:ImageButton(favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id .. itemStat.Name,
 		-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
 		isFavorited and "star_fileld" or "star_empty",
-		{ 26, 26 })
+		{ 26, 26 }))
 
 	favoriteButton.UserData = itemTemplate.Id
-	favoriteButton.Background = { 0, 0, 0, 0.5 }
-	favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
 
 	favoriteButton.OnClick = function()
 		if not isFavorited then
 			table.insert(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteButton.UserData)
 			local func = favoriteButton.OnClick
 			favoriteButton:Destroy()
-			favoriteButton = favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id .. itemStat.Name, "star_fileld", { 26, 26 })
+			favoriteButton = Styler:ImageButton(favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id .. itemStat.Name, "star_fileld", { 26, 26 }))
 			favoriteButton.UserData = itemTemplate.Id
 			favoriteButton.OnClick = func
 			favoriteButton.SameLine = true
-			favoriteButton.Background = { 0, 0, 0, 0.5 }
-			favoriteButton:SetColor("Button", { 0, 0, 0, 0.5 })
 		else
 			table.remove(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteIndex)
 		end

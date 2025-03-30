@@ -1,8 +1,19 @@
-VanityModManager = {}
+VanityModDependencyManager = {}
+
+---@param mod Module
+---@return ModDependency
+function VanityModDependencyManager:RecordDependency(mod)
+	return {
+		Name = mod.Info.Name,
+		Author = mod.Info.Author,
+		Guid = mod.Info.ModuleUUID,
+		Version = mod.Info.ModVersion
+	} --[[@as ModDependency]]
+end
 
 ---@param modDependency ModDependency
 ---@return string, string
-function VanityModManager:GetModInfo(modDependency, excludeNotLoadedMessage)
+function VanityModDependencyManager:GetModInfo(modDependency, excludeNotLoadedMessage)
 	if modDependency.OriginalMod then
 		modDependency = modDependency.OriginalMod
 	end
@@ -18,9 +29,14 @@ function VanityModManager:GetModInfo(modDependency, excludeNotLoadedMessage)
 			modDependency.Version = mod.Info.ModVersion
 		end
 
+		if not modDependency.Author then
+			modDependency.Author = mod.Info.Author
+		end
+
 		return mod.Info.Name, ("v" .. table.concat(mod.Info.ModVersion, "."))
 	else
-		return string.format("%s%s", modDependency.Name or modDependency.Guid, not excludeNotLoadedMessage and "(Not Loaded)" or ""), ("v" .. table.concat(modDependency.Version, "."))
+		return string.format("%s%s", modDependency.Name or modDependency.Guid, not excludeNotLoadedMessage and "(Not Loaded)" or ""),
+			("v" .. table.concat(modDependency.Version, "."))
 	end
 end
 
@@ -32,7 +48,7 @@ end
 
 ---@param preset VanityPreset
 ---@param parentSupplier fun():ExtuiTreeParent
-function VanityModManager:DependencyValidator(preset, parentSupplier)
+function VanityModDependencyManager:DependencyValidator(preset, parentSupplier)
 	if not ConfigurationStructure.config.vanity.miscNameCache then
 		ConfigurationStructure.config.vanity.miscNameCache = {}
 	end
@@ -171,14 +187,14 @@ function VanityModManager:DependencyValidator(preset, parentSupplier)
 		parent:AddNewLine()
 
 		local validationFailureHeader = parent:AddSeparatorText("Dependency Validation Failed!")
-
-		parent:AddText(
-		"Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)")
-
-		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
-
+		validationFailureHeader:SetStyle("SeparatorTextAlign", 0.5)
 		validationFailureHeader.Font = "Large"
 		validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
+
+		parent:AddText(
+			"Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)").TextWrapPos = 0
+
+		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
 
 		for outfitCriteria, validationErrorList in TableUtils:OrderedPairs(validationErrors) do
 			local header = parent:AddCollapsingHeader(outfitCriteria)
@@ -201,7 +217,7 @@ function VanityModManager:DependencyValidator(preset, parentSupplier)
 				row:AddCell():AddText(validationError.displayValue or "Unknown")
 				row:AddCell():AddText(validationError.category)
 				if validationError.modInfo then
-					row:AddCell():AddText(string.format("%s (%s)", VanityModManager:GetModInfo(validationError.modInfo, true)))
+					row:AddCell():AddText(string.format("%s (%s)", VanityModDependencyManager:GetModInfo(validationError.modInfo, true)))
 				else
 					row:AddCell():AddText("Unknown - check custom dependencies")
 				end
@@ -217,7 +233,7 @@ local dependencyWindow
 ---@param preset VanityPreset
 ---@param criteriaCompositeKey VanityCriteriaCompositeKey?
 ---@param parent ExtuiTreeParent?
-function VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
+function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
 	if not parent then
 		if not dependencyWindow then
 			dependencyWindow = Ext.IMGUI.NewWindow("Mod Dependencies")
@@ -286,7 +302,7 @@ function VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeK
 						row:AddCell():AddText((itemEntry.name or itemEntry.guid) .. " (Not Loaded)")
 					end
 
-					row:AddCell():AddText(string.format("%s (%s)", VanityModManager:GetModInfo(itemEntry.modDependency)))
+					row:AddCell():AddText(string.format("%s (%s)", VanityModDependencyManager:GetModInfo(itemEntry.modDependency)))
 				end
 			else
 				row:AddCell():AddText("---")

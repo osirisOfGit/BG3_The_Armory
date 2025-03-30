@@ -8,11 +8,11 @@ Ext.Events.StatsLoaded:Subscribe(function()
 end)
 
 Ext.Require("Shared/Translator.lua")
+Ext.Require("Shared/Vanity/PresetProxy.lua")
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
-Ext.Require("Shared/Vanity/_ExportAndBackupManager.lua")
 
 ConfigurationStructure:InitializeConfig()
 
 Ext.Require("Client/RandomHelpers.lua")
-Ext.Require("Client/Vanity/_ModManager.lua")
+Ext.Require("Client/Styler.lua")
 Ext.Require("Client/Vanity/Main.lua")

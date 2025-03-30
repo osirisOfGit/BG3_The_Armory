@@ -139,3 +139,40 @@ function TableUtils:ListContains(list, str)
 	end
 	return false
 end
+
+--- Returns a pairs()-like iterator that iterates over multiple tables sequentially
+---@generic K, V
+---@param ... table<K, V> A variable number of tables to iterate over
+---@return fun():K, V
+function TableUtils:CombinedPairs(...)
+	local tables = { ... }
+	local keys = {}
+	local tableSizes = {}
+	local totalSize = 0
+
+	for _, tbl in ipairs(tables) do
+		local tblKeys = {}
+		for k in pairs(tbl) do
+			table.insert(tblKeys, k)
+		end
+		table.insert(keys, tblKeys)
+		tableSizes[#tableSizes + 1] = #tblKeys
+		totalSize = totalSize + #tblKeys
+	end
+
+	local i = 0
+	local currentTableIndex = 1
+
+	return function()
+		while currentTableIndex <= #tables do
+			i = i + 1
+			if i <= tableSizes[currentTableIndex] then
+				local key = keys[currentTableIndex][i]
+				return key, tables[currentTableIndex][key]
+			else
+				i = 0
+				currentTableIndex = currentTableIndex + 1
+			end
+		end
+	end
+end

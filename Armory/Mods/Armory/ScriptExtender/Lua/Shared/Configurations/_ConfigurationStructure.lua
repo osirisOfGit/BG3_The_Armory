@@ -12,7 +12,7 @@ local informedUserOfHostRestriction = false
 -- reference any slice of this table and allow their IMGUI elements to modify the table without
 -- any additional logic for letting the server know there were changes. Only works for this implementation -
 -- too fragile for general use
-local function generate_recursive_metatable(proxy_table, real_table)
+function ConfigurationStructure:generate_recursive_metatable(proxy_table, real_table)
 	return setmetatable(proxy_table, {
 		-- don't use the proxy table during pairs() so we don't have to exclude any proxy fields
 		__pairs = function(this_table)
@@ -39,7 +39,7 @@ local function generate_recursive_metatable(proxy_table, real_table)
 				else
 					real_table[key] = value
 					if type(value) == "table" then
-						rawset(proxy_table, key, generate_recursive_metatable(
+						rawset(proxy_table, key, self:generate_recursive_metatable(
 							{
 								_parent_key = key,
 								_parent_table = real_table,
@@ -84,7 +84,7 @@ end
 ConfigurationStructure.DynamicClassDefinitions = {}
 
 --- @class Configuration
-ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+ConfigurationStructure.config = ConfigurationStructure:generate_recursive_metatable({}, real_config_table)
 
 Ext.Require("Shared/RarityEnum.lua")
 Ext.Require("Shared/SlotEnum.lua")
@@ -143,7 +143,7 @@ function ConfigurationStructure:InitializeConfig()
 		else
 			-- All config management is done on the client side - just want server to always use the full config file (instead of attempting to merge with defaults)
 			real_config_table = {}
-			ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+			ConfigurationStructure.config = self:generate_recursive_metatable({}, real_config_table)
 			CopyConfigsIntoReal(config, ConfigurationStructure.config)
 		end
 	end

@@ -5,7 +5,7 @@
 		<node id="TextureBank">
 			<children>
 				<node id="Resource">
-					<attribute id="ID" type="FixedString" value="467e2cd6-dc32-8a77-ac8f-5f6275f953d8" />
+					<attribute id="ID" type="FixedString" value="5197985d-7940-2ce4-8d8f-78f300c07375" />
 					<attribute id="Name" type="LSString" value="gameRips" />
 					<attribute id="SourceFile" type="LSString" value="Public/Armory/Assets/Textures/Icons/gameRips.dds" />
 					<attribute id="Template" type="FixedString" value="gameRips" />

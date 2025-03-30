@@ -117,10 +117,10 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 			local seeDependencyReport = actionCell:AddImageButton("seeFullThingy" .. criteriaCompositeKey, "Spell_Divination_SeeInvisibility", {32, 32})
 			seeDependencyReport:Tooltip():AddText("\t  See full dependency report for this outfit")
 			seeDependencyReport.OnClick = function ()
-				VanityModManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
+				VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
 			end
 
-			if not outfitToCopyTo then
+			if not outfitToCopyTo and not preset.isModPreset then
 				local deleteButton = actionCell:AddButton("X")
 				deleteButton.SameLine = true
 				deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
@@ -130,7 +130,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					Vanity:UpdatePresetOnServer()
 					row:Destroy()
 				end
-			else
+			elseif outfitToCopyTo then
 				local overwriteButton = row:AddButton("Copy")
 				overwriteButton.SameLine = true
 				overwriteButton.IDContext = overwriteButton.Label .. criteriaCompositeKey
