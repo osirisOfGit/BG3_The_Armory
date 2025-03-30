@@ -92,15 +92,20 @@ function VanityPresetManager:OpenManager()
 		---@type ExtuiMenu
 		local presetMenu = menu:AddMenu("Presets")
 
-		local createNewPresetButton = presetMenu:AddButton("Create a New Preset")
-		local openExportManagerButton = presetMenu:AddButton("Open Export Manager")
-		local importPresetsFromFileButton = presetMenu:AddButton("Import Presets from File")
+		---@type ExtuiSelectable
+		local createNewPresetButton = presetMenu:AddSelectable("Create a New Preset")
+		---@type ExtuiSelectable
+		local openExportManagerButton = presetMenu:AddSelectable("Export Presets")
+		---@type ExtuiSelectable
+		local importPresetsFromFileButton = presetMenu:AddSelectable("Import Presets From File")
 
 		openExportManagerButton.OnClick = function()
+			openExportManagerButton.Selected = false
 			VanityExportManager:BuildExportManagerWindow()
 		end
 
 		importPresetsFromFileButton.OnClick = function()
+			importPresetsFromFileButton.Selected = false
 			VanityExportManager:BuildImportManagerWindow()
 		end
 
@@ -108,6 +113,7 @@ function VanityPresetManager:OpenManager()
 		presetForm.Visible = false
 
 		createNewPresetButton.OnClick = function()
+			createNewPresetButton.Selected = false
 			buildPresetForm(presetForm)
 			presetForm.Visible = not presetForm.Visible
 		end
