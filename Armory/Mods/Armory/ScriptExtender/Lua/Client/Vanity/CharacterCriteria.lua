@@ -103,7 +103,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				goto continue
 			end
 			local row = criteriaSelectionDisplayTable:AddRow()
-			local parsedCriteriaTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(criteriaCompositeKey))
+			local parsedCriteriaTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(criteriaCompositeKey), false, true)
 
 			for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
 				local criteriaValue = parsedCriteriaTable[criteriaType]
@@ -134,7 +134,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 			end
 
 			if outfitToCopyTo or preset.isModPreset then
-				local copyButton = row:AddImageButton("Copy", "ico_copy_d", { 32, 32 })
+				local copyButton = Styler:ImageButton(row:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
 				copyButton.SameLine = true
 				copyButton.IDContext = copyButton.Label .. criteriaCompositeKey
 
@@ -176,7 +176,9 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 						popup:AddText("Copy This Outfit To Your Preset(s)")
 
 						local boxGroup = popup:AddGroup("checkboxes")
-						for presetId, existingPreset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets) do
+						for presetId, existingPreset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function (key)
+							return ConfigurationStructure.config.vanity.presets[key].Name
+						end) do
 							boxGroup:AddCheckbox(existingPreset.Name).UserData = presetId
 						end
 
@@ -230,6 +232,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		criteriaGroup = tabHeader:AddGroup("CharacterCriteria")
 	else
 		Helpers:KillChildren(criteriaGroup)
+		VanityCharacterPanel:BuildModule(tabHeader)
 	end
 
 	if not preset then

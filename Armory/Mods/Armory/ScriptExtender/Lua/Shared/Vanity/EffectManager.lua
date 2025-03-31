@@ -318,7 +318,9 @@ if Ext.IsClient() then
 				effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
 
 				effectCollection[effectToModify.Name] = effectToModify
-				ConfigurationStructure.config.vanity.effects[effectToModify.Name].delete = true
+				if ConfigurationStructure.config.vanity.effects[effectToModify.Name] then
+					ConfigurationStructure.config.vanity.effects[effectToModify.Name].delete = true
+				end
 				ConfigurationStructure.config.vanity.effects[effectToModify.Name] = effectToModify
 
 				formPopup:Destroy()
@@ -345,6 +347,8 @@ if Ext.IsClient() then
 	---@param vanityOutfitItemEntry VanityOutfitItemEntry?
 	---@param onSubmitFunc function
 	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc)
+		effectCollection = {}
+
 		for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
 			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
 		end

@@ -372,7 +372,6 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					activateButton.OnClick = function()
 						Vanity:ActivatePreset(guid)
 						VanityPresetManager:UpdatePresetView(guid)
-						presetWindow.Open = false
 					end
 				else
 					activateButton:Tooltip():AddText("\t Deactivate this preset")

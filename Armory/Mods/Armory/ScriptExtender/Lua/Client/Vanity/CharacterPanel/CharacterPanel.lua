@@ -121,8 +121,10 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	end
 
 	if preset.isModPreset then
-		panelGroup:AddText("Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first").Font =
-		"Large"
+		local txt = panelGroup:AddText(
+			"Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first")
+		txt.Font = "Large"
+		txt.TextWrapPos = 0
 	else
 		local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
 		copyOutfitFromButton:Tooltip():AddText("\t  This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)").TextWrapPos = 600
@@ -226,7 +228,12 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 
 						Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
 					else
-						Logger:BasicWarning("%s could not be found - mod %s was likely uninstalled!", outfitSlotEntry.equipment.guid, outfitSlotEntry.equipment.modDependency.Guid)
+						if not self.activePreset.isModPreset then
+							outfitSlotEntry.equipment.guid = nil
+							if outfitSlotEntry.equipment.modDependency then
+								outfitSlotEntry.equipment.modDependency.delete = true
+							end
+						end
 					end
 				end
 			end
@@ -278,9 +285,16 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			if outfitSlotEntry and outfitSlotEntry.dye and outfitSlotEntry.dye.guid then
 				---@type ItemTemplate
 				local dyeTemplate = Ext.Template.GetTemplate(outfitSlotEntry.dye.guid)
-				dyeButton = supplementaryGroup:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
-				dyeButton.UserData = dyeTemplate
-				Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
+				if dyeTemplate then
+					dyeButton = supplementaryGroup:AddImageButton(itemSlot .. " Dye", dyeTemplate.Icon, { 32, 32 })
+					dyeButton.UserData = dyeTemplate
+					Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
+				else
+					if not self.activePreset.isModPreset then
+						outfitSlotEntry.dye.delete = true
+					end
+					dyeButton = supplementaryGroup:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
+				end
 			else
 				dyeButton = supplementaryGroup:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
 			end
