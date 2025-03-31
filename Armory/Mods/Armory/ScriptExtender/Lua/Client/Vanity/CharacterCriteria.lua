@@ -142,7 +142,10 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					copyButton:Tooltip():AddText("\t Copy all equipment/dyes/effects to your active outfit")
 				end
 
+				local popup = row:AddPopup("CopyOutfit")
+
 				copyButton.OnClick = function()
+					popup = popup or row:AddPopup("CopyOutfit")
 					local function copyOutfit(presetToCopyTo, outfitCompositeKeyToCopyTo)
 						if presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo] then
 							presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo].delete = true
@@ -169,7 +172,6 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					end
 
 					if preset.isModPreset then
-						local popup = row:AddPopup("CopyOutfit")
 						Helpers:KillChildren(popup)
 						popup:AddText("Copy This Outfit To Your Preset(s)")
 
@@ -184,6 +186,8 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 									copyOutfit(ConfigurationStructure.config.vanity.presets[child.UserData], criteriaCompositeKey)
 								end
 							end
+							popup:Destroy()
+							popup = nil
 						end
 
 						popup:Open()
