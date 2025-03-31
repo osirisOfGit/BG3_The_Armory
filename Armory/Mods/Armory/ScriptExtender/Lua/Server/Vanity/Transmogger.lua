@@ -36,7 +36,7 @@ local defaultPieces = {
 	Ring2 = "ecf4a8a4-7859-4a82-8c08-0c9526f29500",
 	LightSource = "50c43f27-a12e-412c-88f0-56e15eba692a",
 	MusicalInstrument = "848ad8dc-59f3-464b-b8b2-95eab6022446",
-	HideTransmog = "cd6c6adc-8792-4378-8c63-8169cfad6c55"
+	HideTransmog = "173aad0e-0db4-4f2f-8f24-49e6898b8f90"
 }
 
 -- Things that will cause me psychic damage: https://discord.com/channels/1174823496086470716/1193836567194771506/1327500800766771271
@@ -205,6 +205,11 @@ function Transmogger:MogCharacter(character)
 
 		---@type ItemTemplate
 		local vanityPiece = Ext.Template.GetTemplate(vanityTemplate)
+
+		if not vanityPiece then
+			Logger:BasicWarning("Item %s does not exist - mod is likely not loaded. See Validation Errors in the Preset Manager!", vanityTemplate)
+			goto continue
+		end
 
 		local vanityGuid = Osi.CreateAt(vanityPiece.Id, 0, 0, 0, 0, 0, "")
 
@@ -384,7 +389,7 @@ end
 ---@param characterEntity EntityHandle
 function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
 	if outfitSlot.equipment and outfitSlot.equipment.effects then
-		local effects = ConfigurationStructure:GetRealConfigCopy().vanity.effects
+		local effects = PresetProxy.effects
 		for _, effectName in ipairs(outfitSlot.equipment.effects) do
 			local effectProps = effects[effectName]
 			if effectProps then
@@ -410,7 +415,7 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 
 	local removeEffectMarker = true
 
-	for effectName, _ in pairs(ConfigurationStructure.config.vanity.effects) do
+	for effectName, _ in pairs(PresetProxy.effects) do
 		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
 			if not TableUtils:ListContains((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, effectName) then
 				Logger:BasicDebug("Removing effect status %s from %s", effectName,
@@ -496,6 +501,11 @@ function Transmogger:ApplyDye(character)
 
 				---@type ItemTemplate
 				local itemDyeTemplate = Ext.Template.GetTemplate(dyeTemplate)
+
+				if not itemDyeTemplate then
+					Logger:BasicWarning("Dye %s does not exist - mod is likely not loaded. See Validation Errors in the Preset Manager!", dyeTemplate)
+					goto continue
+				end
 
 				---@type ResourceMaterialPresetResource
 				local materialPreset = Ext.Resource.Get(itemDyeTemplate.ColorPreset, "MaterialPreset")

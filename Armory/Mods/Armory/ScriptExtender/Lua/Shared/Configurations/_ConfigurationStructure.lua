@@ -12,7 +12,7 @@ local informedUserOfHostRestriction = false
 -- reference any slice of this table and allow their IMGUI elements to modify the table without
 -- any additional logic for letting the server know there were changes. Only works for this implementation -
 -- too fragile for general use
-local function generate_recursive_metatable(proxy_table, real_table)
+function ConfigurationStructure:generate_recursive_metatable(proxy_table, real_table)
 	return setmetatable(proxy_table, {
 		-- don't use the proxy table during pairs() so we don't have to exclude any proxy fields
 		__pairs = function(this_table)
@@ -25,26 +25,32 @@ local function generate_recursive_metatable(proxy_table, real_table)
 			return #real_table
 		end,
 		__call = function(this_table, state, index)
-			return next(real_table, index)
+			return next(real_table, index) or #real_table > 0
 		end,
 		__newindex = function(this_table, key, value)
 			if key == "delete" then
 				rawset(this_table._parent_proxy, this_table._parent_key, nil)
 				this_table._parent_table[this_table._parent_key] = nil
 			else
-				real_table[key] = value
-				if type(value) == "table" then
-					rawset(proxy_table, key, generate_recursive_metatable(
-						{
-							_parent_key = key,
-							_parent_table = real_table,
-							_parent_proxy = proxy_table
-						},
-						real_table[key]))
-					-- Accounting for setting a table that has tables in one assignment operation
-					for child_key, child_value in pairs(value) do
-						if type(child_value) == "table" then
-							proxy_table[key][child_key] = child_value
+				if value == nil then
+					if real_table[key] then
+						real_table[key] = nil
+					end
+				else
+					real_table[key] = value
+					if type(value) == "table" then
+						rawset(proxy_table, key, self:generate_recursive_metatable(
+							{
+								_parent_key = key,
+								_parent_table = real_table,
+								_parent_proxy = proxy_table
+							},
+							real_table[key]))
+						-- Accounting for setting a table that has tables in one assignment operation
+						for child_key, child_value in pairs(value) do
+							if type(child_value) == "table" then
+								proxy_table[key][child_key] = child_value
+							end
 						end
 					end
 				end
@@ -78,7 +84,7 @@ end
 ConfigurationStructure.DynamicClassDefinitions = {}
 
 --- @class Configuration
-ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+ConfigurationStructure.config = ConfigurationStructure:generate_recursive_metatable({}, real_config_table)
 
 Ext.Require("Shared/RarityEnum.lua")
 Ext.Require("Shared/SlotEnum.lua")
@@ -137,7 +143,7 @@ function ConfigurationStructure:InitializeConfig()
 		else
 			-- All config management is done on the client side - just want server to always use the full config file (instead of attempting to merge with defaults)
 			real_config_table = {}
-			ConfigurationStructure.config = generate_recursive_metatable({}, real_config_table)
+			ConfigurationStructure.config = self:generate_recursive_metatable({}, real_config_table)
 			CopyConfigsIntoReal(config, ConfigurationStructure.config)
 		end
 	end
@@ -156,6 +162,6 @@ if Ext.IsClient() then
 	end)
 end
 
-Ext.RegisterNetListener(ModuleUUID .. "_UpdateConfiguration", function (channel, payload, user)
+Ext.RegisterNetListener(ModuleUUID .. "_UpdateConfiguration", function(channel, payload, user)
 	ConfigurationStructure:InitializeConfig()
 end)

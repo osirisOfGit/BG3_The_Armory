@@ -82,7 +82,8 @@ local criteriaGroup
 ---@param preset VanityPreset
 ---@param parent ExtuiTreeParent
 ---@param outfitToCopyTo VanityCriteriaCompositeKey?
-function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo)
+---@param effectsToCopy {[string]: VanityEffect}?
+function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo, effectsToCopy)
 	local refreshButton = parent:AddButton("Refresh")
 
 	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
@@ -97,12 +98,12 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 	end
 
 	local function buildTable()
-		for criteriaCompositeKey, _ in TableUtils:OrderedPairs(preset.Outfits) do
+		for criteriaCompositeKey, outfit in TableUtils:OrderedPairs(preset.Outfits) do
 			if criteriaCompositeKey == outfitToCopyTo then
 				goto continue
 			end
 			local row = criteriaSelectionDisplayTable:AddRow()
-			local parsedCriteriaTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(criteriaCompositeKey))
+			local parsedCriteriaTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(criteriaCompositeKey), false, true)
 
 			for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
 				local criteriaValue = parsedCriteriaTable[criteriaType]
@@ -114,8 +115,15 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 			end
 
 			local actionCell = row:AddCell()
-			if not outfitToCopyTo then
+			local seeDependencyReport = actionCell:AddImageButton("seeFullThingy" .. criteriaCompositeKey, "Spell_Divination_SeeInvisibility", { 32, 32 })
+			seeDependencyReport:Tooltip():AddText("\t  See full dependency report for this outfit")
+			seeDependencyReport.OnClick = function()
+				VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
+			end
+
+			if not outfitToCopyTo and not preset.isModPreset then
 				local deleteButton = actionCell:AddButton("X")
+				deleteButton.SameLine = true
 				deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
 				deleteButton:SetColor("Text", { 1, 1, 1, 1 })
 				deleteButton.OnClick = function()
@@ -123,20 +131,72 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					Vanity:UpdatePresetOnServer()
 					row:Destroy()
 				end
-			else
-				local overwriteButton = row:AddButton("Copy")
-				overwriteButton.IDContext = overwriteButton.Label .. criteriaCompositeKey
+			end
 
-				overwriteButton.OnClick = function()
-					if preset.Outfits[outfitToCopyTo] then
-						preset.Outfits[outfitToCopyTo].delete = true
+			if outfitToCopyTo or preset.isModPreset then
+				local copyButton = Styler:ImageButton(row:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
+				copyButton.SameLine = true
+				copyButton.IDContext = copyButton.Label .. criteriaCompositeKey
+
+				if outfitToCopyTo then
+					copyButton:Tooltip():AddText("\t Copy all equipment/dyes/effects to your active outfit")
+				end
+
+				local popup = row:AddPopup("CopyOutfit")
+
+				copyButton.OnClick = function()
+					popup = popup or row:AddPopup("CopyOutfit")
+					local function copyOutfit(presetToCopyTo, outfitCompositeKeyToCopyTo)
+						if presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo] then
+							presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo].delete = true
+						end
+
+						local outfitToCopy = preset.isModPreset
+							and outfit
+							or ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits[criteriaCompositeKey]
+
+						outfitToCopy = TableUtils:DeeplyCopyTable(outfitToCopy)
+
+						if preset.isModPreset then
+							VanityEffect:CopyEffectsToPresetOutfit(ConfigurationStructure.config.vanity,
+								preset.Name,
+								outfitToCopy,
+								effectsToCopy,
+								true
+							)
+						end
+
+						presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo] = TableUtils:DeeplyCopyTable(outfitToCopy)
+
+						Vanity:UpdatePresetOnServer()
 					end
 
-					local outfitToCopy = ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits[criteriaCompositeKey]
-					preset.Outfits[outfitToCopyTo] = TableUtils:DeeplyCopyTable(outfitToCopy)
+					if preset.isModPreset then
+						Helpers:KillChildren(popup)
+						popup:AddText("Copy This Outfit To Your Preset(s)")
 
-					VanityCharacterPanel:BuildModule(parent.ParentElement, preset, outfitToCopyTo)
-					Vanity:UpdatePresetOnServer()
+						local boxGroup = popup:AddGroup("checkboxes")
+						for presetId, existingPreset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function (key)
+							return ConfigurationStructure.config.vanity.presets[key].Name
+						end) do
+							boxGroup:AddCheckbox(existingPreset.Name).UserData = presetId
+						end
+
+						popup:AddButton("Copy").OnClick = function()
+							for _, child in pairs(boxGroup.Children) do
+								if child.Checked then
+									copyOutfit(ConfigurationStructure.config.vanity.presets[child.UserData], criteriaCompositeKey)
+								end
+							end
+							popup:Destroy()
+							popup = nil
+						end
+
+						popup:Open()
+					else
+						copyOutfit(preset, outfitToCopyTo)
+						VanityCharacterPanel:BuildModule(parent.ParentElement, preset, criteriaCompositeKey)
+					end
 				end
 			end
 			::continue::
@@ -172,6 +232,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		criteriaGroup = tabHeader:AddGroup("CharacterCriteria")
 	else
 		Helpers:KillChildren(criteriaGroup)
+		VanityCharacterPanel:BuildModule(tabHeader)
 	end
 
 	if not preset then
@@ -179,10 +240,10 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		return
 	end
 
-	local popupButton = criteriaGroup:AddButton("See Configured Character Criteria Combinations")
+	local popupButton = criteriaGroup:AddButton("See Configured Outfits")
 
 	if not popup then
-		popup = Ext.IMGUI.NewWindow("Configured Character Criteria Combinations")
+		popup = Ext.IMGUI.NewWindow("Configured Outfits")
 		popup.Closeable = true
 		popup.AlwaysAutoResize = true
 		popup.NoResize = true
@@ -341,8 +402,10 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 				criteriaTableCopy[column.UserData] = otherSelectable.UserData or nil
 
 				if preset.Outfits[CreateCriteriaCompositeKey(criteriaTableCopy)] then
+					-- Green
 					otherSelectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 				else
+					-- Default
 					otherSelectable:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 				end
 			end

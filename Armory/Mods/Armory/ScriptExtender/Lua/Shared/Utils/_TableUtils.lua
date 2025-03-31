@@ -33,8 +33,9 @@ local function copy(obj, seen, makeImmutable)
 end
 
 --- If obj is a table, returns a deep clone of that table, otherwise return obj
----@param obj table
----@return table
+---@generic T
+---@param obj T
+---@return T
 function TableUtils:DeeplyCopyTable(obj)
 	return copy(obj, nil, false)
 end
@@ -66,11 +67,45 @@ function TableUtils:CompareLists(first, second)
 	return true
 end
 
+--- Deeply compare two tables for equality
+---@param first table
+---@param second table
+---@return boolean true if the tables are deeply equal
+function TableUtils:TablesAreEqual(first, second)
+	if first == second then
+		return true
+	end
+
+	if type(first) ~= "table" or type(second) ~= "table" then
+		return false
+	end
+
+	local seenKeys = {}
+
+	for key, value in pairs(first) do
+		if not self:TablesAreEqual(value, second[key]) then
+			return false
+		end
+		seenKeys[key] = true
+	end
+
+	for key, value in pairs(second) do
+		if not seenKeys[key] then
+			return false
+		end
+	end
+
+	return true
+end
+
+
 --- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
 --- Optionally accepts a function to transform the key for sorting and returning
----@param t table
----@param keyTransformFunc function?
----@return function
+---@generic K
+---@generic V
+---@param t table<K,V>
+---@param keyTransformFunc fun(key: string):string?
+---@return fun(table: table<K, V>, index?: K):K, V
 function TableUtils:OrderedPairs(t, keyTransformFunc)
 	local keys = {}
 	for k in pairs(t) do
@@ -83,6 +118,7 @@ function TableUtils:OrderedPairs(t, keyTransformFunc)
 	end)
 
 	local i = 0
+
 	return function()
 		i = i + 1
 		if keys[i] then
@@ -102,4 +138,41 @@ function TableUtils:ListContains(list, str)
 		end
 	end
 	return false
+end
+
+--- Returns a pairs()-like iterator that iterates over multiple tables sequentially
+---@generic K, V
+---@param ... table<K, V> A variable number of tables to iterate over
+---@return fun():K, V
+function TableUtils:CombinedPairs(...)
+	local tables = { ... }
+	local keys = {}
+	local tableSizes = {}
+	local totalSize = 0
+
+	for _, tbl in ipairs(tables) do
+		local tblKeys = {}
+		for k in pairs(tbl) do
+			table.insert(tblKeys, k)
+		end
+		table.insert(keys, tblKeys)
+		tableSizes[#tableSizes + 1] = #tblKeys
+		totalSize = totalSize + #tblKeys
+	end
+
+	local i = 0
+	local currentTableIndex = 1
+
+	return function()
+		while currentTableIndex <= #tables do
+			i = i + 1
+			if i <= tableSizes[currentTableIndex] then
+				local key = keys[currentTableIndex][i]
+				return key, tables[currentTableIndex][key]
+			else
+				i = 0
+				currentTableIndex = currentTableIndex + 1
+			end
+		end
+	end
 end

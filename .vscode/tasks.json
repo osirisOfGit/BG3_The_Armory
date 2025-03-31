@@ -8,6 +8,8 @@
 			"type": "shell",
 			// mklink /J "D:\GOG\Baldurs Gate 3\Data\Mods\Armory" "D:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory"
 			// mklink /J "D:\GOG\Baldurs Gate 3\Data\Public\Armory" "D:\Mods\BG3 Modder MultiTool\The Armory\Armory\Public\Armory"
+
+			// mklink /J "D:\GOG\Baldurs Gate 3\Data\Mods\Preset_Mod_Example" "D:\Mods\BG3 Modder MultiTool\The Armory\Preset_Mod_Example\Mods\Preset_Mod_Example"
 			"windows": {
 				"command": "Start-Process",
 				"args": [

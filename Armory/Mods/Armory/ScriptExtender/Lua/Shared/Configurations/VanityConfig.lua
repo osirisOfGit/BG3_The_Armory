@@ -1,12 +1,16 @@
 -- Can't use variables to shortcut as that breaks type hints by the lua extension
 
+---@class Vanity
 ConfigurationStructure.config.vanity = {}
 
 --#region User Settings
 ConfigurationStructure.config.vanity.settings = {
 	general = {
 		showSlotContextMenuModifier = nil,
-		fillEmptySlots = true
+		fillEmptySlots = true,
+		---@alias outfitAndDependencyView "universal"|"perOutfit"
+		---@type outfitAndDependencyView
+		outfitAndDependencyView = "universal"
 	},
 	---@class EquipmentSettings
 	equipment = {
@@ -28,16 +32,30 @@ ConfigurationStructure.config.vanity.settings = {
 --#endregion
 
 --#region Presets
+
 ConfigurationStructure.DynamicClassDefinitions.vanity = {}
 
 ---@class ModDependency
 ConfigurationStructure.DynamicClassDefinitions.modDependency = {
+	---@type string?
+	Name = nil,
+	---@type string
 	Guid = nil,
-	Version = nil
+	---@type string?
+	Author = nil,
+	---@type number[]
+	Version = nil,
+	---@type string?
+	Resources = nil,
+	---@type string?
+	Notes = nil,
+	---@type ModDependency?
+	OriginalMod = nil,
 }
 
 ---@class VanityOutfitItemEntry
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfitItemEntry = {
+	name = nil,
 	guid = nil,
 	---@type ModDependency
 	modDependency = nil,
@@ -70,12 +88,18 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	NSFW = true,
 	---@type ModDependency?
 	ModSourced = nil,
+	isModPreset = false,
 	---@type {[VanityCriteriaCompositeKey] : VanityOutfit}
 	Outfits = {},
+	---@type ModDependency[]
+	CustomDependencies = {}
 }
 
 ---@type {[Guid]: VanityPreset}
 ConfigurationStructure.config.vanity.presets = {}
+
+---@type {[Guid]: string}
+ConfigurationStructure.config.vanity.miscNameCache = {}
 
 ---@type {[string]: VanityEffect}
 ConfigurationStructure.config.vanity.effects = {

@@ -52,7 +52,11 @@ function ParseCriteriaCompositeKey(compositeKey)
 	return criteriaTable
 end
 
-function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS)
+---@param criteriaTable table
+---@param includeUUIDS boolean?
+---@param usingCacheForMissing boolean?
+---@return {[VanityCharacterCriteriaType]: string}
+function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS, usingCacheForMissing)
 	local displayTable = {}
 	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
 		local criteriaId = criteriaTable[criteriaType]
@@ -68,9 +72,20 @@ function ConvertCriteriaTableToDisplay(criteriaTable, includeUUIDS)
 
 			---@type ResourceClassDescription|ResourceRace|ResourceOrigin
 			local resource = Ext.StaticData.Get(criteriaId, resourceType)
-			criteriaValue = resource.DisplayName:Get() or resource.Name
-			if includeUUIDS then
-				criteriaValue = string.format("%s (%s)", criteriaValue, criteriaId)
+			if resource then
+				criteriaValue = resource.DisplayName:Get() or resource.Name
+				if includeUUIDS then
+					criteriaValue = string.format("%s (%s)", criteriaValue, criteriaId)
+				end
+				ConfigurationStructure.config.vanity.miscNameCache[criteriaId] = criteriaValue
+			else
+				if not usingCacheForMissing then
+					criteriaValue = string.format("%s Not Found - Missing Mod? UUID: %s",
+						ConfigurationStructure.config.vanity.miscNameCache[criteriaId] or "Unknown Name",
+						criteriaId)
+				else
+					criteriaValue = ConfigurationStructure.config.vanity.miscNameCache[criteriaId] or ("Unknown Name: " .. criteriaId)
+				end
 			end
 		end
 		displayTable[criteriaType] = criteriaValue

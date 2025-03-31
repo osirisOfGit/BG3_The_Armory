@@ -81,7 +81,7 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 							outfitSlot.delete = true
 						else
 							outfitSlot.guid = "Hide Appearance"
-							outfitSlot.modDependency = nil
+							outfitSlot.modDependency.delete = true
 						end
 
 						onCloseFunc()
