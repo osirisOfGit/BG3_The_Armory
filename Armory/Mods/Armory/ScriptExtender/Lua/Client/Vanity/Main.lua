@@ -143,7 +143,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 				local function validatePreset()
 					local preset = PresetProxy.presets[presetId]
 
-					VanityModDependencyManager:DependencyValidator(preset, function()
+					VanityModDependencyManager:DependencyValidator(PresetProxy, preset, function()
 						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
 						validationErrorWindow.Closeable = true
 

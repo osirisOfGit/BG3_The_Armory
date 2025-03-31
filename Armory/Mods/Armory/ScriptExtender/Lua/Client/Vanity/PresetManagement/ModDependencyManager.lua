@@ -46,13 +46,18 @@ end
 ---@field category "Character Criteria"|"Equipment"|"Dye"|"Effect"
 ---@field modInfo ModDependency?
 
+---@param vanityContainer Vanity
 ---@param preset VanityPreset
 ---@param parentSupplier fun():ExtuiTreeParent
-function VanityModDependencyManager:DependencyValidator(preset, parentSupplier)
-	if not ConfigurationStructure.config.vanity.miscNameCache then
-		ConfigurationStructure.config.vanity.miscNameCache = {}
+function VanityModDependencyManager:DependencyValidator(vanityContainer, preset, parentSupplier)
+	if not preset then
+		return
 	end
-	local miscNamCache = ConfigurationStructure.config.vanity.miscNameCache
+	
+	if not vanityContainer.miscNameCache then
+		vanityContainer.miscNameCache = {}
+	end
+	local miscNamCache = vanityContainer.miscNameCache
 
 	---@type {string : ValidationError[]}
 	local validationErrors = {}
@@ -85,30 +90,34 @@ function VanityModDependencyManager:DependencyValidator(preset, parentSupplier)
 		cachedGuids[outfitItemEntry.guid] = true
 
 		if outfitItemEntry.effects then
-			for _, effect in pairs(outfitItemEntry.effects) do
-				local effectInstance = ConfigurationStructure.config.vanity.effects[effect]
+			for effectName, effect in pairs(outfitItemEntry.effects) do
+				local effectInstance = vanityContainer.effects[effect]
 
-				if not cachedGuids[effectInstance.effectProps.StatusEffect] then
-					---@type ResourceMultiEffectInfo
-					local mei = Ext.StaticData.Get(effectInstance.effectProps.StatusEffect, "MultiEffectInfo")
-					if not mei then
-						if not validationErrors[criteriaKey] then
-							validationErrors[criteriaKey] = {}
-						end
+				if effectInstance then
+					if not cachedGuids[effectInstance.effectProps.StatusEffect] then
+						---@type ResourceMultiEffectInfo
+						local mei = Ext.StaticData.Get(effectInstance.effectProps.StatusEffect, "MultiEffectInfo")
+						if not mei then
+							if not validationErrors[criteriaKey] then
+								validationErrors[criteriaKey] = {}
+							end
 
-						table.insert(validationErrors[criteriaKey],
-							{
-								resourceId = effectInstance.effectProps.StatusEffect,
-								displayValue = effectInstance.cachedDisplayNames and effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect],
-								category = "Effect"
-							} --[[@as ValidationError]])
-					else
-						if not effectInstance.cachedDisplayNames then
-							effectInstance.cachedDisplayNames = {}
+							table.insert(validationErrors[criteriaKey],
+								{
+									resourceId = effectInstance.effectProps.StatusEffect,
+									displayValue = effectInstance.cachedDisplayNames and effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect],
+									category = "Effect"
+								} --[[@as ValidationError]])
+						else
+							if not effectInstance.cachedDisplayNames then
+								effectInstance.cachedDisplayNames = {}
+							end
+							effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect] = mei.Name
 						end
-						effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect] = mei.Name
+						cachedGuids[effectInstance.effectProps.StatusEffect] = true
 					end
-					cachedGuids[effectInstance.effectProps.StatusEffect] = true
+				else
+					outfitItemEntry.effects[effectName] = nil
 				end
 			end
 		end

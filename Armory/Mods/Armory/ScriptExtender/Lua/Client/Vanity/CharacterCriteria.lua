@@ -82,7 +82,8 @@ local criteriaGroup
 ---@param preset VanityPreset
 ---@param parent ExtuiTreeParent
 ---@param outfitToCopyTo VanityCriteriaCompositeKey?
-function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo)
+---@param effectsToCopy {[string]: VanityEffect}?
+function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo, effectsToCopy)
 	local refreshButton = parent:AddButton("Refresh")
 
 	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
@@ -97,7 +98,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 	end
 
 	local function buildTable()
-		for criteriaCompositeKey, _ in TableUtils:OrderedPairs(preset.Outfits) do
+		for criteriaCompositeKey, outfit in TableUtils:OrderedPairs(preset.Outfits) do
 			if criteriaCompositeKey == outfitToCopyTo then
 				goto continue
 			end
@@ -114,9 +115,9 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 			end
 
 			local actionCell = row:AddCell()
-			local seeDependencyReport = actionCell:AddImageButton("seeFullThingy" .. criteriaCompositeKey, "Spell_Divination_SeeInvisibility", {32, 32})
+			local seeDependencyReport = actionCell:AddImageButton("seeFullThingy" .. criteriaCompositeKey, "Spell_Divination_SeeInvisibility", { 32, 32 })
 			seeDependencyReport:Tooltip():AddText("\t  See full dependency report for this outfit")
-			seeDependencyReport.OnClick = function ()
+			seeDependencyReport.OnClick = function()
 				VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
 			end
 
@@ -130,21 +131,66 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 					Vanity:UpdatePresetOnServer()
 					row:Destroy()
 				end
-			elseif outfitToCopyTo then
-				local overwriteButton = row:AddButton("Copy")
-				overwriteButton.SameLine = true
-				overwriteButton.IDContext = overwriteButton.Label .. criteriaCompositeKey
+			end
 
-				overwriteButton.OnClick = function()
-					if preset.Outfits[outfitToCopyTo] then
-						preset.Outfits[outfitToCopyTo].delete = true
+			if outfitToCopyTo or preset.isModPreset then
+				local copyButton = row:AddImageButton("Copy", "ico_copy_d", { 32, 32 })
+				copyButton.SameLine = true
+				copyButton.IDContext = copyButton.Label .. criteriaCompositeKey
+
+				if outfitToCopyTo then
+					copyButton:Tooltip():AddText("\t Copy all equipment/dyes/effects to your active outfit")
+				end
+
+				copyButton.OnClick = function()
+					local function copyOutfit(presetToCopyTo, outfitCompositeKeyToCopyTo)
+						if presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo] then
+							presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo].delete = true
+						end
+
+						local outfitToCopy = preset.isModPreset
+							and outfit
+							or ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits[criteriaCompositeKey]
+
+						outfitToCopy = TableUtils:DeeplyCopyTable(outfitToCopy)
+
+						if preset.isModPreset then
+							VanityEffect:CopyEffectsToPresetOutfit(ConfigurationStructure.config.vanity,
+								preset.Name,
+								outfitToCopy,
+								effectsToCopy,
+								true
+							)
+						end
+
+						presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo] = TableUtils:DeeplyCopyTable(outfitToCopy)
+
+						Vanity:UpdatePresetOnServer()
 					end
 
-					local outfitToCopy = ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits[criteriaCompositeKey]
-					preset.Outfits[outfitToCopyTo] = TableUtils:DeeplyCopyTable(outfitToCopy)
+					if preset.isModPreset then
+						local popup = row:AddPopup("CopyOutfit")
+						Helpers:KillChildren(popup)
+						popup:AddText("Copy This Outfit To Your Preset(s)")
 
-					VanityCharacterPanel:BuildModule(parent.ParentElement, preset, outfitToCopyTo)
-					Vanity:UpdatePresetOnServer()
+						local boxGroup = popup:AddGroup("checkboxes")
+						for presetId, existingPreset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets) do
+							boxGroup:AddCheckbox(existingPreset.Name).UserData = presetId
+						end
+
+						popup:AddButton("Copy").OnClick = function()
+							for _, child in pairs(boxGroup.Children) do
+								if child.Checked then
+									copyOutfit(ConfigurationStructure.config.vanity.presets[child.UserData], criteriaCompositeKey)
+								end
+							end
+						end
+
+						popup:Open()
+					else
+						copyOutfit(preset, outfitToCopyTo)
+						VanityCharacterPanel:BuildModule(parent.ParentElement, preset, criteriaCompositeKey)
+					end
 				end
 			end
 			::continue::
