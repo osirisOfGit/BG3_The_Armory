@@ -317,7 +317,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			--#endregion
 
 			--#region Effects
-			if outfitSlotEntry and outfitSlotEntry.equipment and (outfitSlotEntry.equipment.effects and outfitSlotEntry.equipment.effects()) then
+			if outfitSlotEntry and outfitSlotEntry.equipment and outfitSlotEntry.equipment.effects and (outfitSlotEntry.equipment.effects.__call and outfitSlotEntry.equipment.effects() or next(outfitSlotEntry.equipment.effects)) then
 				local effectsText = supplementaryGroup:AddText("EFF")
 				effectsText.Font = "Tiny"
 				effectsText:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })

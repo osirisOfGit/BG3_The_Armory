@@ -36,7 +36,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		local helpTooltip = tabHeader:AddButton("Instructions"):Tooltip()
 		helpTooltip:AddText("\t  Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it).").TextWrapPos = 800
 		helpTooltip:AddText("The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save").TextWrapPos = 0
-		helpTooltip:AddText("It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process (e.g. Armory type), don't update the tooltips until a reload.").TextWrapPos = 0
+		helpTooltip:AddText("It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process (e.g. Armor type), don't update the tooltips until a reload.").TextWrapPos = 0
 		helpTooltip:AddText("\nAfter creating a preset, you can start defining outfits using the options below. You can select combination of criteria (one item from each column, though Hireling and Origin are mutually exclusive, and you don't have to use all columns) - each combination will create a unique outfit").TextWrapPos = 0
 		helpTooltip:AddText("Party members are automatically matched to the _most specific_ outfit defined - the columns in the criteria table are ordered from most specific to least specific.").TextWrapPos = 0
 		helpTooltip:AddText("For example, an outfit that only has Origin assigned to it will take precedence over an outfit that has Race/Subrace/BodyType, but Race/BodyType will take precedence over BodyType/Class/Subclass").TextWrapPos = 0
@@ -134,7 +134,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 
 		if e.ToState == "Running" and not hasBeenActivated then
 			VanityModPresetManager:ImportPresetsFromMods()
-			
+
 			Logger:BasicDebug("User is the host and has started running game - running check")
 
 			local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
@@ -143,7 +143,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 				local function validatePreset()
 					local preset = PresetProxy.presets[presetId]
 
-					VanityModDependencyManager:DependencyValidator(preset, function()
+					VanityModDependencyManager:DependencyValidator(PresetProxy, preset, function()
 						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
 						validationErrorWindow.Closeable = true
 
@@ -215,7 +215,7 @@ Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 		-- Mod variables load in after the InsertModMenuTab function runs
 		if ModuleUUID == payload.modUUID then
 			hasBeenActivated = true
-			
+
 			VanityModPresetManager:ImportPresetsFromMods()
 			local activePresetUUID = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 			if activePresetUUID and PresetProxy.presets[activePresetUUID] then

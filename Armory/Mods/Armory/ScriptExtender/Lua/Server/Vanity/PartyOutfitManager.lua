@@ -25,7 +25,6 @@ ActiveVanityPreset = nil
 
 Ext.Events.SessionLoaded:Subscribe(function(e)
 	VanityModPresetManager:ImportPresetsFromMods()
-	ConfigurationStructure:UpdateConfigForServer()
 
 	ActiveVanityPreset = PresetProxy.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
 end)
@@ -137,6 +136,12 @@ local function ApplyTransmogsPerPreset()
 end
 
 Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function(channel, payload, user)
+	local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+	if presetId then
+		-- Force the proxy to update the preset on next access
+		PresetProxy.presets[presetId] = nil
+	end
+
 	ApplyTransmogsPerPreset()
 end)
 

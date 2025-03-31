@@ -57,6 +57,8 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 end
 
 ---@param presetIds Guid[]
+---@param exportToExtractFrom Vanity
+---@param targetTable table?
 function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom, targetTable)
 	---@type Vanity
 	local vanityConfig = targetTable or ConfigurationStructure.config.vanity
@@ -66,7 +68,7 @@ function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom, target
 
 	---@type Vanity
 	---@diagnostic disable-next-line: missing-fields
-	local importedPreset = {
+	local tempVanity = {
 		presets = {},
 		effects = {},
 		miscNameCache = {}
@@ -75,82 +77,33 @@ function VanityExportManager:ImportPreset(presetIds, exportToExtractFrom, target
 	for _, presetId in ipairs(presetIds) do
 		local preset = exportToExtractFrom.presets[presetId]
 
-		-- Remove any non-alpabetical and space characters so it can be used as a Status name if necessary
-		local sanitizedPresetName = preset.Name:gsub("[^%a%s]", ""):gsub("%s", "_")
-
 		for criteraKey, outfit in pairs(preset.Outfits) do
 			local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
 			for _, resourceId in pairs(criteriaTable) do
 				if exportToExtractFrom.miscNameCache[resourceId] then
-					importedPreset.miscNameCache[resourceId] = exportToExtractFrom.miscNameCache[resourceId]
+					tempVanity.miscNameCache[resourceId] = exportToExtractFrom.miscNameCache[resourceId]
 				end
 			end
 
-			for _, outfitSlot in pairs(outfit) do
-				if outfitSlot.equipment and outfitSlot.equipment.effects then
-					for index, effect in pairs(outfitSlot.equipment.effects) do
-						if not importedPreset.effects[effect] then
-							if not importedPreset.effects[effect .. sanitizedPresetName] then
-								if vanityConfig.effects[effect] and not targetTable then
-									if not TableUtils:TablesAreEqual(vanityConfig.effects[effect], exportToExtractFrom.effects[effect]) then
-										outfitSlot.equipment.effects[index] = effect .. sanitizedPresetName
+			VanityEffect:CopyEffectsToPresetOutfit(tempVanity, preset.Name, outfit, exportToExtractFrom.effects, targetTable == nil)
 
-										importedPreset.effects[effect .. sanitizedPresetName] = TableUtils:DeeplyCopyTable(exportToExtractFrom.effects[effect])
-										importedPreset.effects[effect .. sanitizedPresetName].Name = effect .. sanitizedPresetName
-									end
-								else
-									importedPreset.effects[effect] = TableUtils:DeeplyCopyTable(exportToExtractFrom.effects[effect])
-								end
-							else
-								outfitSlot.equipment.effects[index] = effect .. sanitizedPresetName
-							end
-						end
-					end
-				end
-
-				if outfitSlot.weaponTypes then
-					for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
-						if weaponSlot.equipment and weaponSlot.equipment.effects then
-							for index, effect in pairs(weaponSlot.equipment.effects) do
-								if not importedPreset.effects[effect] then
-									if not importedPreset.effects[effect .. sanitizedPresetName] then
-										if vanityConfig.effects[effect] and not targetTable then
-											if not TableUtils:TablesAreEqual(vanityConfig.effects[effect], exportToExtractFrom.effects[effect]) then
-												weaponSlot.equipment.effects[index] = effect .. sanitizedPresetName
-
-												importedPreset.effects[effect .. sanitizedPresetName] = TableUtils:DeeplyCopyTable(exportToExtractFrom.effects[effect])
-												importedPreset.effects[effect .. sanitizedPresetName].Name = effect .. sanitizedPresetName
-											end
-										else
-											importedPreset.effects[effect] = TableUtils:DeeplyCopyTable(exportToExtractFrom.effects[effect])
-										end
-									else
-										weaponSlot.equipment.effects[index] = effect .. sanitizedPresetName
-									end
-								end
-							end
-						end
-					end
-				end
-			end
-
-			importedPreset.presets[presetId] = preset
+			tempVanity.presets[presetId] = preset
 		end
 	end
 
-	for resourceId, cachedName in pairs(importedPreset.miscNameCache) do
+	for resourceId, cachedName in pairs(tempVanity.miscNameCache) do
 		if not vanityConfig.miscNameCache[resourceId] then
 			vanityConfig.miscNameCache[resourceId] = cachedName
 		end
 	end
 
-	for effectName, effect in pairs(importedPreset.effects) do
+	for effectName, effect in pairs(tempVanity.effects) do
 		if not vanityConfig.effects[effectName] then
 			vanityConfig.effects[effectName] = effect
 		end
 	end
 
-	for presetId, preset in pairs(importedPreset.presets) do
+	for presetId, preset in pairs(tempVanity.presets) do
 		vanityConfig.presets[presetId] = preset
 		Logger:BasicInfo("Restored preset '%s' from export", preset.Name)
 	end

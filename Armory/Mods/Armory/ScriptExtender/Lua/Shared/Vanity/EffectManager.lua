@@ -68,6 +68,53 @@ function VanityEffect:new(instance, name, effectProps)
 	return instance
 end
 
+---@param targetVanity Vanity
+---@param presetName string
+---@param outfit VanityOutfit
+---@param effectsFromSource {[string]: VanityEffect}
+---@param overwriteSourceEffect boolean
+function VanityEffect:CopyEffectsToPresetOutfit(targetVanity, presetName, outfit, effectsFromSource, overwriteSourceEffect)
+	local vanityConfig = ConfigurationStructure:GetRealConfigCopy().vanity
+
+	-- Remove any non-alpabetical and space characters so it can be used as a Status name if necessary
+	local sanitizedPresetName = presetName:gsub("[^%a%s]", ""):gsub("%s", "_")
+
+	local overwriteTracker = false
+
+	local function processEffects(effects)
+		for index, effect in pairs(effects) do
+			local sanitizedEffect = effect .. "_" .. sanitizedPresetName
+			if not overwriteTracker or (not targetVanity.effects[effect] and not targetVanity.effects[sanitizedEffect]) then
+				overwriteTracker = true
+
+				if vanityConfig.effects[effect] and overwriteSourceEffect and not TableUtils:TablesAreEqual(vanityConfig.effects[effect], effectsFromSource[effect]) then
+					effects[index] = sanitizedEffect
+					targetVanity.effects[sanitizedEffect] = TableUtils:DeeplyCopyTable(effectsFromSource[effect])
+					targetVanity.effects[sanitizedEffect].Name = sanitizedEffect
+				else
+					targetVanity.effects[effect] = TableUtils:DeeplyCopyTable(effectsFromSource[effect])
+				end
+			elseif targetVanity.effects[sanitizedEffect] then
+				effects[index] = sanitizedEffect
+			end
+		end
+	end
+
+	for _, outfitSlot in pairs(outfit) do
+		if outfitSlot.equipment and outfitSlot.equipment.effects then
+			processEffects(outfitSlot.equipment.effects)
+		end
+
+		if outfitSlot.weaponTypes then
+			for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
+				if weaponSlot.equipment and weaponSlot.equipment.effects then
+					processEffects(weaponSlot.equipment.effects)
+				end
+			end
+		end
+	end
+end
+
 if Ext.IsServer() then
 	function VanityEffect:createStat()
 		if not Ext.Stats.Get(self.Name) then
@@ -257,10 +304,23 @@ if Ext.IsClient() then
 				else
 					effectToModify = VanityEffect:new({}, inputs.Name, inputs)
 				end
+
+				if not effectToModify.cachedDisplayNames then
+					effectToModify.cachedDisplayNames = {}
+				end
+				effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = nil
+
 				inputs.Name = nil
 				effectToModify.effectProps = inputs
+
+				---@type ResourceMultiEffectInfo
+				local mei = Ext.StaticData.Get(effectToModify.effectProps.StatusEffect, "MultiEffectInfo")
+				effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
+
 				effectCollection[effectToModify.Name] = effectToModify
+				ConfigurationStructure.config.vanity.effects[effectToModify.Name].delete = true
 				ConfigurationStructure.config.vanity.effects[effectToModify.Name] = effectToModify
+
 				formPopup:Destroy()
 				if initiateEdit then
 					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(self))
@@ -285,10 +345,8 @@ if Ext.IsClient() then
 	---@param vanityOutfitItemEntry VanityOutfitItemEntry?
 	---@param onSubmitFunc function
 	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc)
-		if not next(effectCollection) then
-			for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
-				effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
-			end
+		for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
+			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
 		end
 
 		---@type ExtuiMenu

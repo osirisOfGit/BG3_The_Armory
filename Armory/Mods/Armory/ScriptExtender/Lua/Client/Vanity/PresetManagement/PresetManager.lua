@@ -90,17 +90,22 @@ function VanityPresetManager:OpenManager()
 		presetWindow.MenuBar = true
 		local menu = presetWindow:AddMainMenu()
 		---@type ExtuiMenu
-		local presetMenu = menu:AddMenu("Presets")
+		local presetMenu = menu:AddMenu("Manage Presets")
 
-		local createNewPresetButton = presetMenu:AddButton("Create a New Preset")
-		local openExportManagerButton = presetMenu:AddButton("Open Export Manager")
-		local importPresetsFromFileButton = presetMenu:AddButton("Import Presets from File")
+		---@type ExtuiSelectable
+		local createNewPresetButton = presetMenu:AddSelectable("Create")
+		---@type ExtuiSelectable
+		local openExportManagerButton = presetMenu:AddSelectable("Export")
+		---@type ExtuiSelectable
+		local importPresetsFromFileButton = presetMenu:AddSelectable("Import")
 
 		openExportManagerButton.OnClick = function()
+			openExportManagerButton.Selected = false
 			VanityExportManager:BuildExportManagerWindow()
 		end
 
 		importPresetsFromFileButton.OnClick = function()
+			importPresetsFromFileButton.Selected = false
 			VanityExportManager:BuildImportManagerWindow()
 		end
 
@@ -108,8 +113,13 @@ function VanityPresetManager:OpenManager()
 		presetForm.Visible = false
 
 		createNewPresetButton.OnClick = function()
+			createNewPresetButton.Selected = false
 			buildPresetForm(presetForm)
 			presetForm.Visible = not presetForm.Visible
+		end
+
+		if not Ext.Vars.GetModVariables(ModuleUUID).ActivePreset and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
+			createNewPresetButton.OnClick()
 		end
 
 		local presetTable = presetWindow:AddTable("PresetTable", 2)
@@ -245,9 +255,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 	local activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 
+	---@param vanityContainer Vanity
 	---@param presetCollection {[Guid]: VanityPreset}
 	---@param owningMod string?
-	local function buildSection(presetCollection, owningMod)
+	local function buildSection(vanityContainer, presetCollection, owningMod)
 		local parentSection = owningMod and modPresetSection or userPresetSection
 
 		if owningMod then
@@ -306,7 +317,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				-- Formatting the page into columns
 				local metadataTable = presetGroup:AddTable("metadata", 3)
 				metadataTable:AddColumn("", "WidthStretch")
-				metadataTable:AddColumn("", "WidthFixed")
+				metadataTable:AddColumn("", "WidthFixed", 400)
 				metadataTable:AddColumn("", "WidthStretch")
 				metadataTable.SizingStretchSame = true
 
@@ -420,7 +431,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					end
 				end
 
-				VanityModDependencyManager:DependencyValidator(preset, function()
+				VanityModDependencyManager:DependencyValidator(vanityContainer, preset, function()
 					return presetGroup
 				end)
 
@@ -565,7 +576,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 					if generalSettings.outfitAndDependencyView == "universal" then
 						outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits"):SetStyle("SeparatorTextAlign", 0.5)
-						VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup)
+						VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup, nil, owningMod and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
 						outfitsAndDependenciesGroup:AddNewLine()
 						outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies"):SetStyle("SeparatorTextAlign", 0.5)
 						buildDependencyTable(preset, outfitsAndDependenciesGroup)
@@ -589,12 +600,12 @@ function VanityPresetManager:UpdatePresetView(presetID)
 		end
 	end
 
-	buildSection(ConfigurationStructure.config.vanity.presets)
+	buildSection(ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets)
 
 	VanityModPresetManager:ImportPresetsFromMods()
 	for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
 		return Ext.Mod.GetMod(key).Info.Name
 	end) do
-		buildSection(vanity.presets, Ext.Mod.GetMod(modId).Info.Name)
+		buildSection(vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name)
 	end
 end
