@@ -98,6 +98,7 @@ local function DeleteItem(character, userPreview)
 	for _, item in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_PreviewItem") or {}) do
 		local itemEntity = Ext.Entity.Get(item)
 		if itemEntity and itemEntity.Vars.TheArmory_Vanity_PreviewItem == character then
+			Osi.Unequip(character, item)
 			Osi.RequestDelete(item)
 		end
 	end
