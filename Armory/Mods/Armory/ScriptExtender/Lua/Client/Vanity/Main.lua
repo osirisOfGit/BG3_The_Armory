@@ -19,6 +19,7 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 
 Ext.Require("Client/Vanity/PresetManagement/PresetManager.lua")
 Ext.Require("Client/Vanity/CharacterCriteria.lua")
+Ext.Require("Client/Vanity/ItemValidator.lua")
 
 Vanity = {}
 
@@ -83,6 +84,11 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			VanityPresetManager:OpenManager()
 		end
 		--#endregion
+
+		local itemValidatorButton = tabHeader:AddButton("Item Validation Report")
+		itemValidatorButton.OnClick = function ()
+			ItemValidator:OpenReport()
+		end
 
 		separator = tabHeader:AddSeparatorText("Choose A Preset")
 		separator:SetStyle("SeparatorTextAlign", 0.5)
