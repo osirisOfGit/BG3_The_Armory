@@ -7,3 +7,16 @@ function Styler:ImageButton(imageButton)
 
 	return imageButton
 end
+
+---@param text string
+---@param parent ExtuiTreeParent
+---@param font string?
+function Styler:CheapTextAlign(text, parent, font)
+	---@type ExtuiSelectable
+	local selectable = parent:AddSelectable(text)
+	if font then
+		selectable.Font = font
+	end
+	selectable:SetStyle("SelectableTextAlign", 0.5)
+	selectable.Disabled = true
+end

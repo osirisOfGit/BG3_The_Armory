@@ -16,7 +16,7 @@ ItemValidator.Results = {}
 ---@param text string
 ---@return string
 function ItemValidator:InsertNewlineAtLimit(text)
-	local limit = 150
+	local limit = 100
 	if #text <= limit then
 		return text
 	end
@@ -71,7 +71,7 @@ function ItemValidator:addEntry(id, entry, type, error, severity)
 	self.Results[modId][id] = {
 		id = id,
 		-- Using TextWrapPos on the text in the cell wasn't working - onnly inserts the newline at the next whitespace
-		error = self:InsertNewlineAtLimit(error),
+		error = error,
 		type = type,
 		severity = severity,
 		subModId = subModId
@@ -222,7 +222,8 @@ function ItemValidator:OpenReport()
 			for modId, validationResults in TableUtils:OrderedPairs(self.Results, function(key)
 				return key == "Unknown" and key or (Ext.Mod.GetMod(key) and Ext.Mod.GetMod(key).Info.Name or key)
 			end) do
-				local mod = modId ~= "Unknown" and (Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId)
+				local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
+				
 				---@type ExtuiSelectable
 				local selectable = modsCol:AddSelectable(mod and mod.Name or modId)
 
@@ -239,11 +240,24 @@ function ItemValidator:OpenReport()
 					end
 
 					activeGroup = resultsCol:AddGroup(selectable.Label)
+					
+					-- Lifetime of original var expires, so being lazy instead of serializing
+					local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
+					Styler:CheapTextAlign(mod.Name or modId, activeGroup, "Large")
+					Styler:CheapTextAlign(mod.Name and (mod.Author or "Larian") or "Unknown Author", activeGroup)
+					Styler:CheapTextAlign(mod.Name and (mod.ModVersion and ("v" .. table.concat(mod.ModVersion, "."))) or "Unknown Version", activeGroup)
+
+					activeGroup:AddNewLine()
 
 					local validationErrorsTable = activeGroup:AddTable("ValidationErrors" .. modId, 5)
-					validationErrorsTable.SizingStretchProp = true
 					validationErrorsTable.Resizable = true
 					validationErrorsTable.RowBg = true
+
+					validationErrorsTable:AddColumn("", "WidthFixed")
+					validationErrorsTable:AddColumn("", "WidthStretch")
+					validationErrorsTable:AddColumn("", "WidthFixed")
+					validationErrorsTable:AddColumn("", "WidthStretch")
+					validationErrorsTable:AddColumn("", "WidthFixed")
 
 					local headers = validationErrorsTable:AddRow()
 					headers.Headers = true
@@ -258,7 +272,7 @@ function ItemValidator:OpenReport()
 						row:AddCell():AddText(validationError.severity)
 						row:AddCell():AddText(id)
 						row:AddCell():AddText(validationError.type)
-						row:AddCell():AddText(validationError.error)
+						row:AddCell():AddText(self:InsertNewlineAtLimit(validationError.error))
 						row:AddCell():AddText(validationError.subModId and Ext.Mod.GetMod(validationError.subModId).Info.Name or "---")
 					end
 				end
