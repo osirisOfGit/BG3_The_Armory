@@ -159,7 +159,7 @@ function ItemValidator:ValidateItems()
 					if string.match(stat.ObjectCategory, "Dye") then
 						if not template.ColorPreset or template.ColorPreset == "" then
 							self:addEntry(template.Name .. "_" .. template.Id, template, "Template", "Does not have a ColorPreset defined", "Prevents Dye")
-						elseif not Ext.Resource.Get(template.ColorPreset, "MaterialPreset") then
+						elseif template.ColorPreset ~= "00000000-0000-0000-0000-000000000000" and not Ext.Resource.Get(template.ColorPreset, "MaterialPreset") then
 							self:addEntry(template.Name .. "_" .. template.Id,
 								template,
 								"Template",
@@ -167,7 +167,6 @@ function ItemValidator:ValidateItems()
 								"Prevents Dye")
 						end
 					end
-
 
 					if not template.Stats or template.Stats == "" then
 						self:addEntry(template.Name .. "_" .. template.Id, template, "Template", "Does not have a Stat defined", "Prevents Transmog")
@@ -220,10 +219,10 @@ function ItemValidator:OpenReport()
 			resultsCol.AlwaysHorizontalScrollbar = true
 
 			for modId, validationResults in TableUtils:OrderedPairs(self.Results, function(key)
-				return key == "Unknown" and key or (Ext.Mod.GetMod(key) and Ext.Mod.GetMod(key).Info.Name or key)
+				return Ext.Mod.GetMod(key) and Ext.Mod.GetMod(key).Info.Name or key
 			end) do
 				local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
-				
+
 				---@type ExtuiSelectable
 				local selectable = modsCol:AddSelectable(mod and mod.Name or modId)
 
@@ -240,7 +239,7 @@ function ItemValidator:OpenReport()
 					end
 
 					activeGroup = resultsCol:AddGroup(selectable.Label)
-					
+
 					-- Lifetime of original var expires, so being lazy instead of serializing
 					local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
 					Styler:CheapTextAlign(mod.Name or modId, activeGroup, "Large")
