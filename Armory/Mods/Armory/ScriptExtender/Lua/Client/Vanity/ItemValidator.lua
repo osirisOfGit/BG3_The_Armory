@@ -45,8 +45,16 @@ function ItemValidator:addEntry(id, entry, type, error, severity)
 	local stat
 	if type == "Template" then
 		if (entry.Stats and entry.Stats ~= "") then
-			stat = Ext.Stats.Get(entry.Stats)
-		else
+			pcall(function(...)
+				---@type Armor|Weapon|Object
+				local tempStat = Ext.Stats.Get(entry.Stats)
+				if tempStat and tempStat.RootTemplate == entry.Id then
+					stat = Ext.Stats.Get(entry.Stats)
+				end
+			end)
+		end
+
+		if not stat then
 			modId = entry.FileName:match("([^/]+)/RootTemplates/")
 		end
 	else
@@ -215,6 +223,9 @@ function ItemValidator:OpenReport()
 
 			local resultsRow = resultsTable:AddRow()
 			local modsCol = resultsRow:AddCell():AddChildWindow("ModWindow")
+			modsCol:SetSizeConstraints({ 400, 0 })
+			resultsTable.ColumnDefs[1].Width = 400
+
 			local resultsCol = resultsRow:AddCell():AddChildWindow("ValidationResults")
 			resultsCol.AlwaysHorizontalScrollbar = true
 
@@ -261,16 +272,16 @@ function ItemValidator:OpenReport()
 					local headers = validationErrorsTable:AddRow()
 					headers.Headers = true
 					headers:AddCell():AddText("Severity")
-					headers:AddCell():AddText("Id")
 					headers:AddCell():AddText("Type")
+					headers:AddCell():AddText("Id")
 					headers:AddCell():AddText("Error")
 					headers:AddCell():AddText("Modified By")
 
 					for id, validationError in TableUtils:OrderedPairs(validationResults) do
 						local row = validationErrorsTable:AddRow()
 						row:AddCell():AddText(validationError.severity)
-						row:AddCell():AddText(id)
 						row:AddCell():AddText(validationError.type)
+						row:AddCell():AddText(id)
 						row:AddCell():AddText(self:InsertNewlineAtLimit(validationError.error))
 						row:AddCell():AddText(validationError.subModId and Ext.Mod.GetMod(validationError.subModId).Info.Name or "---")
 					end
