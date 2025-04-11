@@ -89,7 +89,7 @@ end
 function ItemValidator:ValidateItems()
 	if not next(self.Results) then
 		for _, template in pairs(Ext.Template.GetAllRootTemplates()) do
-			if template.TemplateType == "item" and not string.match(template.Name, "TimelineTemplate") then
+			if template.TemplateType == "item" and template.Equipment and template.Equipment.Slot and #template.Equipment.Slot > 0 then
 				---@cast template ItemTemplate
 
 				local success, error = pcall(function()

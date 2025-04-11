@@ -128,7 +128,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, p
 				userPreview.armorSet = nil
 			end)
 		end
-		
+
 		DeleteItem(character, userPreview)
 	end
 end)
