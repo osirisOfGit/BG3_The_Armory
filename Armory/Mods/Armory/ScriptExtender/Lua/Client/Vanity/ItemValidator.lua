@@ -9,7 +9,7 @@ ItemValidator.Window = nil
 ---@field severity "Prevents Transmog"|"Prevents Dye"|"Has Built-In Workaround"
 ---@field subModId string?
 
----@type {[string]: ValidationEntry}
+---@type {[string]: {[string]: ValidationEntry}}
 ItemValidator.Results = {}
 
 --- Inserts a newline at the 1000th character or the next whitespace if the 1000th character is not a whitespace.
@@ -56,6 +56,9 @@ function ItemValidator:addEntry(id, entry, type, error, severity)
 
 		if not stat then
 			modId = entry.FileName:match("([^/]+)/RootTemplates/")
+			if modId and modId:match("_[0-9a-fA-F%-]+$") then
+				modId = modId:gsub("_[0-9a-fA-F%-]+$", "")
+			end
 		end
 	else
 		stat = entry
@@ -214,9 +217,18 @@ function ItemValidator:OpenReport()
 	if not self.Window then
 		self.Window = Ext.IMGUI.NewWindow("Validator Report")
 		self.Window.Closeable = true
+		self.Window.MenuBar = true
+
 		self:ValidateItems()
 
 		if next(self.Results) then
+			---@type ExtuiMenu
+			local filterMenu = self.Window:AddMainMenu():AddMenu("Filters")
+
+			---@type ExtuiSelectable
+			local showWorkaroundSelectable = filterMenu:AddSelectable("Show Issues That Have Built-In Workarounds")
+			showWorkaroundSelectable.Selected = ConfigurationStructure.config.vanity.settings.general.itemValidator_ShowWorkaroundErrors
+
 			local resultsTable = self.Window:AddTable("ValidationResults", 2)
 			resultsTable:AddColumn("Mods", "WidthFixed")
 			resultsTable:AddColumn("Results", "WidthStretch")
@@ -229,63 +241,91 @@ function ItemValidator:OpenReport()
 			local resultsCol = resultsRow:AddCell():AddChildWindow("ValidationResults")
 			resultsCol.AlwaysHorizontalScrollbar = true
 
-			for modId, validationResults in TableUtils:OrderedPairs(self.Results, function(key)
-				return Ext.Mod.GetMod(key) and Ext.Mod.GetMod(key).Info.Name or key
-			end) do
-				local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
+			local function buildResults()
+				for modId, validationResults in TableUtils:OrderedPairs(self.Results, function(key)
+					return Ext.Mod.GetMod(key) and Ext.Mod.GetMod(key).Info.Name or key
+				end) do
+					local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
 
-				---@type ExtuiSelectable
-				local selectable = modsCol:AddSelectable(mod and mod.Name or modId)
-
-				selectable.OnClick = function()
-					for _, child in pairs(modsCol.Children) do
-						---@cast child ExtuiSelectable
-						if child.Selected and child.Handle ~= selectable.Handle then
-							child.Selected = false
+					if not ConfigurationStructure.config.vanity.settings.general.itemValidator_ShowWorkaroundErrors then
+						local buildSelectable = false
+						for _, validationError in pairs(validationResults) do
+							if validationError.severity ~= "Has Built-In Workaround" then
+								buildSelectable = true
+							end
+						end
+						if not buildSelectable then
+							goto continue
 						end
 					end
 
-					if activeGroup then
-						activeGroup:Destroy()
+					---@type ExtuiSelectable
+					local selectable = modsCol:AddSelectable(mod and mod.Name or modId)
+
+					selectable.OnClick = function()
+						for _, child in pairs(modsCol.Children) do
+							---@cast child ExtuiSelectable
+							if child.Selected and child.Handle ~= selectable.Handle then
+								child.Selected = false
+							end
+						end
+
+						if activeGroup then
+							activeGroup:Destroy()
+						end
+
+						activeGroup = resultsCol:AddGroup(selectable.Label)
+
+						-- Lifetime of original var expires, so being lazy instead of serializing
+						local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
+						Styler:CheapTextAlign(mod.Name or modId, activeGroup, "Large")
+						Styler:CheapTextAlign(mod.Name and (mod.Author or "Larian") or "Unknown Author", activeGroup)
+						Styler:CheapTextAlign(mod.Name and (mod.ModVersion and ("v" .. table.concat(mod.ModVersion, "."))) or "Unknown Version", activeGroup)
+
+						activeGroup:AddNewLine()
+
+						local validationErrorsTable = activeGroup:AddTable("ValidationErrors" .. modId, 5)
+						validationErrorsTable.Resizable = true
+						validationErrorsTable.RowBg = true
+
+						validationErrorsTable:AddColumn("", "WidthFixed")
+						validationErrorsTable:AddColumn("", "WidthStretch")
+						validationErrorsTable:AddColumn("", "WidthFixed")
+						validationErrorsTable:AddColumn("", "WidthStretch")
+						validationErrorsTable:AddColumn("", "WidthFixed")
+
+						local headers = validationErrorsTable:AddRow()
+						headers.Headers = true
+						headers:AddCell():AddText("Severity")
+						headers:AddCell():AddText("Type")
+						headers:AddCell():AddText("Id")
+						headers:AddCell():AddText("Error")
+						headers:AddCell():AddText("Modified By")
+
+						for id, validationError in TableUtils:OrderedPairs(validationResults) do
+							if ConfigurationStructure.config.vanity.settings.general.itemValidator_ShowWorkaroundErrors or validationError.severity ~= "Has Built-In Workaround" then
+								local row = validationErrorsTable:AddRow()
+								row:AddCell():AddText(validationError.severity)
+								row:AddCell():AddText(validationError.type)
+								row:AddCell():AddText(id)
+								row:AddCell():AddText(self:InsertNewlineAtLimit(validationError.error))
+								row:AddCell():AddText(validationError.subModId and Ext.Mod.GetMod(validationError.subModId).Info.Name or "---")
+							end
+						end
 					end
-
-					activeGroup = resultsCol:AddGroup(selectable.Label)
-
-					-- Lifetime of original var expires, so being lazy instead of serializing
-					local mod = Ext.Mod.GetMod(modId) and Ext.Mod.GetMod(modId).Info or modId
-					Styler:CheapTextAlign(mod.Name or modId, activeGroup, "Large")
-					Styler:CheapTextAlign(mod.Name and (mod.Author or "Larian") or "Unknown Author", activeGroup)
-					Styler:CheapTextAlign(mod.Name and (mod.ModVersion and ("v" .. table.concat(mod.ModVersion, "."))) or "Unknown Version", activeGroup)
-
-					activeGroup:AddNewLine()
-
-					local validationErrorsTable = activeGroup:AddTable("ValidationErrors" .. modId, 5)
-					validationErrorsTable.Resizable = true
-					validationErrorsTable.RowBg = true
-
-					validationErrorsTable:AddColumn("", "WidthFixed")
-					validationErrorsTable:AddColumn("", "WidthStretch")
-					validationErrorsTable:AddColumn("", "WidthFixed")
-					validationErrorsTable:AddColumn("", "WidthStretch")
-					validationErrorsTable:AddColumn("", "WidthFixed")
-
-					local headers = validationErrorsTable:AddRow()
-					headers.Headers = true
-					headers:AddCell():AddText("Severity")
-					headers:AddCell():AddText("Type")
-					headers:AddCell():AddText("Id")
-					headers:AddCell():AddText("Error")
-					headers:AddCell():AddText("Modified By")
-
-					for id, validationError in TableUtils:OrderedPairs(validationResults) do
-						local row = validationErrorsTable:AddRow()
-						row:AddCell():AddText(validationError.severity)
-						row:AddCell():AddText(validationError.type)
-						row:AddCell():AddText(id)
-						row:AddCell():AddText(self:InsertNewlineAtLimit(validationError.error))
-						row:AddCell():AddText(validationError.subModId and Ext.Mod.GetMod(validationError.subModId).Info.Name or "---")
-					end
+					::continue::
 				end
+			end
+			buildResults()
+
+			showWorkaroundSelectable.OnClick = function()
+				ConfigurationStructure.config.vanity.settings.general.itemValidator_ShowWorkaroundErrors = showWorkaroundSelectable.Selected
+				if activeGroup then
+					activeGroup:Destroy()
+				end
+				activeGroup = nil
+				Helpers:KillChildren(modsCol, resultsCol)
+				buildResults()
 			end
 		end
 	elseif not self.Window.Open then
