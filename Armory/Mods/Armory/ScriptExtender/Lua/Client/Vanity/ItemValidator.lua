@@ -88,11 +88,10 @@ end
 
 function ItemValidator:ValidateItems()
 	if not next(self.Results) then
-
 		for _, template in pairs(Ext.Template.GetAllRootTemplates()) do
 			if template.TemplateType == "item" and not string.match(template.Name, "TimelineTemplate") then
 				---@cast template ItemTemplate
-	
+
 				local success, error = pcall(function()
 					if not template.Stats or template.Stats == "" then
 						self:addEntry(template.Name .. "_" .. template.Id, template, "Template", "Does not have an associated Stat", "Prevents Transmog")
@@ -110,12 +109,12 @@ function ItemValidator:ValidateItems()
 							if not (stat.ModifierList == "Weapon" or stat.ModifierList == "Armor") and not string.match(stat.ObjectCategory, "Dye") then
 								return
 							end
-	
+
 							if not stat.RootTemplate or stat.RootTemplate == "" then
 								self:addEntry(stat.Name, stat, "Stat", "Does not have a RootTemplate associated to it", "Prevents Transmog")
 							elseif stat.RootTemplate ~= template.Id then
 								local otherTemplate = Ext.Template.GetRootTemplate(stat.RootTemplate)
-	
+
 								self:addEntry(template.Name .. "_" .. template.Id,
 									template,
 									"Template",
@@ -134,7 +133,7 @@ function ItemValidator:ValidateItems()
 				end
 			end
 		end
-		
+
 		local combinedStats = {}
 		for _, statType in ipairs({ "Armor", "Weapon", "Object" }) do
 			for _, stat in ipairs(Ext.Stats.GetStats(statType)) do
