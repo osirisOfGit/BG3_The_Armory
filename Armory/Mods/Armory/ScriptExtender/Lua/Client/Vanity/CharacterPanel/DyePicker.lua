@@ -83,13 +83,22 @@ function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
 		local dyeInfoGroup = self.infoCell:AddGroup(dyeTemplateId .. dyeTemplate.Stats .. self.slot .. "dye")
 		self.activeDyeGroup = dyeInfoGroup
 
+		dyeInfoGroup:AddSeparatorText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name)
+		
 		---@type Object
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
-		local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
+		if dyeStat then
+			local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
 
-		dyeInfoGroup:AddSeparatorText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name)
-		dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian"))
-			:SetColor("Text", { 1, 1, 1, 0.5 })
+			dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian"))
+				:SetColor("Text", { 1, 1, 1, 0.5 })
+		else
+			local modId = dyeTemplate.FileName:match("([^/]+)/RootTemplates/")
+			if modId and modId:match("_[0-9a-fA-F%-]+$") then
+				modId = modId:gsub("_[0-9a-fA-F%-]+$", "")
+			end
+			dyeInfoGroup:AddText(string.format("From folder %s", modId)):SetColor("Text", { 1, 1, 1, 0.5 })
+		end
 
 		dyeInfoGroup:AddButton("Select").OnClick = function()
 			self.activeDyeGroup:Destroy()

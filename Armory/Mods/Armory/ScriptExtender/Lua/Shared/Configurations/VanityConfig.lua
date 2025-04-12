@@ -10,7 +10,8 @@ ConfigurationStructure.config.vanity.settings = {
 		fillEmptySlots = true,
 		---@alias outfitAndDependencyView "universal"|"perOutfit"
 		---@type outfitAndDependencyView
-		outfitAndDependencyView = "universal"
+		outfitAndDependencyView = "universal",
+		itemValidator_ShowWorkaroundErrors = false
 	},
 	---@class EquipmentSettings
 	equipment = {

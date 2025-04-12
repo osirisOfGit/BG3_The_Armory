@@ -1,16 +1,12 @@
 local itemIndex = {
 	---@class SearchIndex
 	equipment = {
-		statAndModId = {},
-		statAndTemplateId = {},
 		templateIdAndStat = {},
 		templateIdAndTemplateName = {},
 		modIdAndTemplateIds = {},
 		mods = {}
 	},
 	dyes = {
-		statAndModId = {},
-		statAndTemplateId = {},
 		templateIdAndStat = {},
 		templateIdAndTemplateName = {},
 		modIdAndTemplateIds = {},
@@ -97,32 +93,88 @@ function PickerBaseClass:InitializeSearchBank()
 				error(string.format("RootTemplate %s does not exist", stat.RootTemplate))
 			end
 
-			indexShard.statAndTemplateId[statString] = stat.RootTemplate
 			indexShard.templateIdAndStat[stat.RootTemplate] = statString
 			indexShard.templateIdAndTemplateName[stat.RootTemplate] = itemTemplate.DisplayName:Get() or itemTemplate.Name
 
-			if stat.ModId ~= "" then
-				local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+			if stat.ModId ~= "" or stat.OriginalModId ~= "" then
+				local modId = stat.OriginalModId ~= "" and stat.OriginalModId or stat.ModId
+				local modInfo = Ext.Mod.GetMod(modId).Info
 				if not indexShard.mods[modInfo.Name] then
-					if not modcache[stat.ModId] then
+					if not modcache[modId] then
 						modCount = modCount + 1
-						modcache[stat.ModId] = true
+						modcache[modId] = true
 					end
-					indexShard.mods[modInfo.Name] = stat.ModId
-					indexShard.modIdAndTemplateIds[stat.ModId] = {}
+					indexShard.mods[modInfo.Name] = modId
+					indexShard.modIdAndTemplateIds[modId] = {}
 				end
-				indexShard.statAndModId[statString] = stat.ModId
-				table.insert(indexShard.modIdAndTemplateIds[stat.ModId], itemTemplate.Id)
+				table.insert(indexShard.modIdAndTemplateIds[modId], itemTemplate.Id)
 			end
 		end)
 
 		if not success then
 			Logger:BasicWarning("Couldn't load stat %s (from Mod '%s') into the search table due to %s - please contact the mod author to fix this issue",
 				stat.Name,
-				stat.ModId ~= "" and Ext.Mod.GetMod(stat.ModId).Info.Name or "Unknown",
+				stat.OriginalModId ~= "" and Ext.Mod.GetMod(stat.OriginalModId).Info.Name or "Unknown",
 				error)
 		end
 	end
+
+	local indexShard = itemIndex.equipment
+	for _, template in pairs(Ext.Template.GetAllRootTemplates()) do
+		if template.TemplateType == "item" and not template.Name:match("Timeline") then
+			local success, error = pcall(function()
+				---@cast template ItemTemplate
+
+				if template.Equipment and template.Equipment.Slot and #template.Equipment.Slot > 0 and not indexShard.templateIdAndStat[template.Id] then
+					if template.Stats and template.Stats ~= "" and template.Stats ~= "OBJ_GenericImmutableObject" then
+						---@type Weapon|Armor
+						local stat = Ext.Stats.Get(template.Stats)
+
+						if stat and stat.Slot then
+							itemCount = itemCount + 1
+
+							indexShard.templateIdAndStat[template.Id] = template.Stats
+							indexShard.templateIdAndTemplateName[template.Id] = template.DisplayName:Get() or template.Name
+
+							local modName
+							local modId
+							if stat.RootTemplate == template.Id then
+								modId = stat.OriginalModId ~= "" and stat.OriginalModId or stat.ModId
+								local modInfo = Ext.Mod.GetMod(modId).Info
+								modName = modInfo.Name
+							else
+								local modFolder = template.FileName:match("([^/]+)/RootTemplates/")
+								if modFolder:match("_[0-9a-fA-F%-]+$") then
+									modFolder = modFolder:gsub("_[0-9a-fA-F%-]+$", "")
+								end
+								modName = modFolder
+								modId = modFolder
+							end
+							if not indexShard.mods[modName] then
+								if not modcache[modId] then
+									modCount = modCount + 1
+									modcache[modId] = true
+								end
+								indexShard.mods[modName] = modId
+								indexShard.modIdAndTemplateIds[modId] = {}
+							elseif not indexShard.modIdAndTemplateIds[modId] then
+								modId = indexShard.mods[modName]
+							end
+							table.insert(indexShard.modIdAndTemplateIds[modId], template.Id)
+						end
+					end
+				end
+			end)
+
+			if not success then
+				Logger:BasicWarning("Couldn't load template %s (in folder %s) into the search table due to %s - please contact the mod author to fix this issue",
+					template.Name .. "_" .. template.Id,
+					template.FileName:match("([^/]+)/RootTemplates/"),
+					error)
+			end
+		end
+	end
+
 	for _, indexShard in pairs(itemIndex) do
 		for _, templateIds in pairs(indexShard.modIdAndTemplateIds) do
 			table.sort(templateIds, function(a, b)
@@ -151,7 +203,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window.OnClose = function()
 			self.searchInput.Text = ""
 			self.getAllForModCombo.SelectedIndex = -1
-			Ext.Timer.WaitFor(60, function ()
+			Ext.Timer.WaitFor(60, function()
 				onCloseFunc()
 			end)
 		end
