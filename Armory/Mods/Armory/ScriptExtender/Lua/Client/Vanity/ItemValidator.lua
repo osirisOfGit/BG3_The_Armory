@@ -284,7 +284,7 @@ function ItemValidator:OpenReport()
 								Styler:CheapTextAlign(mod.Name or modId, ele, "Large")
 							end,
 							function(ele)
-								Styler:CheapTextAlign(mod.Name and (mod.Author or "Larian") or "Unknown Author", ele)
+								Styler:CheapTextAlign(mod.Name and (mod.Author == "" and "Larian" or mod.Author) or "Unknown Author", ele)
 							end,
 							function(ele)
 								Styler:CheapTextAlign(mod.Name and (mod.ModVersion and ("v" .. table.concat(mod.ModVersion, "."))) or "Unknown Version", ele)
@@ -370,7 +370,7 @@ Before providing this output to a mod author, please validate the following:
 	1. Check the template/stat name - does it have words like "test", "template", or is numbers (like "1", "2")? If so, the reported issue is probably known and expected
 	2. Make sure the mod reported for the template/stat makes sense - the SE provided modId isn't perfect, especially if multiple mods are modifying the same thing.
 		Any "Overhaul" or "Rebalance" mods are likely not the true owner of the item, and may or may not be responsible for the issue.
-		Any issues under Gustav or Shared are base-game items, so if they've been modified by a mod, disable that mod and see if the issue still occurs. If they haven't been modified, you'll need to patch the item yourself.
+		Any issues under Gustav(Dev) or Shared(Dev) are base-game items, so if they've been modified by a mod, disable that mod and see if the issue still occurs. If they haven't been modified, you'll need to patch the item yourself.
 	3. Ensure you aren't missing any optional downloads/patches from the mod author - sometimes the base mod will house stats/templates that aren't intended to be used unless a patch/additional mod is downloaded
 	4. Check the "Modified By" section and if present, ensure this issue persists without that mod loaded
 	5. Check the mod description/bugs/posts section to see if these issues are known and/or already reported - don't be a spammer!
