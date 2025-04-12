@@ -45,9 +45,24 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		helpTooltip:AddText("When an outfit is matched to a character, all equipped items will be automatically transmogged and/or dyed according to the outfit (if a non-weapon slot is empty and a vanity item is defined, a junk item will spawn in that slot to allow the vanity item to show)").TextWrapPos = 0
 		helpTooltip:AddText("When an item is unequipped, it will be unmogged/undyed _unless_ it's not contained within an inventory (e.g. throwing or dropping). This is intentional while I figure out what the preferred behavior is").TextWrapPos = 0
 
+		--#region Presets
+		local presetPickerButton = tabHeader:AddButton("Preset Manager")
+		presetPickerButton.SameLine = true
+		presetPickerButton.OnClick = function()
+			VanityPresetManager:OpenManager()
+		end
+		--#endregion
+		
+		local itemValidatorButton = tabHeader:AddButton("Item Validation Report")
+		itemValidatorButton.SameLine = true
+		itemValidatorButton.OnClick = function()
+			ItemValidator:OpenReport()
+		end
+
 		--#region Settings
 		local generalSettings = ConfigurationStructure.config.vanity.settings.general
 		local menu = tabHeader:AddButton("Settings")
+		menu.SameLine = true
 		menu.UserData = "keep"
 		local menuPopup = tabHeader:AddPopup("PanelSettings")
 		menuPopup.UserData = "keep"
@@ -77,18 +92,6 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			end
 		end
 		--#endregion
-
-		--#region Presets
-		local presetPickerButton = tabHeader:AddButton("Preset Manager")
-		presetPickerButton.OnClick = function()
-			VanityPresetManager:OpenManager()
-		end
-		--#endregion
-
-		local itemValidatorButton = tabHeader:AddButton("Item Validation Report")
-		itemValidatorButton.OnClick = function ()
-			ItemValidator:OpenReport()
-		end
 
 		separator = tabHeader:AddSeparatorText("Choose A Preset")
 		separator:SetStyle("SeparatorTextAlign", 0.5)
