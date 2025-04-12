@@ -321,7 +321,7 @@ BodyTypes = {
 ]]
 function PickerBaseClass:BuildFilters()
 	--#region Search By Name
-	self.filterGroup:AddText("Search By Name")
+	self.filterGroup:AddText("By Name")
 	local nameSearch = self.filterGroup:AddInputText("")
 	nameSearch.Hint = "Case-insensitive, min 3 characters"
 	nameSearch.AutoSelectAll = true
@@ -345,7 +345,7 @@ function PickerBaseClass:BuildFilters()
 	--#endregion
 
 	--#region Search By Id
-	self.filterGroup:AddText("Search By UUID")
+	self.filterGroup:AddText("By UUID")
 	local idSearch = self.filterGroup:AddInputText("")
 	idSearch.Hint = "Case-insensitive, min 3 characters"
 	idSearch.AutoSelectAll = true
@@ -368,20 +368,24 @@ function PickerBaseClass:BuildFilters()
 	end)
 	--#endregion
 
+	self.filterGroup:AddNewLine()
+
 	--#region Mod Picker
-	local modTitleText = self.filterGroup:AddText("By Mod(s)")
-	local modNameSearch = self.filterGroup:AddInputText("")
+	local modTitleHeader = self.filterGroup:AddCollapsingHeader("By Mod")
+	modTitleHeader.IDContext = "ByMod"
+	modTitleHeader.DefaultOpen = true
+	modTitleHeader:SetColor("Header", { 0, 0, 0, 0 })
+
+	local modNameSearch = modTitleHeader:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
 	modNameSearch.AutoSelectAll = true
 	modNameSearch.EscapeClearsAll = true
 
-	local clearSelected = Styler:ImageButton(self.filterGroup:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
+	local clearSelected = Styler:ImageButton(modTitleHeader:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
 	clearSelected.SameLine = true
 	clearSelected:Tooltip():AddText("\t Clear Selected Mods")
 
-	local modFilterWindow = self.filterGroup:AddChildWindow("modFilters")
-	modFilterWindow.Border = true
-	modFilterWindow:SetColor("Border", { 1, 0.02, 0, 1 })
+	local modFilterWindow = modTitleHeader:AddChildWindow("modFilters")
 
 	local selected = {}
 	local function buildModSelectables()
@@ -413,6 +417,9 @@ function PickerBaseClass:BuildFilters()
 				if buildSelectable then
 					---@type ExtuiSelectable
 					local selectable = modFilterWindow:AddSelectable(modName)
+					-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
+					-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
+					selectable:SetColor("Header", {0.36, 0.30, 0.27, 0.76})
 					selectable.Selected = selected[modId] or false
 
 					selectedCount = selectedCount + (selectable.Selected and 1 or 0)
@@ -422,7 +429,7 @@ function PickerBaseClass:BuildFilters()
 
 						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
 
-						modTitleText.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
+						modTitleHeader.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
 
 						self:RebuildDisplay()
 					end
@@ -431,7 +438,7 @@ function PickerBaseClass:BuildFilters()
 			end
 		end
 
-		modTitleText.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
+		modTitleHeader.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
 	end
 
 	clearSelected.OnClick = function()
@@ -441,10 +448,6 @@ function PickerBaseClass:BuildFilters()
 	end
 
 	buildModSelectables()
-
-	modNameSearch.OnChange = function()
-		buildModSelectables()
-	end
 
 	---@param itemTemplate ItemTemplate
 	---@return boolean
@@ -479,6 +482,10 @@ function PickerBaseClass:BuildFilters()
 
 	for _, customFilter in ipairs(self.customFilters) do
 		customFilter(onChangeFunc)
+	end
+
+	modNameSearch.OnChange = function()
+		onChangeFunc()
 	end
 
 	nameSearch.OnChange = function()
