@@ -32,8 +32,10 @@ PickerBaseClass = {
 	warningGroup = nil,
 	---@type ExtuiChildWindow
 	filterGroup = nil,
+	---@type (fun(function))[]
+	customFilters = {},
 	---@type (fun(template: ItemTemplate): boolean)[]
-	filterPredicates = {}
+	filterPredicates = {},
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -243,8 +245,6 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		local row = displayTable:AddRow()
 
 		self.filterGroup = row:AddCell():AddChildWindow("Filters")
-		-- self.filterGroup:SetSizeConstraints({400, 0})
-		self:BuildFilters()
 
 		local otherGroup = row:AddCell():AddChildWindow("RestOfTheOwl")
 
@@ -258,6 +258,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.resultsGroup = otherGroup:AddGroup(self.title .. "Results")
 
 		customizeFunc()
+		self:BuildFilters()
 	else
 		if not self.window.Open then
 			self.window.Open = true
@@ -276,6 +277,8 @@ function PickerBaseClass:RebuildDisplay()
 	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
 		return self.itemIndex.templateIdAndTemplateName[key]
 	end) do
+		self:DisplayResult(templateId, self.favoritesGroup)
+
 		---@type ItemTemplate
 		local template = Ext.Template.GetRootTemplate(templateId)
 		for _, predicate in ipairs(self.filterPredicates) do
@@ -283,7 +286,6 @@ function PickerBaseClass:RebuildDisplay()
 				goto continue
 			end
 		end
-		self:DisplayResult(templateId, self.favoritesGroup)
 		self:DisplayResult(templateId, self.resultsGroup)
 		::continue::
 	end
@@ -318,9 +320,6 @@ BodyTypes = {
 }
 ]]
 function PickerBaseClass:BuildFilters()
-	self.filterPredicates = {}
-	Helpers:KillChildren(self.filterGroup)
-
 	--#region Search By Name
 	self.filterGroup:AddText("Search By Name")
 	local nameSearch = self.filterGroup:AddInputText("")
@@ -370,43 +369,60 @@ function PickerBaseClass:BuildFilters()
 	--#endregion
 
 	--#region Mod Picker
-	self.filterGroup:AddText("By Mod(s)")
+	local modTitleText = self.filterGroup:AddText("By Mod(s)")
 	local modNameSearch = self.filterGroup:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
 	modNameSearch.AutoSelectAll = true
 	modNameSearch.EscapeClearsAll = true
+
+	local clearSelected = Styler:ImageButton(self.filterGroup:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
+	clearSelected.SameLine = true
+	clearSelected:Tooltip():AddText("\t Clear Selected Mods")
 
 	local modFilterWindow = self.filterGroup:AddChildWindow("modFilters")
 	modFilterWindow.Border = true
 	modFilterWindow:SetColor("Border", { 1, 0.02, 0, 1 })
 
 	local selected = {}
-
 	local function buildModSelectables()
 		Helpers:KillChildren(modFilterWindow)
 		local upperSearch = string.upper(modNameSearch.Text)
 
+		local selectedCount = 0
+
 		for modName, modId in TableUtils:OrderedPairs(self.itemIndex.mods) do
 			if not upperSearch or string.find(string.upper(modName), upperSearch) then
-				local buildSelectable = true
+				local buildSelectable = false
 				for _, templateId in pairs(self.itemIndex.modIdAndTemplateIds[modId]) do
 					---@type ItemTemplate
 					local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
-					for _, predicate in ipairs(self.filterPredicates) do
-						if not predicate(itemTemplate) then
-							buildSelectable = false
-							goto continue
+					for index, predicate in ipairs(self.filterPredicates) do
+						if index ~= 4 and not predicate(itemTemplate) then
+							goto next_template
 						end
 					end
+
+					buildSelectable = true
+					goto build_selectable
+
+					::next_template::
 				end
-				::continue::
+
+				::build_selectable::
 				if buildSelectable then
 					---@type ExtuiSelectable
 					local selectable = modFilterWindow:AddSelectable(modName)
 					selectable.Selected = selected[modId] or false
+
+					selectedCount = selectedCount + (selectable.Selected and 1 or 0)
+
 					selectable.OnClick = function()
 						selected[selectable.UserData] = selectable.Selected
+
+						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
+
+						modTitleText.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
 
 						self:RebuildDisplay()
 					end
@@ -414,6 +430,14 @@ function PickerBaseClass:BuildFilters()
 				end
 			end
 		end
+
+		modTitleText.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
+	end
+
+	clearSelected.OnClick = function()
+		selected = {}
+		buildModSelectables()
+		self:RebuildDisplay()
 	end
 
 	buildModSelectables()
@@ -447,18 +471,22 @@ function PickerBaseClass:BuildFilters()
 		if timer then
 			Ext.Timer.Cancel(timer)
 		end
-		timer = Ext.Timer.WaitFor(300, function ()
+		timer = Ext.Timer.WaitFor(300, function()
 			buildModSelectables()
 			self:RebuildDisplay()
 		end)
 	end
 
-	nameSearch.OnChange = function ()
+	for _, customFilter in ipairs(self.customFilters) do
+		customFilter(onChangeFunc)
+	end
+
+	nameSearch.OnChange = function()
 		if #nameSearch.Text == 0 or #nameSearch.Text >= 3 then
 			onChangeFunc()
 		end
 	end
-	idSearch.OnChange = function ()
+	idSearch.OnChange = function()
 		if #idSearch.Text == 0 or #idSearch.Text >= 3 then
 			onChangeFunc()
 		end

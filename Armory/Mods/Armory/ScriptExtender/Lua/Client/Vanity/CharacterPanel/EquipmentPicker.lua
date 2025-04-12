@@ -20,6 +20,11 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	self.onSelectFunc = onSelectFunc
 	self.vanityOutfitSlot = outfitSlot
 
+	local equivalentSlots = {
+		["Breast"] = "VanityBody",
+		["Boots"] = "VanityBoots"
+	}
+
 	PickerBaseClass.OpenWindow(self,
 		slot,
 		function()
@@ -36,6 +41,51 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			applyDyeCheckbox.OnChange = function()
 				self.settings.applyDyesWhenPreviewingEquipment = applyDyeCheckbox.Checked
 			end
+
+			---@param itemTemplate ItemTemplate
+			table.insert(self.filterPredicates, function(itemTemplate)
+				local itemTemplateId = itemTemplate.Id
+
+				---@type Armor|Weapon|Object
+				local itemStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplateId])
+
+				-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
+				local matchesSlot = itemStat.Slot == self.slot
+
+				if self.weaponType and not string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), self.weaponType) then
+					return false
+				elseif self.slot == "LightSource" and itemStat.ItemGroup ~= "Torch" then
+					return false
+				elseif not matchesSlot and self.slot ~= "LightSource" then
+					local canGoInOffhand = true
+					if string.find(self.slot, "Offhand") and string.find(itemStat.Slot, "Main") and self.slot == string.gsub(itemStat.Slot, "Main", "Offhand") then
+						for _, property in pairs(itemStat["Weapon Properties"]) do
+							if property == "Heavy" or property == "Twohanded" then
+								canGoInOffhand = false
+								break
+							end
+						end
+					else
+						canGoInOffhand = false
+					end
+
+					local isEquivalentSlot = false
+					for slot1, slot2 in pairs(equivalentSlots) do
+						if (slot1 == self.slot and string.find(slot2, itemStat.Slot))
+							or (slot2 == self.slot and string.find(slot1, itemStat.Slot))
+						then
+							isEquivalentSlot = true
+							break
+						end
+					end
+
+					if not canGoInOffhand and not isEquivalentSlot then
+						return false
+					end
+				end
+
+				return true
+			end)
 		end,
 		function()
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
@@ -52,11 +102,6 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	end
 end
 
-local equivalentSlots = {
-	["Breast"] = "VanityBody",
-	["Boots"] = "VanityBoots"
-}
-
 ---@param itemTemplateId string
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
 function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
@@ -70,41 +115,6 @@ function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 
 	---@type Armor|Weapon|Object
 	local itemStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplateId])
-
-	-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
-	local matchesSlot = itemStat.Slot == self.slot
-
-	if self.weaponType and not string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), self.weaponType) then
-		return
-	elseif self.slot == "LightSource" and itemStat.ItemGroup ~= "Torch" then
-		return
-	elseif not matchesSlot and self.slot ~= "LightSource" then
-		local canGoInOffhand = true
-		if string.find(self.slot, "Offhand") and string.find(itemStat.Slot, "Main") and self.slot == string.gsub(itemStat.Slot, "Main", "Offhand") then
-			for _, property in pairs(itemStat["Weapon Properties"]) do
-				if property == "Heavy" or property == "Twohanded" then
-					canGoInOffhand = false
-					break
-				end
-			end
-		else
-			canGoInOffhand = false
-		end
-
-		local isEquivalentSlot = false
-		for slot1, slot2 in pairs(equivalentSlots) do
-			if (slot1 == self.slot and string.find(slot2, itemStat.Slot))
-				or (slot2 == self.slot and string.find(slot1, itemStat.Slot))
-			then
-				isEquivalentSlot = true
-				break
-			end
-		end
-
-		if not canGoInOffhand and not isEquivalentSlot then
-			return
-		end
-	end
 
 	local numChildren = #displayGroup.Children
 	local itemGroup = displayGroup:AddChildWindow(itemTemplate.Id .. itemStat.Name .. displayGroup.Label)
