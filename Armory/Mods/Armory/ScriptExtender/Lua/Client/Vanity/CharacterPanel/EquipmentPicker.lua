@@ -63,7 +63,6 @@ function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
 	---@type ItemTemplate
 	local itemTemplate = Ext.Template.GetRootTemplate(itemTemplateId)
 
-
 	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, itemTemplateId)
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return

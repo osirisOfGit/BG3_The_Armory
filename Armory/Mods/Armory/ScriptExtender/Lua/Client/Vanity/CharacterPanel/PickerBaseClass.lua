@@ -206,8 +206,6 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window.Closeable = true
 		self.window.MenuBar = true
 		self.window.OnClose = function()
-			self.searchInput.Text = ""
-			self.getAllForModCombo.SelectedIndex = -1
 			Ext.Timer.WaitFor(60, function()
 				onCloseFunc()
 			end)
@@ -278,15 +276,16 @@ function PickerBaseClass:RebuildDisplay()
 	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
 		return self.itemIndex.templateIdAndTemplateName[key]
 	end) do
-		self:DisplayResult(templateId, self.favoritesGroup)
-	end
-
-	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
-		return self.itemIndex.templateIdAndTemplateName[key]
-	end) do
-		if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
-			self:DisplayResult(templateId, self.resultsGroup)
+		---@type ItemTemplate
+		local template = Ext.Template.GetRootTemplate(templateId)
+		for _, predicate in ipairs(self.filterPredicates) do
+			if not predicate(template) then
+				goto continue
+			end
 		end
+		self:DisplayResult(templateId, self.favoritesGroup)
+		self:DisplayResult(templateId, self.resultsGroup)
+		::continue::
 	end
 end
 
@@ -332,7 +331,7 @@ function PickerBaseClass:BuildFilters()
 	---@param itemTemplate ItemTemplate
 	---@return boolean
 	table.insert(self.filterPredicates, function(itemTemplate)
-		if #nameSearch.Text > 3 then
+		if #nameSearch.Text >= 3 then
 			local upperSearch = string.upper(nameSearch.Text)
 
 			if not upperSearch or string.find(string.upper(self.itemIndex.templateIdAndTemplateName[itemTemplate.Id]), upperSearch) then
@@ -356,7 +355,7 @@ function PickerBaseClass:BuildFilters()
 	---@param itemTemplate ItemTemplate
 	---@return boolean
 	table.insert(self.filterPredicates, function(itemTemplate)
-		if #idSearch.Text > 3 then
+		if #idSearch.Text >= 3 then
 			local upperSearch = string.upper(idSearch.Text)
 
 			if not upperSearch or string.find(string.upper(itemTemplate.Id), upperSearch) then
@@ -378,7 +377,7 @@ function PickerBaseClass:BuildFilters()
 	modNameSearch.EscapeClearsAll = true
 
 	local modFilterWindow = self.filterGroup:AddChildWindow("modFilters")
-	modFilterWindow:SetSize({ 0, 300 })
+	modFilterWindow.Border = true
 	modFilterWindow:SetColor("Border", { 1, 0.02, 0, 1 })
 
 	local selected = {}
@@ -389,14 +388,14 @@ function PickerBaseClass:BuildFilters()
 
 		for modName, modId in TableUtils:OrderedPairs(self.itemIndex.mods) do
 			if not upperSearch or string.find(string.upper(modName), upperSearch) then
-				local buildSelectable = false
+				local buildSelectable = true
 				for _, templateId in pairs(self.itemIndex.modIdAndTemplateIds[modId]) do
 					---@type ItemTemplate
 					local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
 					for _, predicate in ipairs(self.filterPredicates) do
-						if predicate(itemTemplate) then
-							buildSelectable = true
+						if not predicate(itemTemplate) then
+							buildSelectable = false
 							goto continue
 						end
 					end
@@ -442,10 +441,26 @@ function PickerBaseClass:BuildFilters()
 	end)
 	--#endregion
 
-	local onChangeFunc = function(...)
-		buildModSelectables()
-		self:RebuildDisplay()
+	local timer
+
+	local onChangeFunc = function()
+		if timer then
+			Ext.Timer.Cancel(timer)
+		end
+		timer = Ext.Timer.WaitFor(300, function ()
+			buildModSelectables()
+			self:RebuildDisplay()
+		end)
 	end
-	nameSearch.OnChange = onChangeFunc
-	idSearch.OnChange = onChangeFunc
+
+	nameSearch.OnChange = function ()
+		if #nameSearch.Text == 0 or #nameSearch.Text >= 3 then
+			onChangeFunc()
+		end
+	end
+	idSearch.OnChange = function ()
+		if #idSearch.Text == 0 or #idSearch.Text >= 3 then
+			onChangeFunc()
+		end
+	end
 end
