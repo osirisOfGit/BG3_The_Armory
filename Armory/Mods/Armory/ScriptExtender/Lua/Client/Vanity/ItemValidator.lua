@@ -85,7 +85,7 @@ function ItemValidator:addEntry(id, entry, type, error, severity)
 		error = error,
 		type = type,
 		severity = severity,
-		subModId = subModId
+		subModId = subModId and Ext.Mod.GetMod(subModId).Info.Name or "---"
 	} --[[@as ValidationEntry]]
 end
 
@@ -281,16 +281,20 @@ function ItemValidator:OpenReport()
 
 						Styler:MiddleAlignedColumnLayout(activeGroup,
 							function(ele)
-								ele:AddText(mod.Name or modId).Font = "Large"
+								Styler:CheapTextAlign(mod.Name or modId, ele, "Large")
 							end,
 							function(ele)
-								ele:AddText(mod.Name and (mod.Author or "Larian") or "Unknown Author")
+								Styler:CheapTextAlign(mod.Name and (mod.Author or "Larian") or "Unknown Author", ele)
 							end,
 							function(ele)
-								ele:AddText(mod.Name and (mod.ModVersion and ("v" .. table.concat(mod.ModVersion, "."))) or "Unknown Version")
+								Styler:CheapTextAlign(mod.Name and (mod.ModVersion and ("v" .. table.concat(mod.ModVersion, "."))) or "Unknown Version", ele)
 							end,
 							function(ele)
-								local reportButton = ele:AddButton("Generate Report")
+								local reportButton
+								Styler:MiddleAlignedColumnLayout(ele, function(ele2)
+									reportButton = ele2:AddButton("Generate Report")
+								end)
+
 								local text = ele:AddText("Successfully generated report at: %s")
 								text.Visible = false
 
@@ -330,7 +334,7 @@ function ItemValidator:OpenReport()
 								row:AddCell():AddText(validationError.type)
 								row:AddCell():AddText(id)
 								row:AddCell():AddText(self:InsertNewlineAtLimit(validationError.error))
-								row:AddCell():AddText(validationError.subModId and Ext.Mod.GetMod(validationError.subModId).Info.Name or "---")
+								row:AddCell():AddText(validationError.subModId)
 							end
 						end
 					end
@@ -364,8 +368,9 @@ This tool is not perfect by any stretch of the imagination - it has to make a lo
 
 Before providing this output to a mod author, please validate the following:
 	1. Check the template/stat name - does it have words like "test", "template", or is numbers (like "1", "2")? If so, the reported issue is probably known and expected
-	2. Make sure the mod reported for the template/stat makes sense - the SE provided modId isn't perfect, especially if multiple mods are modifying the same thing. Any "Overhaul" or "Rebalance" mods are likely not the true owner of the item, and may or may not be responsible for the issue.
-			Any issues under Gustav or Shared are base-game items, so if they've been modified by a mod, disable that mod and see if the issue still occurs. If they haven't been modified, you'll need to patch the item yourself.
+	2. Make sure the mod reported for the template/stat makes sense - the SE provided modId isn't perfect, especially if multiple mods are modifying the same thing.
+		Any "Overhaul" or "Rebalance" mods are likely not the true owner of the item, and may or may not be responsible for the issue.
+		Any issues under Gustav or Shared are base-game items, so if they've been modified by a mod, disable that mod and see if the issue still occurs. If they haven't been modified, you'll need to patch the item yourself.
 	3. Ensure you aren't missing any optional downloads/patches from the mod author - sometimes the base mod will house stats/templates that aren't intended to be used unless a patch/additional mod is downloaded
 	4. Check the "Modified By" section and if present, ensure this issue persists without that mod loaded
 	5. Check the mod description/bugs/posts section to see if these issues are known and/or already reported - don't be a spammer!
@@ -384,77 +389,90 @@ The following issues have been identified for templates and/or stats that are as
 
 ]]):format(modName, modVersion or "Unknown")
 
+	---@param outputString string
+	---@param severeIssues boolean
+	local function buildOutput(outputString, severeIssues)
+		local issueHeaders = {
+			["type"] = #"Type",
+			["ID"] = #"ID",
+			["error"] = #"Error",
+			["subModId"] = #"Modified By"
+		}
+
+		local issues = {}
+
+		for id, validationResult in TableUtils:OrderedPairs(validationResults) do
+			if ((validationResult.severity == "Prevents Transmog" or validationResult.severity == "Prevents Dye") and severeIssues)
+				or (validationResult.severity == "Has Built-In Workaround" and not severeIssues)
+			then
+				issues[id] = validationResult
+
+				issueHeaders["ID"] = #tostring(id) > issueHeaders["ID"] and #tostring(id) or issueHeaders["ID"]
+				for key, value in pairs(validationResult) do
+					value = tostring(value or "N/A")
+					issueHeaders[key] = issueHeaders[key] and (#value > issueHeaders[key] and #value or issueHeaders[key]) or nil
+				end
+			end
+		end
+
+		---@param inputString string
+		---@param totalSpaces integer
+		---@param alignment "center"|"left"?
+		---@return string
+		local function padStringWithSpaces(inputString, totalSpaces, alignment)
+			inputString = tostring(inputString)
+			alignment = alignment or "left"
+
+			if alignment == "left" then
+				return inputString .. string.rep(" ", totalSpaces - #inputString)
+			elseif alignment == "center" then
+				local halfSpaces = math.floor((totalSpaces - #inputString) / 2)
+				halfSpaces = halfSpaces < 0 and 0 or halfSpaces
+
+				local extraSpace = (totalSpaces - #inputString) % 2
+				return string.rep(" ", halfSpaces) .. inputString .. string.rep(" ", halfSpaces + extraSpace)
+			else
+				error("Invalid alignment specified. Use 'left' or 'center'.")
+			end
+		end
+
+		if next(issues) then
+			outputString = outputString .. ("\n|%s|%s|%s|%s|"):format(
+				padStringWithSpaces("Type", issueHeaders["type"], "center"),
+				padStringWithSpaces("ID", issueHeaders["ID"], "center"),
+				padStringWithSpaces("Error", issueHeaders["error"], "center"),
+				padStringWithSpaces("Modified By", issueHeaders["subModId"], "center")
+			)
+
+			for id, validationResult in TableUtils:OrderedPairs(issues) do
+				outputString = outputString .. ("\n|%s|%s|%s|%s|"):format(
+					padStringWithSpaces(validationResult.type, issueHeaders["type"]),
+					padStringWithSpaces(id, issueHeaders["ID"]),
+					padStringWithSpaces(validationResult.error, issueHeaders["error"]),
+					padStringWithSpaces(validationResult.subModId, issueHeaders["subModId"])
+				)
+			end
+
+			output = output .. outputString .. "\n\n\n"
+		end
+	end
+
 	local blockingIssueOutput = [[
 ================ ISSUES PREVENTING TRANSMOGGING/DYEING ================
 These issues prevent the transmog/dyeing process from occurring correctly at some stage of the process, so the items are removed from the available pool.
-
 	]]
 
-	local blockingIssueHeaders = {
-		["type"] = #"Type",
-		["ID"] = #"ID",
-		["error"] = #"Error",
-		["subModId"] = #"Modified By"
-	}
+	buildOutput(blockingIssueOutput, true)
 
-	local blockingIssues = {}
+	local workaroundIssueOutput = [[
+================ ISSUES WITH BUILT-IN WORKAROUNDS ================
+These issues have been accomodated in Armory's implementation, but are still generally bad practices that can lead to unintended behavior, and can't be guaranteed to operate exactly as implemented with Armory's workarounds.
+	]]
 
-	for id, validationResult in TableUtils:OrderedPairs(validationResults) do
-		if validationResult.severity == "Prevents Transmog" or validationResult.severity == "Prevents Dye" then
-			blockingIssues[id] = validationResult
+	buildOutput(workaroundIssueOutput, false)
 
-			blockingIssueHeaders["ID"] = #tostring(id) > blockingIssueHeaders["ID"] and #tostring(id) or blockingIssueHeaders["ID"]
-			for key, value in pairs(validationResult) do
-				value = tostring(value or "N/A")
-				blockingIssueHeaders[key] = blockingIssueHeaders[key] and (#value > blockingIssueHeaders[key] and #value or blockingIssueHeaders[key]) or nil
-			end
-		end
-	end
+	local safeModName = modName:gsub("[^%w%s%-_]", ""):gsub("%s+", "_")
+	FileUtils:SaveStringContentToFile("validationReports/" .. safeModName .. ".txt", output)
 
-	---@param inputString string
-	---@param totalSpaces integer
-	---@param alignment "center"|"left"?
-	---@return string
-	local function padStringWithSpaces(inputString, totalSpaces, alignment)
-		inputString = tostring(inputString)
-		alignment = alignment or "left"
-
-		if alignment == "left" then
-			return inputString .. string.rep(" ", totalSpaces - #inputString)
-		elseif alignment == "center" then
-			local halfSpaces = math.floor((totalSpaces - #inputString) / 2)
-			halfSpaces = halfSpaces < 0 and 0 or halfSpaces
-
-			local extraSpace = (totalSpaces - #inputString) % 2
-			return string.rep(" ", halfSpaces) .. inputString .. string.rep(" ", halfSpaces + extraSpace)
-		else
-			error("Invalid alignment specified. Use 'left' or 'center'.")
-		end
-	end
-
-	if next(blockingIssues) then
-		blockingIssueOutput = blockingIssueOutput .. ("\n|%s|%s|%s|%s|"):format(
-			padStringWithSpaces("Type", blockingIssueHeaders["type"], "center"),
-			padStringWithSpaces("ID", blockingIssueHeaders["ID"], "center"),
-			padStringWithSpaces("Error", blockingIssueHeaders["error"], "center"),
-			padStringWithSpaces("Modified By", blockingIssueHeaders["subModId"], "center")
-		)
-
-		for id, validationResult in TableUtils:OrderedPairs(blockingIssues) do
-			blockingIssueOutput = blockingIssueOutput .. ("\n|%s|%s|%s|%s|"):format(
-				padStringWithSpaces(validationResult.type, blockingIssueHeaders["type"]),
-				padStringWithSpaces(id, blockingIssueHeaders["ID"]),
-				padStringWithSpaces(validationResult.error, blockingIssueHeaders["error"]),
-				padStringWithSpaces(validationResult.subModId or "N/A", blockingIssueHeaders["subModId"])
-			)
-		end
-
-		output = output .. blockingIssueOutput
-
-		local safeModName = modName:gsub("[^%w%s%-_]", ""):gsub("%s+", "_")
-		local filePath = FileUtils:BuildAbsoluteFileTargetPath("validationReports/" .. safeModName .. ".txt")
-		FileUtils:SaveStringContentToFile(filePath, output)
-
-		return filePath
-	end
+	return "%localappdata%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\validationReports\\" .. safeModName .. ".txt"
 end

@@ -22,7 +22,7 @@ function Styler:CheapTextAlign(text, parent, font)
 end
 
 ---@param parent ExtuiTreeParent
----@param ... fun(ele: ExtuiTableCell)
+---@param ... fun(ele: ExtuiTableCell)|string
 function Styler:MiddleAlignedColumnLayout(parent, ...)
 	local table = parent:AddTable("", 3)
 	table.NoSavedSettings = true
@@ -31,10 +31,16 @@ function Styler:MiddleAlignedColumnLayout(parent, ...)
 	table:AddColumn("", "WidthFixed")
 	table:AddColumn("", "WidthStretch")
 
-	for _, func in pairs({...}) do
+	for _, uiElement in pairs({ ... }) do
 		local row = table:AddRow()
 		row:AddCell()
-		func(row:AddCell())
+
+		if type(uiElement) == "function" then
+			uiElement(row:AddCell())
+		elseif type(uiElement) == "string" then
+			row:AddCell():AddText(uiElement)
+		end
+
 		row:AddCell()
 	end
 end
