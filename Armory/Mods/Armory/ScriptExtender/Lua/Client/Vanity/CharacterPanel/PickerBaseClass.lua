@@ -30,6 +30,10 @@ PickerBaseClass = {
 	itemIndex = {},
 	---@type ExtuiGroup
 	warningGroup = nil,
+	---@type ExtuiChildWindow
+	filterGroup = nil,
+	---@type (fun(template: ItemTemplate): boolean)[]
+	filterPredicates = {}
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -48,6 +52,7 @@ function PickerBaseClass:new(title, instance)
 	instance.modIdByModName = {}
 	instance.settings = instance.settings or {}
 	instance.blacklistedItems = {}
+	instance.filterPredicates = {}
 	instance.itemIndex = title == "Equipment" and itemIndex.equipment or itemIndex.dyes
 
 	return instance
@@ -233,63 +238,26 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.separator:SetStyle("SeparatorTextAlign", 0.5)
 		self.separator.Font = "Large"
 
-		self.searchInput = self.window:AddInputText("")
-		self.searchInput.Hint = "Case-insensitive, min 3 characters"
-		self.searchInput.AutoSelectAll = true
-		self.searchInput.EscapeClearsAll = true
-		local delayTimer
-		self.searchInput.OnChange = function()
-			if delayTimer then
-				Ext.Timer.Cancel(delayTimer)
-			end
+		local displayTable = self.window:AddTable("", 2)
+		displayTable:AddColumn("", "WidthFixed", 400)
+		displayTable:AddColumn("", "WidthStretch")
 
-			self.getAllForModCombo.SelectedIndex = -1
+		local row = displayTable:AddRow()
 
-			delayTimer = Ext.Timer.WaitFor(150, function()
-				Helpers:KillChildren(self.resultsGroup)
+		self.filterGroup = row:AddCell():AddChildWindow("Filters")
+		-- self.filterGroup:SetSizeConstraints({400, 0})
+		self:BuildFilters()
 
-				self.rowCount = 0
-				local upperSearch
-				if #self.searchInput.Text >= 3 then
-					upperSearch = string.upper(self.searchInput.Text)
-				end
+		local otherGroup = row:AddCell():AddChildWindow("RestOfTheOwl")
 
-				for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
-					return self.itemIndex.templateIdAndTemplateName[key]
-				end) do
-					if not upperSearch or string.find(string.upper(templateName), upperSearch) then
-						self:DisplayResult(templateId, self.resultsGroup)
-					end
-				end
-			end)
-		end
+		self.warningGroup = otherGroup:AddGroup("WarningGroup")
 
-		self.window:AddText("List all items by mod - will be cleared if above search is used")
-
-		self.getAllForModCombo = self.window:AddCombo("")
-		self.getAllForModCombo.WidthFitPreview = true
-		local modOpts = {}
-		for modName, _ in TableUtils:OrderedPairs(self.itemIndex.mods) do
-			table.insert(modOpts, modName)
-		end
-		table.sort(modOpts)
-		self.getAllForModCombo.Options = modOpts
-		self.getAllForModCombo.OnChange = function()
-			Helpers:KillChildren(self.resultsGroup)
-			-- \[[[^_^]]]/
-			for _, templateId in ipairs(self.itemIndex.modIdAndTemplateIds[self.itemIndex.mods[self.getAllForModCombo.Options[self.getAllForModCombo.SelectedIndex + 1]]]) do
-				self:DisplayResult(templateId, self.resultsGroup)
-			end
-		end
-
-		self.warningGroup = self.window:AddGroup("WarningGroup")
-
-		self.favoritesGroup = self.window:AddCollapsingHeader("Favorites")
+		self.favoritesGroup = otherGroup:AddCollapsingHeader("Favorites")
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
-		self.window:AddNewLine()
+		otherGroup:AddNewLine()
 
-		self.resultSeparator = self.window:AddSeparatorText("Results")
-		self.resultsGroup = self.window:AddGroup(self.title .. "Results")
+		self.resultSeparator = otherGroup:AddSeparatorText("Results")
+		self.resultsGroup = otherGroup:AddGroup(self.title .. "Results")
 
 		customizeFunc()
 	else
@@ -313,17 +281,171 @@ function PickerBaseClass:RebuildDisplay()
 		self:DisplayResult(templateId, self.favoritesGroup)
 	end
 
-	if #self.searchInput.Text >= 3 then
-		self.searchInput.OnChange()
-	elseif self.getAllForModCombo.SelectedIndex > -1 then
-		self.getAllForModCombo.OnChange()
-	else
-		for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
-			return self.itemIndex.templateIdAndTemplateName[key]
-		end) do
-			if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
-				self:DisplayResult(templateId, self.resultsGroup)
+	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
+		return self.itemIndex.templateIdAndTemplateName[key]
+	end) do
+		if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
+			self:DisplayResult(templateId, self.resultsGroup)
+		end
+	end
+end
+
+--[[
+BodyTypes = {
+    HumanFemale = "71180b76-5752-4a97-b71f-911a69197f58",
+    HumanMale = "7d73f501-f65e-46af-a13b-2cacf3985d05",
+    HumanStrongFemale = "47c0315c-7dc6-4862-b39b-8bf3a10f8b54",
+    HumanStrongMale = "e39505f7-f576-4e70-a99e-8e29cd381a11",
+    TieflingFemale = "cf421f4e-107b-4ae6-86aa-090419c624a5",
+    TieflingMale = "6503c830-9200-409a-bd26-895738587a4a",
+    TieflingStrongMale = "f625476d-29ec-4a6d-9086-42209af0cf6f",
+    TieflingStrongFemale = "a5789cd3-ecd6-411b-a53a-368b659bc04a",
+    GithyankiFemale = "06aaae02-bb9e-4fa3-ac00-b08e13a5b0fa",
+    GithyankiMale = "f07faafa-0c6f-4f79-a049-70e96b23d51b",
+    ElfMale = "7dd0aa66-5177-4f65-b7d7-187c02531b0b",
+    ElfFemale = "ad21d837-2db5-4e46-8393-7d875dd71287 ",
+    HalfElfFemale = "541473b3-0bf3-4e68-b1ab-d85894d96d3e",
+    HalfElfMale = "a0737289-ca84-4fde-bd52-25bae4fe8dea ",
+    DwarfFemale = "b4a34ce7-41be-44d9-8486-938fe1472149",
+    DwarfMale = "abf674d2-2ea4-4a74-ade0-125429f69f83",
+    HalflingFemale = "8f00cf38-4588-433a-8175-8acdbbf33f33",
+    HalflingMale = "a933e2a8-aee1-4ecb-80d2-8f47b706f024",
+    GnomeFemale = "c491d027-4332-4fda-948f-4a3df6772baa",
+    GnomeMale = "5640e766-aa53-428d-815b-6a0b4ef95aca",
+    DragonbornFemale = "6d38f246-15cb-48b5-9b85-378016a7a78e",
+    DragonbornMale = "9a8bbeba-850c-402f-bac5-ff15696e6497",
+    HalforcFemale = "eb81b1de-985e-4e3a-8573-5717dc1fa15c",
+    HalforcMale = "6dd3db4f-e2db-4097-b82e-12f379f94c2e",
+}
+]]
+function PickerBaseClass:BuildFilters()
+	self.filterPredicates = {}
+	Helpers:KillChildren(self.filterGroup)
+
+	--#region Search By Name
+	self.filterGroup:AddText("Search By Name")
+	local nameSearch = self.filterGroup:AddInputText("")
+	nameSearch.Hint = "Case-insensitive, min 3 characters"
+	nameSearch.AutoSelectAll = true
+	nameSearch.EscapeClearsAll = true
+
+	---@param itemTemplate ItemTemplate
+	---@return boolean
+	table.insert(self.filterPredicates, function(itemTemplate)
+		if #nameSearch.Text > 3 then
+			local upperSearch = string.upper(nameSearch.Text)
+
+			if not upperSearch or string.find(string.upper(self.itemIndex.templateIdAndTemplateName[itemTemplate.Id]), upperSearch) then
+				return true
+			end
+		else
+			return true
+		end
+
+		return false
+	end)
+	--#endregion
+
+	--#region Search By Id
+	self.filterGroup:AddText("Search By UUID")
+	local idSearch = self.filterGroup:AddInputText("")
+	idSearch.Hint = "Case-insensitive, min 3 characters"
+	idSearch.AutoSelectAll = true
+	idSearch.EscapeClearsAll = true
+
+	---@param itemTemplate ItemTemplate
+	---@return boolean
+	table.insert(self.filterPredicates, function(itemTemplate)
+		if #idSearch.Text > 3 then
+			local upperSearch = string.upper(idSearch.Text)
+
+			if not upperSearch or string.find(string.upper(itemTemplate.Id), upperSearch) then
+				return true
+			end
+		else
+			return true
+		end
+
+		return false
+	end)
+	--#endregion
+
+	--#region Mod Picker
+	self.filterGroup:AddText("By Mod(s)")
+	local modNameSearch = self.filterGroup:AddInputText("")
+	modNameSearch.Hint = "Mod Name - Case-insensitive"
+	modNameSearch.AutoSelectAll = true
+	modNameSearch.EscapeClearsAll = true
+
+	local modFilterWindow = self.filterGroup:AddChildWindow("modFilters")
+	modFilterWindow:SetSize({ 0, 300 })
+	modFilterWindow:SetColor("Border", { 1, 0.02, 0, 1 })
+
+	local selected = {}
+
+	local function buildModSelectables()
+		Helpers:KillChildren(modFilterWindow)
+		local upperSearch = string.upper(modNameSearch.Text)
+
+		for modName, modId in TableUtils:OrderedPairs(self.itemIndex.mods) do
+			if not upperSearch or string.find(string.upper(modName), upperSearch) then
+				local buildSelectable = false
+				for _, templateId in pairs(self.itemIndex.modIdAndTemplateIds[modId]) do
+					---@type ItemTemplate
+					local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+					for _, predicate in ipairs(self.filterPredicates) do
+						if predicate(itemTemplate) then
+							buildSelectable = true
+							goto continue
+						end
+					end
+				end
+				::continue::
+				if buildSelectable then
+					---@type ExtuiSelectable
+					local selectable = modFilterWindow:AddSelectable(modName)
+					selectable.Selected = selected[modId] or false
+					selectable.OnClick = function()
+						selected[selectable.UserData] = selectable.Selected
+
+						self:RebuildDisplay()
+					end
+					selectable.UserData = modId
+				end
 			end
 		end
 	end
+
+	buildModSelectables()
+
+	modNameSearch.OnChange = function()
+		buildModSelectables()
+	end
+
+	---@param itemTemplate ItemTemplate
+	---@return boolean
+	table.insert(self.filterPredicates, function(itemTemplate)
+		local anySelected = false
+
+		for _, selectable in ipairs(modFilterWindow.Children) do
+			---@cast selectable ExtuiSelectable
+			if selectable.Selected then
+				anySelected = true
+				if TableUtils:ListContains(self.itemIndex.modIdAndTemplateIds[selectable.UserData], itemTemplate.Id) then
+					return true
+				end
+			end
+		end
+
+		return not anySelected and true or false
+	end)
+	--#endregion
+
+	local onChangeFunc = function(...)
+		buildModSelectables()
+		self:RebuildDisplay()
+	end
+	nameSearch.OnChange = onChangeFunc
+	idSearch.OnChange = onChangeFunc
 end
