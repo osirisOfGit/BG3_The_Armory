@@ -1,9 +1,13 @@
 local itemIndex = {
 	---@class SearchIndex
 	equipment = {
+		---@type {[string]: string}
 		templateIdAndStat = {},
+		---@type {[string]: string}
 		templateIdAndTemplateName = {},
+		---@type {[string]: string[]}
 		modIdAndTemplateIds = {},
+		---@type {[string]: string}
 		mods = {}
 	},
 	dyes = {
@@ -36,6 +40,8 @@ PickerBaseClass = {
 	customFilters = {},
 	---@type (fun(template: ItemTemplate): boolean)[]
 	filterPredicates = {},
+	---@type (fun())[]
+	filterListeners = {}
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -55,6 +61,7 @@ function PickerBaseClass:new(title, instance)
 	instance.settings = instance.settings or {}
 	instance.blacklistedItems = {}
 	instance.filterPredicates = {}
+	instance.filterListeners = {}
 	instance.itemIndex = title == "Equipment" and itemIndex.equipment or itemIndex.dyes
 
 	return instance
@@ -434,6 +441,8 @@ function PickerBaseClass:BuildFilters()
 
 	buildModSelectables()
 
+	table.insert(self.filterListeners, buildModSelectables)
+
 	---@param itemTemplate ItemTemplate
 	---@return boolean
 	table.insert(self.filterPredicates, function(itemTemplate)
@@ -460,7 +469,10 @@ function PickerBaseClass:BuildFilters()
 			Ext.Timer.Cancel(timer)
 		end
 		timer = Ext.Timer.WaitFor(300, function()
-			buildModSelectables()
+			for _, func in ipairs(self.filterListeners) do
+				func()
+			end
+
 			self:RebuildDisplay()
 		end)
 	end

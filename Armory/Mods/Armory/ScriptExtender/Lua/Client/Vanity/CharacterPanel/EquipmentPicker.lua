@@ -53,41 +53,84 @@ function EquipmentPicker:createFilters()
 			local armorTypeGroup = header:AddGroup("")
 
 			local selectedArmorTypes = {}
-			for _, armorType in ipairs(Ext.Enums.ArmorType) do
-				armorType = tostring(armorType)
-				if armorType ~= "Sentinel" then
-					local checkbox = armorTypeGroup:AddCheckbox(armorType)
-					checkbox.OnChange = function()
-						selectedArmorTypes[armorType] = checkbox.Checked or nil
-						func()
+			local function buildArmorTypeFilters()
+				Helpers:KillChildren(armorTypeGroup)
+
+				for _, armorType in ipairs(Ext.Enums.ArmorType) do
+					armorType = tostring(armorType)
+
+					if armorType ~= "Sentinel" then
+						local buildArmorType = false
+
+						for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
+							---@type Armor|Weapon
+							stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[templateId])
+							if stat.ModifierList == "Armor" then
+								---@type ItemTemplate
+								local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+								for index, predicate in ipairs(self.filterPredicates) do
+									if index ~= 6 and not predicate(itemTemplate) then
+										goto next_template
+									end
+								end
+
+								if stat.ArmorType == armorType then
+									buildArmorType = true
+									goto build_checkbox
+								end
+							end
+
+							::next_template::
+						end
+
+						::build_checkbox::
+						if buildArmorType then
+							local checkbox = armorTypeGroup:AddCheckbox(armorType)
+							checkbox.UserData = armorType
+							checkbox.Checked = selectedArmorTypes[armorType] or false
+							checkbox.OnChange = function()
+								selectedArmorTypes[armorType] = checkbox.Checked or nil
+								func()
+							end
+						end
 					end
+				end
+
+				local missingCheckbox = armorTypeGroup:AddCheckbox("None")
+				missingCheckbox.UserData = "None"
+				missingCheckbox.Checked = selectedArmorTypes["None"] or false
+				missingCheckbox.OnChange = function()
+					selectedArmorTypes["None"] = missingCheckbox.Checked or nil
+					func()
 				end
 			end
 
-			local missingCheckbox = armorTypeGroup:AddCheckbox("None")
-			missingCheckbox.OnChange = function()
-				selectedArmorTypes["None"] = missingCheckbox.Checked or nil
-				func()
-			end
+			buildArmorTypeFilters()
+
+			table.insert(self.filterListeners, buildArmorTypeFilters)
 
 			---@param itemTemplate ItemTemplate
 			---@return boolean
 			table.insert(self.filterPredicates, function(itemTemplate)
-				if next(selectedArmorTypes) and self.itemIndex.templateIdAndStat[itemTemplate.Id] then
+				if TableUtils:ListContains(armorTypeGroup.Children, function(value)
+						return value.Checked
+					end)
+					and self.itemIndex.templateIdAndStat[itemTemplate.Id]
+				then
 					---@type Armor|Weapon
 					local stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplate.Id])
 
-					local success, result = pcall(function ()
+					local success, result = pcall(function()
 						return stat.ArmorType
 					end)
 
-					if (not success or not stat.ArmorType or stat.ArmorType == "" or stat.ArmorType == "Sentinel" or stat.ArmorType == "None") then
-						return missingCheckbox.Checked
-					elseif selectedArmorTypes[stat.ArmorType] then
-						return true
-					end
+					result = (success and result) or "None"
 
-					return false
+					return TableUtils:ListContains(armorTypeGroup.Children, function(value)
+						---@cast value ExtuiCheckbox
+						return value.UserData == result and value.Checked
+					end)
 				end
 				return true
 			end)

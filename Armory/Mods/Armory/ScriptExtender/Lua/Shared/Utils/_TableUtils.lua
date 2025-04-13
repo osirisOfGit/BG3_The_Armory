@@ -98,7 +98,6 @@ function TableUtils:TablesAreEqual(first, second)
 	return true
 end
 
-
 --- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
 --- Optionally accepts a function to transform the key for sorting and returning
 ---@generic K
@@ -128,13 +127,20 @@ function TableUtils:OrderedPairs(t, keyTransformFunc)
 	end
 end
 
----@param list table
----@param str string
+---@generic K, V
+---@param list table<K, V>
+---@param str string|fun(value: V): boolean
 ---@return boolean, any?
 function TableUtils:ListContains(list, str)
 	for i, value in pairs(list) do
-		if value == str then
-			return true, i
+		if type(str) == "string" then
+			if value == str then
+				return true, i
+			end
+		elseif type(str) == "function" then
+			if str(value) then
+				return true, i
+			end
 		end
 	end
 	return false
