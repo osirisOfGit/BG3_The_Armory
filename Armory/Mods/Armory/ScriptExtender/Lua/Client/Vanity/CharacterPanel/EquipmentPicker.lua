@@ -15,9 +15,7 @@ function EquipmentPicker:createFilters()
 	self.customFilters = {
 		--#region Equipment Race
 		function(func)
-			local header = self.filterGroup:AddCollapsingHeader("By Supported Equipment Race")
-			header.DefaultOpen = false
-			header:SetColor("Header", { 0, 0, 0, 0 })
+			local header = Styler:CollapsingHeader(self.filterGroup:AddCollapsingHeader("By Supported Equipment Race"))
 
 			local raceGroup = header:AddGroup("raceGroup")
 
@@ -26,7 +24,7 @@ function EquipmentPicker:createFilters()
 			for bodyType, id in TableUtils:OrderedPairs(EquipmentRace) do
 				local checkbox = raceGroup:AddCheckbox(bodyType)
 				checkbox.UserData = id
-				checkbox.OnChange = function ()
+				checkbox.OnChange = function()
 					selectedRaces[checkbox.UserData] = checkbox.Checked or nil
 					func()
 				end
@@ -41,6 +39,54 @@ function EquipmentPicker:createFilters()
 							return true
 						end
 					end
+					return false
+				end
+				return true
+			end)
+		end,
+		--#endregion
+
+		--#region ArmorType
+		function(func)
+			local header = Styler:CollapsingHeader(self.filterGroup:AddCollapsingHeader("By Armor Type"))
+
+			local armorTypeGroup = header:AddGroup("")
+
+			local selectedArmorTypes = {}
+			for _, armorType in ipairs(Ext.Enums.ArmorType) do
+				armorType = tostring(armorType)
+				if armorType ~= "Sentinel" then
+					local checkbox = armorTypeGroup:AddCheckbox(armorType)
+					checkbox.OnChange = function()
+						selectedArmorTypes[armorType] = checkbox.Checked or nil
+						func()
+					end
+				end
+			end
+
+			local missingCheckbox = armorTypeGroup:AddCheckbox("None")
+			missingCheckbox.OnChange = function()
+				selectedArmorTypes["None"] = missingCheckbox.Checked or nil
+				func()
+			end
+
+			---@param itemTemplate ItemTemplate
+			---@return boolean
+			table.insert(self.filterPredicates, function(itemTemplate)
+				if next(selectedArmorTypes) and self.itemIndex.templateIdAndStat[itemTemplate.Id] then
+					---@type Armor|Weapon
+					local stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplate.Id])
+
+					local success, result = pcall(function ()
+						return stat.ArmorType
+					end)
+
+					if (not success or not stat.ArmorType or stat.ArmorType == "" or stat.ArmorType == "Sentinel" or stat.ArmorType == "None") then
+						return missingCheckbox.Checked
+					elseif selectedArmorTypes[stat.ArmorType] then
+						return true
+					end
+
 					return false
 				end
 				return true

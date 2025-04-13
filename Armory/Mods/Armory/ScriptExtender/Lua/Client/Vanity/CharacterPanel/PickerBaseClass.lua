@@ -284,7 +284,11 @@ function PickerBaseClass:RebuildDisplay()
 		---@type ItemTemplate
 		local template = Ext.Template.GetRootTemplate(templateId)
 		for _, predicate in ipairs(self.filterPredicates) do
-			if not predicate(template) then
+			local success, result = pcall(function(...)
+				return predicate(template)
+			end)
+
+			if success and not result then
 				goto continue
 			end
 		end
@@ -396,7 +400,7 @@ function PickerBaseClass:BuildFilters()
 					local selectable = modFilterWindow:AddSelectable(modName)
 					-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
 					-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
-					selectable:SetColor("Header", {0.36, 0.30, 0.27, 0.76})
+					selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
 					selectable.Selected = selected[modId] or false
 
 					selectedCount = selectedCount + (selectable.Selected and 1 or 0)
@@ -408,7 +412,7 @@ function PickerBaseClass:BuildFilters()
 
 						modTitleHeader.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
 
-						-- Changing the label changes the underlying imgui setting reference it seems, even with a manual IDContext, so setting the 
+						-- Changing the label changes the underlying imgui setting reference it seems, even with a manual IDContext, so setting the
 						-- initial defaultOpen to false means every unseen label will collapse the header. This forces everything other than the initial default to remain open
 						modTitleHeader.DefaultOpen = true
 

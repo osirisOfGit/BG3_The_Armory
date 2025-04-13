@@ -1,5 +1,14 @@
 Styler = {}
 
+---@param header ExtuiCollapsingHeader
+---@return ExtuiCollapsingHeader
+function Styler:CollapsingHeader(header)
+	header.DefaultOpen = false
+	header:SetColor("Header", { 0, 0, 0, 0 })
+
+	return header
+end
+
 ---@param imageButton ExtuiImageButton
 function Styler:ImageButton(imageButton)
 	imageButton.Background = { 0, 0, 0, 0 }
