@@ -1,14 +1,25 @@
 Styler = {}
 
----@param header ExtuiCollapsingHeader
----@return ExtuiCollapsingHeader
-function Styler:CollapsingHeader(header)
-	header.IDContext = header.Label
-	header.DefaultOpen = false
-	header:SetColor("Header", { 0, 0, 0, 0 })
-	header.AllowOverlap = true
+---comment
+---@param tree ExtuiTree
+---@return ExtuiTree, fun(count: number)
+function Styler:DynamicLabelTree(tree)
+	local label = tree.Label
+	tree.DefaultOpen = false
 
-	return header
+	local isOpen
+	tree.OnActivate = function()
+		isOpen = true
+	end
+
+	tree.OnDeactivate = function()
+		isOpen = false
+	end
+
+	return tree, function(count)
+		tree.Label = label .. (count > 0 and (" - " .. count .. " selected") or "")
+		tree:SetOpen(isOpen == nil and false or isOpen, "Always")
+	end
 end
 
 ---@param imageButton ExtuiImageButton

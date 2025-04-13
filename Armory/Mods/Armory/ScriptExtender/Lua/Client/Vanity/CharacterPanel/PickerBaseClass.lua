@@ -379,17 +379,7 @@ function PickerBaseClass:BuildFilters()
 	self.filterGroup:AddNewLine()
 
 	--#region Mod Picker
-	local modTitleHeader = self.filterGroup:AddTree("By Mod(s)")
-	modTitleHeader.DefaultOpen = false
-
-	local isOpen
-	modTitleHeader.OnActivate = function ()
-		isOpen = true
-	end
-
-	modTitleHeader.OnDeactivate = function ()
-		isOpen = false
-	end
+	local modTitleHeader, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Mod(s)"))
 
 	local modNameSearch = modTitleHeader:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
@@ -455,9 +445,7 @@ function PickerBaseClass:BuildFilters()
 						selected[selectable.UserData] = selectable.Selected
 
 						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
-
-						modTitleHeader.Label = "By Mod(s)" .. (selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
-						modTitleHeader:SetOpen(isOpen == nil and true or isOpen, "Always")
+						updateLabelWithCount(selectedCount)
 
 						onChangeFunc("Mods")
 					end
@@ -465,8 +453,7 @@ function PickerBaseClass:BuildFilters()
 				end
 			end
 		end
-		modTitleHeader.Label = "By Mod(s)" .. (selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
-		modTitleHeader:SetOpen(isOpen == nil and true or isOpen, "Always")
+		updateLabelWithCount(selectedCount)
 	end
 
 	clearSelected.OnClick = function()

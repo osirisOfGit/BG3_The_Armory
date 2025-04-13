@@ -15,7 +15,7 @@ function EquipmentPicker:createFilters()
 	self.customFilters = {
 		--#region Equipment Race
 		function(func)
-			local header = Styler:CollapsingHeader(self.filterGroup:AddCollapsingHeader("By Supported Equipment Race"))
+			local header = self.filterGroup:AddTree("By Supported Equipment Race")
 
 			local raceGroup = header:AddGroup("raceGroup")
 
@@ -48,22 +48,7 @@ function EquipmentPicker:createFilters()
 
 		--#region ArmorType
 		function(func)
-			local header = Styler:CollapsingHeader(self.filterGroup:AddCollapsingHeader("By Armor Type"))
-
-			local selectedCountText = self.filterGroup:AddText("")
-			selectedCountText.IDContext = "ArmorType"
-			selectedCountText.AllowItemOverlap = true
-			selectedCountText.SameLine = true
-
-			local hasActivated
-			header.OnDeactivate = function()
-				hasActivated = false
-				selectedCountText.Visible = hasActivated
-			end
-			header.OnActivate = function()
-				hasActivated = true
-				selectedCountText.Visible = hasActivated
-			end
+			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Armor Type"))
 
 			local armorTypeGroup = header:AddGroup("")
 
@@ -121,7 +106,7 @@ function EquipmentPicker:createFilters()
 								selectedArmorTypes[armorType] = checkbox.Checked or nil
 								selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
 
-								selectedCountText.Label = selectedCount > 0 and (" - " .. selectedCount .. " selected") or ""
+								updateLabelWithCount(selectedCount)
 								func("ArmorType")
 							end
 						end
@@ -135,11 +120,11 @@ function EquipmentPicker:createFilters()
 				missingCheckbox.OnChange = function()
 					selectedArmorTypes["None"] = missingCheckbox.Checked or nil
 					selectedCount = selectedCount + (missingCheckbox.Checked and 1 or -1)
-					selectedCountText.Label = selectedCount > 0 and (" - " .. selectedCount .. " selected") or ""
+					updateLabelWithCount(selectedCount)
 					func("ArmorType")
 				end
 
-				selectedCountText.Label = selectedCount > 0 and (" - " .. selectedCount .. " selected") or ""
+				updateLabelWithCount(selectedCount)
 			end
 
 			buildArmorTypeFilters()
