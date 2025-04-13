@@ -11,6 +11,47 @@ EquipmentPicker = PickerBaseClass:new("Equipment", {
 	vanityOutfitSlot = nil
 })
 
+function EquipmentPicker:createFilters()
+	self.customFilters = {
+		--#region Equipment Race
+		function(func)
+			local header = self.filterGroup:AddCollapsingHeader("By Supported Equipment Race")
+			header.DefaultOpen = false
+			header:SetColor("Header", { 0, 0, 0, 0 })
+
+			local raceGroup = header:AddGroup("raceGroup")
+
+			local selectedRaces = {}
+
+			for bodyType, id in TableUtils:OrderedPairs(EquipmentRace) do
+				local checkbox = raceGroup:AddCheckbox(bodyType)
+				checkbox.UserData = id
+				checkbox.OnChange = function ()
+					selectedRaces[checkbox.UserData] = checkbox.Checked or nil
+					func()
+				end
+			end
+
+			---@param itemTemplate ItemTemplate
+			---@return boolean
+			table.insert(self.filterPredicates, function(itemTemplate)
+				if next(selectedRaces) and itemTemplate.Equipment and itemTemplate.Equipment.Visuals then
+					for bodyType in pairs(itemTemplate.Equipment.Visuals) do
+						if selectedRaces[bodyType] then
+							return true
+						end
+					end
+					return false
+				end
+				return true
+			end)
+		end
+		--#endregion
+	}
+end
+
+EquipmentPicker:createFilters()
+
 ---@param slot ActualSlot
 ---@param weaponType ActualWeaponType?
 ---@param outfitSlot VanityOutfitSlot

@@ -274,6 +274,8 @@ end
 function PickerBaseClass:RebuildDisplay()
 	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
 
+	local count = 0
+
 	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
 		return self.itemIndex.templateIdAndTemplateName[key]
 	end) do
@@ -287,38 +289,13 @@ function PickerBaseClass:RebuildDisplay()
 			end
 		end
 		self:DisplayResult(templateId, self.resultsGroup)
+		count = count + 1
 		::continue::
 	end
+
+	self.resultSeparator.Label = ("%s Results"):format(count)
 end
 
---[[
-BodyTypes = {
-    HumanFemale = "71180b76-5752-4a97-b71f-911a69197f58",
-    HumanMale = "7d73f501-f65e-46af-a13b-2cacf3985d05",
-    HumanStrongFemale = "47c0315c-7dc6-4862-b39b-8bf3a10f8b54",
-    HumanStrongMale = "e39505f7-f576-4e70-a99e-8e29cd381a11",
-    TieflingFemale = "cf421f4e-107b-4ae6-86aa-090419c624a5",
-    TieflingMale = "6503c830-9200-409a-bd26-895738587a4a",
-    TieflingStrongMale = "f625476d-29ec-4a6d-9086-42209af0cf6f",
-    TieflingStrongFemale = "a5789cd3-ecd6-411b-a53a-368b659bc04a",
-    GithyankiFemale = "06aaae02-bb9e-4fa3-ac00-b08e13a5b0fa",
-    GithyankiMale = "f07faafa-0c6f-4f79-a049-70e96b23d51b",
-    ElfMale = "7dd0aa66-5177-4f65-b7d7-187c02531b0b",
-    ElfFemale = "ad21d837-2db5-4e46-8393-7d875dd71287 ",
-    HalfElfFemale = "541473b3-0bf3-4e68-b1ab-d85894d96d3e",
-    HalfElfMale = "a0737289-ca84-4fde-bd52-25bae4fe8dea ",
-    DwarfFemale = "b4a34ce7-41be-44d9-8486-938fe1472149",
-    DwarfMale = "abf674d2-2ea4-4a74-ade0-125429f69f83",
-    HalflingFemale = "8f00cf38-4588-433a-8175-8acdbbf33f33",
-    HalflingMale = "a933e2a8-aee1-4ecb-80d2-8f47b706f024",
-    GnomeFemale = "c491d027-4332-4fda-948f-4a3df6772baa",
-    GnomeMale = "5640e766-aa53-428d-815b-6a0b4ef95aca",
-    DragonbornFemale = "6d38f246-15cb-48b5-9b85-378016a7a78e",
-    DragonbornMale = "9a8bbeba-850c-402f-bac5-ff15696e6497",
-    HalforcFemale = "eb81b1de-985e-4e3a-8573-5717dc1fa15c",
-    HalforcMale = "6dd3db4f-e2db-4097-b82e-12f379f94c2e",
-}
-]]
 function PickerBaseClass:BuildFilters()
 	--#region Search By Name
 	self.filterGroup:AddText("By Name")
@@ -373,7 +350,7 @@ function PickerBaseClass:BuildFilters()
 	--#region Mod Picker
 	local modTitleHeader = self.filterGroup:AddCollapsingHeader("By Mod")
 	modTitleHeader.IDContext = "ByMod"
-	modTitleHeader.DefaultOpen = true
+	modTitleHeader.DefaultOpen = false
 	modTitleHeader:SetColor("Header", { 0, 0, 0, 0 })
 
 	local modNameSearch = modTitleHeader:AddInputText("")
@@ -431,6 +408,10 @@ function PickerBaseClass:BuildFilters()
 
 						modTitleHeader.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
 
+						-- Changing the label changes the underlying imgui setting reference it seems, even with a manual IDContext, so setting the 
+						-- initial defaultOpen to false means every unseen label will collapse the header. This forces everything other than the initial default to remain open
+						modTitleHeader.DefaultOpen = true
+
 						self:RebuildDisplay()
 					end
 					selectable.UserData = modId
@@ -470,7 +451,7 @@ function PickerBaseClass:BuildFilters()
 
 	local timer
 
-	local onChangeFunc = function()
+	local onChangeFunc = function(...)
 		if timer then
 			Ext.Timer.Cancel(timer)
 		end
@@ -481,12 +462,11 @@ function PickerBaseClass:BuildFilters()
 	end
 
 	for _, customFilter in ipairs(self.customFilters) do
+		self.filterGroup:AddNewLine()
 		customFilter(onChangeFunc)
 	end
 
-	modNameSearch.OnChange = function()
-		onChangeFunc()
-	end
+	modNameSearch.OnChange = onChangeFunc
 
 	nameSearch.OnChange = function()
 		if #nameSearch.Text == 0 or #nameSearch.Text >= 3 then
