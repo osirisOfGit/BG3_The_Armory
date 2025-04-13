@@ -18,6 +18,7 @@ function Styler:DynamicLabelTree(tree)
 
 	return tree, function(count)
 		tree.Label = label .. (count > 0 and (" - " .. count .. " selected") or "")
+		tree.DefaultOpen = true
 		tree:SetOpen(isOpen, "Always")
 	end
 end

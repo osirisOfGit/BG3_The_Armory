@@ -380,18 +380,32 @@ function PickerBaseClass:BuildFilters()
 
 	--#region Mod Picker
 	local modTitleHeader, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Mod(s)"))
+	-- Stops empty tree from firing activation and deactivation events on one click
+	modTitleHeader:AddDummy(0, 0)
 
-	local modNameSearch = modTitleHeader:AddInputText("")
+	local modGroup = self.filterGroup:AddGroup("modGroupBecauseCollapseKeepsResettingScroll")
+
+	modGroup.Visible = false
+	modTitleHeader.OnExpand = function ()
+		modGroup.Visible = true
+	end
+
+	modTitleHeader.OnCollapse = function ()
+		modGroup.Visible = false
+	end
+
+	local modNameSearch = modGroup:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
 	modNameSearch.AutoSelectAll = true
 	modNameSearch.EscapeClearsAll = true
 
-	local clearSelected = Styler:ImageButton(modTitleHeader:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
+	local clearSelected = Styler:ImageButton(modGroup:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
 	clearSelected.SameLine = true
 	clearSelected:Tooltip():AddText("\t Clear Selected Mods")
 
-	local modFilterWindow = modTitleHeader:AddChildWindow("modFilters")
-
+	local modFilterWindow = modGroup:AddChildWindow("modFilters")
+	modFilterWindow.AutoResizeY = true
+	
 	local selected = {}
 
 	self.filterListenerCache["Mod"] = {}
