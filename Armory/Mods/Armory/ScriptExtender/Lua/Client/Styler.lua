@@ -6,6 +6,7 @@ Styler = {}
 function Styler:DynamicLabelTree(tree)
 	local label = tree.Label
 	tree.DefaultOpen = false
+	tree.SpanFullWidth = true
 
 	local isOpen = false
 	tree.OnActivate = function()

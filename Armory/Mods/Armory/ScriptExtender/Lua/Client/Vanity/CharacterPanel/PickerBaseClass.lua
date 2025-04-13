@@ -386,11 +386,11 @@ function PickerBaseClass:BuildFilters()
 	local modGroup = self.filterGroup:AddGroup("modGroupBecauseCollapseKeepsResettingScroll")
 
 	modGroup.Visible = false
-	modTitleHeader.OnExpand = function ()
+	modTitleHeader.OnExpand = function()
 		modGroup.Visible = true
 	end
 
-	modTitleHeader.OnCollapse = function ()
+	modTitleHeader.OnCollapse = function()
 		modGroup.Visible = false
 	end
 
@@ -405,7 +405,7 @@ function PickerBaseClass:BuildFilters()
 
 	local modFilterWindow = modGroup:AddChildWindow("modFilters")
 	modFilterWindow.AutoResizeY = true
-	
+
 	local selected = {}
 
 	self.filterListenerCache["Mod"] = {}
