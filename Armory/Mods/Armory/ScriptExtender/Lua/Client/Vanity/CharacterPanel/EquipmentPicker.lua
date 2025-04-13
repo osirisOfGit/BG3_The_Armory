@@ -15,7 +15,7 @@ function EquipmentPicker:createFilters()
 	self.customFilters = {
 		--#region Equipment Race
 		function(func)
-			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Supported Equipment Race"))
+			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Equipment Race"))
 
 			local raceGroup = header:AddGroup("raceGroup")
 
@@ -25,7 +25,7 @@ function EquipmentPicker:createFilters()
 			for bodyType, id in TableUtils:OrderedPairs(EquipmentRace) do
 				local checkbox = raceGroup:AddCheckbox(bodyType)
 				checkbox.UserData = id
-				checkbox.Checked = selectedRaces[id]
+				checkbox.Checked = selectedRaces[id] or false
 				selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
 
 				checkbox.OnChange = function()

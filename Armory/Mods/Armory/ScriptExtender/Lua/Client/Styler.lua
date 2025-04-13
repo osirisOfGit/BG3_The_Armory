@@ -7,7 +7,7 @@ function Styler:DynamicLabelTree(tree)
 	local label = tree.Label
 	tree.DefaultOpen = false
 
-	local isOpen
+	local isOpen = false
 	tree.OnActivate = function()
 		isOpen = true
 	end
@@ -18,7 +18,7 @@ function Styler:DynamicLabelTree(tree)
 
 	return tree, function(count)
 		tree.Label = label .. (count > 0 and (" - " .. count .. " selected") or "")
-		tree:SetOpen(isOpen == nil and false or isOpen, "Always")
+		tree:SetOpen(isOpen, "Always")
 	end
 end
 
