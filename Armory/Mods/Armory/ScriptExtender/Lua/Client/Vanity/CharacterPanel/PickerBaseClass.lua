@@ -40,8 +40,10 @@ PickerBaseClass = {
 	customFilters = {},
 	---@type (fun(template: ItemTemplate): boolean)[]
 	filterPredicates = {},
-	---@type (fun())[]
-	filterListeners = {}
+	---@type {[string]: fun()}
+	filterListeners = {},
+	---@type {[string]: {[string]: string[]}}
+	filterListenerCache = {}
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -62,6 +64,7 @@ function PickerBaseClass:new(title, instance)
 	instance.blacklistedItems = {}
 	instance.filterPredicates = {}
 	instance.filterListeners = {}
+	instance.filterListenerCache = {}
 	instance.itemIndex = title == "Equipment" and itemIndex.equipment or itemIndex.dyes
 
 	return instance
@@ -308,6 +311,23 @@ function PickerBaseClass:RebuildDisplay()
 end
 
 function PickerBaseClass:BuildFilters()
+	local timer
+
+	local onChangeFunc = function(listenerToIgnore)
+		if timer then
+			Ext.Timer.Cancel(timer)
+		end
+		timer = Ext.Timer.WaitFor(300, function()
+			for listener, func in pairs(self.filterListeners) do
+				if listener ~= listenerToIgnore then
+					func()
+				end
+			end
+
+			self:RebuildDisplay()
+		end)
+	end
+
 	--#region Search By Name
 	self.filterGroup:AddText("By Name")
 	local nameSearch = self.filterGroup:AddInputText("")
@@ -376,6 +396,8 @@ function PickerBaseClass:BuildFilters()
 	local modFilterWindow = modTitleHeader:AddChildWindow("modFilters")
 
 	local selected = {}
+
+	self.filterListenerCache["Mod"] = {}
 	local function buildModSelectables()
 		Helpers:KillChildren(modFilterWindow)
 		local upperSearch = string.upper(modNameSearch.Text)
@@ -384,24 +406,34 @@ function PickerBaseClass:BuildFilters()
 
 		for modName, modId in TableUtils:OrderedPairs(self.itemIndex.mods) do
 			if not upperSearch or string.find(string.upper(modName), upperSearch) then
-				local buildSelectable = false
-				for _, templateId in pairs(self.itemIndex.modIdAndTemplateIds[modId]) do
-					---@type ItemTemplate
-					local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+				local buildSelectable = self:CheckFilterCache(self.filterListenerCache["Mod"][modId], 4)
 
-					for index, predicate in ipairs(self.filterPredicates) do
-						if index ~= 4 and not predicate(itemTemplate) then
-							goto next_template
+				if not buildSelectable then
+					for _, templateId in pairs(self.itemIndex.modIdAndTemplateIds[modId]) do
+						---@type ItemTemplate
+						local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+						for index, predicate in ipairs(self.filterPredicates) do
+							if index ~= 4 and not predicate(itemTemplate) then
+								goto next_template
+							end
 						end
+
+						if not self.filterListenerCache["Mod"][modId] then
+							self.filterListenerCache["Mod"][modId] = {}
+						elseif not TableUtils:ListContains(self.filterListenerCache["Mod"][modId], templateId) then
+							table.insert(self.filterListenerCache["Mod"][modId], templateId)
+						end
+
+						buildSelectable = true
+						goto build_selectable
+
+						::next_template::
 					end
 
-					buildSelectable = true
-					goto build_selectable
-
-					::next_template::
+					::build_selectable::
 				end
 
-				::build_selectable::
 				if buildSelectable then
 					---@type ExtuiSelectable
 					local selectable = modFilterWindow:AddSelectable(modName)
@@ -423,7 +455,7 @@ function PickerBaseClass:BuildFilters()
 						-- initial defaultOpen to false means every unseen label will collapse the header. This forces everything other than the initial default to remain open
 						modTitleHeader.DefaultOpen = true
 
-						self:RebuildDisplay()
+						onChangeFunc("Mods")
 					end
 					selectable.UserData = modId
 				end
@@ -441,7 +473,7 @@ function PickerBaseClass:BuildFilters()
 
 	buildModSelectables()
 
-	table.insert(self.filterListeners, buildModSelectables)
+	self.filterListeners["Mods"] = buildModSelectables
 
 	---@param itemTemplate ItemTemplate
 	---@return boolean
@@ -462,21 +494,6 @@ function PickerBaseClass:BuildFilters()
 	end)
 	--#endregion
 
-	local timer
-
-	local onChangeFunc = function(...)
-		if timer then
-			Ext.Timer.Cancel(timer)
-		end
-		timer = Ext.Timer.WaitFor(300, function()
-			for _, func in ipairs(self.filterListeners) do
-				func()
-			end
-
-			self:RebuildDisplay()
-		end)
-	end
-
 	for _, customFilter in ipairs(self.customFilters) do
 		self.filterGroup:AddNewLine()
 		customFilter(onChangeFunc)
@@ -494,4 +511,30 @@ function PickerBaseClass:BuildFilters()
 			onChangeFunc()
 		end
 	end
+end
+
+---@param cacheEntry string[]
+---@param filterToIgnore number
+function PickerBaseClass:CheckFilterCache(cacheEntry, filterToIgnore)
+	local passes = false
+	if cacheEntry then
+		for _, templateId in ipairs(cacheEntry) do
+			---@type ItemTemplate
+			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+			for index, predicate in ipairs(self.filterPredicates) do
+				if index ~= filterToIgnore and not predicate(itemTemplate) then
+					goto continue
+				end
+			end
+
+			passes = true
+			goto response
+
+			::continue::
+		end
+	end
+
+	::response::
+	return passes
 end

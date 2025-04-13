@@ -53,6 +53,8 @@ function EquipmentPicker:createFilters()
 			local armorTypeGroup = header:AddGroup("")
 
 			local selectedArmorTypes = {}
+			self.filterListenerCache["ArmorType"] = {}
+
 			local function buildArmorTypeFilters()
 				Helpers:KillChildren(armorTypeGroup)
 
@@ -60,38 +62,46 @@ function EquipmentPicker:createFilters()
 					armorType = tostring(armorType)
 
 					if armorType ~= "Sentinel" then
-						local buildArmorType = false
+						local buildArmorType = self:CheckFilterCache(self.filterListenerCache["ArmorType"][armorType], 6)
 
-						for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
-							---@type Armor|Weapon
-							stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[templateId])
-							if stat.ModifierList == "Armor" then
-								---@type ItemTemplate
-								local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+						if not buildArmorType then
+							for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
+								---@type Armor|Weapon
+								stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[templateId])
+								if stat.ModifierList == "Armor" then
+									---@type ItemTemplate
+									local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
-								for index, predicate in ipairs(self.filterPredicates) do
-									if index ~= 6 and not predicate(itemTemplate) then
-										goto next_template
+									for index, predicate in ipairs(self.filterPredicates) do
+										if index ~= 6 and not predicate(itemTemplate) then
+											goto next_template
+										end
+									end
+
+									if stat.ArmorType == armorType then
+										if not self.filterListenerCache["ArmorType"][armorType] then
+											self.filterListenerCache["ArmorType"][armorType] = {}
+										elseif not TableUtils:ListContains(self.filterListenerCache["ArmorType"][armorType], templateId) then
+											table.insert(self.filterListenerCache["ArmorType"][armorType], templateId)
+										end
+										buildArmorType = true
+										goto build_checkbox
 									end
 								end
 
-								if stat.ArmorType == armorType then
-									buildArmorType = true
-									goto build_checkbox
-								end
+								::next_template::
 							end
 
-							::next_template::
+							::build_checkbox::
 						end
 
-						::build_checkbox::
 						if buildArmorType then
 							local checkbox = armorTypeGroup:AddCheckbox(armorType)
 							checkbox.UserData = armorType
 							checkbox.Checked = selectedArmorTypes[armorType] or false
 							checkbox.OnChange = function()
 								selectedArmorTypes[armorType] = checkbox.Checked or nil
-								func()
+								func("ArmorType")
 							end
 						end
 					end
@@ -102,13 +112,13 @@ function EquipmentPicker:createFilters()
 				missingCheckbox.Checked = selectedArmorTypes["None"] or false
 				missingCheckbox.OnChange = function()
 					selectedArmorTypes["None"] = missingCheckbox.Checked or nil
-					func()
+					func("ArmorType")
 				end
 			end
 
 			buildArmorTypeFilters()
 
-			table.insert(self.filterListeners, buildArmorTypeFilters)
+			self.filterListeners["ArmorType"] = buildArmorTypeFilters
 
 			---@param itemTemplate ItemTemplate
 			---@return boolean
@@ -121,16 +131,14 @@ function EquipmentPicker:createFilters()
 					---@type Armor|Weapon
 					local stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplate.Id])
 
-					local success, result = pcall(function()
-						return stat.ArmorType
-					end)
-
-					result = (success and result) or "None"
-
-					return TableUtils:ListContains(armorTypeGroup.Children, function(value)
-						---@cast value ExtuiCheckbox
-						return value.UserData == result and value.Checked
-					end)
+					if stat.ModifierList == "Armor" then
+						return TableUtils:ListContains(armorTypeGroup.Children, function(value)
+							---@cast value ExtuiCheckbox
+							return value.UserData == stat.ArmorType and value.Checked
+						end)
+					else
+						return false
+					end
 				end
 				return true
 			end)
