@@ -385,12 +385,10 @@ function PickerBaseClass:BuildFilters()
 	local isOpen
 	modTitleHeader.OnActivate = function ()
 		isOpen = true
-		Logger:BasicInfo("Opened")
 	end
 
 	modTitleHeader.OnDeactivate = function ()
 		isOpen = false
-		Logger:BasicInfo("Closed")
 	end
 
 	local modNameSearch = modTitleHeader:AddInputText("")
