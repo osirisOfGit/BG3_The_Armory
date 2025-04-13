@@ -36,7 +36,7 @@ PickerBaseClass = {
 	warningGroup = nil,
 	---@type ExtuiChildWindow
 	filterGroup = nil,
-	---@type (fun(function))[]
+	---@type (fun())[]
 	customFilters = {},
 	---@type (fun(template: ItemTemplate): boolean)[]
 	filterPredicates = {},
@@ -278,7 +278,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 	self.separator.Label = string.format("Searching for %s %s", slot, self.title)
 
-	self:RebuildDisplay()
+	self:ProcessFilters()
 end
 
 function PickerBaseClass:RebuildDisplay()
@@ -289,19 +289,19 @@ function PickerBaseClass:RebuildDisplay()
 	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
 		return self.itemIndex.templateIdAndTemplateName[key]
 	end) do
-		self:DisplayResult(templateId, self.favoritesGroup)
-
+		
 		---@type ItemTemplate
 		local template = Ext.Template.GetRootTemplate(templateId)
 		for _, predicate in ipairs(self.filterPredicates) do
 			local success, result = pcall(function(...)
 				return predicate(template)
 			end)
-
+			
 			if success and not result then
 				goto continue
 			end
 		end
+		self:DisplayResult(templateId, self.favoritesGroup)
 		self:DisplayResult(templateId, self.resultsGroup)
 		count = count + 1
 		::continue::
@@ -310,23 +310,23 @@ function PickerBaseClass:RebuildDisplay()
 	self.resultSeparator.Label = ("%s Results"):format(count)
 end
 
-function PickerBaseClass:BuildFilters()
-	local timer
-
-	local onChangeFunc = function(listenerToIgnore)
-		if timer then
-			Ext.Timer.Cancel(timer)
-		end
-		timer = Ext.Timer.WaitFor(300, function()
-			for listener, func in pairs(self.filterListeners) do
-				if listener ~= listenerToIgnore then
-					func()
-				end
-			end
-
-			self:RebuildDisplay()
-		end)
+local timer
+function PickerBaseClass:ProcessFilters(listenerToIgnore)
+	if timer then
+		Ext.Timer.Cancel(timer)
 	end
+	timer = Ext.Timer.WaitFor(300, function()
+		for listener, func in pairs(self.filterListeners) do
+			if listener ~= listenerToIgnore then
+				func()
+			end
+		end
+
+		self:RebuildDisplay()
+	end)
+end
+
+function PickerBaseClass:BuildFilters()
 
 	--#region Search By Name
 	self.filterGroup:AddText("By Name")
@@ -461,7 +461,7 @@ function PickerBaseClass:BuildFilters()
 						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
 						updateLabelWithCount(selectedCount)
 
-						onChangeFunc("Mods")
+						self:ProcessFilters("Mods")
 					end
 					selectable.UserData = modId
 				end
@@ -472,7 +472,7 @@ function PickerBaseClass:BuildFilters()
 
 	clearSelected.OnClick = function()
 		selected = {}
-		onChangeFunc()
+		self:ProcessFilters()
 	end
 
 	buildModSelectables()
@@ -500,19 +500,21 @@ function PickerBaseClass:BuildFilters()
 
 	for _, customFilter in ipairs(self.customFilters) do
 		self.filterGroup:AddNewLine()
-		customFilter(onChangeFunc)
+		customFilter()
 	end
 
-	modNameSearch.OnChange = onChangeFunc
+	modNameSearch.OnChange = function ()
+		self:ProcessFilters()
+	end
 
 	nameSearch.OnChange = function()
 		if #nameSearch.Text == 0 or #nameSearch.Text >= 3 then
-			onChangeFunc()
+			self:ProcessFilters()
 		end
 	end
 	idSearch.OnChange = function()
 		if #idSearch.Text == 0 or #idSearch.Text >= 3 then
-			onChangeFunc()
+			self:ProcessFilters()
 		end
 	end
 end
@@ -525,7 +527,6 @@ function PickerBaseClass:CheckFilterCache(cacheEntry, filterToIgnore)
 		for _, templateId in ipairs(cacheEntry) do
 			---@type ItemTemplate
 			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
-
 			for index, predicate in ipairs(self.filterPredicates) do
 				if index ~= filterToIgnore and not predicate(itemTemplate) then
 					goto continue

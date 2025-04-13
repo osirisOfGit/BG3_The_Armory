@@ -14,7 +14,7 @@ EquipmentPicker = PickerBaseClass:new("Equipment", {
 function EquipmentPicker:createFilters()
 	self.customFilters = {
 		--#region Equipment Race
-		function(func)
+		function()
 			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Equipment Race"))
 
 			local raceGroup = header:AddGroup("raceGroup")
@@ -32,7 +32,7 @@ function EquipmentPicker:createFilters()
 					selectedRaces[checkbox.UserData] = checkbox.Checked or nil
 					selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
 					updateLabelWithCount(selectedCount)
-					func()
+					self:ProcessFilters()
 				end
 			end
 
@@ -53,7 +53,7 @@ function EquipmentPicker:createFilters()
 		--#endregion
 
 		--#region ArmorType
-		function(func)
+		function()
 			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Armor Type"))
 
 			local armorTypeGroup = header:AddGroup("")
@@ -62,6 +62,13 @@ function EquipmentPicker:createFilters()
 			self.filterListenerCache["ArmorType"] = {}
 
 			local function buildArmorTypeFilters()
+				if string.find(self.slot, "Weapon") then
+					header.Visible = false
+					return
+				else
+					header.Visible = true
+				end
+
 				local selectedCount = 0
 
 				Helpers:KillChildren(armorTypeGroup)
@@ -113,7 +120,7 @@ function EquipmentPicker:createFilters()
 								selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
 
 								updateLabelWithCount(selectedCount)
-								func("ArmorType")
+								self:ProcessFilters("ArmorType")
 							end
 						end
 					end
@@ -127,7 +134,7 @@ function EquipmentPicker:createFilters()
 					selectedArmorTypes["None"] = missingCheckbox.Checked or nil
 					selectedCount = selectedCount + (missingCheckbox.Checked and 1 or -1)
 					updateLabelWithCount(selectedCount)
-					func("ArmorType")
+					self:ProcessFilters("ArmorType")
 				end
 
 				updateLabelWithCount(selectedCount)
@@ -140,10 +147,11 @@ function EquipmentPicker:createFilters()
 			---@param itemTemplate ItemTemplate
 			---@return boolean
 			table.insert(self.filterPredicates, function(itemTemplate)
-				if TableUtils:ListContains(armorTypeGroup.Children, function(value)
+				if header.Visible
+					and self.itemIndex.templateIdAndStat[itemTemplate.Id]
+					and TableUtils:ListContains(armorTypeGroup.Children, function(value)
 						return value.Checked
 					end)
-					and self.itemIndex.templateIdAndStat[itemTemplate.Id]
 				then
 					---@type Armor|Weapon
 					local stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplate.Id])
