@@ -50,12 +50,29 @@ function EquipmentPicker:createFilters()
 		function(func)
 			local header = Styler:CollapsingHeader(self.filterGroup:AddCollapsingHeader("By Armor Type"))
 
+			local selectedCountText = self.filterGroup:AddText("")
+			selectedCountText.IDContext = "ArmorType"
+			selectedCountText.AllowItemOverlap = true
+			selectedCountText.SameLine = true
+
+			local hasActivated
+			header.OnDeactivate = function()
+				hasActivated = false
+				selectedCountText.Visible = hasActivated
+			end
+			header.OnActivate = function()
+				hasActivated = true
+				selectedCountText.Visible = hasActivated
+			end
+
 			local armorTypeGroup = header:AddGroup("")
 
 			local selectedArmorTypes = {}
 			self.filterListenerCache["ArmorType"] = {}
 
 			local function buildArmorTypeFilters()
+				local selectedCount = 0
+
 				Helpers:KillChildren(armorTypeGroup)
 
 				for _, armorType in ipairs(Ext.Enums.ArmorType) do
@@ -66,18 +83,18 @@ function EquipmentPicker:createFilters()
 
 						if not buildArmorType then
 							for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
+								---@type ItemTemplate
+								local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+								for index, predicate in ipairs(self.filterPredicates) do
+									if index ~= 6 and not predicate(itemTemplate) then
+										goto next_template
+									end
+								end
+
 								---@type Armor|Weapon
 								stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[templateId])
 								if stat.ModifierList == "Armor" then
-									---@type ItemTemplate
-									local itemTemplate = Ext.Template.GetRootTemplate(templateId)
-
-									for index, predicate in ipairs(self.filterPredicates) do
-										if index ~= 6 and not predicate(itemTemplate) then
-											goto next_template
-										end
-									end
-
 									if stat.ArmorType == armorType then
 										if not self.filterListenerCache["ArmorType"][armorType] then
 											self.filterListenerCache["ArmorType"][armorType] = {}
@@ -99,8 +116,12 @@ function EquipmentPicker:createFilters()
 							local checkbox = armorTypeGroup:AddCheckbox(armorType)
 							checkbox.UserData = armorType
 							checkbox.Checked = selectedArmorTypes[armorType] or false
+							selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
 							checkbox.OnChange = function()
 								selectedArmorTypes[armorType] = checkbox.Checked or nil
+								selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+
+								selectedCountText.Label = selectedCount > 0 and (" - " .. selectedCount .. " selected") or ""
 								func("ArmorType")
 							end
 						end
@@ -110,10 +131,15 @@ function EquipmentPicker:createFilters()
 				local missingCheckbox = armorTypeGroup:AddCheckbox("None")
 				missingCheckbox.UserData = "None"
 				missingCheckbox.Checked = selectedArmorTypes["None"] or false
+				selectedCount = selectedCount + (missingCheckbox.Checked and 1 or 0)
 				missingCheckbox.OnChange = function()
 					selectedArmorTypes["None"] = missingCheckbox.Checked or nil
+					selectedCount = selectedCount + (missingCheckbox.Checked and 1 or -1)
+					selectedCountText.Label = selectedCount > 0 and (" - " .. selectedCount .. " selected") or ""
 					func("ArmorType")
 				end
+
+				selectedCountText.Label = selectedCount > 0 and (" - " .. selectedCount .. " selected") or ""
 			end
 
 			buildArmorTypeFilters()

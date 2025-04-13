@@ -379,10 +379,19 @@ function PickerBaseClass:BuildFilters()
 	self.filterGroup:AddNewLine()
 
 	--#region Mod Picker
-	local modTitleHeader = self.filterGroup:AddCollapsingHeader("By Mod")
-	modTitleHeader.IDContext = "ByMod"
+	local modTitleHeader = self.filterGroup:AddTree("By Mod(s)")
 	modTitleHeader.DefaultOpen = false
-	modTitleHeader:SetColor("Header", { 0, 0, 0, 0 })
+
+	local isOpen
+	modTitleHeader.OnActivate = function ()
+		isOpen = true
+		Logger:BasicInfo("Opened")
+	end
+
+	modTitleHeader.OnDeactivate = function ()
+		isOpen = false
+		Logger:BasicInfo("Closed")
+	end
 
 	local modNameSearch = modTitleHeader:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
@@ -449,11 +458,8 @@ function PickerBaseClass:BuildFilters()
 
 						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
 
-						modTitleHeader.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
-
-						-- Changing the label changes the underlying imgui setting reference it seems, even with a manual IDContext, so setting the
-						-- initial defaultOpen to false means every unseen label will collapse the header. This forces everything other than the initial default to remain open
-						modTitleHeader.DefaultOpen = true
+						modTitleHeader.Label = "By Mod(s)" .. (selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
+						modTitleHeader:SetOpen(isOpen == nil and true or isOpen, "Always")
 
 						onChangeFunc("Mods")
 					end
@@ -461,14 +467,13 @@ function PickerBaseClass:BuildFilters()
 				end
 			end
 		end
-
-		modTitleHeader.Label = ("By Mod(s)%s"):format(selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
+		modTitleHeader.Label = "By Mod(s)" .. (selectedCount > 0 and (" - " .. selectedCount .. " selected") or "")
+		modTitleHeader:SetOpen(isOpen == nil and true or isOpen, "Always")
 	end
 
 	clearSelected.OnClick = function()
 		selected = {}
-		buildModSelectables()
-		self:RebuildDisplay()
+		onChangeFunc()
 	end
 
 	buildModSelectables()

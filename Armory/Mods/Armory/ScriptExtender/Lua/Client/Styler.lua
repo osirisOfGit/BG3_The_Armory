@@ -3,8 +3,10 @@ Styler = {}
 ---@param header ExtuiCollapsingHeader
 ---@return ExtuiCollapsingHeader
 function Styler:CollapsingHeader(header)
+	header.IDContext = header.Label
 	header.DefaultOpen = false
 	header:SetColor("Header", { 0, 0, 0, 0 })
+	header.AllowOverlap = true
 
 	return header
 end
