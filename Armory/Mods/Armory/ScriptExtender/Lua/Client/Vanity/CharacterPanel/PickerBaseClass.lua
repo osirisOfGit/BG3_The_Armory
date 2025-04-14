@@ -204,7 +204,7 @@ function PickerBaseClass:InitializeSearchBank()
 	Logger:BasicInfo("Indexed %d armor/weapons and dyes from %d mods in %dms", itemCount, modCount, Ext.Utils.MonotonicTime() - startTime)
 end
 
-function PickerBaseClass:DisplayResult(templateName, group) end
+function PickerBaseClass:DisplayResult(template, group) end
 
 function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 	self.slot = slot
@@ -256,16 +256,16 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		self.filterGroup = row:AddCell():AddChildWindow("Filters")
 
-		local otherGroup = row:AddCell():AddChildWindow("RestOfTheOwl")
+		self.otherGroup = row:AddCell():AddChildWindow("RestOfTheOwl")
 
-		self.warningGroup = otherGroup:AddGroup("WarningGroup")
+		self.warningGroup = self.otherGroup:AddGroup("WarningGroup")
 
-		self.favoritesGroup = otherGroup:AddCollapsingHeader("Favorites")
+		self.favoritesGroup = self.otherGroup:AddCollapsingHeader("Favorites")
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
-		otherGroup:AddNewLine()
+		self.otherGroup:AddNewLine()
 
-		self.resultSeparator = otherGroup:AddSeparatorText("Results")
-		self.resultsGroup = otherGroup:AddGroup(self.title .. "Results")
+		self.resultSeparator = self.otherGroup:AddSeparatorText("Results")
+		self.resultsGroup = self.otherGroup:AddGroup(self.title .. "Results")
 
 		customizeFunc()
 		self:BuildFilters()
@@ -289,20 +289,19 @@ function PickerBaseClass:RebuildDisplay()
 	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
 		return self.itemIndex.templateIdAndTemplateName[key]
 	end) do
-		
 		---@type ItemTemplate
 		local template = Ext.Template.GetRootTemplate(templateId)
 		for _, predicate in ipairs(self.filterPredicates) do
 			local success, result = pcall(function(...)
 				return predicate(template)
 			end)
-			
+
 			if success and not result then
 				goto continue
 			end
 		end
-		self:DisplayResult(templateId, self.favoritesGroup)
-		self:DisplayResult(templateId, self.resultsGroup)
+		self:DisplayResult(template, self.favoritesGroup)
+		self:DisplayResult(template, self.resultsGroup)
 		count = count + 1
 		::continue::
 	end
@@ -327,7 +326,6 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 end
 
 function PickerBaseClass:BuildFilters()
-
 	--#region Search By Name
 	self.filterGroup:AddText("By Name")
 	local nameSearch = self.filterGroup:AddInputText("")
@@ -371,8 +369,6 @@ function PickerBaseClass:BuildFilters()
 		else
 			return true
 		end
-
-		return false
 	end)
 	--#endregion
 
@@ -503,7 +499,7 @@ function PickerBaseClass:BuildFilters()
 		customFilter()
 	end
 
-	modNameSearch.OnChange = function ()
+	modNameSearch.OnChange = function()
 		self:ProcessFilters()
 	end
 

@@ -16,6 +16,11 @@ function EquipmentPicker:createFilters()
 		--#region Equipment Race
 		function()
 			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Equipment Race"))
+			header:Tooltip():AddText([[
+	  These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids
+These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template
+This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models
+Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work]])
 
 			local raceGroup = header:AddGroup("raceGroup")
 
@@ -55,6 +60,7 @@ function EquipmentPicker:createFilters()
 		--#region ArmorType
 		function()
 			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Armor Type"))
+			header:Tooltip():AddText("\t\t These filters are determined by what is set by the Stat of the item, not the material of the item itself (since there's no way to do that)")
 
 			local armorTypeGroup = header:AddGroup("")
 
@@ -265,19 +271,16 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	end
 end
 
----@param itemTemplateId string
+---@param itemTemplate ItemTemplate
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
-function EquipmentPicker:DisplayResult(itemTemplateId, displayGroup)
-	---@type ItemTemplate
-	local itemTemplate = Ext.Template.GetRootTemplate(itemTemplateId)
-
-	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, itemTemplateId)
+function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
+	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, itemTemplate.Id)
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return
 	end
 
 	---@type Armor|Weapon|Object
-	local itemStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplateId])
+	local itemStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplate.Id])
 
 	local numChildren = #displayGroup.Children
 	local itemGroup = displayGroup:AddChildWindow(itemTemplate.Id .. itemStat.Name .. displayGroup.Label)

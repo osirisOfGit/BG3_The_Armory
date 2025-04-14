@@ -9,7 +9,7 @@ function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 	PickerBaseClass.OpenWindow(self,
 		slot,
 		function()
-			local resultTable = self.window:AddTable("Dyes", 2)
+			local resultTable = self.otherGroup:AddTable("Dyes", 2)
 			resultTable.NoSavedSettings = true
 			resultTable:AddColumn("Dyes", "WidthStretch")
 			resultTable:AddColumn("Information", "WidthStretch")
@@ -20,13 +20,13 @@ function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 			local dyeWindow = dyeCell:AddChildWindow("DyeResults")
 			dyeWindow.NoSavedSettings = true
 
-			self.window:DetachChild(self.favoritesGroup)
+			self.otherGroup:DetachChild(self.favoritesGroup)
 			dyeWindow:AttachChild(self.favoritesGroup)
 			self.favoritesGroup.SpanAvailWidth = true
 
-			self.window:DetachChild(self.resultSeparator)
+			self.otherGroup:DetachChild(self.resultSeparator)
 			dyeWindow:AttachChild(self.resultSeparator)
-			self.window:DetachChild(self.resultsGroup)
+			self.otherGroup:DetachChild(self.resultsGroup)
 			dyeWindow:AttachChild(self.resultsGroup)
 
 			self.infoCell = row:AddCell()
@@ -38,15 +38,12 @@ function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 	self.onSelectFunc = onSelectFunc
 end
 
----@param dyeTemplateId string
+---@param dyeTemplate ItemTemplate
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
-function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
-	if TableUtils:ListContains(self.blacklistedItems, dyeTemplateId) then
+function DyePicker:DisplayResult(dyeTemplate, displayGroup)
+	if TableUtils:ListContains(self.blacklistedItems, dyeTemplate.Id) then
 		return
 	end
-
-	---@type ItemTemplate
-	local dyeTemplate = Ext.Template.GetRootTemplate(dyeTemplateId)
 
 	local isFavorited, favoriteIndex = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
 
@@ -58,17 +55,17 @@ function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
 	local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
 	if not materialPreset then
 		---@type Object
-		local dyeStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[dyeTemplateId])
+		local dyeStat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[dyeTemplate.Id])
 		local modInfo = Ext.Mod.GetMod(dyeStat.ModId).Info
 
-		table.insert(self.blacklistedItems, dyeTemplateId)
+		table.insert(self.blacklistedItems, dyeTemplate.Id)
 		Logger:BasicWarning("Dye %s from Mod %s by %s does not have a materialPreset?", dyeTemplate.DisplayName:Get() or dyeTemplate.Name, modInfo.Name, modInfo.Author)
 		return
 	end
 
-	local favoriteButton = Styler:ImageButton(displayGroup:AddImageButton("Favorite" .. dyeTemplateId, isFavorited and "star_fileld" or "star_empty", { 26, 26 }))
+	local favoriteButton = Styler:ImageButton(displayGroup:AddImageButton("Favorite" .. dyeTemplate.Id, isFavorited and "star_fileld" or "star_empty", { 26, 26 }))
 
-	local dyeImageButton = Styler:ImageButton(displayGroup:AddImageButton(dyeTemplateId, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize }))
+	local dyeImageButton = Styler:ImageButton(displayGroup:AddImageButton(dyeTemplate.Id, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize }))
 	dyeImageButton.UserData = materialPreset.Guid
 	dyeImageButton.SameLine = true
 
@@ -80,7 +77,7 @@ function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
 		if self.activeDyeGroup then
 			self.activeDyeGroup:Destroy()
 		end
-		local dyeInfoGroup = self.infoCell:AddGroup(dyeTemplateId .. dyeTemplate.Stats .. self.slot .. "dye")
+		local dyeInfoGroup = self.infoCell:AddGroup(dyeTemplate.Id .. dyeTemplate.Stats .. self.slot .. "dye")
 		self.activeDyeGroup = dyeInfoGroup
 
 		dyeInfoGroup:AddSeparatorText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name)
@@ -121,7 +118,7 @@ function DyePicker:DisplayResult(dyeTemplateId, displayGroup)
 
 		dyeInfoGroup:AddText("Values are not editable"):SetStyle("Alpha", 0.65)
 
-		local dyeTable = dyeInfoGroup:AddTable(dyeTemplateId, 2)
+		local dyeTable = dyeInfoGroup:AddTable(dyeTemplate.Id, 2)
 		dyeTable.SizingStretchProp = true
 
 		for _, colorSetting in pairs(materialColorParams) do
