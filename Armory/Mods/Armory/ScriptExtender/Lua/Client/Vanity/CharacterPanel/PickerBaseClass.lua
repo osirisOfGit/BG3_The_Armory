@@ -390,6 +390,14 @@ function PickerBaseClass:BuildFilters()
 		modGroup.Visible = false
 	end
 
+	--#region Register Custom Filters
+	-- Adding here because Mod filter should be run last (since it's the most intensive), but I want it higher up in the UI
+	for _, customFilter in ipairs(self.customFilters) do
+		self.filterGroup:AddNewLine()
+		customFilter()
+	end
+	--#endregion
+
 	local modNameSearch = modGroup:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
 	modNameSearch.AutoSelectAll = true
@@ -421,7 +429,7 @@ function PickerBaseClass:BuildFilters()
 						local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
 						for index, predicate in ipairs(self.filterPredicates) do
-							if index ~= 4 and not predicate(itemTemplate) then
+							if index ~= (#self.filterPredicates + 1) and not predicate(itemTemplate) then
 								goto next_template
 							end
 						end
@@ -493,11 +501,6 @@ function PickerBaseClass:BuildFilters()
 		return not anySelected and true or false
 	end)
 	--#endregion
-
-	for _, customFilter in ipairs(self.customFilters) do
-		self.filterGroup:AddNewLine()
-		customFilter()
-	end
 
 	modNameSearch.OnChange = function()
 		self:ProcessFilters()

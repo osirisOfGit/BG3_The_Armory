@@ -67,6 +67,8 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 			local selectedArmorTypes = {}
 			self.filterListenerCache["ArmorType"] = {}
 
+			local filterIndex = #self.filterPredicates + 1
+
 			local function buildArmorTypeFilters()
 				if string.find(self.slot, "Weapon") then
 					header.Visible = false
@@ -83,7 +85,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 					armorType = tostring(armorType)
 
 					if armorType ~= "Sentinel" then
-						local buildArmorType = self:CheckFilterCache(self.filterListenerCache["ArmorType"][armorType], 6)
+						local buildArmorType = self:CheckFilterCache(self.filterListenerCache["ArmorType"][armorType], filterIndex)
 
 						if not buildArmorType then
 							for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
@@ -91,7 +93,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 								local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
 								for index, predicate in ipairs(self.filterPredicates) do
-									if index ~= 6 and not predicate(itemTemplate) then
+									if index ~= filterIndex and not predicate(itemTemplate) then
 										goto next_template
 									end
 								end
