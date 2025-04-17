@@ -408,7 +408,7 @@ function PickerBaseClass:BuildFilters()
 	clearSelected:Tooltip():AddText("\t Clear Selected Mods")
 
 	local modFilterWindow = modGroup:AddChildWindow("modFilters")
-	modFilterWindow.AutoResizeY = true
+	modFilterWindow.NoResize = true
 
 	local selected = {}
 
@@ -472,6 +472,8 @@ function PickerBaseClass:BuildFilters()
 			end
 		end
 		updateLabelWithCount(selectedCount)
+
+		modFilterWindow.Size = { 0, ((self.window.LastSize[1] * .3) / #modFilterWindow.Children) * 1.2 }
 	end
 
 	clearSelected.OnClick = function()
@@ -480,6 +482,8 @@ function PickerBaseClass:BuildFilters()
 	end
 
 	buildModSelectables()
+
+	Logger:BasicInfo(Ext.Json.Stringify(modFilterWindow.LastSize))
 
 	self.filterListeners["Mods"] = buildModSelectables
 
