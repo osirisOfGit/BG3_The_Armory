@@ -483,8 +483,6 @@ function PickerBaseClass:BuildFilters()
 
 	buildModSelectables()
 
-	Logger:BasicInfo(Ext.Json.Stringify(modFilterWindow.LastSize))
-
 	self.filterListeners["Mods"] = buildModSelectables
 
 	---@param itemTemplate ItemTemplate
