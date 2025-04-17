@@ -473,7 +473,7 @@ function PickerBaseClass:BuildFilters()
 		end
 		updateLabelWithCount(selectedCount)
 
-		modFilterWindow.Size = { 0, ((self.window.LastSize[1] * .3) / #modFilterWindow.Children) * 1.2 }
+		modFilterWindow.Size = { 0, ((self.window.LastSize[1] * .025) * #modFilterWindow.Children)}
 	end
 
 	clearSelected.OnClick = function()
