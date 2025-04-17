@@ -16,7 +16,8 @@ function EquipmentPicker:createFilters()
 		--#region Equipment Race
 		function()
 			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Equipment Race"))
-			header:Tooltip():AddText([[
+			local tooltip = header:Tooltip()
+			tooltip:AddText([[
 	  These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids
 These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template
 This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models
@@ -25,21 +26,80 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 			local raceGroup = header:AddGroup("raceGroup")
 
 			local selectedRaces = {}
-			local selectedCount = 0
+			self.filterListenerCache["EquipmentRace"] = {}
 
-			for bodyType, id in TableUtils:OrderedPairs(EquipmentRace) do
-				local checkbox = raceGroup:AddCheckbox(bodyType)
-				checkbox.UserData = id
-				checkbox.Checked = selectedRaces[id] or false
-				selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+			local filterIndex = #self.filterPredicates + 1
 
-				checkbox.OnChange = function()
-					selectedRaces[checkbox.UserData] = checkbox.Checked or nil
-					selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
-					updateLabelWithCount(selectedCount)
-					self:ProcessFilters()
+			local function buildRaceFilters()
+				if string.find(self.slot, "Weapon") then
+					header.Visible = false
+					return
+				else
+					header.Visible = true
+				end
+
+				Helpers:KillChildren(raceGroup)
+
+				local selectedCount = 0
+
+				for bodyType, id in TableUtils:OrderedPairs(EquipmentRace) do
+					local buildRaceFilter = self:CheckFilterCache(self.filterListenerCache["EquipmentRace"][id], filterIndex)
+
+					if not buildRaceFilter then
+						for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
+							---@type ItemTemplate
+							local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+							for index, predicate in ipairs(self.filterPredicates) do
+								if index ~= filterIndex and not predicate(itemTemplate) then
+									goto next_template
+								end
+							end
+
+							if itemTemplate.Equipment and itemTemplate.Equipment.Visuals then
+								for bodyTypeId in pairs(itemTemplate.Equipment.Visuals) do
+									if bodyTypeId == id then
+										buildRaceFilter = true
+										if not self.filterListenerCache["EquipmentRace"][id] then
+											self.filterListenerCache["EquipmentRace"][id] = {}
+										elseif not TableUtils:ListContains(self.filterListenerCache["EquipmentRace"][id], templateId) then
+											table.insert(self.filterListenerCache["EquipmentRace"][id], templateId)
+										end
+										goto next_template
+									end
+								end
+							end
+							::next_template::
+						end
+					end
+
+
+					if buildRaceFilter then
+						local checkbox = raceGroup:AddCheckbox(bodyType)
+						checkbox.UserData = id
+						checkbox.Checked = selectedRaces[id] or false
+						selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+
+						checkbox.OnChange = function()
+							selectedRaces[checkbox.UserData] = checkbox.Checked or nil
+							selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+							updateLabelWithCount(selectedCount)
+							self:ProcessFilters()
+						end
+
+						checkbox.OnHoverEnter = function()
+							tooltip.Visible = false
+						end
+
+						checkbox.OnHoverLeave = function()
+							tooltip.Visible = true
+						end
+					end
 				end
 			end
+
+			buildRaceFilters()
+			self.filterListeners["EquipmentRace"] = buildRaceFilters
 
 			---@param itemTemplate ItemTemplate
 			---@return boolean
@@ -60,7 +120,8 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 		--#region ArmorType
 		function()
 			local header, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Armor Type"))
-			header:Tooltip():AddText("\t\t These filters are determined by what is set by the Stat of the item, not the material of the item itself (since there's no way to do that)")
+			header:Tooltip():AddText(
+				"\t\t These filters are determined by what is set by the Stat of the item, not the material of the item itself (since there's no way to do that)")
 
 			local armorTypeGroup = header:AddGroup("")
 
