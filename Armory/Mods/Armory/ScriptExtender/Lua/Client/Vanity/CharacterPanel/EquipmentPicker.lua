@@ -28,77 +28,74 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 			local selectedRaces = {}
 			self.filterListenerCache["EquipmentRace"] = {}
 
-			local filterIndex = #self.filterPredicates + 1
-
+			---@return number, fun(itemTemplate: ItemTemplate)?
 			local function buildRaceFilters()
-				if string.find(self.slot, "Weapon") then
-					header.Visible = false
-					return
-				else
-					header.Visible = true
-				end
-
-				Helpers:KillChildren(raceGroup)
-
-				local selectedCount = 0
-
-				for bodyType, id in TableUtils:OrderedPairs(EquipmentRace) do
-					local buildRaceFilter = self:CheckFilterCache(self.filterListenerCache["EquipmentRace"][id], filterIndex)
-
-					if not buildRaceFilter then
-						for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
-							---@type ItemTemplate
-							local itemTemplate = Ext.Template.GetRootTemplate(templateId)
-
-							for index, predicate in ipairs(self.filterPredicates) do
-								if index ~= filterIndex and not predicate(itemTemplate) then
-									goto next_template
-								end
+				return #self.filterPredicates + 1,
+					coroutine.wrap(
+					---@param itemTemplate ItemTemplate
+						function(itemTemplate)
+							if string.find(self.slot, "Weapon") then
+								header.Visible = false
+								return
+							else
+								header.Visible = true
 							end
+							Helpers:KillChildren(raceGroup)
 
-							if itemTemplate.Equipment and itemTemplate.Equipment.Visuals then
-								for bodyTypeId in pairs(itemTemplate.Equipment.Visuals) do
-									if bodyTypeId == id then
-										buildRaceFilter = true
-										if not self.filterListenerCache["EquipmentRace"][id] then
-											self.filterListenerCache["EquipmentRace"][id] = {}
-										elseif not TableUtils:ListContains(self.filterListenerCache["EquipmentRace"][id], templateId) then
-											table.insert(self.filterListenerCache["EquipmentRace"][id], templateId)
+							local selectedCount = 0
+
+							local filterTable = TableUtils:DeeplyCopyTable(EquipmentRace)
+
+							while next(filterTable) do
+								for bodyType, id in TableUtils:OrderedPairs(filterTable) do
+									-- local buildRaceFilter = self:CheckFilterCache(self.filterListenerCache["EquipmentRace"][id], filterIndex)
+									local buildRaceFilter
+
+									if itemTemplate.Equipment and itemTemplate.Equipment.Visuals then
+										for bodyTypeId in pairs(itemTemplate.Equipment.Visuals) do
+											if bodyTypeId == id then
+												buildRaceFilter = true
+												-- if not self.filterListenerCache["EquipmentRace"][id] then
+												-- 	self.filterListenerCache["EquipmentRace"][id] = {}
+												-- elseif not TableUtils:ListContains(self.filterListenerCache["EquipmentRace"][id], itemTemplate.Id) then
+												-- 	table.insert(self.filterListenerCache["EquipmentRace"][id], itemTemplate.Id)
+												-- end
+												goto next_template
+											end
 										end
-										goto next_template
+									end
+									::next_template::
+
+									if buildRaceFilter then
+										filterTable[bodyType] = nil
+
+										local checkbox = raceGroup:AddCheckbox(bodyType)
+										checkbox.UserData = id
+										checkbox.Checked = selectedRaces[id] or false
+										selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+
+										checkbox.OnChange = function()
+											selectedRaces[checkbox.UserData] = checkbox.Checked or nil
+											selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+											updateLabelWithCount(selectedCount)
+											self:ProcessFilters()
+										end
+
+										checkbox.OnHoverEnter = function()
+											tooltip.Visible = false
+										end
+
+										checkbox.OnHoverLeave = function()
+											tooltip.Visible = true
+										end
 									end
 								end
+								updateLabelWithCount(selectedCount)
+								coroutine.yield()
 							end
-							::next_template::
-						end
-					end
-
-
-					if buildRaceFilter then
-						local checkbox = raceGroup:AddCheckbox(bodyType)
-						checkbox.UserData = id
-						checkbox.Checked = selectedRaces[id] or false
-						selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
-
-						checkbox.OnChange = function()
-							selectedRaces[checkbox.UserData] = checkbox.Checked or nil
-							selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
-							updateLabelWithCount(selectedCount)
-							self:ProcessFilters()
-						end
-
-						checkbox.OnHoverEnter = function()
-							tooltip.Visible = false
-						end
-
-						checkbox.OnHoverLeave = function()
-							tooltip.Visible = true
-						end
-					end
-				end
+						end)
 			end
 
-			buildRaceFilters()
 			self.filterListeners["EquipmentRace"] = buildRaceFilters
 
 			---@param itemTemplate ItemTemplate
@@ -128,85 +125,71 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 			local selectedArmorTypes = {}
 			self.filterListenerCache["ArmorType"] = {}
 
-			local filterIndex = #self.filterPredicates + 1
-
 			local function buildArmorTypeFilters()
-				if string.find(self.slot, "Weapon") then
-					header.Visible = false
-					return
-				else
-					header.Visible = true
-				end
+				return #self.filterPredicates + 1,
+					coroutine.wrap(
+					---@param itemTemplate ItemTemplate
+						function(itemTemplate)
+							if string.find(self.slot, "Weapon") then
+								header.Visible = false
+								return
+							else
+								header.Visible = true
+							end
+							Helpers:KillChildren(armorTypeGroup)
 
-				local selectedCount = 0
+							local selectedCount = 0
 
-				Helpers:KillChildren(armorTypeGroup)
+							local filterTable = { "None" }
 
-				for _, armorType in ipairs(Ext.Enums.ArmorType) do
-					armorType = tostring(armorType)
-
-					if armorType ~= "Sentinel" then
-						local buildArmorType = self:CheckFilterCache(self.filterListenerCache["ArmorType"][armorType], filterIndex)
-
-						if not buildArmorType then
-							for templateId, stat in pairs(self.itemIndex.templateIdAndStat) do
-								---@type ItemTemplate
-								local itemTemplate = Ext.Template.GetRootTemplate(templateId)
-
-								for index, predicate in ipairs(self.filterPredicates) do
-									if index ~= filterIndex and not predicate(itemTemplate) then
-										goto next_template
-									end
+							for _, armorType in ipairs(Ext.Enums.ArmorType) do
+								if tostring(armorType) ~= "Sentinel" then
+									table.insert(filterTable, tostring(armorType))
 								end
+							end
 
-								---@type Armor|Weapon
-								stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[templateId])
-								if stat.ModifierList == "Armor" then
-									if stat.ArmorType == armorType then
-										if not self.filterListenerCache["ArmorType"][armorType] then
-											self.filterListenerCache["ArmorType"][armorType] = {}
-										elseif not TableUtils:ListContains(self.filterListenerCache["ArmorType"][armorType], templateId) then
-											table.insert(self.filterListenerCache["ArmorType"][armorType], templateId)
+							while next(filterTable) do
+								for i, armorType in ipairs(filterTable) do
+									armorType = tostring(armorType)
+
+									-- local buildArmorType = self:CheckFilterCache(self.filterListenerCache["ArmorType"][armorType], filterIndex)
+									local buildArmorType
+
+									---@type Armor|Weapon
+									local stat = Ext.Stats.Get(self.itemIndex.templateIdAndStat[itemTemplate.Id])
+									if stat.ModifierList == "Armor" then
+										if stat.ArmorType == armorType then
+											-- if not self.filterListenerCache["ArmorType"][armorType] then
+											-- 	self.filterListenerCache["ArmorType"][armorType] = {}
+											-- elseif not TableUtils:ListContains(self.filterListenerCache["ArmorType"][armorType], templateId) then
+											-- 	table.insert(self.filterListenerCache["ArmorType"][armorType], templateId)
+											-- end
+											buildArmorType = true
+											-- goto build_checkbox
 										end
-										buildArmorType = true
-										goto build_checkbox
+									end
+
+									-- ::build_checkbox::
+
+									if buildArmorType then
+										filterTable[i] = nil
+										local checkbox = armorTypeGroup:AddCheckbox(armorType)
+										checkbox.UserData = armorType
+										checkbox.Checked = selectedArmorTypes[armorType] or false
+										selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+										checkbox.OnChange = function()
+											selectedArmorTypes[armorType] = checkbox.Checked or nil
+											selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+
+											updateLabelWithCount(selectedCount)
+											self:ProcessFilters("ArmorType")
+										end
 									end
 								end
-
-								::next_template::
-							end
-
-							::build_checkbox::
-						end
-
-						if buildArmorType then
-							local checkbox = armorTypeGroup:AddCheckbox(armorType)
-							checkbox.UserData = armorType
-							checkbox.Checked = selectedArmorTypes[armorType] or false
-							selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
-							checkbox.OnChange = function()
-								selectedArmorTypes[armorType] = checkbox.Checked or nil
-								selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
-
 								updateLabelWithCount(selectedCount)
-								self:ProcessFilters("ArmorType")
+								coroutine.yield()
 							end
-						end
-					end
-				end
-
-				local missingCheckbox = armorTypeGroup:AddCheckbox("None")
-				missingCheckbox.UserData = "None"
-				missingCheckbox.Checked = selectedArmorTypes["None"] or false
-				selectedCount = selectedCount + (missingCheckbox.Checked and 1 or 0)
-				missingCheckbox.OnChange = function()
-					selectedArmorTypes["None"] = missingCheckbox.Checked or nil
-					selectedCount = selectedCount + (missingCheckbox.Checked and 1 or -1)
-					updateLabelWithCount(selectedCount)
-					self:ProcessFilters("ArmorType")
-				end
-
-				updateLabelWithCount(selectedCount)
+						end)
 			end
 
 			buildArmorTypeFilters()

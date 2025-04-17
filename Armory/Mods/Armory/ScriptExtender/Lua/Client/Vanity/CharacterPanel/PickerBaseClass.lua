@@ -40,7 +40,7 @@ PickerBaseClass = {
 	customFilters = {},
 	---@type (fun(template: ItemTemplate): boolean)[]
 	filterPredicates = {},
-	---@type {[string]: fun()}
+	---@type {[string]: fun(itemTemplate: ItemTemplate)?}
 	filterListeners = {},
 	---@type {[string]: {[string]: string[]}}
 	filterListenerCache = {}
