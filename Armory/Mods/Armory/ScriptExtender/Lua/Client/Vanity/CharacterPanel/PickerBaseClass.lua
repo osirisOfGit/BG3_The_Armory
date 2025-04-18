@@ -387,12 +387,12 @@ function PickerBaseClass:BuildFilters()
 
 			if not upperSearch or string.find(string.upper(pickerInstance.itemIndex.templateIdAndTemplateName[itemTemplate.Id]), upperSearch) then
 				return true
+			else
+				return false
 			end
 		else
 			return true
 		end
-
-		return false
 	end
 	--#endregion
 
@@ -466,6 +466,7 @@ function PickerBaseClass:BuildFilters()
 	modFilterWindow.NoResize = true
 
 	local modFilter = PickerBaseFilterClass:new({ label = "ModFilter", priority = 99 })
+	self.customFilters[modFilter.label] = modFilter
 
 	modFilter.initializeUIBuilder = function(self)
 		Helpers:KillChildren(modFilterWindow)
@@ -497,7 +498,7 @@ function PickerBaseClass:BuildFilters()
 					-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
 					selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
 					selectable.UserData = pickerInstance.itemIndex.mods[modName]
-					selectable.Selected = selected[selectable.UserData] or false
+					selectable.Selected = self.selectedFilters[selectable.UserData] or false
 
 					selectedCount = selectedCount + (selectable.Selected and 1 or 0)
 
@@ -507,7 +508,7 @@ function PickerBaseClass:BuildFilters()
 						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
 						updateLabelWithCount(selectedCount)
 
-						pickerInstance:ProcessFilters("Mods")
+						pickerInstance:ProcessFilters(self.label)
 					end
 
 					updateLabelWithCount(selectedCount)

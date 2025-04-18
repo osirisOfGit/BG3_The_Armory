@@ -100,6 +100,10 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 						tooltip.Visible = true
 					end
 					self.updateLabelWithCount(selectedCount)
+
+					table.sort(raceGroup.Children, function(a, b)
+						return a.Label < b.Label
+					end)
 				end
 			end
 		end
@@ -191,6 +195,9 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 					end
 
 					self.updateLabelWithCount(selectedCount)
+					table.sort(armorTypeGroup.Children, function(a, b)
+						return a.Label < b.Label
+					end)
 				end
 			end
 		end
