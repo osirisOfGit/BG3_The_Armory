@@ -2,7 +2,7 @@
 PickerBaseFilterClass = {
 	---@type string
 	label = "",
-	priority = 99,
+	priority = 50,
 	---@type ExtuiTreeParent?
 	header = nil,
 	---@type fun(count: number)?

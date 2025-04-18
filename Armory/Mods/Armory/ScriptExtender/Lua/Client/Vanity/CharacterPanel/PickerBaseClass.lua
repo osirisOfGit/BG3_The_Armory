@@ -359,20 +359,29 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 end
 
 function PickerBaseClass:BuildFilters()
+	local pickerInstance = self
+
 	--#region Search By Name
 	self.filterGroup:AddText("By Name")
 	local nameSearch = self.filterGroup:AddInputText("")
 	nameSearch.Hint = "Case-insensitive, min 3 characters"
 	nameSearch.AutoSelectAll = true
 	nameSearch.EscapeClearsAll = true
+	nameSearch.OnChange = function()
+		if #nameSearch.Text == 0 or #nameSearch.Text >= 3 then
+			self:ProcessFilters()
+		end
+	end
 
+	local nameFilter = PickerBaseFilterClass:new({ label = "name", priority = 10 })
+	self.customFilters[nameFilter.label] = nameFilter
 	---@param itemTemplate ItemTemplate
 	---@return boolean
-	table.insert(self.filterPredicates, function(itemTemplate)
+	nameFilter.apply = function(self, itemTemplate)
 		if #nameSearch.Text >= 3 then
 			local upperSearch = string.upper(nameSearch.Text)
 
-			if not upperSearch or string.find(string.upper(self.itemIndex.templateIdAndTemplateName[itemTemplate.Id]), upperSearch) then
+			if not upperSearch or string.find(string.upper(pickerInstance.itemIndex.templateIdAndTemplateName[itemTemplate.Id]), upperSearch) then
 				return true
 			end
 		else
@@ -380,7 +389,7 @@ function PickerBaseClass:BuildFilters()
 		end
 
 		return false
-	end)
+	end
 	--#endregion
 
 	--#region Search By Id
@@ -389,20 +398,29 @@ function PickerBaseClass:BuildFilters()
 	idSearch.Hint = "Case-insensitive, min 3 characters"
 	idSearch.AutoSelectAll = true
 	idSearch.EscapeClearsAll = true
+	idSearch.OnChange = function()
+		if #idSearch.Text == 0 or #idSearch.Text >= 3 then
+			self:ProcessFilters()
+		end
+	end
+
+	local idSearchFilter = PickerBaseFilterClass:new({ label = "id", priority = 10 })
+	self.customFilters[idSearchFilter.label] = idSearchFilter
 
 	---@param itemTemplate ItemTemplate
 	---@return boolean
-	table.insert(self.filterPredicates, function(itemTemplate)
-		if #idSearch.Text >= 3 then
-			local upperSearch = string.upper(idSearch.Text)
+	idSearchFilter.apply = function(self, itemTemplate)
+		if #idSearchFilter.Text >= 3 then
+			local upperSearch = string.upper(idSearchFilter.Text)
 
 			if not upperSearch or string.find(string.upper(itemTemplate.Id), upperSearch) then
 				return true
+			else
+				return false
 			end
-		else
-			return true
 		end
-	end)
+		return true
+	end
 	--#endregion
 
 	self.filterGroup:AddNewLine()
@@ -443,115 +461,103 @@ function PickerBaseClass:BuildFilters()
 	local modFilterWindow = modGroup:AddChildWindow("modFilters")
 	modFilterWindow.NoResize = true
 
-	local selected = {}
+	local modFilter = PickerBaseFilterClass:new({ label = "ModFilter", priority = 99 })
 
-	self.filterListenerCache["Mod"] = {}
-	local function buildModSelectables()
-		return #self.filterPredicates + 1,
-			coroutine.wrap(
-			---@param itemTemplate ItemTemplate
-				function(itemTemplate)
-					Helpers:KillChildren(modFilterWindow)
-					local upperSearch = string.upper(modNameSearch.Text)
+	modFilter.selectedFilters = {}
 
-					local selectedCount = 0
+	modFilter.buildFilterUI = coroutine.wrap(
+	---@param self PickerBaseFilterClass
+	---@param itemTemplate ItemTemplate
+		function(self, itemTemplate)
+			while true do
+				Helpers:KillChildren(modFilterWindow)
+				local upperSearch = string.upper(modNameSearch.Text)
 
-					local filterTable = {}
+				local selectedCount = 0
 
-					for modName, modId in pairs(self.itemIndex.mods) do
-						if not upperSearch or string.find(string.upper(modName), upperSearch) then
-							filterTable[modName] = self.itemIndex.modIdAndTemplateIds[modId]
-						end
+				local filterTable = {}
+
+				for modName, modId in pairs(pickerInstance.itemIndex.mods) do
+					if not upperSearch or string.find(string.upper(modName), upperSearch) then
+						filterTable[modName] = pickerInstance.itemIndex.modIdAndTemplateIds[modId]
+					end
+				end
+
+				while next(filterTable) do
+					if not itemTemplate then
+						break
 					end
 
-					while next(filterTable) do
-						for modName, templateIds in pairs(filterTable) do
-							-- local buildSelectable = self:CheckFilterCache(self.filterListenerCache["Mod"][modId], 4)
+					for modName, templateIds in pairs(filterTable) do
+						-- local buildSelectable = self:CheckFilterCache(self.filterListenerCache["Mod"][modId], 4)
 
-							-- if not self.filterListenerCache["Mod"][modId] then
-							-- 	self.filterListenerCache["Mod"][modId] = {}
-							-- elseif not TableUtils:ListContains(self.filterListenerCache["Mod"][modId], templateId) then
-							-- 	table.insert(self.filterListenerCache["Mod"][modId], templateId)
+						-- if not self.filterListenerCache["Mod"][modId] then
+						-- 	self.filterListenerCache["Mod"][modId] = {}
+						-- elseif not TableUtils:ListContains(self.filterListenerCache["Mod"][modId], templateId) then
+						-- 	table.insert(self.filterListenerCache["Mod"][modId], templateId)
 
-							if TableUtils:ListContains(templateIds, itemTemplate.Id) then
-								filterTable[modName] = nil
-								---@type ExtuiSelectable
-								local selectable = modFilterWindow:AddSelectable(modName)
-								-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
-								-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
-								selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
-								selectable.UserData = self.itemIndex.mods[modName]
-								selectable.Selected = selected[selectable.UserData] or false
+						if TableUtils:ListContains(templateIds, itemTemplate.Id) then
+							filterTable[modName] = nil
+							---@type ExtuiSelectable
+							local selectable = modFilterWindow:AddSelectable(modName)
+							-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
+							-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
+							selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
+							selectable.UserData = pickerInstance.itemIndex.mods[modName]
+							selectable.Selected = selected[selectable.UserData] or false
 
-								selectedCount = selectedCount + (selectable.Selected and 1 or 0)
+							selectedCount = selectedCount + (selectable.Selected and 1 or 0)
 
-								selectable.OnClick = function()
-									selected[selectable.UserData] = selectable.Selected
+							selectable.OnClick = function()
+								selected[selectable.UserData] = selectable.Selected
 
-									selectedCount = selectedCount + (selectable.Selected and 1 or -1)
-									updateLabelWithCount(selectedCount)
-
-									self:ProcessFilters("Mods")
-								end
-
+								selectedCount = selectedCount + (selectable.Selected and 1 or -1)
 								updateLabelWithCount(selectedCount)
 
-								table.sort(modFilterWindow.Children, function(a, b)
-									return a.Label < b.Label
-								end)
-
-								modFilterWindow.Size = { 0, ((self.window.LastSize[1] * .025) * #modFilterWindow.Children) }
-
-								break
+								pickerInstance:ProcessFilters("Mods")
 							end
+
+							updateLabelWithCount(selectedCount)
+
+							table.sort(modFilterWindow.Children, function(a, b)
+								return a.Label < b.Label
+							end)
+
+							modFilterWindow.Size = { 0, ((pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
+
+							break
 						end
-
-						coroutine.yield(true)
 					end
-				end)
-	end
 
+					coroutine.yield(true)
+				end
+				coroutine.yield(false)
+			end
+		end)
 	clearSelected.OnClick = function()
-		selected = {}
+		modFilter.selectedFilters = {}
 		self:ProcessFilters()
 	end
 
-	buildModSelectables()
-
-	self.filterListeners["Mods"] = buildModSelectables
-
-	---@param itemTemplate ItemTemplate
-	---@return boolean
-	table.insert(self.filterPredicates, function(itemTemplate)
+	modFilter.apply = function(self, itemTemplate)
 		local anySelected = false
 
 		for _, selectable in ipairs(modFilterWindow.Children) do
 			---@cast selectable ExtuiSelectable
 			if selectable.Selected then
 				anySelected = true
-				if TableUtils:ListContains(self.itemIndex.modIdAndTemplateIds[selectable.UserData], itemTemplate.Id) then
+				if TableUtils:ListContains(pickerInstance.itemIndex.modIdAndTemplateIds[selectable.UserData], itemTemplate.Id) then
 					return true
 				end
 			end
 		end
 
 		return not anySelected and true or false
-	end)
+	end
 	--#endregion
 
 	modNameSearch.OnChange = function()
 		self:ProcessFilters()
-	end
-
-	nameSearch.OnChange = function()
-		if #nameSearch.Text == 0 or #nameSearch.Text >= 3 then
-			self:ProcessFilters()
-		end
-	end
-	idSearch.OnChange = function()
-		if #idSearch.Text == 0 or #idSearch.Text >= 3 then
-			self:ProcessFilters()
-		end
 	end
 end
 
