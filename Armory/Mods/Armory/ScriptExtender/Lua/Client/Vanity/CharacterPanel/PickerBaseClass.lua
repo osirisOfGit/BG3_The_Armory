@@ -36,14 +36,8 @@ PickerBaseClass = {
 	warningGroup = nil,
 	---@type ExtuiChildWindow
 	filterGroup = nil,
-	---@type (fun())[]
+	---@type {[string]: PickerBaseFilterClass}
 	customFilters = {},
-	---@type (fun(template: ItemTemplate): boolean)[]
-	filterPredicates = {},
-	---@type {[string]: fun():(number, fun(itemTemplate: ItemTemplate))?}
-	filterListeners = {},
-	---@type {[string]: {[string]: string[]}}
-	filterListenerCache = {}
 }
 
 ---@param title "Equipment"|"Dyes"
