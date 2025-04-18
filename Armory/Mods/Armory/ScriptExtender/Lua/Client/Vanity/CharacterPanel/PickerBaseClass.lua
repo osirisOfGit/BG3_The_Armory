@@ -40,7 +40,7 @@ PickerBaseClass = {
 	customFilters = {},
 	---@type (fun(template: ItemTemplate): boolean)[]
 	filterPredicates = {},
-	---@type {[string]: fun(itemTemplate: ItemTemplate)?}
+	---@type {[string]: fun():(number, fun(itemTemplate: ItemTemplate))?}
 	filterListeners = {},
 	---@type {[string]: {[string]: string[]}}
 	filterListenerCache = {}
@@ -315,9 +315,48 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 		Ext.Timer.Cancel(timer)
 	end
 	timer = Ext.Timer.WaitFor(300, function()
+		---@type {[string]: fun(itemTemplate: ItemTemplate)}
+		local filtersToRun = {}
+		---@type {[number]: string}
+		local filterIndexesToBeComplicatedAbout = {}
 		for listener, func in pairs(self.filterListeners) do
 			if listener ~= listenerToIgnore then
-				func()
+				local filterIndex, filterFunction = func()
+				filterIndexesToBeComplicatedAbout[filterIndex] = listener
+				filtersToRun[listener] = filterFunction
+			end
+		end
+
+		for templateId in pairs(self.itemIndex.templateIdAndStat) do
+			---@type ItemTemplate
+			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+			local failedPredicate
+
+			local passedFilters = true
+			for i, filterPredicate in ipairs(self.filterPredicates) do
+				local result = filterPredicate(itemTemplate)
+
+				if not result then
+					if not filterIndexesToBeComplicatedAbout[i] or failedPredicate then
+						passedFilters = false
+						break
+					else
+						failedPredicate = filterIndexesToBeComplicatedAbout[i]
+					end
+				end
+			end
+
+			if passedFilters then
+				for listener, filterFunc in pairs(filtersToRun) do
+					if failedPredicate ~= listener then
+						if not filterFunc(itemTemplate) then
+							filtersToRun[listener] = nil
+							local _, index = TableUtils:ListContains(filterIndexesToBeComplicatedAbout, listener)
+							filterIndexesToBeComplicatedAbout[index] = nil
+						end
+					end
+				end
 			end
 		end
 
@@ -414,66 +453,68 @@ function PickerBaseClass:BuildFilters()
 
 	self.filterListenerCache["Mod"] = {}
 	local function buildModSelectables()
-		Helpers:KillChildren(modFilterWindow)
-		local upperSearch = string.upper(modNameSearch.Text)
+		return #self.filterPredicates + 1,
+			coroutine.wrap(
+			---@param itemTemplate ItemTemplate
+				function(itemTemplate)
+					Helpers:KillChildren(modFilterWindow)
+					local upperSearch = string.upper(modNameSearch.Text)
 
-		local selectedCount = 0
+					local selectedCount = 0
 
-		for modName, modId in TableUtils:OrderedPairs(self.itemIndex.mods) do
-			if not upperSearch or string.find(string.upper(modName), upperSearch) then
-				local buildSelectable = self:CheckFilterCache(self.filterListenerCache["Mod"][modId], 4)
+					local filterTable = {}
 
-				if not buildSelectable then
-					for _, templateId in pairs(self.itemIndex.modIdAndTemplateIds[modId]) do
-						---@type ItemTemplate
-						local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+					for modName, modId in pairs(self.itemIndex.mods) do
+						if not upperSearch or string.find(string.upper(modName), upperSearch) then
+							filterTable[modName] = self.itemIndex.modIdAndTemplateIds[modId]
+						end
+					end
 
-						for index, predicate in ipairs(self.filterPredicates) do
-							if index ~= (#self.filterPredicates + 1) and not predicate(itemTemplate) then
-								goto next_template
+					while next(filterTable) do
+						for modName, templateIds in pairs(filterTable) do
+							-- local buildSelectable = self:CheckFilterCache(self.filterListenerCache["Mod"][modId], 4)
+
+							-- if not self.filterListenerCache["Mod"][modId] then
+							-- 	self.filterListenerCache["Mod"][modId] = {}
+							-- elseif not TableUtils:ListContains(self.filterListenerCache["Mod"][modId], templateId) then
+							-- 	table.insert(self.filterListenerCache["Mod"][modId], templateId)
+
+							if TableUtils:ListContains(templateIds, itemTemplate.Id) then
+								filterTable[modName] = nil
+								---@type ExtuiSelectable
+								local selectable = modFilterWindow:AddSelectable(modName)
+								-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
+								-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
+								selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
+								selectable.UserData = self.itemIndex.mods[modName]
+								selectable.Selected = selected[selectable.UserData] or false
+
+								selectedCount = selectedCount + (selectable.Selected and 1 or 0)
+
+								selectable.OnClick = function()
+									selected[selectable.UserData] = selectable.Selected
+
+									selectedCount = selectedCount + (selectable.Selected and 1 or -1)
+									updateLabelWithCount(selectedCount)
+
+									self:ProcessFilters("Mods")
+								end
+
+								updateLabelWithCount(selectedCount)
+
+								table.sort(modFilterWindow.Children, function(a, b)
+									return a.Label < b.Label
+								end)
+
+								modFilterWindow.Size = { 0, ((self.window.LastSize[1] * .025) * #modFilterWindow.Children) }
+
+								break
 							end
 						end
 
-						if not self.filterListenerCache["Mod"][modId] then
-							self.filterListenerCache["Mod"][modId] = {}
-						elseif not TableUtils:ListContains(self.filterListenerCache["Mod"][modId], templateId) then
-							table.insert(self.filterListenerCache["Mod"][modId], templateId)
-						end
-
-						buildSelectable = true
-						goto build_selectable
-
-						::next_template::
+						coroutine.yield(true)
 					end
-
-					::build_selectable::
-				end
-
-				if buildSelectable then
-					---@type ExtuiSelectable
-					local selectable = modFilterWindow:AddSelectable(modName)
-					-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
-					-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
-					selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
-					selectable.Selected = selected[modId] or false
-
-					selectedCount = selectedCount + (selectable.Selected and 1 or 0)
-
-					selectable.OnClick = function()
-						selected[selectable.UserData] = selectable.Selected
-
-						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
-						updateLabelWithCount(selectedCount)
-
-						self:ProcessFilters("Mods")
-					end
-					selectable.UserData = modId
-				end
-			end
-		end
-		updateLabelWithCount(selectedCount)
-
-		modFilterWindow.Size = { 0, ((self.window.LastSize[1] * .025) * #modFilterWindow.Children)}
+				end)
 	end
 
 	clearSelected.OnClick = function()

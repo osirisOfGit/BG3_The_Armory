@@ -88,10 +88,10 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 										checkbox.OnHoverLeave = function()
 											tooltip.Visible = true
 										end
+										updateLabelWithCount(selectedCount)
 									end
 								end
-								updateLabelWithCount(selectedCount)
-								coroutine.yield()
+								coroutine.yield(true)
 							end
 						end)
 			end
@@ -184,10 +184,11 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 											updateLabelWithCount(selectedCount)
 											self:ProcessFilters("ArmorType")
 										end
+
+										updateLabelWithCount(selectedCount)
 									end
 								end
-								updateLabelWithCount(selectedCount)
-								coroutine.yield()
+								coroutine.yield(true)
 							end
 						end)
 			end
