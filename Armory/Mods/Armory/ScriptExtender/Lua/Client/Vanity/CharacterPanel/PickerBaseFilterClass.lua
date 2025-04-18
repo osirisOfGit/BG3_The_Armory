@@ -9,8 +9,9 @@ PickerBaseFilterClass = {
 	updateLabelWithCount = nil,
 	---@type {[string]: boolean}?
 	selectedFilters = nil,
+	filterTable = nil,
 	-- A persistent coroutine.wrap function - must not be recreated after initialization to preserve imgui function references
-	---@type fun(self: PickerBaseFilterClass, slot: string, itemTemplate: ItemTemplate)?
+	---@type fun(self: PickerBaseFilterClass, itemTemplate: ItemTemplate)?
 	buildFilterUI = nil,
 	---@type fun(self: PickerBaseFilterClass, itemTemplate: ItemTemplate):boolean
 	apply = nil,
@@ -26,3 +27,7 @@ function PickerBaseFilterClass:new(instance)
 
 	return instance
 end
+
+-- I tried to use coroutines so i didn't have to maintain cross-function state,
+-- but IMGUI had problems with such strictly encapsulated state and function refs
+function PickerBaseFilterClass:initializeUIBuilder() end

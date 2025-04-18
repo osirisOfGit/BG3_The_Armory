@@ -1,3 +1,5 @@
+Ext.Require("Client/Vanity/CharacterPanel/PickerBaseFilterClass.lua")
+
 local itemIndex = {
 	---@class SearchIndex
 	equipment = {
@@ -309,54 +311,56 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 		Ext.Timer.Cancel(timer)
 	end
 	timer = Ext.Timer.WaitFor(300, function()
-		---@type {[string]: fun(itemTemplate: ItemTemplate)}
-		local filtersToRun = {}
-		---@type {[number]: string}
-		local filterIndexesToBeComplicatedAbout = {}
-		for listener, func in pairs(self.filterListeners) do
-			if listener ~= listenerToIgnore then
-				local filterIndex, filterFunction = func()
-				filterIndexesToBeComplicatedAbout[filterIndex] = listener
-				filtersToRun[listener] = filterFunction
+		---@type {[string]: PickerBaseFilterClass}
+		local filterBuildersToRun = {}
+
+		for label, filter in pairs(self.customFilters) do
+			if label ~= listenerToIgnore and filter.buildFilterUI then
+				filterBuildersToRun[label] = filter
+				filter:initializeUIBuilder()
 			end
 		end
+
+		Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
+		local count = 0
 
 		for templateId in pairs(self.itemIndex.templateIdAndStat) do
 			---@type ItemTemplate
 			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
 			local failedPredicate
-
-			local passedFilters = true
-			for i, filterPredicate in ipairs(self.filterPredicates) do
-				local result = filterPredicate(itemTemplate)
-
-				if not result then
-					if not filterIndexesToBeComplicatedAbout[i] or failedPredicate then
-						passedFilters = false
-						break
+			for label, filter in TableUtils:OrderedPairs(self.customFilters, function(key)
+				return self.customFilters[key].priority
+			end) do
+				if not filter:apply(itemTemplate) then
+					if not failedPredicate and filter.buildFilterUI then
+						failedPredicate = label
 					else
-						failedPredicate = filterIndexesToBeComplicatedAbout[i]
+						goto next_template
 					end
 				end
 			end
 
-			if passedFilters then
-				for listener, filterFunc in pairs(filtersToRun) do
-					if failedPredicate ~= listener then
-						if not filterFunc(itemTemplate) then
-							filtersToRun[listener] = nil
-							local _, index = TableUtils:ListContains(filterIndexesToBeComplicatedAbout, listener)
-							filterIndexesToBeComplicatedAbout[index] = nil
-						end
-					end
+			for label, filter in pairs(filterBuildersToRun) do
+				if failedPredicate ~= label then
+					filter:buildFilterUI(itemTemplate)
 				end
 			end
+
+			if not failedPredicate then
+				self:DisplayResult(itemTemplate, self.favoritesGroup)
+				self:DisplayResult(itemTemplate, self.resultsGroup)
+				count = count + 1
+			end
+
+			::next_template::
 		end
 
-		self:RebuildDisplay()
+		self.resultSeparator.Label = ("%s Results"):format(count)
 	end)
 end
+
+function PickerBaseClass:CreateCustomFilters() end
 
 function PickerBaseClass:BuildFilters()
 	local pickerInstance = self
@@ -410,8 +414,8 @@ function PickerBaseClass:BuildFilters()
 	---@param itemTemplate ItemTemplate
 	---@return boolean
 	idSearchFilter.apply = function(self, itemTemplate)
-		if #idSearchFilter.Text >= 3 then
-			local upperSearch = string.upper(idSearchFilter.Text)
+		if #idSearch.Text >= 3 then
+			local upperSearch = string.upper(idSearch.Text)
 
 			if not upperSearch or string.find(string.upper(itemTemplate.Id), upperSearch) then
 				return true
@@ -443,16 +447,16 @@ function PickerBaseClass:BuildFilters()
 
 	--#region Register Custom Filters
 	-- Adding here because Mod filter should be run last (since it's the most intensive), but I want it higher up in the UI
-	for _, customFilter in ipairs(self.customFilters) do
-		self.filterGroup:AddNewLine()
-		customFilter()
-	end
+	self:CreateCustomFilters()
 	--#endregion
 
 	local modNameSearch = modGroup:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
 	modNameSearch.AutoSelectAll = true
 	modNameSearch.EscapeClearsAll = true
+	modNameSearch.OnChange = function()
+		self:ProcessFilters()
+	end
 
 	local clearSelected = Styler:ImageButton(modGroup:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
 	clearSelected.SameLine = true
@@ -463,77 +467,62 @@ function PickerBaseClass:BuildFilters()
 
 	local modFilter = PickerBaseFilterClass:new({ label = "ModFilter", priority = 99 })
 
+	modFilter.initializeUIBuilder = function(self)
+		Helpers:KillChildren(modFilterWindow)
+		local upperSearch = string.upper(modNameSearch.Text)
+
+		self.filterTable = {}
+		for modName, modId in pairs(pickerInstance.itemIndex.mods) do
+			if not upperSearch or string.find(string.upper(modName), upperSearch) then
+				self.filterTable[modName] = pickerInstance.itemIndex.modIdAndTemplateIds[modId]
+			end
+		end
+	end
+
 	modFilter.selectedFilters = {}
 
-	modFilter.buildFilterUI = coroutine.wrap(
+	modFilter.buildFilterUI =
 	---@param self PickerBaseFilterClass
 	---@param itemTemplate ItemTemplate
 		function(self, itemTemplate)
-			while true do
-				Helpers:KillChildren(modFilterWindow)
-				local upperSearch = string.upper(modNameSearch.Text)
+			local selectedCount = 0
 
-				local selectedCount = 0
+			for modName, templateIds in pairs(self.filterTable) do
+				if TableUtils:ListContains(templateIds, itemTemplate.Id) then
+					self.filterTable[modName] = nil
 
-				local filterTable = {}
+					---@type ExtuiSelectable
+					local selectable = modFilterWindow:AddSelectable(modName)
+					-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
+					-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
+					selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
+					selectable.UserData = pickerInstance.itemIndex.mods[modName]
+					selectable.Selected = selected[selectable.UserData] or false
 
-				for modName, modId in pairs(pickerInstance.itemIndex.mods) do
-					if not upperSearch or string.find(string.upper(modName), upperSearch) then
-						filterTable[modName] = pickerInstance.itemIndex.modIdAndTemplateIds[modId]
+					selectedCount = selectedCount + (selectable.Selected and 1 or 0)
+
+					selectable.OnClick = function()
+						self.selectedFilters[selectable.UserData] = selectable.Selected
+
+						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
+						updateLabelWithCount(selectedCount)
+
+						pickerInstance:ProcessFilters("Mods")
 					end
+
+					updateLabelWithCount(selectedCount)
+
+					table.sort(modFilterWindow.Children, function(a, b)
+						return a.Label < b.Label
+					end)
+
+					modFilterWindow.Size = { 0, ((pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
+
+					break
 				end
-
-				while next(filterTable) do
-					if not itemTemplate then
-						break
-					end
-
-					for modName, templateIds in pairs(filterTable) do
-						-- local buildSelectable = self:CheckFilterCache(self.filterListenerCache["Mod"][modId], 4)
-
-						-- if not self.filterListenerCache["Mod"][modId] then
-						-- 	self.filterListenerCache["Mod"][modId] = {}
-						-- elseif not TableUtils:ListContains(self.filterListenerCache["Mod"][modId], templateId) then
-						-- 	table.insert(self.filterListenerCache["Mod"][modId], templateId)
-
-						if TableUtils:ListContains(templateIds, itemTemplate.Id) then
-							filterTable[modName] = nil
-							---@type ExtuiSelectable
-							local selectable = modFilterWindow:AddSelectable(modName)
-							-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
-							-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
-							selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
-							selectable.UserData = pickerInstance.itemIndex.mods[modName]
-							selectable.Selected = selected[selectable.UserData] or false
-
-							selectedCount = selectedCount + (selectable.Selected and 1 or 0)
-
-							selectable.OnClick = function()
-								selected[selectable.UserData] = selectable.Selected
-
-								selectedCount = selectedCount + (selectable.Selected and 1 or -1)
-								updateLabelWithCount(selectedCount)
-
-								pickerInstance:ProcessFilters("Mods")
-							end
-
-							updateLabelWithCount(selectedCount)
-
-							table.sort(modFilterWindow.Children, function(a, b)
-								return a.Label < b.Label
-							end)
-
-							modFilterWindow.Size = { 0, ((pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
-
-							break
-						end
-					end
-
-					coroutine.yield(true)
-				end
-				coroutine.yield(false)
 			end
-		end)
+		end
+
 	clearSelected.OnClick = function()
 		modFilter.selectedFilters = {}
 		self:ProcessFilters()
@@ -555,33 +544,4 @@ function PickerBaseClass:BuildFilters()
 		return not anySelected and true or false
 	end
 	--#endregion
-
-	modNameSearch.OnChange = function()
-		self:ProcessFilters()
-	end
-end
-
----@param cacheEntry string[]
----@param filterToIgnore number
-function PickerBaseClass:CheckFilterCache(cacheEntry, filterToIgnore)
-	local passes = false
-	if cacheEntry then
-		for _, templateId in ipairs(cacheEntry) do
-			---@type ItemTemplate
-			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
-			for index, predicate in ipairs(self.filterPredicates) do
-				if index ~= filterToIgnore and not predicate(itemTemplate) then
-					goto continue
-				end
-			end
-
-			passes = true
-			goto response
-
-			::continue::
-		end
-	end
-
-	::response::
-	return passes
 end
