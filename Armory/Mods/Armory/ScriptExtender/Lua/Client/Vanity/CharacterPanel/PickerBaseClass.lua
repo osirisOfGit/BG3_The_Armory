@@ -242,7 +242,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.separator:SetStyle("SeparatorTextAlign", 0.5)
 		self.separator.Font = "Large"
 
-		local toggleFilterColumn = self.window:AddImageButton("filterCol", "ico_filter", { 32, 32 })
+		local toggleFilterColumn = Styler:ImageButton(self.window:AddImageButton("filterCol", "ico_filter", { 40, 40 }))
 
 		local displayTable = self.window:AddTable("", 2)
 		displayTable:AddColumn("", "WidthFixed", math.min(350, self.window.LastSize[1] * .3))
