@@ -143,16 +143,16 @@ function DyePicker:CreateCustomFilters()
 		self:ProcessFilters()
 	end
 
-	local maxDiffText = similarColourFilter.header:AddText("Max Difference %")
-	local maxDistance = similarColourFilter.header:AddSliderInt("", 50, 0, 100)
+	local maxDiffText = similarColourFilter.header:AddText("Max Delta")
+	local maxDistance = similarColourFilter.header:AddSliderInt("", 15, 0, 100)
 	maxDistance.OnChange = function()
 		self:ProcessFilters()
 	end
 
-	local eucledianDistance = similarColourFilter.header:AddRadioButton("Euclidean Distance", true)
+	local eucledianDistance = similarColourFilter.header:AddRadioButton("Euclidean Distance", false)
 	eucledianDistance:Tooltip():AddText("\t Faster, less accurate")
 
-	local cielab94Delta = similarColourFilter.header:AddRadioButton("CIE94 Delta", false)
+	local cielab94Delta = similarColourFilter.header:AddRadioButton("CIE94 Delta", true)
 	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)")
 
 	eucledianDistance.OnActivate = function()
