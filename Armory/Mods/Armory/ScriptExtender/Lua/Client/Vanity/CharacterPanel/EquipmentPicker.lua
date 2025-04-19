@@ -233,7 +233,114 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	armorTypeFilter.header:AddNewLine()
 	--#endregion
 
-	--#region Slot filter
+	--#region Template Slot Filter
+	local templateSlotFilter = PickerBaseFilterClass:new({ label = "TemplateSlot", priority = 1 })
+	self.customFilters[templateSlotFilter.label] = templateSlotFilter
+	templateSlotFilter.header, templateSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Visual Slot"))
+
+	local templateSlotTooltip = templateSlotFilter.header:Tooltip()
+	templateSlotTooltip:AddText("\t Determined by the Template's Equipment Slot")
+
+	templateSlotFilter.selectedFilters = {}
+	local templateSlotCount = 0
+	local templateSlotGroup = templateSlotFilter.header:AddGroup("templateSlotFilter")
+
+	templateSlotFilter.apply = function(self, itemTemplate)
+		if self.header.Visible
+			and itemTemplate.Equipment
+			and itemTemplate.Equipment.Slot
+			and TableUtils:ListContains(templateSlotGroup.Children, function(value)
+				return value.Checked
+			end)
+		then
+			for _, slot in pairs(itemTemplate.Equipment.Slot) do
+				if TableUtils:ListContains(templateSlotGroup.Children, function(value)
+						---@cast value ExtuiCheckbox
+						return value.UserData == slot and value.Checked
+					end)
+				then
+					return true
+				end
+			end
+
+			return false
+		end
+		return true
+	end
+
+	templateSlotFilter.initializeUIBuilder = function(self)
+		self.filterBuilders = {}
+
+		if string.find(EquipmentPicker.slot, "Weapon") then
+			self.header.Visible = false
+			return
+		else
+			self.header.Visible = true
+		end
+
+		selectedCount = 0
+
+		self.filterTable = {}
+
+		for _, slot in ipairs(TemplateEquipmentSlot) do
+			table.insert(self.filterTable, slot)
+		end
+	end
+
+	templateSlotFilter.buildUI = function(self)
+		Helpers:KillChildren(templateSlotGroup)
+		for _, func in TableUtils:OrderedPairs(self.filterBuilders) do
+			func()
+		end
+	end
+
+	templateSlotFilter.prepareFilterUI = function(self, itemTemplate)
+		if self.header.Visible
+			and itemTemplate.Equipment
+			and itemTemplate.Equipment.Slot
+		then
+			for i, filterSlot in pairs(self.filterTable) do
+				local buildCheckbox
+
+				for _, templateSlot in pairs(itemTemplate.Equipment.Slot) do
+					if templateSlot == filterSlot then
+						buildCheckbox = true
+						break
+					end
+				end
+
+				if buildCheckbox then
+					self.filterTable[i] = nil
+					self.filterBuilders[filterSlot] = function()
+						local checkbox = templateSlotGroup:AddCheckbox(filterSlot)
+						checkbox.UserData = filterSlot
+						checkbox.Checked = self.selectedFilters[filterSlot] or false
+						templateSlotCount = templateSlotCount + (checkbox.Checked and 1 or 0)
+
+						checkbox.OnHoverEnter = function()
+							armorTypeTooltip.Visible = false
+						end
+						checkbox.OnHoverLeave = function()
+							armorTypeTooltip.Visible = true
+						end
+						checkbox.OnChange = function()
+							self.selectedFilters[filterSlot] = checkbox.Checked or nil
+							templateSlotCount = templateSlotCount + (checkbox.Checked and 1 or -1)
+
+							self.updateLabelWithCount(templateSlotCount)
+							EquipmentPicker:ProcessFilters(self.label)
+						end
+
+						self.updateLabelWithCount(templateSlotCount)
+					end
+				end
+			end
+		end
+	end
+
+	--#endregion
+
+	--#region Item Stat Slot filter
 	local equivalentSlots = {
 		["Breast"] = "VanityBody",
 		["Boots"] = "VanityBoots"
