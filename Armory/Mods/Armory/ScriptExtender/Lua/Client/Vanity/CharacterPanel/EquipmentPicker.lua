@@ -318,10 +318,10 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 						templateSlotCount = templateSlotCount + (checkbox.Checked and 1 or 0)
 
 						checkbox.OnHoverEnter = function()
-							armorTypeTooltip.Visible = false
+							templateSlotTooltip.Visible = false
 						end
 						checkbox.OnHoverLeave = function()
-							armorTypeTooltip.Visible = true
+							templateSlotTooltip.Visible = true
 						end
 						checkbox.OnChange = function()
 							self.selectedFilters[filterSlot] = checkbox.Checked or nil
