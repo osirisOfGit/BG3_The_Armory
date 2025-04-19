@@ -296,7 +296,9 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 		Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
 		local count = 0
 
-		for templateId in pairs(self.itemIndex.templateIdAndStat) do
+		for templateId in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
+			return self.itemIndex.templateIdAndTemplateName[key]
+		end) do
 			---@type ItemTemplate
 			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
