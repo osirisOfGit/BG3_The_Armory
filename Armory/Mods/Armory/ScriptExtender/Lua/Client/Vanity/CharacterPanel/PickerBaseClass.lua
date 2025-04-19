@@ -58,9 +58,7 @@ function PickerBaseClass:new(title, instance)
 	instance.modIdByModName = {}
 	instance.settings = instance.settings or {}
 	instance.blacklistedItems = {}
-	instance.filterPredicates = {}
-	instance.filterListeners = {}
-	instance.filterListenerCache = {}
+	instance.customFilters = {}
 	instance.itemIndex = title == "Equipment" and itemIndex.equipment or itemIndex.dyes
 
 	return instance
@@ -350,9 +348,7 @@ function PickerBaseClass:BuildFilters()
 	nameSearch.AutoSelectAll = true
 	nameSearch.EscapeClearsAll = true
 	nameSearch.OnChange = function()
-		if #nameSearch.Text == 0 or #nameSearch.Text >= 3 then
-			self:ProcessFilters()
-		end
+		self:ProcessFilters()
 	end
 
 	local nameFilter = PickerBaseFilterClass:new({ label = "name", priority = 10 })
@@ -381,9 +377,7 @@ function PickerBaseClass:BuildFilters()
 	idSearch.AutoSelectAll = true
 	idSearch.EscapeClearsAll = true
 	idSearch.OnChange = function()
-		if #idSearch.Text == 0 or #idSearch.Text >= 3 then
-			self:ProcessFilters()
-		end
+		self:ProcessFilters()
 	end
 
 	local idSearchFilter = PickerBaseFilterClass:new({ label = "id", priority = 10 })
