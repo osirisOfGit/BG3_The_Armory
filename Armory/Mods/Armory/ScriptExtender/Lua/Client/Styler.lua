@@ -5,16 +5,18 @@ Styler = {}
 ---@return ExtuiTree, fun(count: number)
 function Styler:DynamicLabelTree(tree)
 	local label = tree.Label
-	tree.DefaultOpen = false
+	tree.DefaultOpen = true
+	tree:SetOpen(false, "Always")
+
 	tree.SpanFullWidth = true
 
 	local isOpen = false
-	tree.OnActivate = function()
-		isOpen = true
+	tree.OnClick = function()
+		isOpen = not isOpen
 	end
 
-	tree.OnDeactivate = function()
-		isOpen = false
+	tree.OnCollapse = function()
+		tree:SetOpen(isOpen, "Always")
 	end
 
 	return tree, function(count)
