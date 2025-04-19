@@ -241,7 +241,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	statSlotFilter.header, statSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Stat Slot"))
 
 	local statSlotTooltip = statSlotFilter.header:Tooltip()
-	statSlotTooltip:AddText("\t Determined by the Template's Equipment Slot")
+	statSlotTooltip:AddText("\t Determined by the Template's Stat's Slot")
 
 	statSlotFilter.selectedFilters = {}
 	local statSlotCount = 0
