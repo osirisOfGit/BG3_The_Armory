@@ -242,13 +242,65 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.separator:SetStyle("SeparatorTextAlign", 0.5)
 		self.separator.Font = "Large"
 
+		local toggleFilterColumn = self.window:AddImageButton("filterCol", "ico_filter", { 32, 32 })
+
 		local displayTable = self.window:AddTable("", 2)
-		displayTable:AddColumn("", "WidthFixed", 400)
+		displayTable:AddColumn("", "WidthFixed", math.min(350, self.window.LastSize[1] * .3))
 		displayTable:AddColumn("", "WidthStretch")
 
 		local row = displayTable:AddRow()
 
 		self.filterGroup = row:AddCell():AddChildWindow("Filters")
+		self.filterGroup.Visible = true
+
+		-- Shoutout to Skiz for this
+		local toggleTimer
+		toggleFilterColumn.OnClick = function()
+			if not toggleTimer then
+				local cWidth = displayTable.ColumnDefs[1].Width
+				local function stepCollapse()
+					local stepDelay = 10
+					if cWidth > 0 then
+						cWidth = math.max(0, cWidth - (cWidth * 0.1)) -- Reduce by 10%
+						cWidth = cWidth < 1 and 0 or cWidth
+
+						displayTable.ColumnDefs[1].Width = cWidth
+						stepDelay = math.min(50, stepDelay * 1.02) -- Increase delay per step to make it like soft-close drawer
+						toggleTimer = Ext.Timer.WaitFor(stepDelay, stepCollapse)
+					else
+						toggleTimer = nil
+						self.filterGroup.Visible = false
+					end
+				end
+
+				local function stepExpand()
+					local stepDelay = 0.5
+
+					cWidth = cWidth == 0 and 1 or cWidth
+
+					local max = math.min(350, self.window.LastSize[1] * .3)
+
+					self.filterGroup.Visible = true
+					if cWidth < max then
+						cWidth = math.min(max, cWidth + (cWidth * 0.1))
+						displayTable.ColumnDefs[1].Width = cWidth
+
+						stepDelay = math.min(50, stepDelay)
+						toggleTimer = Ext.Timer.WaitFor(stepDelay, stepExpand)
+					else
+						toggleTimer = nil
+					end
+				end
+
+				if not self.filterGroup.Visible then
+					stepExpand()
+				else
+					stepCollapse()
+				end
+			else
+				toggleTimer = false
+			end
+		end
 
 		self.otherGroup = row:AddCell():AddChildWindow("RestOfTheOwl")
 
@@ -432,6 +484,8 @@ function PickerBaseClass:BuildFilters()
 	local modFilterWindow = modGroup:AddChildWindow("modFilters")
 	modFilterWindow.NoResize = true
 
+	modGroup:AddNewLine()
+
 	local modFilter = PickerBaseFilterClass:new({ label = "ModFilter", priority = 99 })
 	self.customFilters[modFilter.label] = modFilter
 
@@ -487,7 +541,7 @@ function PickerBaseClass:BuildFilters()
 
 						updateLabelWithCount(selectedCount)
 
-						modFilterWindow.Size = { 0, ((pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
+						modFilterWindow.Size = { 0, math.max(130, (pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
 					end
 
 					break

@@ -62,7 +62,7 @@ local function calculateEuclideanDistance(baseColor, otherColor)
 end
 
 --- http://www.easyrgb.com/en/math.php
----@param color number[]
+---@param color number[] SRGB / 255
 ---@return number[]
 local function convertToXYZ(color)
 	color = TableUtils:DeeplyCopyTable(color)
