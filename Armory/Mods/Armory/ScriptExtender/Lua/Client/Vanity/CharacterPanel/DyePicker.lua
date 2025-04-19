@@ -122,7 +122,7 @@ local function calculateCIE94Delta(baseCIE, otherCIE)
 	return maxDelta and ((delta / maxDelta) * 100) or delta
 end
 
-maxDelta = calculateCIE94Delta(convertToCIELAB(convertToXYZ({ 255, 255, 255 }), convertToCIELAB(convertToXYZ({ 0, 0, 0 }))))
+maxDelta = calculateCIE94Delta(convertToCIELAB(convertToXYZ({ 255, 255, 255 })), convertToCIELAB(convertToXYZ({ 0, 0, 0 })))
 
 function DyePicker:CreateCustomFilters()
 	local similarColourFilter = PickerBaseFilterClass:new({ label = "similarColor", priority = 1000 })
@@ -142,7 +142,7 @@ function DyePicker:CreateCustomFilters()
 	eucledianDistance:Tooltip():AddText("\t Faster, less accurate")
 
 	local cielab94Delta = header:AddRadioButton("CIE94 Delta", false)
-	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1) (don't @ me CIE2000 nerds, I ain't that smart)")
+	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1) \n(don't @ me CIE2000 nerds, I ain't that smart)")
 
 	eucledianDistance.OnChange = function()
 		cielab94Delta.Active = not eucledianDistance.Active
