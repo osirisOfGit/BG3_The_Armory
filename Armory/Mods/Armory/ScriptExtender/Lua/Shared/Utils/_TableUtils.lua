@@ -98,13 +98,12 @@ function TableUtils:TablesAreEqual(first, second)
 	return true
 end
 
-
 --- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
 --- Optionally accepts a function to transform the key for sorting and returning
 ---@generic K
 ---@generic V
 ---@param t table<K,V>
----@param keyTransformFunc fun(key: string):string?
+---@param keyTransformFunc (fun(key: string):any)?
 ---@return fun(table: table<K, V>, index?: K):K, V
 function TableUtils:OrderedPairs(t, keyTransformFunc)
 	local keys = {}
@@ -128,13 +127,20 @@ function TableUtils:OrderedPairs(t, keyTransformFunc)
 	end
 end
 
----@param list table
----@param str string
+---@generic K, V
+---@param list table<K, V>
+---@param str string|fun(value: V): boolean
 ---@return boolean, any?
 function TableUtils:ListContains(list, str)
 	for i, value in pairs(list) do
-		if value == str then
-			return true, i
+		if type(str) == "string" then
+			if value == str then
+				return true, i
+			end
+		elseif type(str) == "function" then
+			if str(value) then
+				return true, i
+			end
 		end
 	end
 	return false
@@ -175,4 +181,14 @@ function TableUtils:CombinedPairs(...)
 			end
 		end
 	end
+end
+
+---@param tbl table
+---@return number
+function TableUtils:CountElements(tbl)
+	local count = 0
+	for _, value in pairs(tbl) do
+		count = count + 1
+	end
+	return count
 end

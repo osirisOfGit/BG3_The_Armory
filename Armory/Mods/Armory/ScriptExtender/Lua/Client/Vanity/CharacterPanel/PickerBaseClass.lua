@@ -1,9 +1,15 @@
+Ext.Require("Client/Vanity/CharacterPanel/PickerBaseFilterClass.lua")
+
 local itemIndex = {
 	---@class SearchIndex
 	equipment = {
+		---@type {[string]: string}
 		templateIdAndStat = {},
+		---@type {[string]: string}
 		templateIdAndTemplateName = {},
+		---@type {[string]: string[]}
 		modIdAndTemplateIds = {},
+		---@type {[string]: string}
 		mods = {}
 	},
 	dyes = {
@@ -30,6 +36,10 @@ PickerBaseClass = {
 	itemIndex = {},
 	---@type ExtuiGroup
 	warningGroup = nil,
+	---@type ExtuiChildWindow
+	filterGroup = nil,
+	---@type {[string]: PickerBaseFilterClass}
+	customFilters = {},
 }
 
 ---@param title "Equipment"|"Dyes"
@@ -48,6 +58,7 @@ function PickerBaseClass:new(title, instance)
 	instance.modIdByModName = {}
 	instance.settings = instance.settings or {}
 	instance.blacklistedItems = {}
+	instance.customFilters = {}
 	instance.itemIndex = title == "Equipment" and itemIndex.equipment or itemIndex.dyes
 
 	return instance
@@ -187,7 +198,7 @@ function PickerBaseClass:InitializeSearchBank()
 	Logger:BasicInfo("Indexed %d armor/weapons and dyes from %d mods in %dms", itemCount, modCount, Ext.Utils.MonotonicTime() - startTime)
 end
 
-function PickerBaseClass:DisplayResult(templateName, group) end
+function PickerBaseClass:DisplayResult(template, group) end
 
 function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 	self.slot = slot
@@ -201,8 +212,6 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window.Closeable = true
 		self.window.MenuBar = true
 		self.window.OnClose = function()
-			self.searchInput.Text = ""
-			self.getAllForModCombo.SelectedIndex = -1
 			Ext.Timer.WaitFor(60, function()
 				onCloseFunc()
 			end)
@@ -217,7 +226,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		showNameCheckbox.SameLine = true
 		showNameCheckbox.OnChange = function()
 			self.settings.showNames = showNameCheckbox.Checked
-			self:RebuildDisplay()
+			self:ProcessFilters()
 		end
 
 		self.settingsMenu:AddSeparator()
@@ -226,72 +235,105 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		local imageSizeSetting = self.settingsMenu:AddSliderInt("", self.settings.imageSize, 10, 200)
 		imageSizeSetting.OnChange = function()
 			self.settings.imageSize = imageSizeSetting.Value[1]
-			self:RebuildDisplay()
+			self:ProcessFilters()
 		end
 
 		self.separator = self.window:AddSeparatorText("")
 		self.separator:SetStyle("SeparatorTextAlign", 0.5)
 		self.separator.Font = "Large"
 
-		self.searchInput = self.window:AddInputText("")
-		self.searchInput.Hint = "Case-insensitive, min 3 characters"
-		self.searchInput.AutoSelectAll = true
-		self.searchInput.EscapeClearsAll = true
-		local delayTimer
-		self.searchInput.OnChange = function()
-			if delayTimer then
-				Ext.Timer.Cancel(delayTimer)
-			end
+		local toggleFilterColumn = Styler:ImageButton(self.window:AddImageButton("filterCol", "ico_filter", { 40, 40 }))
 
-			self.getAllForModCombo.SelectedIndex = -1
+		local displayTable = self.window:AddTable("", 2)
+		displayTable:AddColumn("", "WidthFixed", 400)
+		displayTable:AddColumn("", "WidthStretch")
 
-			delayTimer = Ext.Timer.WaitFor(150, function()
-				Helpers:KillChildren(self.resultsGroup)
+		local row = displayTable:AddRow()
 
-				self.rowCount = 0
-				local upperSearch
-				if #self.searchInput.Text >= 3 then
-					upperSearch = string.upper(self.searchInput.Text)
-				end
+		self.filterGroup = row:AddCell():AddChildWindow("Filters")
+		self.filterGroup.Visible = true
 
-				for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
-					return self.itemIndex.templateIdAndTemplateName[key]
-				end) do
-					if not upperSearch or string.find(string.upper(templateName), upperSearch) then
-						self:DisplayResult(templateId, self.resultsGroup)
+		-- Shoutout to Skiz for this
+		local toggleTimer
+		toggleFilterColumn.OnClick = function()
+			if not toggleTimer then
+				local cWidth = displayTable.ColumnDefs[1].Width
+				local stepDelay = 10
+				local function stepCollapse()
+					if cWidth > 0 then
+						cWidth = math.max(0, cWidth - (cWidth * 0.1)) -- Reduce by 10%
+						cWidth = cWidth < 10 and 0 or cWidth
+
+						displayTable.ColumnDefs[1].Width = cWidth
+						stepDelay = math.min(50, stepDelay * 1.02) -- Increase delay per step to make it like soft-close drawer
+						toggleTimer = Ext.Timer.WaitFor(stepDelay, stepCollapse)
+					else
+						toggleTimer = nil
+						self.filterGroup.Visible = false
+						-- EquipmentPicker auto determines entries per row based on childWindow size, Dyes don't
+						if self.slot then
+							self:ProcessFilters()
+						end
 					end
 				end
-			end)
-		end
 
-		self.window:AddText("List all items by mod - will be cleared if above search is used")
+				local widthStep = 1
+				local function stepExpand()
+					cWidth = cWidth == 0 and 1 or cWidth
 
-		self.getAllForModCombo = self.window:AddCombo("")
-		self.getAllForModCombo.WidthFitPreview = true
-		local modOpts = {}
-		for modName, _ in TableUtils:OrderedPairs(self.itemIndex.mods) do
-			table.insert(modOpts, modName)
-		end
-		table.sort(modOpts)
-		self.getAllForModCombo.Options = modOpts
-		self.getAllForModCombo.OnChange = function()
-			Helpers:KillChildren(self.resultsGroup)
-			-- \[[[^_^]]]/
-			for _, templateId in ipairs(self.itemIndex.modIdAndTemplateIds[self.itemIndex.mods[self.getAllForModCombo.Options[self.getAllForModCombo.SelectedIndex + 1]]]) do
-				self:DisplayResult(templateId, self.resultsGroup)
+					local max = math.min(350, self.window.LastSize[1] * .3)
+
+					self.filterGroup.Visible = true
+					if cWidth < max then
+						widthStep = math.max(0.01, widthStep - (widthStep * .125))
+
+						cWidth = math.min(max, cWidth + (cWidth * widthStep))
+						displayTable.ColumnDefs[1].Width = cWidth
+
+						stepDelay = math.min(50, stepDelay)
+						toggleTimer = Ext.Timer.WaitFor(stepDelay, stepExpand)
+					else
+						toggleTimer = nil
+						-- EquipmentPicker auto determines entries per row based on childWindow size, Dyes don't
+						if self.slot then
+							self:ProcessFilters()
+						end
+					end
+				end
+
+				if not self.filterGroup.Visible then
+					stepExpand()
+				else
+					if cWidth == 0 then
+						cWidth = math.min(350, self.window.LastSize[1] * .3)
+					end
+					stepCollapse()
+				end
+			else
+				toggleTimer = false
 			end
 		end
 
-		self.warningGroup = self.window:AddGroup("WarningGroup")
+		self.otherGroup = row:AddCell():AddGroup("RestOfTheOwl")
 
-		self.favoritesGroup = self.window:AddCollapsingHeader("Favorites")
+		self.warningGroup = self.otherGroup:AddGroup("WarningGroup")
+
+		self.favoritesGroup = self.otherGroup:AddCollapsingHeader("Favorites")
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
-		self.window:AddNewLine()
+		self.otherGroup:AddNewLine()
 
-		self.resultSeparator = self.window:AddSeparatorText("Results")
-		self.resultsGroup = self.window:AddGroup(self.title .. "Results")
+		if self.slot then
+			local refreshViewButton = Styler:ImageButton(self.otherGroup:AddImageButton("", "ico_reset_d", { 32, 32 }))
+			refreshViewButton:Tooltip():AddText("\t Refresh the display view, recomputing items per row")
+			refreshViewButton.OnClick = function()
+				self:ProcessFilters()
+			end
+		end
+		self.resultSeparator = self.otherGroup:AddSeparatorText("Results")
+		self.resultsGroup = self.otherGroup:AddChildWindow(self.title .. "Results")
 
 		customizeFunc()
+		self:BuildFilters()
 	else
 		if not self.window.Open then
 			self.window.Open = true
@@ -301,29 +343,252 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 	self.separator.Label = string.format("Searching for %s %s", slot, self.title)
 
-	self:RebuildDisplay()
+	self:ProcessFilters()
 end
 
-function PickerBaseClass:RebuildDisplay()
-	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
-
-	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
-		return self.itemIndex.templateIdAndTemplateName[key]
-	end) do
-		self:DisplayResult(templateId, self.favoritesGroup)
+local timer
+function PickerBaseClass:ProcessFilters(listenerToIgnore)
+	if timer then
+		Ext.Timer.Cancel(timer)
 	end
+	timer = Ext.Timer.WaitFor(300, function()
+		---@type {[string]: PickerBaseFilterClass}
+		local filterBuildersToRun = {}
 
-	if #self.searchInput.Text >= 3 then
-		self.searchInput.OnChange()
-	elseif self.getAllForModCombo.SelectedIndex > -1 then
-		self.getAllForModCombo.OnChange()
-	else
-		for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
+		for label, filter in pairs(self.customFilters) do
+			if label ~= listenerToIgnore and filter.prepareFilterUI then
+				filterBuildersToRun[label] = filter
+				filter:initializeUIBuilder()
+			end
+		end
+
+		Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
+		local count = 0
+
+		for templateId in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
 			return self.itemIndex.templateIdAndTemplateName[key]
 		end) do
-			if self.title ~= "Dyes" or not string.find(templateName, "FOCUSDYES_MiraculousDye") then
-				self:DisplayResult(templateId, self.resultsGroup)
+			---@type ItemTemplate
+			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
+
+			local failedPredicate
+			for label, filter in TableUtils:OrderedPairs(self.customFilters, function(key)
+				return self.customFilters[key].priority
+			end) do
+				if not filter:apply(itemTemplate) then
+					if not failedPredicate and filter.prepareFilterUI then
+						failedPredicate = label
+					else
+						goto next_template
+					end
+				end
+			end
+
+			for label, filter in pairs(filterBuildersToRun) do
+				if not failedPredicate or failedPredicate == label then
+					filter:prepareFilterUI(itemTemplate)
+				end
+			end
+
+			if not failedPredicate then
+				self:DisplayResult(itemTemplate, self.favoritesGroup)
+				self:DisplayResult(itemTemplate, self.resultsGroup)
+				count = count + 1
+			end
+
+			::next_template::
+		end
+
+		for _, filter in pairs(filterBuildersToRun) do
+			filter:buildUI()
+		end
+
+		self.resultSeparator.Label = ("%s Results"):format(count)
+	end)
+end
+
+function PickerBaseClass:CreateCustomFilters() end
+
+function PickerBaseClass:BuildFilters()
+	local pickerInstance = self
+
+	--#region Search By Name
+	self.filterGroup:AddText("By Name")
+	local nameSearch = self.filterGroup:AddInputText("")
+	nameSearch.Hint = "Case-insensitive, min 3 characters"
+	nameSearch.AutoSelectAll = true
+	nameSearch.EscapeClearsAll = true
+	nameSearch.OnChange = function()
+		self:ProcessFilters()
+	end
+
+	local nameFilter = PickerBaseFilterClass:new({ label = "name", priority = 10 })
+	self.customFilters[nameFilter.label] = nameFilter
+	---@param itemTemplate ItemTemplate
+	---@return boolean
+	nameFilter.apply = function(self, itemTemplate)
+		if #nameSearch.Text >= 3 then
+			local upperSearch = string.upper(nameSearch.Text)
+
+			if not upperSearch or string.find(string.upper(pickerInstance.itemIndex.templateIdAndTemplateName[itemTemplate.Id]), upperSearch) then
+				return true
+			else
+				return false
+			end
+		else
+			return true
+		end
+	end
+	--#endregion
+
+	--#region Search By Id
+	self.filterGroup:AddText("By UUID")
+	local idSearch = self.filterGroup:AddInputText("")
+	idSearch.Hint = "Case-insensitive, min 3 characters"
+	idSearch.AutoSelectAll = true
+	idSearch.EscapeClearsAll = true
+	idSearch.OnChange = function()
+		self:ProcessFilters()
+	end
+
+	local idSearchFilter = PickerBaseFilterClass:new({ label = "id", priority = 10 })
+	self.customFilters[idSearchFilter.label] = idSearchFilter
+
+	---@param itemTemplate ItemTemplate
+	---@return boolean
+	idSearchFilter.apply = function(self, itemTemplate)
+		if #idSearch.Text >= 3 then
+			local upperSearch = string.upper(idSearch.Text)
+
+			if not upperSearch or string.find(string.upper(itemTemplate.Id), upperSearch) then
+				return true
+			else
+				return false
+			end
+		end
+		return true
+	end
+	--#endregion
+
+	self.filterGroup:AddNewLine()
+
+	--#region Mod Picker
+	local modTitleHeader, updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Mod(s)"))
+	-- Stops empty tree from firing activation and deactivation events on one click
+	modTitleHeader:AddDummy(0, 0)
+
+	local modGroup = self.filterGroup:AddGroup("modGroupBecauseCollapseKeepsResettingScroll")
+
+	modGroup.Visible = false
+	modTitleHeader.OnExpand = function()
+		modGroup.Visible = true
+	end
+
+	modTitleHeader.OnCollapse = function()
+		modGroup.Visible = false
+	end
+
+	local modNameSearch = modGroup:AddInputText("")
+	modNameSearch.Hint = "Mod Name - Case-insensitive"
+	modNameSearch.AutoSelectAll = true
+	modNameSearch.EscapeClearsAll = true
+	modNameSearch.OnChange = function()
+		self:ProcessFilters()
+	end
+
+	local clearSelected = Styler:ImageButton(modGroup:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
+	clearSelected.SameLine = true
+	clearSelected:Tooltip():AddText("\t Clear Selected Mods")
+
+	local modFilterWindow = modGroup:AddChildWindow("modFilters")
+	modFilterWindow.NoResize = true
+
+	modGroup:AddNewLine()
+
+	local modFilter = PickerBaseFilterClass:new({ label = "ModFilter", priority = 99 })
+	self.customFilters[modFilter.label] = modFilter
+
+	local selectedCount = 0
+	modFilter.initializeUIBuilder = function(self)
+		selectedCount = 0
+		local upperSearch = string.upper(modNameSearch.Text)
+		self.filterBuilders = {}
+		self.filterTable = {}
+		for modName, modId in pairs(pickerInstance.itemIndex.mods) do
+			if not upperSearch or string.find(string.upper(modName), upperSearch) then
+				self.filterTable[modName] = pickerInstance.itemIndex.modIdAndTemplateIds[modId]
 			end
 		end
 	end
+
+	modFilter.selectedFilters = {}
+
+	modFilter.buildUI = function(self)
+		Helpers:KillChildren(modFilterWindow)
+		for _, func in TableUtils:OrderedPairs(self.filterBuilders) do
+			func()
+		end
+	end
+
+	modFilter.prepareFilterUI =
+	---@param self PickerBaseFilterClass
+	---@param itemTemplate ItemTemplate
+		function(self, itemTemplate)
+			for modName, templateIds in pairs(self.filterTable) do
+				if TableUtils:ListContains(templateIds, itemTemplate.Id) then
+					self.filterTable[modName] = nil
+
+					self.filterBuilders[modName] = function()
+						---@type ExtuiSelectable
+						local selectable = modFilterWindow:AddSelectable(modName)
+						-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
+						-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
+						selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
+						selectable.UserData = pickerInstance.itemIndex.mods[modName]
+						selectable.Selected = self.selectedFilters[selectable.UserData] or false
+
+						selectedCount = selectedCount + (selectable.Selected and 1 or 0)
+
+						selectable.OnClick = function()
+							self.selectedFilters[selectable.UserData] = selectable.Selected
+
+							selectedCount = selectedCount + (selectable.Selected and 1 or -1)
+							updateLabelWithCount(selectedCount)
+
+							pickerInstance:ProcessFilters(self.label)
+						end
+
+						updateLabelWithCount(selectedCount)
+
+						modFilterWindow.Size = { 0, math.max(130, (pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
+					end
+
+					break
+				end
+			end
+		end
+
+	clearSelected.OnClick = function()
+		modFilter.selectedFilters = {}
+		self:ProcessFilters()
+	end
+
+	modFilter.apply = function(self, itemTemplate)
+		local anySelected = false
+
+		for _, selectable in ipairs(modFilterWindow.Children) do
+			---@cast selectable ExtuiSelectable
+			if selectable.Selected then
+				anySelected = true
+				if TableUtils:ListContains(pickerInstance.itemIndex.modIdAndTemplateIds[selectable.UserData], itemTemplate.Id) then
+					return true
+				end
+			end
+		end
+
+		return not anySelected and true or false
+	end
+	--#endregion
+
+	self:CreateCustomFilters()
 end
