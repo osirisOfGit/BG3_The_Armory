@@ -46,26 +46,35 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 		return true
 	end
 
+	local selectedCount = 0
 	equipmentRaceFilter.initializeUIBuilder = function(self)
+		self.filterBuilders = {}
+		
 		if string.find(EquipmentPicker.slot, "Weapon") then
 			self.header.Visible = false
+			self.filterTable = {}
 			return
 		else
 			self.header.Visible = true
 		end
-		Helpers:KillChildren(raceGroup)
+
+		selectedCount = 0
 
 		self.filterTable = TableUtils:DeeplyCopyTable(EquipmentRace)
 	end
 
-	equipmentRaceFilter.buildFilterUI =
+	equipmentRaceFilter.buildUI = function(self)
+		Helpers:KillChildren(raceGroup)
+		for _, func in TableUtils:OrderedPairs(self.filterBuilders) do
+			func()
+		end
+	end
+
+	equipmentRaceFilter.prepareFilterUI =
 	---@param self PickerBaseFilterClass
 	---@param itemTemplate ItemTemplate
 		function(self, itemTemplate)
-			local selectedCount = 0
-
 			for bodyType, id in pairs(self.filterTable) do
-				-- local buildRaceFilter = self:CheckFilterCache(self.filterListenerCache["EquipmentRace"][id], filterIndex)
 				local buildRaceFilter
 
 				if itemTemplate.Equipment and itemTemplate.Equipment.Visuals then
@@ -80,30 +89,28 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 				if buildRaceFilter then
 					self.filterTable[bodyType] = nil
 
-					local checkbox = raceGroup:AddCheckbox(bodyType)
-					checkbox.UserData = id
-					checkbox.Checked = self.selectedFilters[id] or false
-					selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+					self.filterBuilders[bodyType] = function()
+						local checkbox = raceGroup:AddCheckbox(bodyType)
+						checkbox.UserData = id
+						checkbox.Checked = self.selectedFilters[id] or false
+						selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
 
-					checkbox.OnChange = function()
-						self.selectedFilters[checkbox.UserData] = checkbox.Checked or nil
-						selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+						checkbox.OnChange = function()
+							self.selectedFilters[checkbox.UserData] = checkbox.Checked or nil
+							selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+							self.updateLabelWithCount(selectedCount)
+							EquipmentPicker:ProcessFilters(equipmentRaceFilter.label)
+						end
+
+						checkbox.OnHoverEnter = function()
+							tooltip.Visible = false
+						end
+
+						checkbox.OnHoverLeave = function()
+							tooltip.Visible = true
+						end
 						self.updateLabelWithCount(selectedCount)
-						EquipmentPicker:ProcessFilters(equipmentRaceFilter.label)
 					end
-
-					checkbox.OnHoverEnter = function()
-						tooltip.Visible = false
-					end
-
-					checkbox.OnHoverLeave = function()
-						tooltip.Visible = true
-					end
-					self.updateLabelWithCount(selectedCount)
-
-					table.sort(raceGroup.Children, function(a, b)
-						return a.Label < b.Label
-					end)
 				end
 			end
 		end
@@ -142,15 +149,18 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 
 	armorTypeFilter.selectedFilters = {}
 
-
+	local selectedCount = 0
 	armorTypeFilter.initializeUIBuilder = function(self)
+		self.filterBuilders = {}
+
 		if string.find(EquipmentPicker.slot, "Weapon") then
 			self.header.Visible = false
 			return
 		else
 			self.header.Visible = true
 		end
-		Helpers:KillChildren(armorTypeGroup)
+
+		selectedCount = 0
 
 		self.filterTable = { "None" }
 
@@ -161,12 +171,17 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 		end
 	end
 
-	armorTypeFilter.buildFilterUI =
+	armorTypeFilter.buildUI = function(self)
+		Helpers:KillChildren(armorTypeGroup)
+		for _, func in TableUtils:OrderedPairs(self.filterBuilders) do
+			func()
+		end
+	end
+
+	armorTypeFilter.prepareFilterUI =
 	---@param self PickerBaseFilterClass
 	---@param itemTemplate ItemTemplate
 		function(self, itemTemplate)
-			local selectedCount = 0
-
 			for i, armorType in pairs(self.filterTable) do
 				armorType = tostring(armorType)
 
@@ -182,25 +197,77 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 
 				if buildArmorType then
 					self.filterTable[i] = nil
-					local checkbox = armorTypeGroup:AddCheckbox(armorType)
-					checkbox.UserData = armorType
-					checkbox.Checked = self.selectedFilters[armorType] or false
-					selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
-					checkbox.OnChange = function()
-						self.selectedFilters[armorType] = checkbox.Checked or nil
-						selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+					self.filterBuilders[armorType] = function()
+						local checkbox = armorTypeGroup:AddCheckbox(armorType)
+						checkbox.UserData = armorType
+						checkbox.Checked = self.selectedFilters[armorType] or false
+						selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+						checkbox.OnChange = function()
+							self.selectedFilters[armorType] = checkbox.Checked or nil
+							selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+
+							self.updateLabelWithCount(selectedCount)
+							EquipmentPicker:ProcessFilters(armorTypeFilter.label)
+						end
 
 						self.updateLabelWithCount(selectedCount)
-						EquipmentPicker:ProcessFilters(armorTypeFilter.label)
 					end
-
-					self.updateLabelWithCount(selectedCount)
-					table.sort(armorTypeGroup.Children, function(a, b)
-						return a.Label < b.Label
-					end)
 				end
 			end
 		end
+	--#endregion
+
+	--#region Slot filter
+	local equivalentSlots = {
+		["Breast"] = "VanityBody",
+		["Boots"] = "VanityBoots"
+	}
+
+	local itemTypeFilter = PickerBaseFilterClass:new({ label = "SlotType", priority = 1 })
+	self.customFilters[itemTypeFilter.label] = itemTypeFilter
+	itemTypeFilter.apply = function(self, itemTemplate)
+		local itemTemplateId = itemTemplate.Id
+
+		---@type Armor|Weapon|Object
+		local itemStat = Ext.Stats.Get(EquipmentPicker.itemIndex.templateIdAndStat[itemTemplateId])
+
+		-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
+		local matchesSlot = itemStat.Slot == EquipmentPicker.slot
+
+		if EquipmentPicker.weaponType and not string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), EquipmentPicker.weaponType) then
+			return false
+		elseif EquipmentPicker.slot == "LightSource" and itemStat.ItemGroup ~= "Torch" then
+			return false
+		elseif not matchesSlot and EquipmentPicker.slot ~= "LightSource" then
+			local canGoInOffhand = true
+			if string.find(EquipmentPicker.slot, "Offhand") and string.find(itemStat.Slot, "Main") and EquipmentPicker.slot == string.gsub(itemStat.Slot, "Main", "Offhand") then
+				for _, property in pairs(itemStat["Weapon Properties"]) do
+					if property == "Heavy" or property == "Twohanded" then
+						canGoInOffhand = false
+						break
+					end
+				end
+			else
+				canGoInOffhand = false
+			end
+
+			local isEquivalentSlot = false
+			for slot1, slot2 in pairs(equivalentSlots) do
+				if (slot1 == EquipmentPicker.slot and string.find(slot2, itemStat.Slot))
+					or (slot2 == EquipmentPicker.slot and string.find(slot1, itemStat.Slot))
+				then
+					isEquivalentSlot = true
+					break
+				end
+			end
+
+			if not canGoInOffhand and not isEquivalentSlot then
+				return false
+			end
+		end
+
+		return true
+	end
 	--#endregion
 end
 
@@ -213,11 +280,6 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	self.onSelectFunc = onSelectFunc
 	self.vanityOutfitSlot = outfitSlot
 
-	local equivalentSlots = {
-		["Breast"] = "VanityBody",
-		["Boots"] = "VanityBoots"
-	}
-
 	PickerBaseClass.OpenWindow(self,
 		slot,
 		function()
@@ -225,7 +287,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			local perRowSetting = self.settingsMenu:AddSliderInt("", self.settings.rowSize, 0, 10)
 			perRowSetting.OnChange = function()
 				self.settings.rowSize = perRowSetting.Value[1]
-				self:RebuildDisplay()
+				self:ProcessFilters()
 			end
 
 			self.settingsMenu:AddText("Apply Dye?")
@@ -233,52 +295,6 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			applyDyeCheckbox.SameLine = true
 			applyDyeCheckbox.OnChange = function()
 				self.settings.applyDyesWhenPreviewingEquipment = applyDyeCheckbox.Checked
-			end
-
-			local itemTypeFilter = PickerBaseFilterClass:new({ label = "SlotType", priority = 1 })
-			self.customFilters[itemTypeFilter.label] = itemTypeFilter
-			itemTypeFilter.apply = function(self, itemTemplate)
-				local itemTemplateId = itemTemplate.Id
-
-				---@type Armor|Weapon|Object
-				local itemStat = Ext.Stats.Get(EquipmentPicker.itemIndex.templateIdAndStat[itemTemplateId])
-
-				-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
-				local matchesSlot = itemStat.Slot == EquipmentPicker.slot
-
-				if EquipmentPicker.weaponType and not string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), EquipmentPicker.weaponType) then
-					return false
-				elseif EquipmentPicker.slot == "LightSource" and itemStat.ItemGroup ~= "Torch" then
-					return false
-				elseif not matchesSlot and EquipmentPicker.slot ~= "LightSource" then
-					local canGoInOffhand = true
-					if string.find(EquipmentPicker.slot, "Offhand") and string.find(itemStat.Slot, "Main") and EquipmentPicker.slot == string.gsub(itemStat.Slot, "Main", "Offhand") then
-						for _, property in pairs(itemStat["Weapon Properties"]) do
-							if property == "Heavy" or property == "Twohanded" then
-								canGoInOffhand = false
-								break
-							end
-						end
-					else
-						canGoInOffhand = false
-					end
-
-					local isEquivalentSlot = false
-					for slot1, slot2 in pairs(equivalentSlots) do
-						if (slot1 == EquipmentPicker.slot and string.find(slot2, itemStat.Slot))
-							or (slot2 == EquipmentPicker.slot and string.find(slot1, itemStat.Slot))
-						then
-							isEquivalentSlot = true
-							break
-						end
-					end
-
-					if not canGoInOffhand and not isEquivalentSlot then
-						return false
-					end
-				end
-
-				return true
 			end
 		end,
 		function()
@@ -342,7 +358,7 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 		else
 			table.remove(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteIndex)
 		end
-		self:RebuildDisplay()
+		self:ProcessFilters()
 	end
 
 	icon.OnHoverEnter = function()

@@ -1,3 +1,5 @@
+-- This is a mess :/ But performance was really crappy when this was neat, because i was running filters multiple times per event
+-- Optimizing seems to require a three-phase process
 ---@class PickerBaseFilterClass
 PickerBaseFilterClass = {
 	---@type string
@@ -12,7 +14,11 @@ PickerBaseFilterClass = {
 	filterTable = nil,
 	-- A persistent coroutine.wrap function - must not be recreated after initialization to preserve imgui function references
 	---@type fun(self: PickerBaseFilterClass, itemTemplate: ItemTemplate)?
-	buildFilterUI = nil,
+	prepareFilterUI = nil,
+	---@type {[string]: fun()}
+	filterBuilders = nil,
+	---@type fun(self: PickerBaseFilterClass)?
+	buildUI = nil,
 	---@type fun(self: PickerBaseFilterClass, itemTemplate: ItemTemplate):boolean
 	apply = nil,
 }

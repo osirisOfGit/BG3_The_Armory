@@ -228,7 +228,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		showNameCheckbox.SameLine = true
 		showNameCheckbox.OnChange = function()
 			self.settings.showNames = showNameCheckbox.Checked
-			self:RebuildDisplay()
+			self:ProcessFilters()
 		end
 
 		self.settingsMenu:AddSeparator()
@@ -237,7 +237,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		local imageSizeSetting = self.settingsMenu:AddSliderInt("", self.settings.imageSize, 10, 200)
 		imageSizeSetting.OnChange = function()
 			self.settings.imageSize = imageSizeSetting.Value[1]
-			self:RebuildDisplay()
+			self:ProcessFilters()
 		end
 
 		self.separator = self.window:AddSeparatorText("")
@@ -277,34 +277,6 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 	self:ProcessFilters()
 end
 
-function PickerBaseClass:RebuildDisplay()
-	Helpers:KillChildren(self.favoritesGroup, self.resultsGroup)
-
-	local count = 0
-
-	for templateId, templateName in TableUtils:OrderedPairs(self.itemIndex.templateIdAndTemplateName, function(key)
-		return self.itemIndex.templateIdAndTemplateName[key]
-	end) do
-		---@type ItemTemplate
-		local template = Ext.Template.GetRootTemplate(templateId)
-		for _, predicate in ipairs(self.filterPredicates) do
-			local success, result = pcall(function(...)
-				return predicate(template)
-			end)
-
-			if success and not result then
-				goto continue
-			end
-		end
-		self:DisplayResult(template, self.favoritesGroup)
-		self:DisplayResult(template, self.resultsGroup)
-		count = count + 1
-		::continue::
-	end
-
-	self.resultSeparator.Label = ("%s Results"):format(count)
-end
-
 local timer
 function PickerBaseClass:ProcessFilters(listenerToIgnore)
 	if timer then
@@ -315,7 +287,7 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 		local filterBuildersToRun = {}
 
 		for label, filter in pairs(self.customFilters) do
-			if label ~= listenerToIgnore and filter.buildFilterUI then
+			if label ~= listenerToIgnore and filter.prepareFilterUI then
 				filterBuildersToRun[label] = filter
 				filter:initializeUIBuilder()
 			end
@@ -333,7 +305,7 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 				return self.customFilters[key].priority
 			end) do
 				if not filter:apply(itemTemplate) then
-					if not failedPredicate and filter.buildFilterUI then
+					if not failedPredicate and filter.prepareFilterUI then
 						failedPredicate = label
 					else
 						goto next_template
@@ -343,7 +315,7 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 
 			for label, filter in pairs(filterBuildersToRun) do
 				if failedPredicate ~= label then
-					filter:buildFilterUI(itemTemplate)
+					filter:prepareFilterUI(itemTemplate)
 				end
 			end
 
@@ -354,6 +326,10 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 			end
 
 			::next_template::
+		end
+
+		for _, filter in pairs(filterBuildersToRun) do
+			filter:buildUI()
 		end
 
 		self.resultSeparator.Label = ("%s Results"):format(count)
@@ -468,10 +444,11 @@ function PickerBaseClass:BuildFilters()
 	local modFilter = PickerBaseFilterClass:new({ label = "ModFilter", priority = 99 })
 	self.customFilters[modFilter.label] = modFilter
 
+	local selectedCount = 0
 	modFilter.initializeUIBuilder = function(self)
-		Helpers:KillChildren(modFilterWindow)
+		selectedCount = 0
 		local upperSearch = string.upper(modNameSearch.Text)
-
+		self.filterBuilders = {}
 		self.filterTable = {}
 		for modName, modId in pairs(pickerInstance.itemIndex.mods) do
 			if not upperSearch or string.find(string.upper(modName), upperSearch) then
@@ -482,42 +459,45 @@ function PickerBaseClass:BuildFilters()
 
 	modFilter.selectedFilters = {}
 
-	modFilter.buildFilterUI =
+	modFilter.buildUI = function(self)
+		Helpers:KillChildren(modFilterWindow)
+		for _, func in TableUtils:OrderedPairs(self.filterBuilders) do
+			func()
+		end
+	end
+
+	modFilter.prepareFilterUI =
 	---@param self PickerBaseFilterClass
 	---@param itemTemplate ItemTemplate
 		function(self, itemTemplate)
-			local selectedCount = 0
-
 			for modName, templateIds in pairs(self.filterTable) do
 				if TableUtils:ListContains(templateIds, itemTemplate.Id) then
 					self.filterTable[modName] = nil
 
-					---@type ExtuiSelectable
-					local selectable = modFilterWindow:AddSelectable(modName)
-					-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
-					-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
-					selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
-					selectable.UserData = pickerInstance.itemIndex.mods[modName]
-					selectable.Selected = self.selectedFilters[selectable.UserData] or false
+					self.filterBuilders[modName] = function()
+						---@type ExtuiSelectable
+						local selectable = modFilterWindow:AddSelectable(modName)
+						-- Selectable Active Bg inherits from the collapsible Header color, so resetting to default per
+						-- https://github.com/Norbyte/bg3se/blob/f8b982125c6c1997ceab2d65cfaa3c1a04908ea6/BG3Extender/Extender/Client/IMGUI/IMGUI.cpp#L1901C34-L1901C60
+						selectable:SetColor("Header", { 0.36, 0.30, 0.27, 0.76 })
+						selectable.UserData = pickerInstance.itemIndex.mods[modName]
+						selectable.Selected = self.selectedFilters[selectable.UserData] or false
 
-					selectedCount = selectedCount + (selectable.Selected and 1 or 0)
+						selectedCount = selectedCount + (selectable.Selected and 1 or 0)
 
-					selectable.OnClick = function()
-						self.selectedFilters[selectable.UserData] = selectable.Selected
+						selectable.OnClick = function()
+							self.selectedFilters[selectable.UserData] = selectable.Selected
 
-						selectedCount = selectedCount + (selectable.Selected and 1 or -1)
+							selectedCount = selectedCount + (selectable.Selected and 1 or -1)
+							updateLabelWithCount(selectedCount)
+
+							pickerInstance:ProcessFilters(self.label)
+						end
+
 						updateLabelWithCount(selectedCount)
 
-						pickerInstance:ProcessFilters(self.label)
+						modFilterWindow.Size = { 0, ((pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
 					end
-
-					updateLabelWithCount(selectedCount)
-
-					table.sort(modFilterWindow.Children, function(a, b)
-						return a.Label < b.Label
-					end)
-
-					modFilterWindow.Size = { 0, ((pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
 
 					break
 				end

@@ -145,6 +145,6 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 		else
 			table.remove(ConfigurationStructure.config.vanity.settings.dyes.favorites, favoriteIndex)
 		end
-		self:RebuildDisplay()
+		self:ProcessFilters()
 	end
 end
