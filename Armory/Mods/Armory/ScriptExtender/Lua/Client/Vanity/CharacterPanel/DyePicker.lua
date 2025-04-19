@@ -38,6 +38,16 @@ function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 	self.onSelectFunc = onSelectFunc
 end
 
+---@param color number[]
+local function convertToRGB(color)
+	local color = TableUtils:DeeplyCopyTable(color)
+	for i, c in ipairs(color) do
+		color[i] = c * 255
+	end
+
+	return color
+end
+
 local maxEuclideanValue = math.sqrt((255 ^ 2) + (255 ^ 2) + (255 ^ 2))
 --- https://en.wikipedia.org/wiki/Color_difference
 ---@param baseColor number[]
@@ -58,7 +68,6 @@ local function convertToXYZ(color)
 	color = TableUtils:DeeplyCopyTable(color)
 
 	for i, c in ipairs(color) do
-		local s = c / 255
 		color[i] = c > 0.04045 and (((c + 0.055) / 1.055) ^ 2.4) or (c / 12.92)
 		color[i] = color[i] * 100
 	end
@@ -87,8 +96,6 @@ local function convertToCIELAB(color)
 	return { L, a, b }
 end
 
-local maxDelta
-
 --- https://en.wikipedia.org/wiki/Color_difference
 --- How the HELL did anyone come up with this
 ---@param baseCIE number[]
@@ -108,7 +115,8 @@ local function calculateCIE94Delta(baseCIE, otherCIE)
 
 	local deltaA = (baseCIE[2] - otherCIE[2]) ^ 2
 	local deltaB = (baseCIE[3] - otherCIE[3]) ^ 2
-	local deltaH = math.sqrt(deltaA + deltaB - (deltaC ^ 2))
+	local deltaH = deltaA + deltaB - (deltaC ^ 2)
+	deltaH = deltaH < 0 and 0 or math.sqrt(deltaH)
 
 	local SL = 1
 	local SC = 1 + (K1 * C1)
@@ -118,12 +126,11 @@ local function calculateCIE94Delta(baseCIE, otherCIE)
 	local secondGroup = (deltaC / (kC * SC)) ^ 2
 	local thirdGroup = (deltaH / (kH * SH)) ^ 2
 
-	local delta = math.sqrt(firstGroup + secondGroup + thirdGroup)
+	local delta = firstGroup + secondGroup + thirdGroup
+	delta = delta < 0 and 0 or math.sqrt(delta)
 
-	return maxDelta and ((delta / maxDelta) * 100) or delta
+	return delta
 end
-
-maxDelta = calculateCIE94Delta(convertToCIELAB(convertToXYZ({ 255, 255, 255 })), convertToCIELAB(convertToXYZ({ 0, 0, 0 })))
 
 function DyePicker:CreateCustomFilters()
 	local similarColourFilter = PickerBaseFilterClass:new({ label = "similarColor", priority = 1000 })
@@ -132,8 +139,11 @@ function DyePicker:CreateCustomFilters()
 	local header = Styler:DynamicLabelTree(self.filterGroup:AddTree("Similar Color"))
 
 	local baseColor = header:AddColorPicker("Base Color")
+	baseColor.OnChange = function ()
+		self:ProcessFilters()
+	end
 
-	header:AddText("Max Difference %")
+	local maxDiffText = header:AddText("Max Difference %")
 	local maxDistance = header:AddSliderInt("", 50, 0, 100)
 	maxDistance.OnChange = function()
 		self:ProcessFilters()
@@ -145,13 +155,28 @@ function DyePicker:CreateCustomFilters()
 	local cielab94Delta = header:AddRadioButton("CIE94 Delta", false)
 	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)")
 
-	eucledianDistance.OnChange = function()
-		cielab94Delta.Active = not eucledianDistance.Active
+	eucledianDistance.OnActivate = function()
+		cielab94Delta.Active = eucledianDistance.Active
+		eucledianDistance.Active = not eucledianDistance.Active
+
+		if cielab94Delta.Active then
+			maxDiffText.Label = "Max Delta"
+		else
+			maxDiffText.Label = "Max Difference %"
+		end
+
 		self:ProcessFilters()
 	end
 
-	cielab94Delta.OnChange = function()
-		eucledianDistance.Active = not cielab94Delta.Active
+	cielab94Delta.OnActivate = function()
+		eucledianDistance.Active = cielab94Delta.Active
+		cielab94Delta.Active = not cielab94Delta.Active
+
+		if cielab94Delta.Active then
+			maxDiffText.Label = "Max Delta"
+		else
+			maxDiffText.Label = "Max Difference %"
+		end
 		self:ProcessFilters()
 	end
 
@@ -178,7 +203,41 @@ function DyePicker:CreateCustomFilters()
 				return value.Checked
 			end)
 		then
+			---@type ResourceMaterialPresetResource
+			local materialPreset = Ext.Resource.Get(itemTemplate.ColorPreset, "MaterialPreset")
 
+			if not materialPreset then
+				return false
+			end
+
+			for _, checkbox in pairs(checkboxGroup.Children) do
+				---@cast checkbox ExtuiCheckbox
+				if checkbox.Checked then
+					for _, setting in pairs(materialPreset.Presets.Vector3Parameters) do
+						if setting.Parameter == checkbox.Label and setting.Enabled == true then
+							if cielab94Delta.Active then
+								local delta = calculateCIE94Delta(
+									convertToCIELAB(convertToXYZ(baseColor.Color)),
+									convertToCIELAB(convertToXYZ(setting.Value)))
+
+								if delta <= maxDistance.Value[1] then
+									return true
+								end
+							elseif eucledianDistance.Active then
+								local distance = calculateEuclideanDistance(
+									convertToRGB(baseColor.Color),
+									convertToRGB(setting.Value))
+
+								if distance <= maxDistance.Value[1] then
+									return true
+								end
+							end
+						end
+					end
+				end
+			end
+
+			return false
 		end
 
 		return true
