@@ -457,6 +457,9 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 						local checkbox = templateSlotGroup:AddCheckbox(filterSlot)
 						checkbox.UserData = filterSlot
 						checkbox.Checked = self.selectedFilters[filterSlot] or false
+						if filterSlot == "Cloak" then
+							checkbox:Tooltip():AddText("\t  Vanilla cloaks don't use this value for some reason - use stat slots to find those")
+						end
 						templateSlotCount = templateSlotCount + (checkbox.Checked and 1 or 0)
 
 						checkbox.OnHoverEnter = function()
