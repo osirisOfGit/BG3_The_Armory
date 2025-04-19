@@ -1,5 +1,6 @@
 -- This is a mess :/ But performance was really crappy when this was neat, because i was running filters multiple times per event
--- Optimizing seems to require a three-phase process
+-- <br/> Optimizing seems to require a three-phase process. 
+-- I tried to use coroutines so i didn't have to maintain cross-function state, but IMGUI had problems with such strictly encapsulated state and function refs
 ---@class PickerBaseFilterClass
 PickerBaseFilterClass = {
 	---@type string
@@ -34,6 +35,4 @@ function PickerBaseFilterClass:new(instance)
 	return instance
 end
 
--- I tried to use coroutines so i didn't have to maintain cross-function state,
--- but IMGUI had problems with such strictly encapsulated state and function refs
 function PickerBaseFilterClass:initializeUIBuilder() end

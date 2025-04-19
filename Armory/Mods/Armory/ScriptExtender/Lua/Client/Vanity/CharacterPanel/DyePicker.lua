@@ -38,6 +38,152 @@ function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 	self.onSelectFunc = onSelectFunc
 end
 
+local maxEuclideanValue = math.sqrt((255 ^ 2) + (255 ^ 2) + (255 ^ 2))
+--- https://en.wikipedia.org/wiki/Color_difference
+---@param baseColor number[]
+---@param otherColor number[]
+---@return number percentage difference between the two numbers
+local function calculateEuclideanDistance(baseColor, otherColor)
+	local r = (otherColor[1] - baseColor[1]) ^ 2
+	local g = (otherColor[2] - baseColor[2]) ^ 2
+	local b = (otherColor[3] - baseColor[3]) ^ 2
+
+	return (math.sqrt(r + g + b) / maxEuclideanValue) * 100
+end
+
+--- http://www.easyrgb.com/en/math.php
+---@param color number[]
+---@return number[]
+local function convertToXYZ(color)
+	color = TableUtils:DeeplyCopyTable(color)
+
+	for i, c in ipairs(color) do
+		local s = c / 255
+		color[i] = c > 0.04045 and (((c + 0.055) / 1.055) ^ 2.4) or (c / 12.92)
+		color[i] = color[i] * 100
+	end
+
+	local x = (color[1] * 0.4124) + (color[2] * 0.3576) + (color[3] * 0.1805)
+	local y = (color[1] * 0.2126) + (color[2] * 0.7152) + (color[3] * 0.0722)
+	local z = (color[1] * 0.0193) + (color[2] * 0.1192) + (color[3] * 0.9505)
+
+	return { x, y, z }
+end
+
+--- I     X2      Y2      Z2       X10       Y10     Z10
+---D65	95.047	100.000	108.883	  94.811   100.000	107.304	     Daylight, sRGB, Adobe-RGB
+---@param color number[] XYZ
+local function convertToCIELAB(color)
+	local standardized = { color[1] / 94.811, color[2] / 100, color[3] / 107.304 }
+
+	for i, c in ipairs(standardized) do
+		standardized[i] = c > 0.008856 and (c ^ (1 / 3)) or ((7.787 * c) + (16 / 116))
+	end
+
+	local L = (116 * standardized[2]) - 16
+	local a = 500 * (standardized[1] - standardized[2])
+	local b = 200 * (standardized[2] - standardized[3])
+
+	return { L, a, b }
+end
+
+local maxDelta
+
+--- https://en.wikipedia.org/wiki/Color_difference
+---@param baseCIE number[]
+---@param otherCIE number[]
+local function calculateCIE94Delta(baseCIE, otherCIE)
+	local kL = 1
+	local K1 = 0.045
+	local K2 = 0.015
+	local kC = 1
+	local kH = 1
+
+	local deltaL = baseCIE[1] - otherCIE[1]
+
+	local C1 = math.sqrt((baseCIE[2] ^ 2) + (baseCIE[3] ^ 2))
+	local C2 = math.sqrt((otherCIE[2] ^ 2) + (otherCIE[3] ^ 2))
+	local deltaC = C1 - C2
+
+	local deltaA = (baseCIE[2] - otherCIE[2]) ^ 2
+	local deltaB = (baseCIE[3] - otherCIE[3]) ^ 2
+	local deltaH = math.sqrt(deltaA + deltaB - (deltaC ^ 2))
+
+	local SL = 1
+	local SC = 1 + (K1 * C1)
+	local SH = 1 + (K2 * C1)
+
+	local firstGroup = (deltaL / (kL * SL)) ^ 2
+	local secondGroup = (deltaC / (kC * SC)) ^ 2
+	local thirdGroup = (deltaH / (kH * SH)) ^ 2
+
+	local delta = math.sqrt(firstGroup + secondGroup + thirdGroup)
+
+	return maxDelta and ((delta / maxDelta) * 100) or delta
+end
+
+maxDelta = calculateCIE94Delta(convertToCIELAB(convertToXYZ({ 255, 255, 255 }), convertToCIELAB(convertToXYZ({ 0, 0, 0 }))))
+
+function DyePicker:CreateCustomFilters()
+	local similarColourFilter = PickerBaseFilterClass:new({ label = "similarColor", priority = 1000 })
+	self.customFilters[similarColourFilter.label] = similarColourFilter
+
+	local header = Styler:DynamicLabelTree(self.filterGroup:AddTree("Similar Color"))
+
+	local baseColor = header:AddColorPicker("Base Color")
+
+	header:AddText("Max Difference %")
+	local maxDistance = header:AddSliderInt("", 50, 0, 100)
+	maxDistance.OnChange = function()
+		self:ProcessFilters()
+	end
+
+	local eucledianDistance = header:AddRadioButton("Euclidean Distance", true)
+	eucledianDistance:Tooltip():AddText("\t Faster, less accurate")
+
+	local cielab94Delta = header:AddRadioButton("CIE94 Delta", false)
+	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1) (don't @ me CIE2000 nerds, I ain't that smart)")
+
+	eucledianDistance.OnChange = function()
+		cielab94Delta.Active = not eucledianDistance.Active
+		self:ProcessFilters()
+	end
+
+	cielab94Delta.OnChange = function()
+		eucledianDistance.Active = not cielab94Delta.Active
+		self:ProcessFilters()
+	end
+
+	local checkboxGroup = header:AddGroup("checkboxes")
+
+	---@type ResourcePresetDataVector3Parameter[]
+	local materialColorParams = {}
+	for _, setting in pairs(Ext.Resource.Get("a8690bc5-9f17-5672-28e2-41c1ab3018ea", "MaterialPreset").Presets.Vector3Parameters) do
+		table.insert(materialColorParams, setting)
+	end
+	for _, materialColor in TableUtils:OrderedPairs(materialColorParams, function(key)
+		return materialColorParams[key].Parameter
+	end) do
+		local checkbox = checkboxGroup:AddCheckbox(materialColor.Parameter)
+
+		checkbox.OnChange = function()
+			self:ProcessFilters()
+		end
+	end
+
+	similarColourFilter.apply = function(self, itemTemplate)
+		if TableUtils:ListContains(checkboxGroup.Children, function(value)
+				---@cast value ExtuiCheckbox
+				return value.Checked
+			end)
+		then
+
+		end
+
+		return true
+	end
+end
+
 ---@param dyeTemplate ItemTemplate
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
 function DyePicker:DisplayResult(dyeTemplate, displayGroup)
@@ -81,7 +227,7 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 		self.activeDyeGroup = dyeInfoGroup
 
 		dyeInfoGroup:AddSeparatorText(dyeTemplate.DisplayName:Get() or dyeTemplate.Name)
-		
+
 		---@type Object
 		local dyeStat = Ext.Stats.Get(dyeTemplate.Stats)
 		if dyeStat then
