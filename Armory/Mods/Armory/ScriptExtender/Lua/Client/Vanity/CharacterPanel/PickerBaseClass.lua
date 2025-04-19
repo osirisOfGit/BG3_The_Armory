@@ -314,7 +314,7 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 			end
 
 			for label, filter in pairs(filterBuildersToRun) do
-				if failedPredicate ~= label then
+				if not failedPredicate or failedPredicate == label then
 					filter:prepareFilterUI(itemTemplate)
 				end
 			end
