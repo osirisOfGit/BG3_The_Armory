@@ -52,7 +52,6 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 
 	Logger:BasicDebug("%s started previewing %s", character, templateUUID)
 
-	local slot = Ext.Stats.Get(stat).Slot
 	userPreview.equippedItem = Osi.GetEquippedItem(character, slot)
 	if userPreview.equippedItem then
 		Ext.Entity.Get(userPreview.equippedItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
@@ -61,8 +60,20 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 	local correctArmorSet = string.find(slot, "Vanity") and 1 or 0
 	Osi.SetArmourSet(character, correctArmorSet)
 
-	-- Otherwise the avatar doesn't show it in the inventory view
-	Ext.Timer.WaitFor(50, function()
+	-- Non-weapons use cross-slot mogging with the default pieces, but weapons are just equipped as-is
+	if not string.find(slot, "Weapon") then
+		Transmogger:TransmogItem(templateUUID,
+			Osi.CreateAt(Transmogger.defaultPieces[slot], 0, 0, 0, 0, 0, ""),
+			Ext.Entity.Get(character)
+		)
+
+		-- Otherwise the avatar doesn't show it in the inventory view
+		Ext.Timer.WaitFor(50, function()
+			if payload.dye then
+				Transmogger:ApplyDye(Ext.Entity.Get(character))
+			end
+		end)
+	else
 		if userPreview.previewItem then
 			---@type EntityHandle
 			local previewEntity = Ext.Entity.Get(userPreview.previewItem)
@@ -90,7 +101,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 				itemEntity:Replicate("ItemDye")
 			end
 		end
-	end)
+	end
 end)
 
 local function DeleteItem(character, userPreview)
@@ -99,6 +110,7 @@ local function DeleteItem(character, userPreview)
 	for _, item in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_PreviewItem") or {}) do
 		local itemEntity = Ext.Entity.Get(item)
 		if itemEntity and itemEntity.Vars.TheArmory_Vanity_PreviewItem == character then
+			itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 			Osi.Unequip(character, item)
 			Osi.RequestDelete(item)
 		end

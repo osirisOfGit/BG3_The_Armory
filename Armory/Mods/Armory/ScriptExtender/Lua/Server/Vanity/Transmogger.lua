@@ -22,7 +22,9 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_Item_CurrentlyMogging", {
 	Server = true
 })
 
-local defaultPieces = {
+Transmogger = {}
+
+Transmogger.defaultPieces = {
 	Helmet = "4d2e0931-3a01-4759-834b-8ae36749daab",
 	VanityBody = "2f7aadd5-65ea-4ab6-8c55-88ee584c72df",
 	Cloak = "a1978b4d-3d93-49ec-9a8b-d19171ed35d5",
@@ -87,8 +89,6 @@ local componentsToReplicateOnRefresh = {
 	["Tag"] = true
 }
 
-Transmogger = {}
-
 ---@param entity EntityHandle
 ---@return string
 local function buildMetaInfoForLog(entity)
@@ -145,7 +145,7 @@ function Transmogger:MogCharacter(character)
 		---@type string
 		local vanityTemplate = outfitSlot.equipment and outfitSlot.equipment.guid or nil
 		if vanityTemplate == "Hide Appearance" then
-			vanityTemplate = defaultPieces["HideTransmog"]
+			vanityTemplate = self.defaultPieces["HideTransmog"]
 		end
 
 		if equippedItem and outfitSlot.weaponTypes then
@@ -171,8 +171,8 @@ function Transmogger:MogCharacter(character)
 		end
 
 		if not equippedItem then
-			if defaultPieces[actualSlot] and ConfigurationStructure.config.vanity.settings.general.fillEmptySlots then
-				equippedItem = Osi.CreateAt(defaultPieces[actualSlot], 0, 0, 0, 0, 0, "")
+			if self.defaultPieces[actualSlot] and ConfigurationStructure.config.vanity.settings.general.fillEmptySlots then
+				equippedItem = Osi.CreateAt(self.defaultPieces[actualSlot], 0, 0, 0, 0, 0, "")
 			else
 				goto continue
 			end
