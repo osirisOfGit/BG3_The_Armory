@@ -245,7 +245,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		local toggleFilterColumn = Styler:ImageButton(self.window:AddImageButton("filterCol", "ico_filter", { 40, 40 }))
 
 		local displayTable = self.window:AddTable("", 2)
-		displayTable:AddColumn("", "WidthFixed", math.min(350, self.window.LastSize[1] * .3))
+		displayTable:AddColumn("", "WidthFixed", 400)
 		displayTable:AddColumn("", "WidthStretch")
 
 		local row = displayTable:AddRow()
@@ -334,7 +334,6 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		customizeFunc()
 		self:BuildFilters()
-		self.filterGroup:SetSize({ 0, 0 }, "Always")
 	else
 		if not self.window.Open then
 			self.window.Open = true
