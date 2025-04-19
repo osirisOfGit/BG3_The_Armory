@@ -417,11 +417,6 @@ function PickerBaseClass:BuildFilters()
 		modGroup.Visible = false
 	end
 
-	--#region Register Custom Filters
-	-- Adding here because Mod filter should be run last (since it's the most intensive), but I want it higher up in the UI
-	self:CreateCustomFilters()
-	--#endregion
-
 	local modNameSearch = modGroup:AddInputText("")
 	modNameSearch.Hint = "Mod Name - Case-insensitive"
 	modNameSearch.AutoSelectAll = true
@@ -521,4 +516,6 @@ function PickerBaseClass:BuildFilters()
 		return not anySelected and true or false
 	end
 	--#endregion
+
+	self:CreateCustomFilters()
 end
