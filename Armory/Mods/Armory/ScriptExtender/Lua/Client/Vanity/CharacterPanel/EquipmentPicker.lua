@@ -236,11 +236,6 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	--#endregion
 
 	--#region Item Stat Slot filter
-	local equivalentSlots = {
-		["Breast"] = "VanityBody",
-		["Boots"] = "VanityBoots"
-	}
-
 	local statSlotFilter = PickerBaseFilterClass:new({ label = "StatSlot", priority = 0 })
 	self.customFilters[statSlotFilter.label] = statSlotFilter
 	statSlotFilter.header, statSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Stat Slot"))
@@ -283,17 +278,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 					canGoInOffhand = false
 				end
 
-				local isEquivalentSlot = false
-				for slot1, slot2 in pairs(equivalentSlots) do
-					if (slot1 == slot and string.find(slot2, itemStat.Slot))
-						or (slot2 == slot and string.find(slot1, itemStat.Slot))
-					then
-						isEquivalentSlot = true
-						break
-					end
-				end
-
-				if not canGoInOffhand and not isEquivalentSlot then
+				if not canGoInOffhand then
 					return false
 				end
 			end
