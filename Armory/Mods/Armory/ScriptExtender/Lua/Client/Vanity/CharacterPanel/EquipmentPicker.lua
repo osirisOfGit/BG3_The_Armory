@@ -11,6 +11,8 @@ EquipmentPicker = PickerBaseClass:new("Equipment", {
 	vanityOutfitSlot = nil
 })
 
+local clearStatSlotChildren
+
 function EquipmentPicker:CreateCustomFilters()
 	--#region EquipmentRaceFilter
 	local equipmentRaceFilter = PickerBaseFilterClass:new({ label = "EquipmentRace" })
@@ -249,6 +251,8 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	statSlotFilter.selectedFilters = {}
 	local statSlotCount = 0
 	local statSlotGroup = statSlotFilter.header:AddGroup("statSlotFilter")
+
+	statSlotFilter.header:AddNewLine()
 
 	statSlotFilter.apply = function(self, itemTemplate)
 		local itemTemplateId = itemTemplate.Id
@@ -492,6 +496,18 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	end
 
 	--#endregion
+
+	clearStatSlotChildren = function()
+		for _, statSlot in pairs(statSlotGroup.Children) do
+			statSlot.Checked = statSlot.UserData == self.slot
+		end
+		statSlotFilter.selectedFilters = {}
+
+		for _, templateSlot in pairs(templateSlotGroup.Children) do
+			templateSlot.Checked = false
+		end
+		templateSlotFilter.selectedFilters = {}
+	end
 end
 
 ---@param slot ActualSlot
@@ -524,6 +540,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		end)
 
+	clearStatSlotChildren()
 	self.customFilters["StatSlot"].selectedFilters[slot] = true
 
 	Helpers:KillChildren(self.warningGroup)
