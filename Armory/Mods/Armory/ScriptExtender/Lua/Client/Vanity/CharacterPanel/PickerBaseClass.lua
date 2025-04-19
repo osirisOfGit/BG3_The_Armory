@@ -258,11 +258,11 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		toggleFilterColumn.OnClick = function()
 			if not toggleTimer then
 				local cWidth = displayTable.ColumnDefs[1].Width
+				local stepDelay = 10
 				local function stepCollapse()
-					local stepDelay = 10
 					if cWidth > 0 then
 						cWidth = math.max(0, cWidth - (cWidth * 0.1)) -- Reduce by 10%
-						cWidth = cWidth < 1 and 0 or cWidth
+						cWidth = cWidth < 10 and 0 or cWidth
 
 						displayTable.ColumnDefs[1].Width = cWidth
 						stepDelay = math.min(50, stepDelay * 1.02) -- Increase delay per step to make it like soft-close drawer
@@ -273,16 +273,17 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 					end
 				end
 
+				local widthStep = 1
 				local function stepExpand()
-					local stepDelay = 0.5
-
 					cWidth = cWidth == 0 and 1 or cWidth
 
 					local max = math.min(350, self.window.LastSize[1] * .3)
 
 					self.filterGroup.Visible = true
 					if cWidth < max then
-						cWidth = math.min(max, cWidth + (cWidth * 0.1))
+						widthStep = math.max(0.01, widthStep - (widthStep * .125))
+
+						cWidth = math.min(max, cWidth + (cWidth * widthStep))
 						displayTable.ColumnDefs[1].Width = cWidth
 
 						stepDelay = math.min(50, stepDelay)
@@ -295,6 +296,9 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 				if not self.filterGroup.Visible then
 					stepExpand()
 				else
+					if cWidth == 0 then
+						cWidth = math.min(350, self.window.LastSize[1] * .3)
+					end
 					stepCollapse()
 				end
 			else
@@ -315,6 +319,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		customizeFunc()
 		self:BuildFilters()
+		self.filterGroup:SetSize({0, 0}, "Always")
 	else
 		if not self.window.Open then
 			self.window.Open = true
