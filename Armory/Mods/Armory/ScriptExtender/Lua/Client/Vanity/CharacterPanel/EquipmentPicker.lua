@@ -20,7 +20,7 @@ function EquipmentPicker:CreateCustomFilters()
 	equipmentRaceFilter.header, equipmentRaceFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Equipment Race"))
 	local tooltip = equipmentRaceFilter.header:Tooltip()
 	tooltip:AddText([[
-These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids
+	 These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids
 These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template
 This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models
 Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work]])
@@ -37,9 +37,9 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 		then
 			for bodyType in pairs(itemTemplate.Equipment.Visuals) do
 				if TableUtils:ListContains(raceGroup.Children, function(value)
-					---@cast value ExtuiCheckbox
-					return value.UserData == bodyType and value.Checked
-				end) then
+						---@cast value ExtuiCheckbox
+						return value.UserData == bodyType and value.Checked
+					end) then
 					return true
 				end
 			end
@@ -116,6 +116,8 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 				end
 			end
 		end
+
+	equipmentRaceFilter.header:AddNewLine()
 	--#endregion
 
 	--#region ArmorType
@@ -123,8 +125,9 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	self.customFilters[armorTypeFilter.label] = armorTypeFilter
 	armorTypeFilter.header, armorTypeFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Armor Type"))
 
-	armorTypeFilter.header:Tooltip():AddText(
-		"\t\t These filters are determined by what is set by the Stat of the item, not the material of the item itself (since there's no way to do that)")
+	local armorTypeTooltip = armorTypeFilter.header:Tooltip()
+	armorTypeTooltip:AddText(
+		"\t\t These filters are determined by the Stat of the item, not the material of the item itself (since there's no way to do that)")
 
 	local armorTypeGroup = armorTypeFilter.header:AddGroup("")
 	armorTypeFilter.apply = function(self, itemTemplate)
@@ -204,6 +207,13 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 						checkbox.UserData = armorType
 						checkbox.Checked = self.selectedFilters[armorType] or false
 						selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+
+						checkbox.OnHoverEnter = function ()
+							armorTypeTooltip.Visible = false
+						end
+						checkbox.OnHoverLeave = function ()
+							armorTypeTooltip.Visible = true
+						end
 						checkbox.OnChange = function()
 							self.selectedFilters[armorType] = checkbox.Checked or nil
 							selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
@@ -217,6 +227,8 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 				end
 			end
 		end
+
+	armorTypeFilter.header:AddNewLine()
 	--#endregion
 
 	--#region Slot filter
