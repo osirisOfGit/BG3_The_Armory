@@ -36,10 +36,12 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 			end)
 		then
 			for bodyType in pairs(itemTemplate.Equipment.Visuals) do
-				return TableUtils:ListContains(raceGroup.Children, function(value)
+				if TableUtils:ListContains(raceGroup.Children, function(value)
 					---@cast value ExtuiCheckbox
 					return value.UserData == bodyType and value.Checked
-				end)
+				end) then
+					return true
+				end
 			end
 			return false
 		end
@@ -49,7 +51,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	local selectedCount = 0
 	equipmentRaceFilter.initializeUIBuilder = function(self)
 		self.filterBuilders = {}
-		
+
 		if string.find(EquipmentPicker.slot, "Weapon") then
 			self.header.Visible = false
 			self.filterTable = {}
