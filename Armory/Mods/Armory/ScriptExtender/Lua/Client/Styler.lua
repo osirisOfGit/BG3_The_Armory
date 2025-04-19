@@ -1,6 +1,10 @@
 Styler = {}
 
----comment
+--- OKAY, so, this fucker.
+--- Changing a label for tree elements in this flavour of IMGUI recomputes the _internal_ id, which is different from the IDContext
+--- For Tree Elements, the internal id is based exclusively on the label. Change the label, change the id, it behaves like you just created it again
+--- If the default open is false and it hasn't seen this id before, guess what, tree element collapses on you even if you didn't click it
+--- If it has seen this ID before, it'll set the state to its last known state, and if the filter has 5 selected, but another filter removes 1 possible option, it closes/opens on you
 ---@param tree ExtuiTree
 ---@return ExtuiTree, fun(count: number)
 function Styler:DynamicLabelTree(tree)
