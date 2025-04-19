@@ -281,7 +281,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 				local function stepExpand()
 					cWidth = cWidth == 0 and 1 or cWidth
 
-					local max = math.min(350, self.window.LastSize[1] * .3)
+					local max = math.min(350, Ext.Utils.Version() >= 23 and self.window.LastSize[1] * .3 or 350)
 
 					self.filterGroup.Visible = true
 					if cWidth < max then
@@ -305,7 +305,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 					stepExpand()
 				else
 					if cWidth == 0 then
-						cWidth = math.min(350, self.window.LastSize[1] * .3)
+						cWidth = math.min(350, Ext.Utils.Version() >= 23 and self.window.LastSize[1] * .3 or 350)
 					end
 					stepCollapse()
 				end
@@ -560,7 +560,11 @@ function PickerBaseClass:BuildFilters()
 
 						updateLabelWithCount(selectedCount)
 
-						modFilterWindow.Size = { 0, math.max(130, (pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children) }
+						modFilterWindow.Size = { 0,
+							Ext.Utils.Version() >= 23
+							and math.max(130, (pickerInstance.window.LastSize[1] * .025) * #modFilterWindow.Children)
+							or 0
+						}
 					end
 
 					break

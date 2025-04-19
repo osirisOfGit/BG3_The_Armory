@@ -555,7 +555,7 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	itemGroup.NoSavedSettings = true
 	itemGroup.Size = { self.settings.imageSize + 40, self.settings.imageSize + (self.settings.showNames and 100 or 10) }
 
-	if displayGroup.Handle == self.resultsGroup.Handle then
+	if displayGroup.Handle == self.resultsGroup.Handle and Ext.Utils.Version() >= 23 then
 		local maxRowSize = math.floor(self.resultsGroup.LastSize[1] / itemGroup.Size[1])
 
 		if maxRowSize > 0 then
