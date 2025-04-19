@@ -15,6 +15,7 @@ local resetSetTimer
 Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload, user)
 	payload = Ext.Json.Parse(payload)
 	local templateUUID = payload.templateId
+	local slot = payload.slot
 
 	user = PeerToUserID(user)
 	local character = Osi.GetCurrentCharacter(user)
