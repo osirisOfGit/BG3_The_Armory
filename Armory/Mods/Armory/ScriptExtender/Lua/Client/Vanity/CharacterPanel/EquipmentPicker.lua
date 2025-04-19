@@ -187,42 +187,44 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	---@param self PickerBaseFilterClass
 	---@param itemTemplate ItemTemplate
 		function(self, itemTemplate)
-			for i, armorType in pairs(self.filterTable) do
-				armorType = tostring(armorType)
+			if self.header.Visible then
+				for i, armorType in pairs(self.filterTable) do
+					armorType = tostring(armorType)
 
-				local buildArmorType
+					local buildArmorType
 
-				---@type Armor|Weapon
-				local stat = Ext.Stats.Get(EquipmentPicker.itemIndex.templateIdAndStat[itemTemplate.Id])
-				if stat.ModifierList == "Armor" then
-					if stat.ArmorType == armorType then
-						buildArmorType = true
+					---@type Armor|Weapon
+					local stat = Ext.Stats.Get(EquipmentPicker.itemIndex.templateIdAndStat[itemTemplate.Id])
+					if stat.ModifierList == "Armor" then
+						if stat.ArmorType == armorType then
+							buildArmorType = true
+						end
 					end
-				end
 
-				if buildArmorType then
-					self.filterTable[i] = nil
-					self.filterBuilders[armorType] = function()
-						local checkbox = armorTypeGroup:AddCheckbox(armorType)
-						checkbox.UserData = armorType
-						checkbox.Checked = self.selectedFilters[armorType] or false
-						selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
+					if buildArmorType then
+						self.filterTable[i] = nil
+						self.filterBuilders[armorType] = function()
+							local checkbox = armorTypeGroup:AddCheckbox(armorType)
+							checkbox.UserData = armorType
+							checkbox.Checked = self.selectedFilters[armorType] or false
+							selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
 
-						checkbox.OnHoverEnter = function ()
-							armorTypeTooltip.Visible = false
-						end
-						checkbox.OnHoverLeave = function ()
-							armorTypeTooltip.Visible = true
-						end
-						checkbox.OnChange = function()
-							self.selectedFilters[armorType] = checkbox.Checked or nil
-							selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+							checkbox.OnHoverEnter = function()
+								armorTypeTooltip.Visible = false
+							end
+							checkbox.OnHoverLeave = function()
+								armorTypeTooltip.Visible = true
+							end
+							checkbox.OnChange = function()
+								self.selectedFilters[armorType] = checkbox.Checked or nil
+								selectedCount = selectedCount + (checkbox.Checked and 1 or -1)
+
+								self.updateLabelWithCount(selectedCount)
+								EquipmentPicker:ProcessFilters(armorTypeFilter.label)
+							end
 
 							self.updateLabelWithCount(selectedCount)
-							EquipmentPicker:ProcessFilters(armorTypeFilter.label)
 						end
-
-						self.updateLabelWithCount(selectedCount)
 					end
 				end
 			end
@@ -327,7 +329,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 end
 
 ---@param itemTemplate ItemTemplate
----@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
+---@param displayGroup ExtuiChildWindow|ExtuiCollapsingHeader
 function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, itemTemplate.Id)
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
@@ -341,7 +343,18 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	local itemGroup = displayGroup:AddChildWindow(itemTemplate.Id .. itemStat.Name .. displayGroup.Label)
 	itemGroup.NoSavedSettings = true
 	itemGroup.Size = { self.settings.imageSize + 40, self.settings.imageSize + (self.settings.showNames and 100 or 10) }
-	itemGroup.SameLine = numChildren > 0 and (numChildren % self.settings.rowSize) > 0
+
+	if displayGroup.Handle == self.resultsGroup.Handle then
+		local maxRowSize = math.floor(self.resultsGroup.LastSize[1] / itemGroup.Size[1])
+
+		if maxRowSize > 0 then
+			itemGroup.SameLine = #self.resultsGroup.Children > 0 and ((#self.resultsGroup.Children - 1) % maxRowSize) > 0
+		else
+			itemGroup.SameLine = numChildren > 0 and (numChildren % self.settings.rowSize) > 0
+		end
+	else
+		itemGroup.SameLine = numChildren > 0 and (numChildren % self.settings.rowSize) > 0
+	end
 	itemGroup.ResizeY = true
 
 	local icon = itemGroup:AddImageButton(itemTemplate.Name, itemTemplate.Icon, { self.settings.imageSize, self.settings.imageSize })

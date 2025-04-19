@@ -270,6 +270,10 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 					else
 						toggleTimer = nil
 						self.filterGroup.Visible = false
+						-- EquipmentPicker auto determines entries per row based on childWindow size, Dyes don't
+						if self.slot then
+							self:ProcessFilters()
+						end
 					end
 				end
 
@@ -290,6 +294,10 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 						toggleTimer = Ext.Timer.WaitFor(stepDelay, stepExpand)
 					else
 						toggleTimer = nil
+						-- EquipmentPicker auto determines entries per row based on childWindow size, Dyes don't
+						if self.slot then
+							self:ProcessFilters()
+						end
 					end
 				end
 
@@ -306,7 +314,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 			end
 		end
 
-		self.otherGroup = row:AddCell():AddChildWindow("RestOfTheOwl")
+		self.otherGroup = row:AddCell():AddGroup("RestOfTheOwl")
 
 		self.warningGroup = self.otherGroup:AddGroup("WarningGroup")
 
@@ -314,12 +322,19 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
 		self.otherGroup:AddNewLine()
 
+		if self.slot then
+			local refreshViewButton = Styler:ImageButton(self.otherGroup:AddImageButton("", "ico_reset_d", { 32, 32 }))
+			refreshViewButton:Tooltip():AddText("\t Refresh the display view, recomputing items per row")
+			refreshViewButton.OnClick = function()
+				self:ProcessFilters()
+			end
+		end
 		self.resultSeparator = self.otherGroup:AddSeparatorText("Results")
-		self.resultsGroup = self.otherGroup:AddGroup(self.title .. "Results")
+		self.resultsGroup = self.otherGroup:AddChildWindow(self.title .. "Results")
 
 		customizeFunc()
 		self:BuildFilters()
-		self.filterGroup:SetSize({0, 0}, "Always")
+		self.filterGroup:SetSize({ 0, 0 }, "Always")
 	else
 		if not self.window.Open then
 			self.window.Open = true
