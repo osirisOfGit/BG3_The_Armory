@@ -90,6 +90,7 @@ end
 local maxDelta
 
 --- https://en.wikipedia.org/wiki/Color_difference
+--- How the HELL did anyone come up with this
 ---@param baseCIE number[]
 ---@param otherCIE number[]
 local function calculateCIE94Delta(baseCIE, otherCIE)
@@ -142,7 +143,7 @@ function DyePicker:CreateCustomFilters()
 	eucledianDistance:Tooltip():AddText("\t Faster, less accurate")
 
 	local cielab94Delta = header:AddRadioButton("CIE94 Delta", false)
-	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1) \n(don't @ me CIE2000 nerds, I ain't that smart)")
+	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)")
 
 	eucledianDistance.OnChange = function()
 		cielab94Delta.Active = not eucledianDistance.Active
