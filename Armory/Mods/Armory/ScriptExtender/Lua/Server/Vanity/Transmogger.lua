@@ -276,7 +276,6 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 
 		local createdErrorDumps
 		for key, componentToCopy in pairs(componentsToCopy) do
-			local componentBeingCopied
 			local success, error = pcall(function()
 				if type(componentToCopy) == "string" then
 					if equippedItemEntity[componentToCopy] then
@@ -291,27 +290,27 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 								Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, statusToAdd.StatusId, Osi.GetStatusCurrentLifetime(equippedItem, statusToAdd.StatusId), 1)
 							end
 						else
-							if not createdVanityEntity[componentToCopy] then
-								Logger:BasicTrace("Creating %s on vanity item", componentToCopy)
-								createdVanityEntity:CreateComponent(componentToCopy)
-							end
+							if equippedItemEntity[componentToCopy] then
+								if not createdVanityEntity[componentToCopy] then
+									Logger:BasicTrace("Creating %s on vanity item", componentToCopy)
+									createdVanityEntity:CreateComponent(componentToCopy)
+								end
 
-							componentBeingCopied = equippedItemEntity[componentToCopy]
+								Ext.Types.Unserialize(createdVanityEntity[componentToCopy], Ext.Types.Serialize(equippedItemEntity[componentToCopy]))
 
-							Ext.Types.Unserialize(createdVanityEntity[componentToCopy], Ext.Types.Serialize(equippedItemEntity[componentToCopy]))
+								if componentToCopy == "Value" then
+									-- TE had reports of crashing when multiple unique items exist in the world (not equipped or in the player inventory)
+									createdVanityEntity.Value.Unique = false
+								end
 
-							if componentToCopy == "Value" then
-								-- TE had reports of crashing when multiple unique items exist in the world (not equipped or in the player inventory)
-								createdVanityEntity.Value.Unique = false
-							end
+								if componentsToReplicateOnRefresh[componentToCopy] then
+									varComponentsToReplicateOnRefresh[componentToCopy] = Ext.Types.Serialize(equippedItemEntity[componentToCopy])
+								end
 
-							if componentsToReplicateOnRefresh[componentToCopy] then
-								varComponentsToReplicateOnRefresh[componentToCopy] = Ext.Types.Serialize(equippedItemEntity[componentToCopy])
-							end
-
-							if not string.find(componentToCopy, "Server") then
-								Logger:BasicTrace("Replicating %s", componentToCopy)
-								createdVanityEntity:Replicate(componentToCopy)
+								if not string.find(componentToCopy, "Server") then
+									Logger:BasicTrace("Replicating %s", componentToCopy)
+									createdVanityEntity:Replicate(componentToCopy)
+								end
 							end
 						end
 					end
@@ -335,12 +334,9 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 						createdVanityEntity:Replicate(key)
 					end
 				end
-
-				componentBeingCopied = nil
 			end)
 
 			if not success then
-				local componentInfo = componentBeingCopied and Ext.Types.TypeOf(componentBeingCopied)
 				Logger:BasicError(
 					"Encountered error while mogging %s to look like %s for %s. Entity Dumps created at dumps/. \n\tComponent Info: %s\n\tError: %s\n\tBase Item Info: %s\n\tVanity Item Info: %s",
 					equippedItemEntity.DisplayName.Name:Get(),
@@ -348,8 +344,7 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 					character.DisplayName.Name:Get(),
 					Ext.Json.Stringify({
 						name = type(componentToCopy) == "string" and componentToCopy or key,
-						subComponents = type(componentToCopy) == "table" and Ext.Json.Stringify(componentToCopy) or nil,
-						typeOfComponent = componentInfo and Ext.Types.Serialize(componentInfo) or "Component was nil?"
+						subComponents = (type(componentToCopy) == "table") and Ext.Json.Stringify(componentToCopy) or nil
 					}),
 					error,
 					buildMetaInfoForLog(equippedItemEntity),

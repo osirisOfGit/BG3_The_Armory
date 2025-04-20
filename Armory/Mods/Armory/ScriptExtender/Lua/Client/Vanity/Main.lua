@@ -52,7 +52,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 			VanityPresetManager:OpenManager()
 		end
 		--#endregion
-		
+
 		local itemValidatorButton = tabHeader:AddButton("Item Validation Report")
 		itemValidatorButton.SameLine = true
 		itemValidatorButton.OnClick = function()
