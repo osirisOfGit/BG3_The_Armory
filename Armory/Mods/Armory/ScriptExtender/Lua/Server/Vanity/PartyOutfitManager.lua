@@ -146,7 +146,9 @@ Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function(channel, payloa
 end)
 
 Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
+	Transmogger.saveLoadLock = true
 	ApplyTransmogsPerPreset()
+	Transmogger.saveLoadLock = false
 end)
 
 Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(character)

@@ -107,6 +107,9 @@ local function buildMetaInfoForLog(entity)
 	})
 end
 
+-- Lock for transmogs that shouldn't run on save load, like polymorphed chars
+Transmogger.saveLoadLock = false
+
 ---@param character EntityHandle
 function Transmogger:MogCharacter(character)
 	if not ActiveVanityPreset then
@@ -117,7 +120,8 @@ function Transmogger:MogCharacter(character)
 	-- characters that are wildshaped in a save when it's loaded will not start with their equipment, it gets added back by the game,
 	-- but Vanity triggers before that happens, giving the player default items and blocking the requipment of the original ones
 	-- Also, you can't change gear while whildshaped anyway
-	if character.ServerShapeshiftStates
+	if self.saveLoadLock
+		and character.ServerShapeshiftStates
 		and character.ServerShapeshiftStates.States
 		and character.ServerShapeshiftStates.States[1]
 	then
