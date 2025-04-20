@@ -126,6 +126,21 @@
     <content contentuid="ha10b4c04046f48afb9f17c17727c442feeg0" version="1">EFF</content>
     <!-- END Character Panel -->
 
+    <!-- START Base Picker Class -->
+    <content contentuid="h15b23f8636494a0ea1fbb1cb0f605834e5e5" version="1">Show Item Names?</content>
+    <content contentuid="hf774f31272a3408eb1d821627b4dffda274a" version="1">Image Size</content>
+    <content contentuid="h4ecd73d7c85948aa8c7ad088a2aeff4b6g5e" version="1">Favorites</content>
+    <content contentuid="he24fdd27343e4fd8a53e4d37dcb43ffbd210" version="1">Refresh the display view, recomputing items per row</content>
+    <content contentuid="h60320c8fd60f4e329fc979d283e5dce0d340" version="1">Results</content>
+    <content contentuid="h87745ae926e7438fa00f3920006b0aad2gea" version="1">Searching for %s %s</content>
+    <content contentuid="h9dbe60adda1e41ccb5cebf9bde7105753b67" version="1">%s Results</content>
+    <content contentuid="hf01b1f0475134fdfa6ee01f6df801dd180g3" version="1">By Name</content>
+    <content contentuid="h6f1ccb4fee7444d49dfe3f92d670070e118g" version="1">Case-insensitive, min 3 characters</content>
+    <content contentuid="he6026f619cb34081b2bf00be3563b09801ea" version="1">By UUID</content>
+    <content contentuid="h35a82652afb94de4a417ccbda4a61caeg6c9" version="1">Mod Name - Case-insensitive</content>
+    <content contentuid="h2a3702e0861c4c5cbe3ee7a1f332f774g91b" version="1">Clear Selected Mods</content>
+    <!-- END Base Picker Class -->
+
     <!-- START Dye Picker -->
     <content contentuid="hb6a7b860c6ed4eb4b4f7128a2e017e86g632" version="1">Similar Color</content>
     <content contentuid="hbc5959ac156f49cf8a2fa7fddd39adfdee3c" version="1">Base Color</content>

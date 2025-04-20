@@ -217,11 +217,11 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 			end)
 		end
 
-		self.settingsMenu = self.window:AddMainMenu():AddMenu("Settings")
+		self.settingsMenu = self.window:AddMainMenu():AddMenu(Translator:translate("Settings"))
 		self.settingsMenu:SetColor("PopupBg", { 0, 0, 0, 1 })
 
 		self.settingsMenu:AddSeparator()
-		self.settingsMenu:AddText("Show Item Names?")
+		self.settingsMenu:AddText(Translator:translate("Show Item Names?"))
 		local showNameCheckbox = self.settingsMenu:AddCheckbox("", self.settings.showNames)
 		showNameCheckbox.SameLine = true
 		showNameCheckbox.OnChange = function()
@@ -231,7 +231,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		self.settingsMenu:AddSeparator()
 
-		self.settingsMenu:AddText("Image Size")
+		self.settingsMenu:AddText(Translator:translate("Image Size"))
 		local imageSizeSetting = self.settingsMenu:AddSliderInt("", self.settings.imageSize, 10, 200)
 		imageSizeSetting.OnChange = function()
 			self.settings.imageSize = imageSizeSetting.Value[1]
@@ -250,7 +250,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		local row = displayTable:AddRow()
 
-		self.filterGroup = row:AddCell():AddChildWindow("Filters")
+		self.filterGroup = row:AddCell():AddChildWindow(Translator:translate("Filters"))
 		self.filterGroup.Visible = true
 
 		-- Shoutout to Skiz for this
@@ -318,19 +318,19 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 
 		self.warningGroup = self.otherGroup:AddGroup("WarningGroup")
 
-		self.favoritesGroup = self.otherGroup:AddCollapsingHeader("Favorites")
+		self.favoritesGroup = self.otherGroup:AddCollapsingHeader(Translator:translate("Favorites"))
 		self.favoritesGroup.IDContext = self.title .. "Favorites"
 		self.otherGroup:AddNewLine()
 
-		if self.slot then
+		if self.slot and Ext.Utils.Version() >= 23 then
 			local refreshViewButton = Styler:ImageButton(self.otherGroup:AddImageButton("", "ico_reset_d", { 32, 32 }))
-			refreshViewButton:Tooltip():AddText("\t Refresh the display view, recomputing items per row")
+			refreshViewButton:Tooltip():AddText("\t  " .. Translator:translate("Refresh the display view, recomputing items per row"))
 			refreshViewButton.OnClick = function()
 				self:ProcessFilters()
 			end
 		end
-		self.resultSeparator = self.otherGroup:AddSeparatorText("Results")
-		self.resultsGroup = self.otherGroup:AddChildWindow(self.title .. "Results")
+		self.resultSeparator = self.otherGroup:AddSeparatorText(Translator:translate("Results"))
+		self.resultsGroup = self.otherGroup:AddChildWindow(self.title .. Translator:translate("Results"))
 
 		customizeFunc()
 		self:BuildFilters()
@@ -341,7 +341,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window:SetFocus()
 	end
 
-	self.separator.Label = string.format("Searching for %s %s", slot, self.title)
+	self.separator.Label = string.format(Translator:translate("Searching for %s %s"), slot, self.title)
 
 	self:ProcessFilters()
 end
@@ -403,7 +403,7 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 			filter:buildUI()
 		end
 
-		self.resultSeparator.Label = ("%s Results"):format(count)
+		self.resultSeparator.Label = (Translator:translate("%s Results")):format(count)
 	end)
 end
 
@@ -413,9 +413,9 @@ function PickerBaseClass:BuildFilters()
 	local pickerInstance = self
 
 	--#region Search By Name
-	self.filterGroup:AddText("By Name")
+	self.filterGroup:AddText(Translator:translate("By Name"))
 	local nameSearch = self.filterGroup:AddInputText("")
-	nameSearch.Hint = "Case-insensitive, min 3 characters"
+	nameSearch.Hint = Translator:translate("Case-insensitive, min 3 characters")
 	nameSearch.AutoSelectAll = true
 	nameSearch.EscapeClearsAll = true
 	nameSearch.OnChange = function()
@@ -442,9 +442,9 @@ function PickerBaseClass:BuildFilters()
 	--#endregion
 
 	--#region Search By Id
-	self.filterGroup:AddText("By UUID")
+	self.filterGroup:AddText(Translator:translate("By UUID"))
 	local idSearch = self.filterGroup:AddInputText("")
-	idSearch.Hint = "Case-insensitive, min 3 characters"
+	idSearch.Hint = Translator:translate("Case-insensitive, min 3 characters")
 	idSearch.AutoSelectAll = true
 	idSearch.EscapeClearsAll = true
 	idSearch.OnChange = function()
@@ -489,7 +489,7 @@ function PickerBaseClass:BuildFilters()
 	end
 
 	local modNameSearch = modGroup:AddInputText("")
-	modNameSearch.Hint = "Mod Name - Case-insensitive"
+	modNameSearch.Hint = Translator:translate("Mod Name - Case-insensitive")
 	modNameSearch.AutoSelectAll = true
 	modNameSearch.EscapeClearsAll = true
 	modNameSearch.OnChange = function()
@@ -498,7 +498,7 @@ function PickerBaseClass:BuildFilters()
 
 	local clearSelected = Styler:ImageButton(modGroup:AddImageButton("resetMods", "ico_reset_d", { 32, 32 }))
 	clearSelected.SameLine = true
-	clearSelected:Tooltip():AddText("\t Clear Selected Mods")
+	clearSelected:Tooltip():AddText("\t  " .. Translator:translate("Clear Selected Mods"))
 
 	local modFilterWindow = modGroup:AddChildWindow("modFilters")
 	modFilterWindow.NoResize = true
@@ -597,3 +597,18 @@ function PickerBaseClass:BuildFilters()
 
 	self:CreateCustomFilters()
 end
+
+Translator:RegisterTranslation({
+	["Show Item Names?"] = "h15b23f8636494a0ea1fbb1cb0f605834e5e5",
+	["Image Size"] = "hf774f31272a3408eb1d821627b4dffda274a",
+	["Favorites"] = "h4ecd73d7c85948aa8c7ad088a2aeff4b6g5e",
+	["Refresh the display view, recomputing items per row"] = "he24fdd27343e4fd8a53e4d37dcb43ffbd210",
+	["Results"] = "h60320c8fd60f4e329fc979d283e5dce0d340",
+	["Searching for %s %s"] = "h87745ae926e7438fa00f3920006b0aad2gea",
+	["%s Results"] = "h9dbe60adda1e41ccb5cebf9bde7105753b67",
+	["By Name"] = "hf01b1f0475134fdfa6ee01f6df801dd180g3",
+	["Case-insensitive, min 3 characters"] = "h6f1ccb4fee7444d49dfe3f92d670070e118g",
+	["By UUID"] = "he6026f619cb34081b2bf00be3563b09801ea",
+	["Mod Name - Case-insensitive"] = "h35a82652afb94de4a417ccbda4a61caeg6c9",
+	["Clear Selected Mods"] = "h2a3702e0861c4c5cbe3ee7a1f332f774g91b",
+})
