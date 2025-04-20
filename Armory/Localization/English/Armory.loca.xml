@@ -167,4 +167,20 @@
     <content contentuid="h5cb494e597854c4c9d275a25a6573f8436f9" version="1">Registry is nil!</content>
     <content contentuid="hb0c29a13cc8c4fce84e77b3c6e0e670be11d" version="1">No backed up presets!</content>
     <!-- END Backup Manager -->
+
+    <!-- START Export Manager -->
+    <content contentuid="h1e65934b5386473ead8b4c04e2599a40bc03" version="1">Preset Export Manager</content>
+    <content contentuid="hf2d535d5082c4180b299a17bd1425d8d158c" version="1">Export Presets</content>
+    <content contentuid="h74823c34b02c4ddaab857057d5f5940ffb38" version="1">This file can then be packaged with any mod by placing it next to the meta.lsx or be manually sent to users for them to place in the same location Active mods containing this file will automatically be read in by Armory and displayed under the 'Mod Presets' section of the Preset Manager. Users can manually import this file if present on their machine via the menu option within the Preset Manager When exporting presets, an existing file will be completely overwritten with the chosen presets</content>
+    <content contentuid="h2c61d10aaf184da9b05d657831ed2e3c4g51" version="1">Preset(s) successfully exported!</content>
+    <content contentuid="hbf30abefdee747b7acd0145be475ee3d43be" version="1">Export</content>
+    <content contentuid="h7b62ce80af614dd997bb7655c0fee8f66016" version="1">File failed to save - check logs</content>
+    <content contentuid="h7cea480a601c448882c6724413a67d36g1d6" version="1">Import Presets</content>
+    <content contentuid="hfe36d27abca34ce3be19669466742f648662" version="1">Refresh</content>
+    <content contentuid="h2220039b944a417db15fe7c6d52a3c112c47" version="1">Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details</content>
+    <content contentuid="he5f85c5b317b48f28d5744da796c66245a20" version="1">Preset(s) successfully imported!</content>
+    <content contentuid="he795e262f136407c9b3c216e910d4d6fd495" version="1">Import Selected Presets</content>
+    <content contentuid="h6ed4ff24fd8647b1a7ef56df74b19c5de707" version="1">NSFW</content>
+    <content contentuid="h528dee02d5a1465a9c7846a3cb74d3879800" version="1">SFW</content>
+    <!-- END Export Manager -->
 </contentList>

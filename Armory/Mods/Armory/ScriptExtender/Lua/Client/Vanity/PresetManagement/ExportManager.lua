@@ -114,7 +114,7 @@ local exportWindow = nil
 
 function VanityExportManager:BuildExportManagerWindow()
 	if not exportWindow then
-		exportWindow = Ext.IMGUI.NewWindow("Preset Export Manager")
+		exportWindow = Ext.IMGUI.NewWindow(Translator:translate("Preset Export Manager"))
 		exportWindow.Closeable = true
 		exportWindow.AlwaysAutoResize = true
 	else
@@ -124,28 +124,29 @@ function VanityExportManager:BuildExportManagerWindow()
 
 	Helpers:KillChildren(exportWindow)
 
-	local header = exportWindow:AddText("Export Presets")
+	local header = exportWindow:AddText(Translator:translate("Export Presets"))
 	header.Font = "Large"
 
 	exportWindow:AddText(
 		"Selected presets will be exported to %localappdata%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\Armory_Vanity_Presets.json").TextWrapPos = 0
 
-	exportWindow:AddText("This file can then be packaged with any mod by placing it next to the meta.lsx or be manually sent to users for them to place in the same location").TextWrapPos = 0
-	exportWindow:AddText("Active mods containing this file will automatically be read in by Armory and displayed under the 'Mod Presets' section of the Preset Manager. Users can manually import this file if present on their machine via the menu option within the Preset Manager").TextWrapPos = 0
-
-	exportWindow:AddText("When exporting presets, an existing file will be completely overwritten with the chosen presets")
+	exportWindow:AddText(Translator:translate([[
+This file can then be packaged with any mod by placing it next to the meta.lsx or be manually sent to users for them to place in the same location
+Active mods containing this file will automatically be read in by Armory and displayed under the 'Mod Presets' section of the Preset Manager. Users can manually import this file if present on their machine via the menu option within the Preset Manager
+When exporting presets, an existing file will be completely overwritten with the chosen presets
+]])).TextWrapPos = 0
 
 	exportWindow:AddSeparator()
 
 	local selectionGroup = exportWindow:AddGroup("SelectionGroup")
 
-	local exportButton = exportWindow:AddButton("Export")
+	local exportButton = exportWindow:AddButton(Translator:translate("Export"))
 
-	local successText = exportWindow:AddText("Preset(s) successfully exported!")
+	local successText = exportWindow:AddText(Translator:translate("Preset(s) successfully exported!"))
 	successText.Visible = false
 	successText:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 
-	local errorText = exportWindow:AddText("File failed to save - check logs")
+	local errorText = exportWindow:AddText(Translator:translate("File failed to save - check logs"))
 	errorText.Visible = false
 	errorText:SetColor("Text", { 1, 0.02, 0, 1 })
 
@@ -179,7 +180,7 @@ local importWindow
 
 function VanityExportManager:BuildImportManagerWindow()
 	if not importWindow then
-		importWindow = Ext.IMGUI.NewWindow("Import Presets")
+		importWindow = Ext.IMGUI.NewWindow(Translator:translate("Import Presets"))
 		importWindow.Closeable = true
 		importWindow.AlwaysAutoResize = true
 	else
@@ -189,10 +190,10 @@ function VanityExportManager:BuildImportManagerWindow()
 
 	Helpers:KillChildren(importWindow)
 
-	local refreshButton = importWindow:AddButton("Refresh")
+	local refreshButton = importWindow:AddButton(Translator:translate("Refresh"))
 
 	local errorText = importWindow:AddText(string.format(
-		"Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details",
+		Translator:translate("Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"),
 		self.ExportFilename))
 
 	errorText.Visible = false
@@ -200,10 +201,10 @@ function VanityExportManager:BuildImportManagerWindow()
 
 	local presetGroup = importWindow:AddGroup("PresetGroup")
 
-	local successText = importWindow:AddText("Preset(s) successfully imported!")
+	local successText = importWindow:AddText(Translator:translate("Preset(s) successfully imported!"))
 	successText.Visible = false
 	successText:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
-	local importButton = importWindow:AddButton("Import Selected Presets")
+	local importButton = importWindow:AddButton(Translator:translate("Import Selected Presets"))
 
 	---@type Vanity?
 	local exportedPresets
@@ -220,7 +221,7 @@ function VanityExportManager:BuildImportManagerWindow()
 			errorText.Visible = false
 
 			for presetId, preset in pairs(exportedPresets.presets) do
-				local checkbox = presetGroup:AddCheckbox(string.format("%s v%s (%s)", preset.Name, preset.Version, preset.NSFW and "NSFW" or "SFW"))
+				local checkbox = presetGroup:AddCheckbox(string.format("%s v%s (%s)", preset.Name, preset.Version, preset.NSFW and Translator:translate("NSFW") or Translator:translate("SFW")))
 				checkbox.Checked = true
 				checkbox.UserData = presetId
 			end
@@ -246,3 +247,23 @@ function VanityExportManager:BuildImportManagerWindow()
 		end
 	end
 end
+
+Translator:RegisterTranslation({
+	["Preset Export Manager"] = "h1e65934b5386473ead8b4c04e2599a40bc03",
+	["Export Presets"] = "hf2d535d5082c4180b299a17bd1425d8d158c",
+	[([[	
+This file can then be packaged with any mod by placing it next to the meta.lsx or be manually sent to users for them to place in the same location
+Active mods containing this file will automatically be read in by Armory and displayed under the 'Mod Presets' section of the Preset Manager. Users can manually import this file if present on their machine via the menu option within the Preset Manager
+When exporting presets, an existing file will be completely overwritten with the chosen presets
+]])] = "h74823c34b02c4ddaab857057d5f5940ffb38",
+	["Preset(s) successfully exported!"] = "h2c61d10aaf184da9b05d657831ed2e3c4g51",
+	["Export"] = "hbf30abefdee747b7acd0145be475ee3d43be",
+	["File failed to save - check logs"] = "h7b62ce80af614dd997bb7655c0fee8f66016",
+	["Import Presets"] = "h7cea480a601c448882c6724413a67d36g1d6",
+	["Refresh"] = "hfe36d27abca34ce3be19669466742f648662",
+	["Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"] = "h2220039b944a417db15fe7c6d52a3c112c47",
+	["Preset(s) successfully imported!"] = "he5f85c5b317b48f28d5744da796c66245a20",
+	["Import Selected Presets"] = "he795e262f136407c9b3c216e910d4d6fd495",
+	["NSFW"] = "h6ed4ff24fd8647b1a7ef56df74b19c5de707",
+	["SFW"] = "h528dee02d5a1465a9c7846a3cb74d3879800",
+})
