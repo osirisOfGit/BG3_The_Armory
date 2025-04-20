@@ -31,7 +31,7 @@ Ext.RegisterConsoleCommand("Armory_Vanity_SeePresetBackupRegistry", function(cmd
 	if presetBackupRegistry then
 		_D(presetBackupRegistry)
 	else
-		_D("Registry is nil!")
+		_D(Translator:translate("Registry is nil!"))
 	end
 end)
 
@@ -42,7 +42,7 @@ Ext.RegisterConsoleCommand("Armory_Vanity_SeeBackedUpPresets", function(cmd, ...
 	if savedPresets then
 		_D(savedPresets)
 	else
-		_D("No backed up presets!")
+		_D(Translator:translate("No backed up presets!"))
 	end
 end)
 
@@ -147,3 +147,8 @@ function VanityBackupManager:RemovePresetsFromBackup(presetIds)
 	cachedBackup = VanityExportManager:ExportPresets(presetsToKeep)
 	Ext.Vars.GetModVariables(ModuleUUID).SavedPresets = cachedBackup
 end
+
+Translator:RegisterTranslation({
+	["Registry is nil!"] = "h5cb494e597854c4c9d275a25a6573f8436f9",
+	["No backed up presets!"] = "hb0c29a13cc8c4fce84e77b3c6e0e670be11d",
+})

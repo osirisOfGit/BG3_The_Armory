@@ -162,4 +162,9 @@
     <content contentuid="h6363d1da247f4d5d9999da5f43aa382bcf2b" version="1">Hide Appearance</content>
     <content contentuid="h9a821af9dcff45c4b304e8a97265fb5a28e5" version="1">Show Appearance</content>
     <!-- END Slot Context Menu -->
+
+    <!-- START Backup Manager -->
+    <content contentuid="h5cb494e597854c4c9d275a25a6573f8436f9" version="1">Registry is nil!</content>
+    <content contentuid="hb0c29a13cc8c4fce84e77b3c6e0e670be11d" version="1">No backed up presets!</content>
+    <!-- END Backup Manager -->
 </contentList>
