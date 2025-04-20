@@ -122,12 +122,12 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 
 	if preset.isModPreset then
 		local txt = panelGroup:AddText(
-			"Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first")
+			Translator:translate("Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first"))
 		txt.Font = "Large"
 		txt.TextWrapPos = 0
 	else
-		local copyOutfitFromButton = panelGroup:AddButton("Copy From Another Outfit")
-		copyOutfitFromButton:Tooltip():AddText("\t  This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)").TextWrapPos = 600
+		local copyOutfitFromButton = panelGroup:AddButton(Translator:translate("Copy From Another Outfit"))
+		copyOutfitFromButton:Tooltip():AddText("\t  " .. Translator:translate("This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)")).TextWrapPos = 600
 		local copyPopup = panelGroup:AddPopup("CopyOutfit")
 		copyOutfitFromButton.OnClick = function()
 			Helpers:KillChildren(copyPopup)
@@ -214,7 +214,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 					imageButton = parentContainer:AddImageButton(itemSlotOrWeaponTypeEntry[1], "Item_Unknown")
 					imageButton.Background = { 0, 0, 0, 1 }
 					imageButton:SetColor("Button", { 0, 0, 0, 0.5 })
-					imageButton:Tooltip():AddText("Hiding Appearance")
+					imageButton:Tooltip():AddText(Translator:translate("Hiding Appearance"))
 				else
 					---@type ItemTemplate
 					local itemTemplate = Ext.Template.GetTemplate(outfitSlotEntry.equipment.guid)
@@ -332,7 +332,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 
 			--#region Effects
 			if outfitSlotEntry and outfitSlotEntry.equipment and outfitSlotEntry.equipment.effects and (outfitSlotEntry.equipment.effects.__call and outfitSlotEntry.equipment.effects() or next(outfitSlotEntry.equipment.effects)) then
-				local effectsText = supplementaryGroup:AddText("EFF")
+				local effectsText = supplementaryGroup:AddText(Translator:translate("EFF"))
 				effectsText.Font = "Tiny"
 				effectsText:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 			end
@@ -404,3 +404,11 @@ function VanityCharacterPanel:InitializeOutfitSlot(itemSlot, weaponType)
 
 	return outfitSlotEntryForItem
 end
+
+Translator:RegisterTranslation({
+	["Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first"] = "h87888372190f4a01bd3c236148d79209d284",
+	["Copy From Another Outfit"] = "h39a529d80937485fa0cbd44a4a57c13dc09g",
+	["This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)"] = "h0450b90e8cd74c91b1fba6749387ecfd4ec0",
+	["Hiding Appearance"] = "h88ee937b2cc54a608b75e7b6d1cd7682g54e",
+	["EFF"] = "ha10b4c04046f48afb9f17c17727c442feeg0",
+})

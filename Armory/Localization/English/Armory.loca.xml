@@ -96,4 +96,33 @@
     <content contentuid="h42428030fd9c47ccb714a2d75fb9889ea6f8" version="1">Class</content>
     <content contentuid="haf2c5cb12b364e998df5d5d8e08246a091a8" version="1">Subclass</content>
     <!-- END Character Criteria -->
+
+    <!-- START Slots -->
+    <content contentuid="h5b0a2d8f0c8e4ce8a1ef527426e62522fd6e" version="1">Helmet</content>
+    <content contentuid="hf74176385e94459b96532b9a8f8ec3b9045f" version="1">VanityBody</content>
+    <content contentuid="hc01711edcfa04c7ab7864f5dc021545fag8c" version="1">Cloak</content>
+    <content contentuid="h22afc1f6d3c04e3090d77d0cd9875229d2eb" version="1">VanityBoots</content>
+    <content contentuid="h9d436850c7954f209ff1ca964cdd1e65ddfd" version="1">Breast</content>
+    <content contentuid="he10ad70a90374196bd8db63cf562e7d005df" version="1">Underwear</content>
+    <content contentuid="h3fa83144c16847969e15690163e376e5b8a7" version="1">Gloves</content>
+    <content contentuid="heb0eb76654154923a47c7048d68108af9faf" version="1">Amulet</content>
+    <content contentuid="h4a79c4beca6a4f8285bab72cc5f42974021g" version="1">Amulet</content>
+    <content contentuid="hbfcd5aff4b9847c386c05556f0af48e69966" version="1">Boots</content>
+    <content contentuid="ha59b944a5a9443ff81e983e3a0944ad366d2" version="1">Ring1</content>
+    <content contentuid="hdb4fe6b00c944684b377ff5500a18083faca" version="1">Ring2</content>
+    <content contentuid="h89f722dc76464fb2865c179d3ea0e2fbd1b4" version="1">LightSource</content>
+    <content contentuid="h0d91c1d77e094380bbdfec893477981c2100" version="1">MusicalInstrument</content>
+    <content contentuid="hbbdfb364ff944f6d8051bab0aae23218be00" version="1">Melee Main Weapon</content>
+    <content contentuid="hbea1b418c67344de90abe1bf35cb47945204" version="1">Ranged Main Weapon</content>
+    <content contentuid="hd8c60d406e5045828d109396c3ca173a0a6d" version="1">Melee Offhand Weapon</content>
+    <content contentuid="h842b8ade2fec42909acd13a95320c0b1b291" version="1">Ranged Offhand Weapon</content>
+    <!-- END Slots -->
+
+    <!-- START Character Panel -->
+    <content contentuid="h87888372190f4a01bd3c236148d79209d284" version="1">Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first</content>
+    <content contentuid="h39a529d80937485fa0cbd44a4a57c13dc09g" version="1">Copy From Another Outfit</content>
+    <content contentuid="h0450b90e8cd74c91b1fba6749387ecfd4ec0" version="1">This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)</content>
+    <content contentuid="h88ee937b2cc54a608b75e7b6d1cd7682g54e" version="1">Hiding Appearance</content>
+    <content contentuid="ha10b4c04046f48afb9f17c17727c442feeg0" version="1">EFF</content>
+    <!-- END Character Panel -->
 </contentList>

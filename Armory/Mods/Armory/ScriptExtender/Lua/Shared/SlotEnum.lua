@@ -35,3 +35,22 @@ SlotEnum = {
 	[16] = "Melee Offhand Weapon",
 	[17] = "Ranged Offhand Weapon"
 }
+
+Translator:RegisterTranslation({
+	["Helmet"] = "h5b0a2d8f0c8e4ce8a1ef527426e62522fd6e",
+	["VanityBody"] = "hf74176385e94459b96532b9a8f8ec3b9045f",
+	["Cloak"] = "hc01711edcfa04c7ab7864f5dc021545fag8c",
+	["VanityBoots"] = "h22afc1f6d3c04e3090d77d0cd9875229d2eb",
+	["Breast"] = "h9d436850c7954f209ff1ca964cdd1e65ddfd",
+	["Underwear"] = "he10ad70a90374196bd8db63cf562e7d005df",
+	["Amulet"] = "h4a79c4beca6a4f8285bab72cc5f42974021g",
+	["Boots"] = "hbfcd5aff4b9847c386c05556f0af48e69966",
+	["Ring1"] = "ha59b944a5a9443ff81e983e3a0944ad366d2",
+	["Ring2"] = "hdb4fe6b00c944684b377ff5500a18083faca",
+	["LightSource"] = "h89f722dc76464fb2865c179d3ea0e2fbd1b4",
+	["MusicalInstrument"] = "h0d91c1d77e094380bbdfec893477981c2100",
+	["Melee Main Weapon"] = "hbbdfb364ff944f6d8051bab0aae23218be00",
+	["Ranged Main Weapon"] = "hbea1b418c67344de90abe1bf35cb47945204",
+	["Melee Offhand Weapon"] = "hd8c60d406e5045828d109396c3ca173a0a6d",
+	["Ranged Offhand Weapon"] = "h842b8ade2fec42909acd13a95320c0b1b291",
+})
