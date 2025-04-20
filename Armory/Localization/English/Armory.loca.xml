@@ -27,4 +27,55 @@
     <content contentuid="h4243eab69148467d9787ab4a7f0e9927efe9" version="1">Restore Preset</content>
     <content contentuid="hb902441c10684c4bb6cf4299accdbf77e6cb" version="1">Delete Backup and Deactivate Preset</content>
     <!-- END Main MCM Menu -->
+
+    <!-- START Item Validation -->
+    <content contentuid="h8f8b71c378d4457f970052e0bb6edb0cd26a" version="1">Does not have a RootTemplate associated to it</content>
+    <content contentuid="h7074ea7d969741df9b4ef8268ef4c4fd1c39" version="1">Stat</content>
+    <content contentuid="hf2b90aa4dcbb46069fabced42b1c859e527e" version="1">Prevents Transmog</content>
+    <content contentuid="hb60192b3bd634ee6a91649ec0b55c17555f6" version="1">Points to stat %s which does not exist</content>
+    <content contentuid="hbed365f66dc447388aa334cc40e8dd0ae60e" version="1">Points to stat %s, but stat %s points to template %s - template should point to the same stat that points to the template</content>
+    <content contentuid="hf6890715dadb4cf0aabf046da9b59b58025e" version="1">(Which doesn't exist)</content>
+    <content contentuid="h5e063dcf6d1d46d2ae5c59bd810eebbe0d33" version="1">Template</content>
+    <content contentuid="h2ba7d0fda0f340a88417888a57f76aaee1bf" version="1">Has Built-In Workaround</content>
+    <content contentuid="h2ab0ff25e18b41f491ea3d631d7f43d3f78d" version="1">Unknown error ocurred</content>
+    <content contentuid="h9697779ec9624648b2cfd5cab8c7e5793345" version="1">Does not have a Slot defined</content>
+    <content contentuid="he1866918e48548c99364ce926b2300840acf" version="1">Does not have a RootTemplate defined</content>
+    <content contentuid="hc67e61cafa9a47008f413f82b634a6db5339" version="1">RootTemplate %s does not exist</content>
+    <content contentuid="hc69ca3d1da3141f39751f53b8c3e0ae4dgg3" version="1">Does not have a ColorPreset defined</content>
+    <content contentuid="h73ee2f1628a943f58d0346700a3bbf581cfd" version="1">ColorPreset %s does not exist</content>
+    <content contentuid="h432aaf8e6247405fb8a66ae3b22924edd321" version="1">Does not have a Stat defined</content>
+    <content contentuid="h0f1da9613b9e4b87a40d0791321648c744b6" version="1">Points to stat %s, but stat %s points to this template - template should point to the same stat that points to the template</content>
+    <content contentuid="h8ed8091985cf4ea299f59edc7f46f0999gd7" version="1">Validator Report</content>
+    <content contentuid="h75408c1818334a67ba10b5b250c56d040bd7" version="1">Filters</content>
+    <content contentuid="hef8667af5d9d47cb882be6c94bfef135fg1g" version="1">Show Issues That Have Built-In Workarounds</content>
+    <content contentuid="hb94f44966ef742b0bf7c3ce15061ff13a811" version="1">Unknown Author</content>
+    <content contentuid="h123c161fe29d418b948dc502e24bbac174ga" version="1">Unknown Version</content>
+    <content contentuid="h6126932b78b64947837be2c06fd55c530c7c" version="1">Generate Report</content>
+    <content contentuid="hca76fb633ccb45f4a962979ba7ab1a1c05d5" version="1">Successfully generated report at: %s</content>
+    <content contentuid="h6801d43e1343452cbef7b58c76e5bf223717" version="1">Severity</content>
+    <content contentuid="hb2c7504ed8d54e6ba10729cf5e7b3d0da27e" version="1">Type</content>
+    <content contentuid="h77479c482cbf4d7fa8f817daacb099fbe14f" version="1">Id</content>
+    <content contentuid="hbadc4a8fdaa94a05b277ec4f8539fa40b7ac" version="1">Error</content>
+    <content contentuid="h1fd91b2b8b1a4d5da50d0e86c1fd5978b496" version="1">Modified By</content>
+    <content contentuid="h64d7af3e35464776a935fc5f7fa36bfdb3b7" version="1">Prevents Dye</content>
+    <!-- The below intentionally leaves out the message to the mod author, as mods use a lot of english values and most mod makers have to understand English to at least a readable extent -->
+    <content contentuid="h405b02f82ed24dd3a43340655ad3a8cb5a9g" version="1">================ USER: READ THIS SECTION FIRST ================ 
+    This tool is not perfect by any stretch of the imagination - it has to make a lot of guesses based on available information, so it can be inaccurate depending on the type of issue.  Before providing this output to a mod author, please validate the following: 	
+        1. Check the template/stat name - does it have words like "test", "template", or is numbers (like "1", "2")? If so, the reported issue is probably known and expected 	
+        2. Make sure the mod reported for the template/stat makes sense - the SE provided modId isn't perfect, especially if multiple mods are modifying the same thing. 		
+            Any "Overhaul" or "Rebalance" mods are likely not the true owner of the item, and may or may not be responsible for the issue. 		
+            Any issues under Gustav(Dev) or Shared(Dev) are base-game items, so if they've been modified by a mod, disable that mod and see if the issue still occurs. If they haven't been modified, you'll need to patch the item yourself. 	
+        3. Ensure you aren't missing any optional downloads/patches from the mod author - sometimes the base mod will house stats/templates that aren't intended to be used unless a patch/additional mod is downloaded 	
+        4. Check the "Modified By" section and if present, ensure this issue persists without that mod loaded 	
+        5. Check the mod description/bugs/posts section to see if these issues are known and/or already reported - don't be a spammer!  
+    
+    Also, please respect any author's decision to not fix any of the issues identified here, regardless of their reasons. Be polite! 
+    Please don't bring these issues into the Larian discord / help channels unless you're looking to learn how to fix them yourself.  
+    
+    If the next section has a lot of reports, please upload it to https://pastebin.com first and provide the shareable link to the author so you don't bloat their mod page 
+    ===============================================================  
+    
+    ================ PROVIDE THE BELOW TO THE MOD AUTHOR ================</content>
+    <content contentuid="hc2bb0dd943924f5f99eab5f9e1aa71f381ae" version="1">Unknown</content>
+    <!-- END Item Validation -->
 </contentList>
