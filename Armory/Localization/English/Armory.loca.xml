@@ -154,4 +154,12 @@
     <content contentuid="ha92d449ace30423bb7bc0a55d23debe8eef8" version="1">From folder %s</content>
     <content contentuid="h75dccb5798f34d38951cd809b862b9b9300f" version="1">Values are not editable</content>
     <!-- END Dye Picker -->
+
+    <!-- START Slot Context Menu -->
+    <content contentuid="h260010c7678342f89f5a09832dd2ca101b0e" version="1">Pick Vanity Item</content>
+    <content contentuid="h7e4abc9883f2456585775e7b548c67f7eb86" version="1">Pick Dye</content>
+    <content contentuid="h770ae7fb135c42b09168469f28c9d4c0714c" version="1">Clear</content>
+    <content contentuid="h6363d1da247f4d5d9999da5f43aa382bcf2b" version="1">Hide Appearance</content>
+    <content contentuid="h9a821af9dcff45c4b304e8a97265fb5a28e5" version="1">Show Appearance</content>
+    <!-- END Slot Context Menu -->
 </contentList>
