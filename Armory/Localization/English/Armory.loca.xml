@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <contentList>
+    <!-- START Main MCM Menu -->
     <content contentuid="h14895335e14d4041a1427fdc5ec80db6458a" version="1">Show Camp Clothes Out Of Combat</content>
     <content contentuid="h5b5f354b7dd846ca9027d4d6710518e4d2d9" version="1">When enabled the character will automatically have camp clothes shown when out of combat, and main armor shown when entering combat. Only executes this functionality when entering/exiting combat. (Owned by Armory mod)</content>
+    <content contentuid="h343957cb9d284aeb86930a5311c10f61a199" version="1">Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it).</content>
+    <content contentuid="heeef36ef99d5401093a374888ccb2bc6b325" version="1">The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save</content>
+    <content contentuid="hb7bc2ec3130d492f912d638fffa06869c7e6" version="1">It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process don't fully complete until a reload (e.g. Armor type)</content>
+    <content contentuid="h22045f1bbdb6459a811165f3a5c6631c546d" version="1">After creating a preset, you can start defining outfits using the options below. You can select combination of criteria (one item from each column, though Hireling and Origin are mutually exclusive, and you don't have to use all columns) - each combination will create a unique outfit</content>
+    <content contentuid="hd4eba786a08645ee80fae2adccc984d6a80a" version="1">Party members are automatically matched to the _most specific_ outfit defined - the columns in the criteria table are ordered from most specific to least specific.</content>
+    <content contentuid="h8b54792743254ac2ad067581d9d3bace1923" version="1">For example, an outfit that only has Origin assigned to it will take precedence over an outfit that has Race/Subrace/BodyType, but Race/BodyType will take precedence over BodyType/Class/Subclass</content>
+    <content contentuid="hb2e0c6f036da4fc49b793294c8cc9b825f69" version="1">This allows you to create Presets that support a wide variety of party compositions while still adhering to a consistent theme, which can be exported via the Preset Manager for users to manual import or to package with mods (which will be automatically read in by Armory when present in the load order)</content>
+    <content contentuid="hcade6027c785411682b9fdfa3666b2a5efa3" version="1">When an outfit is matched to a character, all equipped items will be automatically transmogged and/or dyed according to the outfit (if a non-weapon slot is empty and a vanity item is defined, a junk item will spawn in that slot to allow the vanity item to show)</content>
+    <content contentuid="h3b3f53c38b1d4e62bb0c3f66e4dc9ffa5gfg" version="1">When an item is unequipped, it will be unmogged/undyed _unless_ it's not contained within an inventory (e.g. throwing or dropping). This is intentional while I figure out what the preferred behavior is</content>
+    <content contentuid="he7ac5c315ea143849d7614f3eea5dc3c3ce6" version="1">Preset Manager</content>
+    <content contentuid="h87bb9fb4d984424b90bf2a07018fce4b7bb9" version="1">Item Validation Report</content>
+    <content contentuid="h147cf2b184734696946b29f53af8634b2939" version="1">Settings</content>
+    <content contentuid="h3cd833c3ceaf423982e2a4e5ccc5cde2617a" version="1">Show Slot Context Menu only when holding Left Shift</content>
+    <content contentuid="h204c96c088344a14a75291a07a5f994a3527" version="1">If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it</content>
+    <content contentuid="h6477215a59964b258c51ae8cc3042963197a" version="1">Generate Junk Items in Empty Slots For Transmog</content>
+    <content contentuid="hf5af20f3b67c4eefb3f6de7db8a8705973f2" version="1">When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur.</content>
+    <content contentuid="hd7c30d7bd7824ca8b05690ed24cbba2575e4" version="1">Choose A Preset</content>
+    <content contentuid="hfdd58b6fefd94e89babdb0cf39c26cb4fa6b" version="1">Active Preset:</content>
+    <content contentuid="h0d3f6797e7ed4d7ca30b60dfd2fb205a07b6" version="1">Armory: Validation of Active Vanity Preset [%s] failed!</content>
+    <content contentuid="h1ce43e8d6ff945fa9e26629c56367aecg181" version="1">Armory: Restore Backed Up Preset</content>
+    <content contentuid="h2ad4ba32de41497e80215ea9d3fe88188d00" version="1">Preset '%s' was detected as the active preset for this save, but is not loaded in the config - however, a backup was found. Restore?</content>
+    <content contentuid="h4243eab69148467d9787ab4a7f0e9927efe9" version="1">Restore Preset</content>
+    <content contentuid="hb902441c10684c4bb6cf4299accdbf77e6cb" version="1">Delete Backup and Deactivate Preset</content>
+    <!-- END Main MCM Menu -->
 </contentList>
