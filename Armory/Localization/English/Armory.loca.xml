@@ -78,4 +78,22 @@
     ================ PROVIDE THE BELOW TO THE MOD AUTHOR ================</content>
     <content contentuid="hc2bb0dd943924f5f99eab5f9e1aa71f381ae" version="1">Unknown</content>
     <!-- END Item Validation -->
+
+    <!-- START Character Criteria -->
+    <content contentuid="hb35104d33791460c8b4c06cf50c8dd06b81b" version="1">Refresh</content>
+    <content contentuid="h669644fe8de44705b09b108b66b2b59b04g2" version="1">See full dependency report for this outfit</content>
+    <content contentuid="h445ed9a92e28469da14f492a0b8e8020902f" version="1">Copy all equipment/dyes/effects to your active outfit</content>
+    <content contentuid="hed6d19ee967542cebd5b729b33caa517360b" version="1">Copy This Outfit To Your Preset(s)</content>
+    <content contentuid="h991dbf35893541b8b2fcabab0d8113427a00" version="1">Copy</content>
+    <content contentuid="hdef001a5c88042978f8cfb0ef435135fa1ab" version="1">See Configured Outfits</content>
+    <content contentuid="h3f8115bf9abd4797a69607745a357f501a19" version="1">Configured Outfits</content>
+    <content contentuid="h25667b0948a04afbb3acfedab04911efe1be" version="1">Select Character Criteria for Outfit</content>
+    <content contentuid="ha057630ea08143a4b03a096c096b2ae078de" version="1">Origin</content>
+    <content contentuid="heaa603343c5a41d28038e0aa9538b6fb3aa2" version="1">Hireling</content>
+    <content contentuid="hbee924c4dc99454c825b5245ee862e161e59" version="1">Race</content>
+    <content contentuid="h85d392bd42a14d92a6533654cfb969bd4agc" version="1">Subrace</content>
+    <content contentuid="h220792c3549346a0acf165fffd99503b975g" version="1">BodyType</content>
+    <content contentuid="h42428030fd9c47ccb714a2d75fb9889ea6f8" version="1">Class</content>
+    <content contentuid="haf2c5cb12b364e998df5d5d8e08246a091a8" version="1">Subclass</content>
+    <!-- END Character Criteria -->
 </contentList>

@@ -18,6 +18,16 @@ VanityCharacterCriteriaType = {
 	Subclass = 7,
 }
 
+Translator:RegisterTranslation({
+	["Origin"] = "ha057630ea08143a4b03a096c096b2ae078de",
+	["Hireling"] = "heaa603343c5a41d28038e0aa9538b6fb3aa2",
+	["Race"] = "hbee924c4dc99454c825b5245ee862e161e59",
+	["Subrace"] = "h85d392bd42a14d92a6533654cfb969bd4agc",
+	["BodyType"] = "h220792c3549346a0acf165fffd99503b975g",
+	["Class"] = "h42428030fd9c47ccb714a2d75fb9889ea6f8",
+	["Subclass"] = "haf2c5cb12b364e998df5d5d8e08246a091a8",
+})
+
 ---@param criteriaTable {[VanityCharacterCriteriaType] : string} of VanityCharacterCriteria values to concat into an ordered key
 ---@return string compositeKey
 function CreateCriteriaCompositeKey(criteriaTable)
