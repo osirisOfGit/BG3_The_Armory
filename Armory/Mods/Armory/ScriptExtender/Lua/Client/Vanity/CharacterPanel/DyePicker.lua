@@ -136,33 +136,33 @@ function DyePicker:CreateCustomFilters()
 	local similarColourFilter = PickerBaseFilterClass:new({ label = "similarColor", priority = 1000 })
 	self.customFilters[similarColourFilter.label] = similarColourFilter
 
-	similarColourFilter.header, similarColourFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("Similar Color"))
+	similarColourFilter.header, similarColourFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree(Translator:translate("Similar Color")))
 
-	local baseColor = similarColourFilter.header:AddColorPicker("Base Color")
+	local baseColor = similarColourFilter.header:AddColorPicker(Translator:translate("Base Color"))
 	baseColor.OnChange = function()
 		self:ProcessFilters()
 	end
 
-	local maxDiffText = similarColourFilter.header:AddText("Max Delta")
+	local maxDiffText = similarColourFilter.header:AddText(Translator:translate("Max Delta"))
 	local maxDistance = similarColourFilter.header:AddSliderInt("", 15, 0, 100)
 	maxDistance.OnChange = function()
 		self:ProcessFilters()
 	end
 
-	local eucledianDistance = similarColourFilter.header:AddRadioButton("Euclidean Distance", false)
-	eucledianDistance:Tooltip():AddText("\t Faster, less accurate")
+	local eucledianDistance = similarColourFilter.header:AddRadioButton(Translator:translate("Euclidean Distance"), false)
+	eucledianDistance:Tooltip():AddText("\t  " .. Translator:translate("Faster, less accurate"))
 
-	local cielab94Delta = similarColourFilter.header:AddRadioButton("CIE94 Delta", true)
-	cielab94Delta:Tooltip():AddText("\t Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)")
+	local cielab94Delta = similarColourFilter.header:AddRadioButton(Translator:translate("CIE94 Delta"), true)
+	cielab94Delta:Tooltip():AddText("\t  " .. Translator:translate("Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)"))
 
 	eucledianDistance.OnActivate = function()
 		cielab94Delta.Active = eucledianDistance.Active
 		eucledianDistance.Active = not eucledianDistance.Active
 
 		if cielab94Delta.Active then
-			maxDiffText.Label = "Max Delta"
+			maxDiffText.Label = Translator:translate("Max Delta")
 		else
-			maxDiffText.Label = "Max Difference %"
+			maxDiffText.Label = Translator:translate("Max Difference %")
 		end
 
 		self:ProcessFilters()
@@ -173,9 +173,9 @@ function DyePicker:CreateCustomFilters()
 		cielab94Delta.Active = not cielab94Delta.Active
 
 		if cielab94Delta.Active then
-			maxDiffText.Label = "Max Delta"
+			maxDiffText.Label = Translator:translate("Max Delta")
 		else
-			maxDiffText.Label = "Max Difference %"
+			maxDiffText.Label = Translator:translate("Max Difference %")
 		end
 		self:ProcessFilters()
 	end
@@ -183,7 +183,7 @@ function DyePicker:CreateCustomFilters()
 	similarColourFilter.header:AddSeparator():SetStyle("ItemSpacing", 20, 20)
 
 	local resetButton = Styler:ImageButton(similarColourFilter.header:AddImageButton("resetColors", "ico_reset_d", { 32, 32 }))
-	resetButton:Tooltip():AddText("\t Clear all selected")
+	resetButton:Tooltip():AddText("\t  " .. Translator:translate("Clear all selected"))
 
 	local selectedCount = 0
 	local checkboxGroup = similarColourFilter.header:AddGroup("checkboxes")
@@ -311,14 +311,14 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 		if dyeStat then
 			local modInfo = Ext.Mod.GetMod(dyeStat.ModId)
 
-			dyeInfoGroup:AddText(string.format("From '%s' by '%s'", modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian"))
+			dyeInfoGroup:AddText(string.format(Translator:translate("From '%s' by '%s'"), modInfo.Info.Name, modInfo.Info.Author ~= '' and modInfo.Info.Author or "Larian"))
 				:SetColor("Text", { 1, 1, 1, 0.5 })
 		else
 			local modId = dyeTemplate.FileName:match("([^/]+)/RootTemplates/")
 			if modId and modId:match("_[0-9a-fA-F%-]+$") then
 				modId = modId:gsub("_[0-9a-fA-F%-]+$", "")
 			end
-			dyeInfoGroup:AddText(string.format("From folder %s", modId)):SetColor("Text", { 1, 1, 1, 0.5 })
+			dyeInfoGroup:AddText(string.format(Translator:translate("From folder %s"), modId)):SetColor("Text", { 1, 1, 1, 0.5 })
 		end
 
 		dyeInfoGroup:AddButton("Select").OnClick = function()
@@ -340,7 +340,7 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 			return a.Parameter < b.Parameter
 		end)
 
-		dyeInfoGroup:AddText("Values are not editable"):SetStyle("Alpha", 0.65)
+		dyeInfoGroup:AddText(Translator:translate("Values are not editable")):SetStyle("Alpha", 0.65)
 
 		local dyeTable = dyeInfoGroup:AddTable(dyeTemplate.Id, 2)
 		dyeTable.SizingStretchProp = true
@@ -372,3 +372,17 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 		self:ProcessFilters()
 	end
 end
+
+Translator:RegisterTranslation({
+	["Similar Color"] = "hb6a7b860c6ed4eb4b4f7128a2e017e86g632",
+	["Base Color"] = "hbc5959ac156f49cf8a2fa7fddd39adfdee3c",
+	["Max Delta"] = "h2529490b172d4c50ac5fd15a95518db39660",
+	["Euclidean Distance"] = "hfe62d8f993574d94bf9a3fc3237355540852",
+	["Faster, less accurate"] = "h328df4ad01d44d79b55f03064091f9e0e8e3",
+	["CIE94 Delta"] = "h72202728a036493c9f4306bf78307c774877",
+	["Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)"] = "hc0aa5fd57af24a15a60ef1520fe37d5b8a9d",
+	["Clear all selected"] = "h1359eb40e8454a6f95882d1c8c8040adc0c1",
+	["From '%s' by '%s'"] = "h3c40176769e948bca7d57ee57e58210bdg19",
+	["From folder %s"] = "ha92d449ace30423bb7bc0a55d23debe8eef8",
+	["Values are not editable"] = "h75dccb5798f34d38951cd809b862b9b9300f",
+})

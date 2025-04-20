@@ -125,4 +125,18 @@
     <content contentuid="h88ee937b2cc54a608b75e7b6d1cd7682g54e" version="1">Hiding Appearance</content>
     <content contentuid="ha10b4c04046f48afb9f17c17727c442feeg0" version="1">EFF</content>
     <!-- END Character Panel -->
+
+    <!-- START Dye Picker -->
+    <content contentuid="hb6a7b860c6ed4eb4b4f7128a2e017e86g632" version="1">Similar Color</content>
+    <content contentuid="hbc5959ac156f49cf8a2fa7fddd39adfdee3c" version="1">Base Color</content>
+    <content contentuid="h2529490b172d4c50ac5fd15a95518db39660" version="1">Max Delta</content>
+    <content contentuid="hfe62d8f993574d94bf9a3fc3237355540852" version="1">Euclidean Distance</content>
+    <content contentuid="h328df4ad01d44d79b55f03064091f9e0e8e3" version="1">Faster, less accurate</content>
+    <content contentuid="h72202728a036493c9f4306bf78307c774877" version="1">CIE94 Delta</content>
+    <content contentuid="hc0aa5fd57af24a15a60ef1520fe37d5b8a9d" version="1">Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)&lt;br&gt;(don't @ me CIE2000 nerds, I ain't that smart)</content>
+    <content contentuid="h1359eb40e8454a6f95882d1c8c8040adc0c1" version="1">Clear all selected</content>
+    <content contentuid="h3c40176769e948bca7d57ee57e58210bdg19" version="1">From '%s' by '%s'</content>
+    <content contentuid="ha92d449ace30423bb7bc0a55d23debe8eef8" version="1">From folder %s</content>
+    <content contentuid="h75dccb5798f34d38951cd809b862b9b9300f" version="1">Values are not editable</content>
+    <!-- END Dye Picker -->
 </contentList>
