@@ -574,6 +574,7 @@ function PickerBaseClass:BuildFilters()
 
 	clearSelected.OnClick = function()
 		modFilter.selectedFilters = {}
+		Helpers:KillChildren(modFilterWindow)
 		self:ProcessFilters()
 	end
 
