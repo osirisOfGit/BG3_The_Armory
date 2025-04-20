@@ -11,6 +11,8 @@ EquipmentPicker = PickerBaseClass:new("Equipment", {
 	vanityOutfitSlot = nil
 })
 
+local clearStatSlotChildren
+
 function EquipmentPicker:CreateCustomFilters()
 	--#region EquipmentRaceFilter
 	local equipmentRaceFilter = PickerBaseFilterClass:new({ label = "EquipmentRace" })
@@ -233,58 +235,267 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	armorTypeFilter.header:AddNewLine()
 	--#endregion
 
-	--#region Slot filter
-	local equivalentSlots = {
-		["Breast"] = "VanityBody",
-		["Boots"] = "VanityBoots"
-	}
+	--#region Item Stat Slot filter
+	local statSlotFilter = PickerBaseFilterClass:new({ label = "StatSlot", priority = 0 })
+	self.customFilters[statSlotFilter.label] = statSlotFilter
+	statSlotFilter.header, statSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Stat Slot"))
 
-	local itemTypeFilter = PickerBaseFilterClass:new({ label = "SlotType", priority = 1 })
-	self.customFilters[itemTypeFilter.label] = itemTypeFilter
-	itemTypeFilter.apply = function(self, itemTemplate)
+	local statSlotTooltip = statSlotFilter.header:Tooltip()
+	statSlotTooltip:AddText("\t Determined by the Template's Stat's Slot")
+
+	statSlotFilter.selectedFilters = {}
+	local statSlotCount = 0
+	local statSlotGroup = statSlotFilter.header:AddGroup("statSlotFilter")
+
+	statSlotFilter.header:AddNewLine()
+
+	statSlotFilter.apply = function(self, itemTemplate)
 		local itemTemplateId = itemTemplate.Id
 
 		---@type Armor|Weapon|Object
 		local itemStat = Ext.Stats.Get(EquipmentPicker.itemIndex.templateIdAndStat[itemTemplateId])
 
-		-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
-		local matchesSlot = itemStat.Slot == EquipmentPicker.slot
+		---@param slot ActualSlot
+		---@return boolean
+		local function doesMatchSlot(slot)
+			-- I started out with a combined if statement. I can't stress enough that I severely regret that decision.
+			local matchesSlot = itemStat.Slot == slot
 
-		if EquipmentPicker.weaponType and not string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), EquipmentPicker.weaponType) then
-			return false
-		elseif EquipmentPicker.slot == "LightSource" and itemStat.ItemGroup ~= "Torch" then
-			return false
-		elseif not matchesSlot and EquipmentPicker.slot ~= "LightSource" then
-			local canGoInOffhand = true
-			if string.find(EquipmentPicker.slot, "Offhand") and string.find(itemStat.Slot, "Main") and EquipmentPicker.slot == string.gsub(itemStat.Slot, "Main", "Offhand") then
-				for _, property in pairs(itemStat["Weapon Properties"]) do
-					if property == "Heavy" or property == "Twohanded" then
-						canGoInOffhand = false
-						break
+			if EquipmentPicker.weaponType and not string.find(Ext.Json.Stringify(itemStat["Proficiency Group"], { Beautify = false }), EquipmentPicker.weaponType) then
+				return false
+			elseif slot == "LightSource" and itemStat.ItemGroup ~= "Torch" then
+				return false
+			elseif not matchesSlot and slot ~= "LightSource" then
+				local canGoInOffhand = true
+				if string.find(slot, "Offhand") and string.find(itemStat.Slot, "Main") and slot == string.gsub(itemStat.Slot, "Main", "Offhand") then
+					for _, property in pairs(itemStat["Weapon Properties"]) do
+						if property == "Heavy" or property == "Twohanded" then
+							canGoInOffhand = false
+							break
+						end
+					end
+				else
+					canGoInOffhand = false
+				end
+
+				if not canGoInOffhand then
+					return false
+				end
+			end
+
+			return true
+		end
+
+		if string.find(EquipmentPicker.slot, "Weapon") or #statSlotGroup.Children == 0 then
+			return doesMatchSlot(EquipmentPicker.slot)
+		else
+			if itemStat.ModifierList == "Weapon" then
+				return false
+			end
+
+			if self.header.Visible
+				and TableUtils:ListContains(statSlotGroup.Children, function(value)
+					return value.Checked
+				end)
+			then
+				for _, slotBox in pairs(statSlotGroup.Children) do
+					---@cast slotBox ExtuiCheckbox
+					if slotBox.Checked and doesMatchSlot(slotBox.UserData) then
+						return true
 					end
 				end
-			else
-				canGoInOffhand = false
-			end
-
-			local isEquivalentSlot = false
-			for slot1, slot2 in pairs(equivalentSlots) do
-				if (slot1 == EquipmentPicker.slot and string.find(slot2, itemStat.Slot))
-					or (slot2 == EquipmentPicker.slot and string.find(slot1, itemStat.Slot))
-				then
-					isEquivalentSlot = true
-					break
-				end
-			end
-
-			if not canGoInOffhand and not isEquivalentSlot then
 				return false
 			end
 		end
 
 		return true
 	end
+
+	statSlotFilter.initializeUIBuilder = function(self)
+		self.filterBuilders = {}
+
+		if string.find(EquipmentPicker.slot, "Weapon") then
+			self.header.Visible = false
+			return
+		else
+			self.header.Visible = true
+		end
+
+		statSlotCount = 0
+
+		self.filterTable = {}
+
+		for _, slot in ipairs(SlotEnum) do
+			if not string.find(slot, "Weapon") then
+				table.insert(self.filterTable, slot)
+			end
+		end
+	end
+
+	statSlotFilter.buildUI = function(self)
+		Helpers:KillChildren(statSlotGroup)
+		for _, func in TableUtils:OrderedPairs(self.filterBuilders) do
+			func()
+		end
+	end
+
+	statSlotFilter.prepareFilterUI = function(self, itemTemplate)
+		if self.header.Visible then
+			for i, filterSlot in pairs(self.filterTable) do
+				---@type Armor|Weapon|Object
+				local itemStat = Ext.Stats.Get(EquipmentPicker.itemIndex.templateIdAndStat[itemTemplate.Id])
+
+				if itemStat.Slot == filterSlot then
+					self.filterTable[i] = nil
+					self.filterBuilders[filterSlot] = function()
+						local checkbox = statSlotGroup:AddCheckbox(filterSlot)
+						checkbox.UserData = filterSlot
+						checkbox.Checked = self.selectedFilters[filterSlot] or false
+						statSlotCount = statSlotCount + (checkbox.Checked and 1 or 0)
+
+						checkbox.OnHoverEnter = function()
+							statSlotTooltip.Visible = false
+						end
+						checkbox.OnHoverLeave = function()
+							statSlotTooltip.Visible = true
+						end
+						checkbox.OnChange = function()
+							self.selectedFilters[filterSlot] = checkbox.Checked or nil
+							statSlotCount = statSlotCount + (checkbox.Checked and 1 or -1)
+
+							self.updateLabelWithCount(statSlotCount)
+							EquipmentPicker:ProcessFilters(self.label)
+						end
+
+						self.updateLabelWithCount(statSlotCount)
+					end
+				end
+			end
+		end
+	end
 	--#endregion
+
+	--#region Template Slot Filter
+	local templateSlotFilter = PickerBaseFilterClass:new({ label = "TemplateSlot", priority = 1 })
+	self.customFilters[templateSlotFilter.label] = templateSlotFilter
+	templateSlotFilter.header, templateSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Visual Slot"))
+
+	local templateSlotTooltip = templateSlotFilter.header:Tooltip()
+	templateSlotTooltip:AddText("\t Determined by the Template's Equipment Slot")
+
+	templateSlotFilter.selectedFilters = {}
+	local templateSlotCount = 0
+	local templateSlotGroup = templateSlotFilter.header:AddGroup("templateSlotFilter")
+
+	templateSlotFilter.apply = function(self, itemTemplate)
+		if self.header.Visible then
+			if not itemTemplate.Equipment or not itemTemplate.Equipment.Slot then
+				return false
+			elseif TableUtils:ListContains(templateSlotGroup.Children, function(value)
+					return value.Checked
+				end)
+			then
+				for _, slot in pairs(itemTemplate.Equipment.Slot) do
+					if TableUtils:ListContains(templateSlotGroup.Children, function(value)
+							---@cast value ExtuiCheckbox
+							return value.UserData == slot and value.Checked
+						end)
+					then
+						return true
+					end
+				end
+				return false
+			end
+		end
+		return true
+	end
+
+	templateSlotFilter.initializeUIBuilder = function(self)
+		self.filterBuilders = {}
+
+		if string.find(EquipmentPicker.slot, "Weapon") then
+			self.header.Visible = false
+			return
+		else
+			self.header.Visible = true
+		end
+
+		templateSlotCount = 0
+
+		self.filterTable = {}
+
+		for _, slot in ipairs(TemplateEquipmentSlot) do
+			table.insert(self.filterTable, slot)
+		end
+	end
+
+	templateSlotFilter.buildUI = function(self)
+		Helpers:KillChildren(templateSlotGroup)
+		for _, func in TableUtils:OrderedPairs(self.filterBuilders) do
+			func()
+		end
+	end
+
+	templateSlotFilter.prepareFilterUI = function(self, itemTemplate)
+		if self.header.Visible
+			and itemTemplate.Equipment
+			and itemTemplate.Equipment.Slot
+		then
+			for i, filterSlot in pairs(self.filterTable) do
+				local buildCheckbox
+
+				for _, templateSlot in pairs(itemTemplate.Equipment.Slot) do
+					if templateSlot == filterSlot then
+						buildCheckbox = true
+						break
+					end
+				end
+
+				if buildCheckbox then
+					self.filterTable[i] = nil
+					self.filterBuilders[filterSlot] = function()
+						local checkbox = templateSlotGroup:AddCheckbox(filterSlot)
+						checkbox.UserData = filterSlot
+						checkbox.Checked = self.selectedFilters[filterSlot] or false
+						if filterSlot == "Cloak" then
+							checkbox:Tooltip():AddText("\t  Vanilla cloaks don't use this value for some reason - use stat slots to find those")
+						end
+						templateSlotCount = templateSlotCount + (checkbox.Checked and 1 or 0)
+
+						checkbox.OnHoverEnter = function()
+							templateSlotTooltip.Visible = false
+						end
+						checkbox.OnHoverLeave = function()
+							templateSlotTooltip.Visible = true
+						end
+						checkbox.OnChange = function()
+							self.selectedFilters[filterSlot] = checkbox.Checked or nil
+							templateSlotCount = templateSlotCount + (checkbox.Checked and 1 or -1)
+
+							self.updateLabelWithCount(templateSlotCount)
+							EquipmentPicker:ProcessFilters(self.label)
+						end
+
+						self.updateLabelWithCount(templateSlotCount)
+					end
+				end
+			end
+		end
+	end
+
+	--#endregion
+
+	clearStatSlotChildren = function()
+		for _, statSlot in pairs(statSlotGroup.Children) do
+			statSlot.Checked = statSlot.UserData == self.slot
+		end
+		statSlotFilter.selectedFilters = {}
+
+		for _, templateSlot in pairs(templateSlotGroup.Children) do
+			templateSlot.Checked = false
+		end
+		templateSlotFilter.selectedFilters = {}
+	end
 end
 
 ---@param slot ActualSlot
@@ -317,6 +528,9 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
 		end)
 
+	clearStatSlotChildren()
+	self.customFilters["StatSlot"].selectedFilters[slot] = true
+
 	Helpers:KillChildren(self.warningGroup)
 	if string.match(self.slot, "Offhand") then
 		local warningButton = Styler:ImageButton(self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 }))
@@ -344,7 +558,7 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	itemGroup.NoSavedSettings = true
 	itemGroup.Size = { self.settings.imageSize + 40, self.settings.imageSize + (self.settings.showNames and 100 or 10) }
 
-	if displayGroup.Handle == self.resultsGroup.Handle then
+	if displayGroup.Handle == self.resultsGroup.Handle and Ext.Utils.Version() >= 23 then
 		local maxRowSize = math.floor(self.resultsGroup.LastSize[1] / itemGroup.Size[1])
 
 		if maxRowSize > 0 then
@@ -392,7 +606,8 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 		self.equipmentPreviewTimer = Ext.Timer.WaitFor(300, function()
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", Ext.Json.Stringify({
 				templateId = itemTemplate.Id,
-				dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil
+				dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
+				slot = self.slot
 			}))
 
 			self.equipmentPreviewTimer = nil
