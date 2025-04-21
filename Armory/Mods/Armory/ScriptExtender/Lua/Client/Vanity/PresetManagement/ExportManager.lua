@@ -134,7 +134,7 @@ function VanityExportManager:BuildExportManagerWindow()
 This file can then be packaged with any mod by placing it next to the meta.lsx or be manually sent to users for them to place in the same location
 Active mods containing this file will automatically be read in by Armory and displayed under the 'Mod Presets' section of the Preset Manager. Users can manually import this file if present on their machine via the menu option within the Preset Manager
 When exporting presets, an existing file will be completely overwritten with the chosen presets
-]])).TextWrapPos = 0
+]])).TextWrapPos = 800
 
 	exportWindow:AddSeparator()
 

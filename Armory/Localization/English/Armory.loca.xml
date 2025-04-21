@@ -171,7 +171,11 @@
     <!-- START Export Manager -->
     <content contentuid="h1e65934b5386473ead8b4c04e2599a40bc03" version="1">Preset Export Manager</content>
     <content contentuid="hf2d535d5082c4180b299a17bd1425d8d158c" version="1">Export Presets</content>
-    <content contentuid="h74823c34b02c4ddaab857057d5f5940ffb38" version="1">This file can then be packaged with any mod by placing it next to the meta.lsx or be manually sent to users for them to place in the same location Active mods containing this file will automatically be read in by Armory and displayed under the 'Mod Presets' section of the Preset Manager. Users can manually import this file if present on their machine via the menu option within the Preset Manager When exporting presets, an existing file will be completely overwritten with the chosen presets</content>
+    <content contentuid="h74823c34b02c4ddaab857057d5f5940ffb38" version="1">This file can then be packaged with any mod by placing it next to the meta.lsx or be manually sent to users for them to place in the same location 
+    Active mods containing this file will automatically be read in by Armory and displayed under the 'Mod Presets' section of the Preset Manager. 
+    Users can manually import this file if present on their machine via the menu option within the Preset Manager 
+    When exporting presets, an existing file will be completely overwritten with the chosen presets</content>
+
     <content contentuid="h2c61d10aaf184da9b05d657831ed2e3c4g51" version="1">Preset(s) successfully exported!</content>
     <content contentuid="hbf30abefdee747b7acd0145be475ee3d43be" version="1">Export</content>
     <content contentuid="h7b62ce80af614dd997bb7655c0fee8f66016" version="1">File failed to save - check logs</content>
@@ -183,4 +187,26 @@
     <content contentuid="h6ed4ff24fd8647b1a7ef56df74b19c5de707" version="1">NSFW</content>
     <content contentuid="h528dee02d5a1465a9c7846a3cb74d3879800" version="1">SFW</content>
     <!-- END Export Manager -->
+
+    <!-- START Mod Dependency Manager -->
+    <content contentuid="h30ebfb0890a94acfafd6fcb2c7055e95b3cc" version="1">(Not Loaded)</content>
+    <content contentuid="h86454123313f4929bd5323d270167fcec8cg" version="1">Not Found</content>
+    <content contentuid="h793469ac5bc24c4987d5a1b09f7c7b89b714" version="1">(Custom Dependency)</content>
+    <content contentuid="h00f60c3fa76548999a7841c7df32782d0ded" version="1">Character Criteria:</content>
+    <content contentuid="he2c28fd2c0b44fa58a446bd615d758831a12" version="1">Dependency Validation Failed!</content>
+    <content contentuid="h442cbe39c77f40a09e0509602f3a9fad604c" version="1">Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)</content>
+    <content contentuid="heb24a0aa862a4d0380d2f5038a48f8bcdf01" version="1">Columns can be resized by clicking and dragging on the vertical lines between columns</content>
+    <content contentuid="h8075c08128ba48c6a76e1315c1e02fd22dee" version="1">ResourceID</content>
+    <content contentuid="habe8e5de7a1f4962b043cf6c7023635886af" version="1">Display Name</content>
+    <content contentuid="h253b5aa5fb084ec1907b62ea91a50ef5af7e" version="1">Resource Category</content>
+    <content contentuid="h066957084e8f4457a6d8be67e244f9c7cd1g" version="1">Mod Info</content>
+    <content contentuid="h24774f919e0148bcac988d09e6ec6b98231d" version="1">Unknown - check custom dependencies</content>
+    <content contentuid="hc0010df89a234f54b7fd4d48dc82acaaeb3g" version="1">Mod Dependencies</content>
+    <content contentuid="h5e93f9fb5bac4a28904d1a16cf55f67c0f2e" version="1">Slot</content>
+    <content contentuid="h75e82a26e6c6488798ece79f67c38f277g5c" version="1">Item</content>
+    <content contentuid="h83253fe60dd1465192fbc54380e3b160bf7e" version="1">Dye</content>
+    <content contentuid="h17bbaf1f69dd4ab7842d6abea3272eea7ebf" version="1">Mod</content>
+    <content contentuid="h089952c189144c1bad82f5281bafef2397a8" version="1">Effects</content>
+    <content contentuid="hcf4a7001f0b840068800475066d499a8ge2g" version="1">Appearance Hidden</content>
+    <!-- END Mod Dependency Manager -->
 </contentList>
