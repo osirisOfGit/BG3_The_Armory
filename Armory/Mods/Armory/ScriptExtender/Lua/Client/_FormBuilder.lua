@@ -30,7 +30,8 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 	Helpers:KillChildren(parent)
 
 	for _, formInput in pairs(formInputs) do
-		local label = parent:AddText(formInput.label)
+		local label = parent:AddText(Translator:translate(formInput.label))
+
 		if formInput.errorMessageIfEmpty then
 			label.Label = label.Label .. "*"
 		end

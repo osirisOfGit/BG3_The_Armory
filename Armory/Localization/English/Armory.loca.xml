@@ -123,6 +123,7 @@
     <content contentuid="h39a529d80937485fa0cbd44a4a57c13dc09g" version="1">Copy From Another Outfit</content>
     <content contentuid="h0450b90e8cd74c91b1fba6749387ecfd4ec0" version="1">This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)</content>
     <content contentuid="h88ee937b2cc54a608b75e7b6d1cd7682g54e" version="1">Hiding Appearance</content>
+    <!-- Short for EFFECT, indicator for active effects next to slots -->
     <content contentuid="ha10b4c04046f48afb9f17c17727c442feeg0" version="1">EFF</content>
     <!-- END Character Panel -->
 
@@ -209,4 +210,53 @@
     <content contentuid="h089952c189144c1bad82f5281bafef2397a8" version="1">Effects</content>
     <content contentuid="hcf4a7001f0b840068800475066d499a8ge2g" version="1">Appearance Hidden</content>
     <!-- END Mod Dependency Manager -->
+
+    <!-- START Preset Manager -->
+    <content contentuid="h0c775f4f9b1b4a8da184b42a54961e65gc0a" version="1">Author</content>
+    <content contentuid="h2f93c88025444a8a8dc8692b89cd00749d82" version="1">This is a required field</content>
+    <content contentuid="h8cf4fc5072a14706bb86a7700e907395bb9d" version="1">Name</content>
+    <content contentuid="h0fbbbc8cc91342acb5f2618f7e516f02f784" version="1">Version</content>
+    <content contentuid="hfef14e1ed1e244da914d944ba1273dd77fga" version="1">Vanity Preset Manager</content>
+    <content contentuid="h36a65f42e9454d8e9d55db55acd77a17158e" version="1">Manage Presets</content>
+    <content contentuid="h02e16e4c68864e839f3e8051eaf2a2d9b04c" version="1">Create</content>
+    <content contentuid="he99b2e5a0ee74074a9958b5bfe5612f8558d" version="1">Export</content>
+    <content contentuid="h7bb0a4f461a54390804603cc81c72341633b" version="1">Import</content>
+    <content contentuid="h9f20917d682d419cb126147a04f7cac54057" version="1">Your Presets</content>
+    <content contentuid="ha36a9cae681941d897becb20f0deb5873c5d" version="1">Mod Presets</content>
+    <content contentuid="hec26e6f59bdb43eb85700c98e7a19143c347" version="1">Preset Information</content>
+    <content contentuid="hdf32fd262354456c9c1aec067af5220637bg" version="1">Dependencies</content>
+    <content contentuid="hcc2a773852c04c058bbb400119a6d59b89d7" version="1">Unknown - Mod Not Loaded</content>
+    <content contentuid="ha9e7348b2fdf4b3c84d3e85d51bb7b828gge" version="1">Unknown</content>
+    <content contentuid="hd5230f18925447c48ae1aa25225548fe4gc2" version="1">Equipment</content>
+    <content contentuid="hdb1ccb583441428d9969cd8399a69f4fad93" version="1">This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign. 
+    Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.
+    Backup will be removed if this option is disabled or the preset is deleted via this UI 
+    You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console</content>
+    <!-- Below two are used as replacements for the %s above -->
+    <content contentuid="hc866d5f99b614659a916d385a2a169ff4fba" version="1">is</content>
+    <content contentuid="h655fa609aba94e4da173f288273bb164f327" version="1">is not</content>
+    <content contentuid="h56e8b2c4fe22439f872e50563cd22980475g" version="1">Copied from %s v%s by %s</content>
+    <content contentuid="h13cdd47ac7e042a899f01b53c16d7168500c" version="1">Activate this preset (deactivates the active preset if there is one)</content>
+    <content contentuid="h42ee9c3a84d24714948eba0228ed7332e1ab" version="1">Deactivate this preset</content>
+    <content contentuid="hd42726262de242a59fa8b101e7ae76a24cb6" version="1">Edit this preset's name/author/version/SFW flag</content>
+    <content contentuid="hcfe9a7b1e464427ba15aaf9b84e1d1d945bf" version="1">Clone this preset into your local config, making a copy you can edit</content>
+    <content contentuid="heebe64439a5148979d83ee0673ded21fc077" version="1">Duplicate this preset</content>
+    <content contentuid="h42293f999b9949beaa6206ff558d630c8e12" version="1">(Copy)</content>
+    <content contentuid="heb9024ee3f44462e8a590264854093def107" version="1">Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled</content>
+    <content contentuid="hbd3ce5eb5269474da9bbcef2a47324a86772" version="1">Custom Dependencies</content>
+    <content contentuid="h99ceff29985f4d5693aebbca0e79c0486959" version="1">Add Custom Dependency</content>
+    <content contentuid="he4650ba63a7140ac8c8f0c4b571b8f68f343" version="1">Required Field</content>
+    <content contentuid="h5c0839d1f5ac4301868aa03ede57bd1cf191" version="1">Minimum Version</content>
+    <content contentuid="h2fa625ee384f4a0e8316751b36c74a7ae781" version="1">UUID</content>
+    <content contentuid="h96f6254d6a5a4fc8b3c66fd1ae0fdf9bdg77" version="1">UUIDs of Packaged Resources (i.e Classes, MultiEffect Info) - One UUID Per Line</content>
+    <content contentuid="h24c4edbd963f4a9bbc2f4d687a55805ae561" version="1">Notes</content>
+    <content contentuid="h5f891e61a23341f5a0006e2ff2fa4813f1a3" version="1">Packaged Resource UUIDs</content>
+    <content contentuid="h1e0fd8dd3b4c4b74ac5f5612827665336cdb" version="1">Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod</content>
+    <!-- Label for the delete button -->
+    <content contentuid="h76c716ee29b14bed95b8ae32f030b812c5ac" version="1">X</content>
+    <content contentuid="h2eb2e6ab9c57419b9b1a4e093a90f3d06d0g" version="1">Swap between Overall and Per-Outfit view</content>
+    <content contentuid="h0a6eaeaa1fda45bfa725d97b81f4ea24b10f" version="1">Configured Outfits</content>
+    <content contentuid="heaa77ab0ae33446b97b5ba4027a456e860c5" version="1">Mod Dependencies</content>
+    <content contentuid="hc92985c0bcec460f847ab891262ec4a15dec" version="1">Outfit Report</content>
+    <!-- END Preset Manager -->
 </contentList>

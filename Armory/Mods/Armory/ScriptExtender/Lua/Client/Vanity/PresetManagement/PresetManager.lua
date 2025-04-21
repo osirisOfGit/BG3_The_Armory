@@ -84,20 +84,20 @@ function VanityPresetManager:OpenManager()
 		VanityPresetManager:UpdatePresetView()
 	elseif not presetWindow then
 		Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
-		presetWindow = Ext.IMGUI.NewWindow("Vanity Preset Manager")
+		presetWindow = Ext.IMGUI.NewWindow(Translator:translate("Vanity Preset Manager"))
 		presetWindow.Closeable = true
 
 		presetWindow.MenuBar = true
 		local menu = presetWindow:AddMainMenu()
 		---@type ExtuiMenu
-		local presetMenu = menu:AddMenu("Manage Presets")
+		local presetMenu = menu:AddMenu(Translator:translate("Manage Presets"))
 
 		---@type ExtuiSelectable
-		local createNewPresetButton = presetMenu:AddSelectable("Create")
+		local createNewPresetButton = presetMenu:AddSelectable(Translator:translate("Create"))
 		---@type ExtuiSelectable
-		local openExportManagerButton = presetMenu:AddSelectable("Export")
+		local openExportManagerButton = presetMenu:AddSelectable(Translator:translate("Export"))
 		---@type ExtuiSelectable
-		local importPresetsFromFileButton = presetMenu:AddSelectable("Import")
+		local importPresetsFromFileButton = presetMenu:AddSelectable(Translator:translate("Import"))
 
 		openExportManagerButton.OnClick = function()
 			openExportManagerButton.Selected = false
@@ -136,19 +136,19 @@ function VanityPresetManager:OpenManager()
 		presetTable.ColumnDefs[1].Width = 0
 
 		userPresetSection = selectionCell:AddGroup("User_Presets")
-		local userHeader = userPresetSection:AddSeparatorText("Your Presets")
+		local userHeader = userPresetSection:AddSeparatorText(Translator:translate("Your Presets"))
 		userHeader:SetStyle("SeparatorTextAlign", 0.5)
 		userHeader.Font = "Large"
 		userHeader.UserData = "keep"
 
 		selectionCell:AddNewLine()
 		modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
-		local modHeader = modPresetSection:AddSeparatorText("Mod Presets")
+		local modHeader = modPresetSection:AddSeparatorText(Translator:translate("Mod Presets"))
 		modHeader:SetStyle("SeparatorTextAlign", 0.5)
 		modHeader.Font = "Large"
 		modHeader.UserData = "keep"
 
-		presetInfoSection = row:AddCell():AddChildWindow("Preset Information")
+		presetInfoSection = row:AddCell():AddChildWindow(Translator:translate("Preset Information"))
 		presetInfoSection.NoSavedSettings = true
 		presetInfoSection.HorizontalScrollbar = true
 
@@ -206,7 +206,7 @@ local function buildDependencyTable(preset, parent)
 	---@param key string
 	---@param modlist ModDependency[]
 	local function buildDependencyTab(key, modlist)
-		parent:AddSeparatorText(key .. " Dependencies"):SetStyle("SeparatorTextAlign", 0.1)
+		parent:AddSeparatorText(Translator:translate(key) .. " " .. Translator:translate("Dependencies")):SetStyle("SeparatorTextAlign", 0.1)
 
 		local dependencyTable = parent:AddTable(key .. preset.Name .. preset.Author, 4)
 		dependencyTable.PreciseWidths = true
@@ -214,9 +214,9 @@ local function buildDependencyTable(preset, parent)
 
 		local headerRow = dependencyTable:AddRow()
 		headerRow.Headers = true
-		headerRow:AddCell():AddText("Name")
-		headerRow:AddCell():AddText("Author")
-		headerRow:AddCell():AddText("Version")
+		headerRow:AddCell():AddText(Translator:translate("Name"))
+		headerRow:AddCell():AddText(Translator:translate("Author"))
+		headerRow:AddCell():AddText(Translator:translate("Version"))
 
 		for _, modDependency in ipairs(modlist) do
 			local mod = Ext.Mod.GetMod(modDependency.Guid)
@@ -224,9 +224,9 @@ local function buildDependencyTable(preset, parent)
 			if mod and mod.Info.Author ~= '' then
 				local modRow = dependencyTable:AddRow()
 
-				local nameText = modRow:AddCell():AddText(mod and mod.Info.Name or "Unknown - Mod Not Loaded")
+				local nameText = modRow:AddCell():AddText(mod and mod.Info.Name or Translator:translate("Unknown - Mod Not Loaded"))
 				nameText.TextWrapPos = 0
-				local authorText = modRow:AddCell():AddText(mod and (mod.Info.Author ~= '' and mod.Info.Author or "Larian") or "Unknown")
+				local authorText = modRow:AddCell():AddText(mod and (mod.Info.Author ~= '' and mod.Info.Author or "Larian") or Translator:translate("Unknown"))
 				authorText.TextWrapPos = 0
 
 				if not mod then
@@ -278,15 +278,13 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				local syncButton = Styler:ImageButton(parentSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
 
 				local tooltip = syncButton:Tooltip()
-				tooltip:AddText(string.format(
-					"\t  This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.",
-					isPresetInBackup and "is" or "is not")).TextWrapPos = 1000
+				tooltip:AddText(string.format(Translator:translate([[
+	This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.
+Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.\nBackup will be removed if this option is disabled or the preset is deleted via this UI
+You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
+]]),
+					Translator:translate(isPresetInBackup and "is" or "is not"))).TextWrapPos = 1000
 
-				tooltip:AddText(
-					"Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.\nBackup will be removed if this option is disabled or the preset is deleted via this UI").TextWrapPos = 1000
-
-				tooltip:AddText(
-					"You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console").TextWrapPos = 1000
 
 				syncButton.OnClick = function()
 					VanityBackupManager:FlipPresetBackupRegistration(guid)
@@ -332,7 +330,8 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 				local metadataRow = metadataTable:AddRow()
 				metadataRow:AddCell()
-				local metadataText = metadataRow:AddCell():AddSelectable(string.format("%s | v%s | %s", preset.NSFW and "NSFW" or "SFW", preset.Version, preset.Author))
+				local metadataText = metadataRow:AddCell():AddSelectable(string.format("%s | v%s | %s", Translator:translate(preset.NSFW and "NSFW" or "SFW"), preset.Version,
+					preset.Author))
 				metadataText:SetStyle("SelectableTextAlign", 0.5)
 				metadataText.Disabled = true
 				metadataRow:AddCell()
@@ -343,7 +342,8 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					local mod = Ext.Mod.GetMod(preset.ModSourced.Guid)
 					mod = mod and mod.Info or preset.ModSourced
 
-					local text = modRow:AddCell():AddSelectable(string.format("Copied from %s v%s by %s", mod.Name, table.concat(mod.ModVersion or mod.Version, "."), mod.Author))
+					local text = modRow:AddCell():AddSelectable(string.format(Translator:translate("Copied from %s v%s by %s"), mod.Name,
+						table.concat(mod.ModVersion or mod.Version, "."), mod.Author))
 					text.Disabled = true
 					text:SetStyle("SelectableTextAlign", 0.5)
 					text:SetStyle("Alpha", 0.8)
@@ -368,13 +368,13 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				)
 
 				if activePreset ~= guid then
-					activateButton:Tooltip():AddText("\t Activate this preset (deactivates the active preset if there is one)")
+					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Activate this preset (deactivates the active preset if there is one)"))
 					activateButton.OnClick = function()
 						Vanity:ActivatePreset(guid)
 						VanityPresetManager:UpdatePresetView(guid)
 					end
 				else
-					activateButton:Tooltip():AddText("\t Deactivate this preset")
+					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Deactivate this preset"))
 					activateButton.OnClick = function()
 						Vanity:ActivatePreset()
 						VanityPresetManager:UpdatePresetView(guid)
@@ -383,7 +383,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 				if not owningMod then
 					local editButton = Styler:ImageButton(actionCell:AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
-					editButton:Tooltip():AddText("\t Edit this preset's name/author/version/SFW flag")
+					editButton:Tooltip():AddText("\t  " .. Translator:translate("Edit this preset's name/author/version/SFW flag"))
 					editButton.SameLine = true
 
 					local infoGroup = presetGroup:AddGroup("info")
@@ -398,7 +398,8 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				end
 
 				local copyButton = Styler:ImageButton(actionCell:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
-				copyButton:Tooltip():AddText(owningMod and "\t Clone this preset into your local config, making a copy you can edit" or "\t Duplicate this preset")
+				copyButton:Tooltip():AddText(owningMod and ("\t  " .. Translator:translate("Clone this preset into your local config, making a copy you can edit"))
+					or ("\t  " .. Translator:translate("Duplicate this preset")))
 				copyButton.SameLine = true
 				copyButton.OnClick = function()
 					local newGuid = FormBuilder:generateGUID()
@@ -408,14 +409,15 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					ConfigurationStructure.config.vanity.presets[newGuid].isModPreset = false
 
 					if not owningMod then
-						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name .. " (Copy)"
+						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name ..
+							" " .. Translator:translate("(Copy)")
 					end
 					VanityPresetManager:UpdatePresetView(presetID)
 				end
 
 				if not owningMod then
 					local deleteButton = Styler:ImageButton(actionCell:AddImageButton("Delete", "ico_red_x", { 32, 32 }))
-					deleteButton:Tooltip():AddText("\t Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled").TextWrapPos = 600
+					deleteButton:Tooltip():AddText("\t  " .. Translator:translate("Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled")).TextWrapPos = 600
 					deleteButton.SameLine = true
 					deleteButton.OnClick = function()
 						if VanityBackupManager:IsPresetInBackup(guid) then
@@ -436,8 +438,8 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 				--#region Custom Dependencies
 				presetGroup:AddNewLine()
-				local customDependencyHeader = presetGroup:AddCollapsingHeader("Custom Dependencies")
-				local customDependencyButton = customDependencyHeader:AddButton("Add Custom Dependency")
+				local customDependencyHeader = presetGroup:AddCollapsingHeader(Translator:translate("Custom Dependencies"))
+				local customDependencyButton = customDependencyHeader:AddButton(Translator:translate("Add Custom Dependency"))
 				customDependencyButton.Visible = not owningMod
 
 				local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
@@ -514,11 +516,11 @@ function VanityPresetManager:UpdatePresetView(presetID)
 
 					local headerRow = customDependencyTable:AddRow()
 					headerRow.Headers = true
-					headerRow:AddCell():AddText("Name")
-					headerRow:AddCell():AddText("Minimum Version")
-					headerRow:AddCell():AddText("UUID")
-					headerRow:AddCell():AddText("Packaged Resource UUIDs")
-					headerRow:AddCell():AddText("Notes")
+					headerRow:AddCell():AddText(Translator:translate("Name"))
+					headerRow:AddCell():AddText(Translator:translate("Minimum Version"))
+					headerRow:AddCell():AddText(Translator:translate("UUID"))
+					headerRow:AddCell():AddText(Translator:translate("Packaged Resource UUIDs"))
+					headerRow:AddCell():AddText(Translator:translate("Notes"))
 
 					for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function(key)
 						return preset.CustomDependencies[key].Name
@@ -539,7 +541,8 @@ function VanityPresetManager:UpdatePresetView(presetID)
 								local warningImage = nameCell:AddImage("tutorial_warning_yellow", { 32, 32 })
 								warningImage.SameLine = true
 								warningImage:Tooltip():AddText(
-									"\t Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod")
+									"\t  " ..
+									Translator:translate("Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod"))
 							end
 						end
 
@@ -550,7 +553,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 								customDepFormGroup.Visible = true
 							end
 
-							local deleteButton = actionCell:AddButton("X")
+							local deleteButton = actionCell:AddButton(Translator:translate("X"))
 							deleteButton.SameLine = true
 							deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
 							deleteButton:SetColor("Text", { 1, 1, 1, 1 })
@@ -565,7 +568,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				--#endregion
 				presetGroup:AddNewLine()
 				local swapViewButton = Styler:ImageButton(presetGroup:AddImageButton("swap_view", "ico_randomize_d", { 32, 32 }))
-				swapViewButton:Tooltip():AddText("\t Swap between Overall and Per-Outfit view")
+				swapViewButton:Tooltip():AddText("\t  " .. Translator:translate("Swap between Overall and Per-Outfit view"))
 
 				local generalSettings = ConfigurationStructure.config.vanity.settings.general
 
@@ -574,13 +577,14 @@ function VanityPresetManager:UpdatePresetView(presetID)
 					Helpers:KillChildren(outfitsAndDependenciesGroup)
 
 					if generalSettings.outfitAndDependencyView == "universal" then
-						outfitsAndDependenciesGroup:AddSeparatorText("Configured Outfits"):SetStyle("SeparatorTextAlign", 0.5)
-						VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup, nil, owningMod and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
+						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Configured Outfits")):SetStyle("SeparatorTextAlign", 0.5)
+						VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup, nil,
+							owningMod and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
 						outfitsAndDependenciesGroup:AddNewLine()
-						outfitsAndDependenciesGroup:AddSeparatorText("Mod Dependencies"):SetStyle("SeparatorTextAlign", 0.5)
+						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Mod Dependencies")):SetStyle("SeparatorTextAlign", 0.5)
 						buildDependencyTable(preset, outfitsAndDependenciesGroup)
 					else
-						outfitsAndDependenciesGroup:AddSeparatorText("Outfit Report"):SetStyle("SeparatorTextAlign", 0.5)
+						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Outfit Report")):SetStyle("SeparatorTextAlign", 0.5)
 						VanityModDependencyManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
 					end
 				end
@@ -608,3 +612,51 @@ function VanityPresetManager:UpdatePresetView(presetID)
 		buildSection(vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name)
 	end
 end
+
+Translator:RegisterTranslation({
+	["This is a required field"] = "h2f93c88025444a8a8dc8692b89cd00749d82",
+	["Author"] = "h0c775f4f9b1b4a8da184b42a54961e65gc0a",
+	["Name"] = "h8cf4fc5072a14706bb86a7700e907395bb9d",
+	["Version"] = "h0fbbbc8cc91342acb5f2618f7e516f02f784",
+	["Vanity Preset Manager"] = "hfef14e1ed1e244da914d944ba1273dd77fga",
+	["Manage Presets"] = "h36a65f42e9454d8e9d55db55acd77a17158e",
+	["Create"] = "h02e16e4c68864e839f3e8051eaf2a2d9b04c",
+	["Export"] = "he99b2e5a0ee74074a9958b5bfe5612f8558d",
+	["Import"] = "h7bb0a4f461a54390804603cc81c72341633b",
+	["Your Presets"] = "h9f20917d682d419cb126147a04f7cac54057",
+	["Mod Presets"] = "ha36a9cae681941d897becb20f0deb5873c5d",
+	["Preset Information"] = "hec26e6f59bdb43eb85700c98e7a19143c347",
+	["Dependencies"] = "hdf32fd262354456c9c1aec067af5220637bg",
+	["Unknown - Mod Not Loaded"] = "hcc2a773852c04c058bbb400119a6d59b89d7",
+	["Unknown"] = "ha9e7348b2fdf4b3c84d3e85d51bb7b828gge",
+	["Equipment"] = "hd5230f18925447c48ae1aa25225548fe4gc2",
+	[([[
+	This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.
+Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.\nBackup will be removed if this option is disabled or the preset is deleted via this UI
+You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
+	]])] = "hdb1ccb583441428d9969cd8399a69f4fad93",
+	["is"] = "hc866d5f99b614659a916d385a2a169ff4fba",
+	["is not"] = "h655fa609aba94e4da173f288273bb164f327",
+	["Copied from %s v%s by %s"] = "h56e8b2c4fe22439f872e50563cd22980475g",
+	["Activate this preset (deactivates the active preset if there is one)"] = "h13cdd47ac7e042a899f01b53c16d7168500c",
+	["Deactivate this preset"] = "h42ee9c3a84d24714948eba0228ed7332e1ab",
+	["Edit this preset's name/author/version/SFW flag"] = "hd42726262de242a59fa8b101e7ae76a24cb6",
+	["Clone this preset into your local config, making a copy you can edit"] = "hcfe9a7b1e464427ba15aaf9b84e1d1d945bf",
+	["Duplicate this preset"] = "heebe64439a5148979d83ee0673ded21fc077",
+	["(Copy)"] = "h42293f999b9949beaa6206ff558d630c8e12",
+	["Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled"] = "heb9024ee3f44462e8a590264854093def107",
+	["Custom Dependencies"] = "hbd3ce5eb5269474da9bbcef2a47324a86772",
+	["Add Custom Dependency"] = "h99ceff29985f4d5693aebbca0e79c0486959",
+	["Required Field"] = "he4650ba63a7140ac8c8f0c4b571b8f68f343",
+	["Minimum Version"] = "h5c0839d1f5ac4301868aa03ede57bd1cf191",
+	["UUID"] = "h2fa625ee384f4a0e8316751b36c74a7ae781",
+	["UUIDs of Packaged Resources (i.e Classes, MultiEffect Info) - One UUID Per Line"] = "h96f6254d6a5a4fc8b3c66fd1ae0fdf9bdg77",
+	["Notes"] = "h24c4edbd963f4a9bbc2f4d687a55805ae561",
+	["Packaged Resource UUIDs"] = "h5f891e61a23341f5a0006e2ff2fa4813f1a3",
+	["Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod"] = "h1e0fd8dd3b4c4b74ac5f5612827665336cdb",
+	["X"] = "h76c716ee29b14bed95b8ae32f030b812c5ac",
+	["Swap between Overall and Per-Outfit view"] = "h2eb2e6ab9c57419b9b1a4e093a90f3d06d0g",
+	["Configured Outfits"] = "h0a6eaeaa1fda45bfa725d97b81f4ea24b10f",
+	["Mod Dependencies"] = "heaa77ab0ae33446b97b5ba4027a456e860c5",
+	["Outfit Report"] = "hc92985c0bcec460f847ab891262ec4a15dec",
+})
