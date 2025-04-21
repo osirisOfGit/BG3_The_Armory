@@ -142,6 +142,23 @@
     <content contentuid="h2a3702e0861c4c5cbe3ee7a1f332f774g91b" version="1">Clear Selected Mods</content>
     <!-- END Base Picker Class -->
 
+    <!-- START Equipment Picker -->
+    <content contentuid="h916fc5f1979342aeb9848b362bded8865ge3" version="1">These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work</content>
+    <content contentuid="hb6ebd9f368894e11b9020f49ee3a8ec68dg5" version="1">By Equipment Race</content>
+    <content contentuid="h4d1648200ebc4ccda856362ca12c087a03dc" version="1">By Armor Type</content>
+    <content contentuid="hc7f094dd04e14c0fa607315cee3612f6ed80" version="1">These filters are determined by the Stat of the item, not the material of the item itself (since there's no way to do that)</content>
+    <content contentuid="heaec1ab79adf42eb89f43d5753f295df08be" version="1">By Stat Slot</content>
+    <content contentuid="hde39176c2440420b9a068a904d67e8717b52" version="1">Determined by the Template's Stat's Slot</content>
+    <content contentuid="hffec1d1dafee4460b9a6d63e5fabbb1cb233" version="1">By Visual Slot</content>
+    <content contentuid="he025d0ca53674df1953cb583bb93475aad95" version="1">Determined by the Template's Equipment Slot</content>
+    <content contentuid="h5eb8683de63b4131a1ebc9593a91e953b6a7" version="1">Vanilla cloaks don't use this value for some reason - use stat slots to find those</content>
+    <content contentuid="h670f5005fae647019d884dcb37db31dd9a7g" version="1">Number of Items Per Row</content>
+    <content contentuid="h2b39a9f0f90840b19f8b602684ddbc7c4177" version="1">Only used for Favorites on Patch 8</content>
+    <content contentuid="hd399ef020f5e4e319cf68affb8585f8d06b8" version="1">Apply Dye</content>
+    <content contentuid="ha9c5c3919a744036925cf8010a1c7bb48a2f" version="1">WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots</content>
+    <content contentuid="had9a379edf23424997655761c7dbbc6eb84g" version="1">Status Effect</content>
+    <!-- END Equipment Picker -->
+
     <!-- START Dye Picker -->
     <content contentuid="hb6a7b860c6ed4eb4b4f7128a2e017e86g632" version="1">Similar Color</content>
     <content contentuid="hbc5959ac156f49cf8a2fa7fddd39adfdee3c" version="1">Base Color</content>
@@ -298,7 +315,7 @@
     <content contentuid="h2f0808c87edb4c61aa766d09d6c771417e6d" version="1">Halforc Male</content>
     <content contentuid="h2e4bf18792234fc78e0efb2fe4ca7dcec918" version="1">Karlach</content>
     <!-- END Equipment Race Enum -->
-    
+
     <!-- START Template Equipment Slot Enum -->
     <content contentuid="h852bec62c2b345638619c508fc85ca4687ac" version="1">Unassigned</content>
     <content contentuid="hd627f77b590c4bd787602fad5b477bc2b6e3" version="1">Test</content>
