@@ -265,4 +265,60 @@
     <content contentuid="h22a13b7bb7414c7a9d31bc5c82c363c9af2g" version="1">Must select from the list that appears on focus</content>
     <content contentuid="he104f70306a44117a9fbe8367c05d5bbe6ba" version="1">Submit</content>
     <!-- END Form Builder -->
+
+    <!-- START Equipment Tooltip -->
+    <content contentuid="hb46981c098c145978bd8daa53a1453aeb9c0" version="1">From mod '%s' by '%s'</content>
+    <content contentuid="h1d4bb3618c794d8bb495a19db4fd9a52325e" version="1">Originally from mod '%s' by '%s'</content>
+    <!-- END Equipment Tooltip -->
+
+    <!-- START Equipment Race Enum -->
+    <content contentuid="h1f3b97a8545840aba590c63f6b117aa7ga81" version="1">Human Female</content>
+    <content contentuid="h2fdc6e96304d4812801a4e265c9e8212c9af" version="1">Human Male</content>
+    <content contentuid="hc44f1846d40646d9864906c09bf47287d71d" version="1">Human Strong Female</content>
+    <content contentuid="hb30746621af849c9b9d931931ac6b1dfefe9" version="1">Human Strong Male</content>
+    <content contentuid="h6eb1e153bc40462ab47de4b821903c4dfggg" version="1">Tiefling Female</content>
+    <content contentuid="h3a36e0f690384e8fb37bc6523d05739eg0af" version="1">Tiefling Male</content>
+    <content contentuid="hf77dc0bdc76d4c95be9348e0c0e70722a61g" version="1">Tiefling Strong Male</content>
+    <content contentuid="haa878b0604af4abe9c2a940a8b0582d56024" version="1">Tiefling Strong Female</content>
+    <content contentuid="h8f31378226144805ad1be6f499194c7bee55" version="1">Githyanki Female</content>
+    <content contentuid="h5156652134ea4c8eada9000d78c718793e26" version="1">Githyanki Male</content>
+    <content contentuid="ha82e1e345d7247748a492c684af6ea642cda" version="1">Elf Male</content>
+    <content contentuid="hf8c71922d38a453abe099dddb4e3ab764e99" version="1">Elf Female</content>
+    <content contentuid="h5d768cedca8e46dc8762e81125230b377gg6" version="1">Half-Elf Female</content>
+    <content contentuid="h443b302f3f864a5fb1a3b11a5e67036018f4" version="1">Half-Elf Male</content>
+    <content contentuid="h20f563c05d4944208cabd0b49c6cd735f095" version="1">Dwarf Female</content>
+    <content contentuid="hfc55370d03d44d2ba5f3a2c61c6718b5274f" version="1">Dwarf Male</content>
+    <content contentuid="h2db0f3f840ae4e20a99e12bc58105c528fdc" version="1">Halfling Female</content>
+    <content contentuid="h86c2f2bfc93e4cacb8bf8bd0fc5191c2e233" version="1">Halfling Male</content>
+    <content contentuid="hb1773307603d4986a979b84b98b0ba30f024" version="1">Gnome Female</content>
+    <content contentuid="hfc28464c0c874a888a3dd148bdc0076a1b49" version="1">Gnome Male</content>
+    <content contentuid="h1f43b537e20c4a9c83cd4cf6b0eb7ec491d5" version="1">Dragonborn Female</content>
+    <content contentuid="h6c69179f918f4deeb7d7c1fcbc41df8568a9" version="1">Dragonborn Male</content>
+    <content contentuid="h48724aff31414cfdbaad2843057d3870aaa6" version="1">Halforc Female</content>
+    <content contentuid="h2f0808c87edb4c61aa766d09d6c771417e6d" version="1">Halforc Male</content>
+    <content contentuid="h2e4bf18792234fc78e0efb2fe4ca7dcec918" version="1">Karlach</content>
+    <!-- END Equipment Race Enum -->
+    
+    <!-- START Template Equipment Slot Enum -->
+    <content contentuid="h852bec62c2b345638619c508fc85ca4687ac" version="1">Unassigned</content>
+    <content contentuid="hd627f77b590c4bd787602fad5b477bc2b6e3" version="1">Test</content>
+    <content contentuid="h4eedf76947ff42c2b1231d189567aa13a0f7" version="1">Head</content>
+    <content contentuid="hbb64c0cb1235415394c3dd9ab106f563e17d" version="1">Private Parts</content>
+    <content contentuid="hdd68f0054af04dd782f5120f6a2f3d6765cc" version="1">ModestyLeaf</content>
+    <content contentuid="hefe130281b884c9ba653955a563b828e8a44" version="1">Hair</content>
+    <content contentuid="h5b21dc161c994462b05727ac88859b344c54" version="1">HelmetHair</content>
+    <content contentuid="h904bb20413e943eebe38c31657ac90c108f7" version="1">Hair DWR</content>
+    <content contentuid="hebca55d008fe4639bc36798e9273c67d9302" version="1">Beard</content>
+    <content contentuid="hb71bd6e39b1d4e1eb11e9babd17c94d97bd5" version="1">Body</content>
+    <content contentuid="h45d00509d1dd4f708c1af9128e967534e1d2" version="1">Headwear</content>
+    <content contentuid="h04b6d07c31784b3ea6b77940810474f37259" version="1">Gloves</content>
+    <content contentuid="h3225650da5f0475aae1c4ba10a4a14be2f6g" version="1">Cloak</content>
+    <content contentuid="h657134a6d7a24d9ca9c0e5dbd5fadfd95350" version="1">Footwear</content>
+    <content contentuid="habf48e69d82e427da804cdddf03951eegf84" version="1">Underwear</content>
+    <content contentuid="hd2ba54ed776249efa914c5853fbdc414b4c9" version="1">Piercing</content>
+    <content contentuid="h881b4036cbec4eb5ac389c094bee0d4b66cb" version="1">Horns</content>
+    <content contentuid="he7a1adb7905c4d378a9590f3378ac580b2fb" version="1">DragonbornTop</content>
+    <content contentuid="hdc00b57acc944a3ea93f0313fa69cf4728b7" version="1">DragonbornJaw</content>
+    <content contentuid="h790059b0232d4fa681570a917e3d75bcfage" version="1">DragonbornChin</content>
+    <!-- END Template Equipment Slot Enum -->
 </contentList>
