@@ -27,11 +27,15 @@ function Styler:DynamicLabelTree(tree)
 	end
 
 	return tree, function(count)
-		tree.Label = label .. (count > 0 and (" - " .. count .. " selected") or "")
+		tree.Label = label .. (count > 0 and (" - " .. count .. " " .. Translator:translate("selected")) or "")
 		tree.DefaultOpen = true
 		tree:SetOpen(isOpen, "Always")
 	end
 end
+
+Translator:RegisterTranslation({
+	["selected"] = "h3876382ff8ce409fa821615fe1171de2d3a5",
+})
 
 ---@param imageButton ExtuiImageButton
 function Styler:ImageButton(imageButton)

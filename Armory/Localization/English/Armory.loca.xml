@@ -338,4 +338,8 @@
     <content contentuid="hdc00b57acc944a3ea93f0313fa69cf4728b7" version="1">DragonbornJaw</content>
     <content contentuid="h790059b0232d4fa681570a917e3d75bcfage" version="1">DragonbornChin</content>
     <!-- END Template Equipment Slot Enum -->
+
+    <!-- START Styler -->
+    <content contentuid="h3876382ff8ce409fa821615fe1171de2d3a5" version="1">selected</content>
+    <!-- END Styler -->
 </contentList>
