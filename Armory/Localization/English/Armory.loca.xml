@@ -259,4 +259,10 @@
     <content contentuid="heaa77ab0ae33446b97b5ba4027a456e860c5" version="1">Mod Dependencies</content>
     <content contentuid="hc92985c0bcec460f847ab891262ec4a15dec" version="1">Outfit Report</content>
     <!-- END Preset Manager -->
+
+    <!-- START Form Builder -->
+    <content contentuid="hac02ba6d6b2b4edab1eeb923591ccd4e6e7e" version="1">Numbers, periods, and slashes only</content>
+    <content contentuid="h22a13b7bb7414c7a9d31bc5c82c363c9af2g" version="1">Must select from the list that appears on focus</content>
+    <content contentuid="he104f70306a44117a9fbe8367c05d5bbe6ba" version="1">Submit</content>
+    <!-- END Form Builder -->
 </contentList>
