@@ -357,6 +357,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 
     <!-- START Effect Manager -->
     <content contentuid="h6be19d3e032543a58900a528e1399bfefa2g" version="1">Create Effect Form</content>
+    <content contentuid="hf66bcec3350b4fa1b317a08b6d038e1d7eg6" version="1">StatusEffect</content>
     <content contentuid="h5f8facf0545f4d9b9871fc4ef0756c720e53" version="1">Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies</content>
     <content contentuid="h3985d3d0bf8943f7b33cd0ac714e48020447" version="1">Must provide a name</content>
     <content contentuid="h3ab9121338134e3b850376b2c36f65d5ca1b" version="1">Must select a value</content>
@@ -368,5 +369,6 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="hca540bf66df845bc9fde931f58c0aaa71b3b" version="1">Edit</content>
     <content contentuid="h87dc5ed2db464ee9b73b29e2fcd22135100f" version="1">Delete</content>
     <content contentuid="h16fdaad3e9c04689afcf6469c0bc2f453751" version="1">Create New Effect</content>
+    <content contentuid="hf7fbcebf0543427487ff3e48b2e16a22e7g0" version="1">Restore Pre-Packaged Effects</content>
     <!-- END Effect Manager -->
 </contentList>
