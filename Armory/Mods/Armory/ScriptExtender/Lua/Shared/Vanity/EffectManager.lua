@@ -13,7 +13,7 @@ local function buildEffectBankSupplier(extClass, type)
 		local displayOrderedMap = {}
 		local displayToKeyMap = {}
 		for _, key in ipairs(extClass.GetAll(type)) do
-			---@type ResourceMultiEffectInfo|ResourceSoundResource
+			---@type ResourceMultiEffectInfo
 			local single = extClass.Get(key, type)
 			displayToKeyMap[type == "Sound" and key or single.Name] = key
 			table.insert(displayOrderedMap, type == "Sound" and key or single.Name)
@@ -24,11 +24,7 @@ local function buildEffectBankSupplier(extClass, type)
 end
 
 local effectBanks = {
-	-- BeamEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
-	-- FormatColor = function() return FormatStringColor end,
-	-- MaterialType = function() return MaterialType end,
 	StatusEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
-	-- StatusEffectOnTurn = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
 }
 
 ---@class VanityEffect
@@ -425,6 +421,7 @@ end
 
 Translator:RegisterTranslation({
 	["Create Effect Form"] = "h6be19d3e032543a58900a528e1399bfefa2g",
+	["StatusEffect"] = "hf66bcec3350b4fa1b317a08b6d038e1d7eg6",
 	["Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"] = "h5f8facf0545f4d9b9871fc4ef0756c720e53",
 	["Must provide a name"] = "h3985d3d0bf8943f7b33cd0ac714e48020447",
 	["Must select a value"] = "h3ab9121338134e3b850376b2c36f65d5ca1b",
