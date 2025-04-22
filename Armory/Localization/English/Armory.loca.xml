@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <contentList>
+    <!-- All `%s` must be kept exactly the same - these are placeholders replaced with dynamic values at runtime -->
+    <!-- Please let me know if i missed anything! -->
+
     <!-- START Main MCM Menu -->
     <content contentuid="h14895335e14d4041a1427fdc5ec80db6458a" version="1">Show Camp Clothes Out Of Combat</content>
     <content contentuid="h5b5f354b7dd846ca9027d4d6710518e4d2d9" version="1">When enabled the character will automatically have camp clothes shown when out of combat, and main armor shown when entering combat. Only executes this functionality when entering/exiting combat. (Owned by Armory mod)</content>
