@@ -272,6 +272,7 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 			header.Font = "Large"
 		else
 			header = parent:AddCollapsingHeader(table.concat(displayTable, "|"))
+			header.IDContext = "OutfitView" .. header.Label
 			header.DefaultOpen = true
 			parent = header
 		end
