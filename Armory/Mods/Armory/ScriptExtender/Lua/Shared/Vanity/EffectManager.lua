@@ -264,14 +264,14 @@ if Ext.IsClient() then
 			end)
 		end
 
-		formPopup = Ext.IMGUI.NewWindow("Create Effect Form")
+		formPopup = Ext.IMGUI.NewWindow(Translator:translate("Create Effect Form"))
 		formPopup:SetFocus()
 		formPopup.Closeable = true
 		formPopup.NoCollapse = true
 		formPopup.AlwaysAutoResize = true
 
 		local warningText = formPopup:AddText(
-			"Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies")
+			Translator:translate("Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"))
 		warningText.UserData = "keep"
 		warningText.TextWrapPos = 0
 		warningText:SetStyle("Alpha", 0.65)
@@ -330,7 +330,7 @@ if Ext.IsClient() then
 			end,
 			formInputs)
 
-		local previewButton = formPopup:AddButton("Preview")
+		local previewButton = formPopup:AddButton(Translator:translate("Preview"))
 		previewButton.SameLine = true
 		previewButton.OnClick = function()
 			local inputs = inputSupplier()
@@ -340,7 +340,7 @@ if Ext.IsClient() then
 				Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
 			end
 		end
-		previewButton:Tooltip():AddText(string.format("\t  Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds", SlotContextMenu.itemSlot)).TextWrapPos = 600
+		previewButton:Tooltip():AddText(string.format("\t  " .. Translator:translate("Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"), SlotContextMenu.itemSlot)).TextWrapPos = 600
 	end
 
 	---@param parentPopup ExtuiPopup
@@ -354,7 +354,7 @@ if Ext.IsClient() then
 		end
 
 		---@type ExtuiMenu
-		local menu = parentPopup:AddMenu("Add Effects")
+		local menu = parentPopup:AddMenu(Translator:translate("Add Effects"))
 		for effectName, vanityEffect in TableUtils:OrderedPairs(effectCollection) do
 			---@type ExtuiMenu
 			local effectMenu = menu:AddMenu(string.sub(effectName, #"ARMORY_VANITY_EFFECT_" + 1))
@@ -363,7 +363,7 @@ if Ext.IsClient() then
 			local enableEffect = effectMenu:AddSelectable("", "DontClosePopups")
 			enableEffect.UserData = vanityEffect
 			enableEffect.Selected = (vanityOutfitItemEntry and vanityOutfitItemEntry.effects) and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
-			enableEffect.Label = enableEffect.Selected and "Disable" or "Enable"
+			enableEffect.Label = enableEffect.Selected and Translator:translate("Disable") or Translator:translate("Enable")
 			if enableEffect.Selected then
 				effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 			end
@@ -390,18 +390,18 @@ if Ext.IsClient() then
 					Helpers:ClearEmptyTablesInProxyTree(vanityOutfitItemEntry)
 				end
 				onSubmitFunc()
-				enableEffect.Label = enableEffect.Selected and "Disable" or "Enable"
+				enableEffect.Label = enableEffect.Selected and Translator:translate("Disable") or Translator:translate("Enable")
 			end
 
 			---@type ExtuiSelectable
-			local editEffect = effectMenu:AddSelectable("Edit")
+			local editEffect = effectMenu:AddSelectable(Translator:translate("Edit"))
 			editEffect.IDContext = effectMenu.Label .. "Edit"
 			editEffect.OnClick = function()
 				vanityEffect:buildCreateEffectForm(parentPopup)
 			end
 
 			---@type ExtuiSelectable
-			local deleteEffect = effectMenu:AddSelectable("Delete", "DontClosePopups")
+			local deleteEffect = effectMenu:AddSelectable(Translator:translate("Delete"), "DontClosePopups")
 			deleteEffect.IDContext = effectMenu.Label .. "Delete"
 			deleteEffect.OnClick = function()
 				vanityEffect:deleteStat()
@@ -416,9 +416,24 @@ if Ext.IsClient() then
 		end
 
 		---@type ExtuiSelectable
-		local addNewEffectSelectable = menu:AddSelectable("Create New Effect")
+		local addNewEffectSelectable = menu:AddSelectable(Translator:translate("Create New Effect"))
 		addNewEffectSelectable.OnClick = function()
 			self:buildCreateEffectForm(parentPopup)
 		end
 	end
 end
+
+Translator:RegisterTranslation({
+	["Create Effect Form"] = "h6be19d3e032543a58900a528e1399bfefa2g",
+	["Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"] = "h5f8facf0545f4d9b9871fc4ef0756c720e53",
+	["Must provide a name"] = "h3985d3d0bf8943f7b33cd0ac714e48020447",
+	["Must select a value"] = "h3ab9121338134e3b850376b2c36f65d5ca1b",
+	["Preview"] = "h38a45f57bdd7446bb5464ce2cfd4078bcegf",
+	["Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"] = "h10acf4ac4f2b4c6887e317d60bea1cf23e8g",
+	["Add Effects"] = "h47d69cc7394e4b1eb882464b287b5719e3fb",
+	["Disable"] = "h5fbccc4e25c241a887b57c60988bafe7e705",
+	["Enable"] = "hb12adca21c4e45189573c291701a5fa6d293",
+	["Edit"] = "hca540bf66df845bc9fde931f58c0aaa71b3b",
+	["Delete"] = "h87dc5ed2db464ee9b73b29e2fcd22135100f",
+	["Create New Effect"] = "h16fdaad3e9c04689afcf6469c0bc2f453751",
+})
