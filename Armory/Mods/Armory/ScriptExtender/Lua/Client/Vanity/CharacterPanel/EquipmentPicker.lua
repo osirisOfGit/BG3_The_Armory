@@ -19,13 +19,13 @@ function EquipmentPicker:CreateCustomFilters()
 	self.customFilters[equipmentRaceFilter.label] = equipmentRaceFilter
 	equipmentRaceFilter.selectedFilters = {}
 
-	equipmentRaceFilter.header, equipmentRaceFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Equipment Race"))
+	equipmentRaceFilter.header, equipmentRaceFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree(Translator:translate("By Equipment Race")))
 	local tooltip = equipmentRaceFilter.header:Tooltip()
-	tooltip:AddText([[
+	tooltip:AddText(Translator:translate([[
 	 These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids
 These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template
 This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models
-Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work]])
+Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work]]))
 
 	local raceGroup = equipmentRaceFilter.header:AddGroup("raceGroup")
 
@@ -94,7 +94,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 					self.filterTable[bodyType] = nil
 
 					self.filterBuilders[bodyType] = function()
-						local checkbox = raceGroup:AddCheckbox(bodyType)
+						local checkbox = raceGroup:AddCheckbox(Translator:translate(bodyType))
 						checkbox.UserData = id
 						checkbox.Checked = self.selectedFilters[id] or false
 						selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
@@ -123,13 +123,13 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	--#endregion
 
 	--#region ArmorType
-	local armorTypeFilter = PickerBaseFilterClass:new({ label = "ArmoryType" })
+	local armorTypeFilter = PickerBaseFilterClass:new({ label = "ArmorType" })
 	self.customFilters[armorTypeFilter.label] = armorTypeFilter
-	armorTypeFilter.header, armorTypeFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Armor Type"))
+	armorTypeFilter.header, armorTypeFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree(Translator:translate("By Armor Type")))
 
 	local armorTypeTooltip = armorTypeFilter.header:Tooltip()
 	armorTypeTooltip:AddText(
-		"\t\t These filters are determined by the Stat of the item, not the material of the item itself (since there's no way to do that)")
+		"\t  " .. Translator:translate("These filters are determined by the Stat of the item, not the material of the item itself (since there's no way to do that)"))
 
 	local armorTypeGroup = armorTypeFilter.header:AddGroup("")
 	armorTypeFilter.apply = function(self, itemTemplate)
@@ -206,7 +206,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 					if buildArmorType then
 						self.filterTable[i] = nil
 						self.filterBuilders[armorType] = function()
-							local checkbox = armorTypeGroup:AddCheckbox(armorType)
+							local checkbox = armorTypeGroup:AddCheckbox(Translator:translate(armorType))
 							checkbox.UserData = armorType
 							checkbox.Checked = self.selectedFilters[armorType] or false
 							selectedCount = selectedCount + (checkbox.Checked and 1 or 0)
@@ -238,10 +238,10 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	--#region Item Stat Slot filter
 	local statSlotFilter = PickerBaseFilterClass:new({ label = "StatSlot", priority = 0 })
 	self.customFilters[statSlotFilter.label] = statSlotFilter
-	statSlotFilter.header, statSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Stat Slot"))
+	statSlotFilter.header, statSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree(Translator:translate("By Stat Slot")))
 
 	local statSlotTooltip = statSlotFilter.header:Tooltip()
-	statSlotTooltip:AddText("\t Determined by the Template's Stat's Slot")
+	statSlotTooltip:AddText("\t  " .. Translator:translate("Determined by the Template's Stat's Slot"))
 
 	statSlotFilter.selectedFilters = {}
 	local statSlotCount = 0
@@ -348,7 +348,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 				if itemStat.Slot == filterSlot then
 					self.filterTable[i] = nil
 					self.filterBuilders[filterSlot] = function()
-						local checkbox = statSlotGroup:AddCheckbox(filterSlot)
+						local checkbox = statSlotGroup:AddCheckbox(Translator:translate(filterSlot))
 						checkbox.UserData = filterSlot
 						checkbox.Checked = self.selectedFilters[filterSlot] or false
 						statSlotCount = statSlotCount + (checkbox.Checked and 1 or 0)
@@ -378,10 +378,10 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	--#region Template Slot Filter
 	local templateSlotFilter = PickerBaseFilterClass:new({ label = "TemplateSlot", priority = 1 })
 	self.customFilters[templateSlotFilter.label] = templateSlotFilter
-	templateSlotFilter.header, templateSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree("By Visual Slot"))
+	templateSlotFilter.header, templateSlotFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree(Translator:translate("By Visual Slot")))
 
 	local templateSlotTooltip = templateSlotFilter.header:Tooltip()
-	templateSlotTooltip:AddText("\t Determined by the Template's Equipment Slot")
+	templateSlotTooltip:AddText("\t  " .. "Determined by the Template's Equipment Slot")
 
 	templateSlotFilter.selectedFilters = {}
 	local templateSlotCount = 0
@@ -454,11 +454,11 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 				if buildCheckbox then
 					self.filterTable[i] = nil
 					self.filterBuilders[filterSlot] = function()
-						local checkbox = templateSlotGroup:AddCheckbox(filterSlot)
+						local checkbox = templateSlotGroup:AddCheckbox(Translator:translate(filterSlot))
 						checkbox.UserData = filterSlot
 						checkbox.Checked = self.selectedFilters[filterSlot] or false
 						if filterSlot == "Cloak" then
-							checkbox:Tooltip():AddText("\t  Vanilla cloaks don't use this value for some reason - use stat slots to find those")
+							checkbox:Tooltip():AddText("\t  " .. Translator:translate("Vanilla cloaks don't use this value for some reason - use stat slots to find those"))
 						end
 						templateSlotCount = templateSlotCount + (checkbox.Checked and 1 or 0)
 
@@ -510,14 +510,14 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	PickerBaseClass.OpenWindow(self,
 		slot,
 		function()
-			self.settingsMenu:AddText("Number of Items Per Row")
+			self.settingsMenu:AddText(Translator:translate("Number of Items Per Row")):Tooltip():AddText(Translator:translate("Only used for Favorites on Patch 8"))
 			local perRowSetting = self.settingsMenu:AddSliderInt("", self.settings.rowSize, 0, 10)
 			perRowSetting.OnChange = function()
 				self.settings.rowSize = perRowSetting.Value[1]
 				self:ProcessFilters()
 			end
 
-			self.settingsMenu:AddText("Apply Dye?")
+			self.settingsMenu:AddText(Translator:translate("Apply Dye?"))
 			local applyDyeCheckbox = self.settingsMenu:AddCheckbox("", self.settings.applyDyesWhenPreviewingEquipment)
 			applyDyeCheckbox.SameLine = true
 			applyDyeCheckbox.OnChange = function()
@@ -536,7 +536,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 		local warningButton = Styler:ImageButton(self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 }))
 
 		local warningText = warningButton:Tooltip():AddText(
-			"\t WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots")
+			"\t  " .. Translator:translate("WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"))
 		warningText.TextWrapPos = 600
 		warningText:SetColor("Text", { 1, 0.02, 0, 1 })
 	end
@@ -648,20 +648,34 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 					---@type ResourceMultiEffectInfo
 					local mei = Ext.StaticData.Get(status.StatusEffect, "MultiEffectInfo")
 					if mei then
-						tooltip:AddText("Status Effect: " .. mei.Name)
+						tooltip:AddText(Translator:translate("Status Effect") .. ": " .. mei.Name)
 					end
 				end)
 				if not success then
-					tooltip:AddText("Status Effect: " .. status.StatusEffect)
-
-					-- Logger:BasicWarning("Couldn't load the Status Effect %s from Stat %s on Item %s (from Mod '%s') due to %s - please contact the mod author to fix this issue",
-					-- status.StatusEffect,
-					-- status.Name,
-					-- itemTemplate.Name .. "_" .. itemTemplate.Id,
-					-- status.ModId ~= "" and Ext.Mod.GetMod(status.ModId).Info.Name or "Unknown",
-					-- error)
+					tooltip:AddText(Translator:translate("Status Effect") .. ": " .. status.StatusEffect)
 				end
 			end
 		end
 	end
 end
+
+Translator:RegisterTranslation({
+	["By Equipment Race"] = "hb6ebd9f368894e11b9020f49ee3a8ec68dg5",
+	[([[
+	 These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids
+These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template
+This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models
+Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work]])] = "h916fc5f1979342aeb9848b362bded8865ge3",
+	["By Armor Type"] = "h4d1648200ebc4ccda856362ca12c087a03dc",
+	["These filters are determined by the Stat of the item, not the material of the item itself (since there's no way to do that)"] = "hc7f094dd04e14c0fa607315cee3612f6ed80",
+	["By Stat Slot"] = "heaec1ab79adf42eb89f43d5753f295df08be",
+	["Determined by the Template's Stat's Slot"] = "hde39176c2440420b9a068a904d67e8717b52",
+	["By Visual Slot"] = "hffec1d1dafee4460b9a6d63e5fabbb1cb233",
+	["Determined by the Template's Equipment Slot"] = "he025d0ca53674df1953cb583bb93475aad95",
+	["Vanilla cloaks don't use this value for some reason - use stat slots to find those"] = "h5eb8683de63b4131a1ebc9593a91e953b6a7",
+	["Number of Items Per Row"] = "h670f5005fae647019d884dcb37db31dd9a7g",
+	["Only used for Favorites on Patch 8"] = "h2b39a9f0f90840b19f8b602684ddbc7c4177",
+	["Apply Dye"] = "hd399ef020f5e4e319cf68affb8585f8d06b8",
+	["WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"] = "ha9c5c3919a744036925cf8010a1c7bb48a2f",
+	["Status Effect"] = "had9a379edf23424997655761c7dbbc6eb84g",
+})

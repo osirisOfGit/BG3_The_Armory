@@ -12,12 +12,12 @@ function Helpers:BuildTooltip(tooltip, itemName, itemStat)
 
 	if itemStat.ModId ~= "" then
 		local mod = Ext.Mod.GetMod(itemStat.ModId).Info
-		tooltip:AddText(string.format("From mod '%s' by '%s'", mod.Name, mod.Author ~= "" and mod.Author or "Larian")).TextWrapPos = 600
+		tooltip:AddText(string.format(Translator:translate("From mod '%s' by '%s'"), mod.Name, mod.Author ~= "" and mod.Author or "Larian")).TextWrapPos = 600
 	end
 
 	if itemStat.OriginalModId ~= "" and itemStat.OriginalModId ~= itemStat.ModId then
 		local mod = Ext.Mod.GetMod(itemStat.OriginalModId).Info
-		tooltip:AddText(string.format("Originally from mod '%s' by '%s'", mod.Name, mod.Author ~= "" and mod.Author or "Larian")).TextWrapPos = 600
+		tooltip:AddText(string.format(Translator:translate("Originally from mod '%s' by '%s'"), mod.Name, mod.Author ~= "" and mod.Author or "Larian")).TextWrapPos = 600
 	end
 end
 
@@ -41,3 +41,8 @@ function Helpers:ClearEmptyTablesInProxyTree(proxyTable)
 		end
 	end
 end
+
+Translator:RegisterTranslation({
+	["From mod '%s' by '%s'"] = "hb46981c098c145978bd8daa53a1453aeb9c0",
+	["Originally from mod '%s' by '%s'"] = "h1d4bb3618c794d8bb495a19db4fd9a52325e",
+})

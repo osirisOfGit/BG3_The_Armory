@@ -35,25 +35,25 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		mainParent = tabHeader
 
 		local helpTooltip = tabHeader:AddButton("Instructions"):Tooltip()
-		helpTooltip:AddText("\t  Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it).").TextWrapPos = 800
-		helpTooltip:AddText("The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save").TextWrapPos = 0
-		helpTooltip:AddText("It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process (e.g. Armor type), don't update the tooltips until a reload.").TextWrapPos = 0
-		helpTooltip:AddText("\nAfter creating a preset, you can start defining outfits using the options below. You can select combination of criteria (one item from each column, though Hireling and Origin are mutually exclusive, and you don't have to use all columns) - each combination will create a unique outfit").TextWrapPos = 0
-		helpTooltip:AddText("Party members are automatically matched to the _most specific_ outfit defined - the columns in the criteria table are ordered from most specific to least specific.").TextWrapPos = 0
-		helpTooltip:AddText("For example, an outfit that only has Origin assigned to it will take precedence over an outfit that has Race/Subrace/BodyType, but Race/BodyType will take precedence over BodyType/Class/Subclass").TextWrapPos = 0
-		helpTooltip:AddText("This matters less during this stage of the beta - future updates will allow you to export Presets to other users in the same session, or to a file that you can include with a mod that players will be able to import, in which case you may want to define more generic outfits to account for respecs/resculpts").TextWrapPos = 0
-		helpTooltip:AddText("When an outfit is matched to a character, all equipped items will be automatically transmogged and/or dyed according to the outfit (if a non-weapon slot is empty and a vanity item is defined, a junk item will spawn in that slot to allow the vanity item to show)").TextWrapPos = 0
-		helpTooltip:AddText("When an item is unequipped, it will be unmogged/undyed _unless_ it's not contained within an inventory (e.g. throwing or dropping). This is intentional while I figure out what the preferred behavior is").TextWrapPos = 0
+		helpTooltip:AddText("\t  " .. Translator:translate("Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it).")).TextWrapPos = 800
+		helpTooltip:AddText(Translator:translate("The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save")).TextWrapPos = 0
+		helpTooltip:AddText(Translator:translate("It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process don't fully complete until a reload (e.g. Armor type)")).TextWrapPos = 0
+		helpTooltip:AddText("\n" .. Translator:translate("After creating a preset, you can start defining outfits using the options below. You can select combination of criteria (one item from each column, though Hireling and Origin are mutually exclusive, and you don't have to use all columns) - each combination will create a unique outfit")).TextWrapPos = 0
+		helpTooltip:AddText(Translator:translate("Party members are automatically matched to the _most specific_ outfit defined - the columns in the criteria table are ordered from most specific to least specific.")).TextWrapPos = 0
+		helpTooltip:AddText(Translator:translate("For example, an outfit that only has Origin assigned to it will take precedence over an outfit that has Race/Subrace/BodyType, but Race/BodyType will take precedence over BodyType/Class/Subclass")).TextWrapPos = 0
+		helpTooltip:AddText(Translator:translate("This allows you to create Presets that support a wide variety of party compositions while still adhering to a consistent theme, which can be exported via the Preset Manager for users to manual import or to package with mods (which will be automatically read in by Armory when present in the load order)")).TextWrapPos = 0
+		helpTooltip:AddText(Translator:translate("When an outfit is matched to a character, all equipped items will be automatically transmogged and/or dyed according to the outfit (if a non-weapon slot is empty and a vanity item is defined, a junk item will spawn in that slot to allow the vanity item to show)")).TextWrapPos = 0
+		helpTooltip:AddText(Translator:translate("When an item is unequipped, it will be unmogged/undyed _unless_ it's not contained within an inventory (e.g. throwing or dropping). This is intentional while I figure out what the preferred behavior is")).TextWrapPos = 0
 
 		--#region Presets
-		local presetPickerButton = tabHeader:AddButton("Preset Manager")
+		local presetPickerButton = tabHeader:AddButton(Translator:translate("Preset Manager"))
 		presetPickerButton.SameLine = true
 		presetPickerButton.OnClick = function()
 			VanityPresetManager:OpenManager()
 		end
 		--#endregion
 
-		local itemValidatorButton = tabHeader:AddButton("Item Validation Report")
+		local itemValidatorButton = tabHeader:AddButton(Translator:translate("Item Validation Report"))
 		itemValidatorButton.SameLine = true
 		itemValidatorButton.OnClick = function()
 			ItemValidator:OpenReport()
@@ -61,7 +61,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 		--#region Settings
 		local generalSettings = ConfigurationStructure.config.vanity.settings.general
-		local menu = tabHeader:AddButton("Settings")
+		local menu = tabHeader:AddButton(Translator:translate("Settings"))
 		menu.SameLine = true
 		menu.UserData = "keep"
 		local menuPopup = tabHeader:AddPopup("PanelSettings")
@@ -69,9 +69,9 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		menu.OnClick = function() return menuPopup:Open() end
 
 		---@type ExtuiSelectable
-		local contextMenuSetting = menuPopup:AddSelectable("Show Slot Context Menu only when holding Left Shift", "DontClosePopups")
+		local contextMenuSetting = menuPopup:AddSelectable(Translator:translate("Show Slot Context Menu only when holding Left Shift"), "DontClosePopups")
 		contextMenuSetting.Selected = generalSettings.showSlotContextMenuModifier ~= nil
-		contextMenuSetting:Tooltip():AddText("\t If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it").TextWrapPos = 600
+		contextMenuSetting:Tooltip():AddText("\t " .. Translator:translate("If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it")).TextWrapPos = 600
 		contextMenuSetting.OnClick = function()
 			generalSettings.showSlotContextMenuModifier = contextMenuSetting.Selected and "LSHIFT" or nil
 			SlotContextMenu:SubscribeToKeyEvents()
@@ -80,10 +80,12 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		menuPopup:AddSeparator()
 
 		---@type ExtuiSelectable
-		local placeholderItemSetting = menuPopup:AddSelectable("Generate Junk Items in Empty Slots For Transmog")
+		local placeholderItemSetting = menuPopup:AddSelectable(Translator:translate("Generate Junk Items in Empty Slots For Transmog"))
 		placeholderItemSetting.Selected = generalSettings.fillEmptySlots
 		placeholderItemSetting:Tooltip():AddText(
-			"\t When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur.")
+			"\t " ..
+			Translator:translate(
+				"When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur."))
 		placeholderItemSetting.OnClick = function()
 			generalSettings.fillEmptySlots = placeholderItemSetting.Selected
 
@@ -93,7 +95,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		end
 		--#endregion
 
-		separator = tabHeader:AddSeparatorText("Choose A Preset")
+		separator = tabHeader:AddSeparatorText(Translator:translate("Choose A Preset"))
 		separator:SetStyle("SeparatorTextAlign", 0.5)
 	end)
 
@@ -110,10 +112,10 @@ function Vanity:ActivatePreset(presetId, initializing)
 
 	if presetId then
 		local preset = PresetProxy.presets[presetId]
-		separator.Label = "Active Preset: " .. preset.Name
+		separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
 		VanityCharacterCriteria:BuildModule(mainParent, preset)
 	else
-		separator.Label = "Choose a Preset"
+		separator.Label = Translator:translate("Choose a Preset")
 		VanityCharacterCriteria:BuildModule(mainParent)
 	end
 end
@@ -153,11 +155,11 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					local preset = PresetProxy.presets[presetId]
 
 					VanityModDependencyManager:DependencyValidator(PresetProxy, preset, function()
-						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format("Armory: Validation of Active Vanity Preset [%s] failed!", preset.Name))
+						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format(Translator:translate("Armory: Validation of Active Vanity Preset [%s] failed!"), preset.Name))
 						validationErrorWindow.Closeable = true
 
 						validationErrorWindow:AddButton("Open Preset").OnClick = function()
-							separator.Label = "Active Preset: " .. preset.Name
+							separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
 							VanityCharacterCriteria:BuildModule(mainParent, preset)
 
 							Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
@@ -171,15 +173,15 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
 
 					local presetBackup = TableUtils:DeeplyCopyTable(VanityBackupManager:RestorePresetFromExport(presetId))
-					local restoreBackupWindow = Ext.IMGUI.NewWindow("Armory: Restore Backed Up Preset")
+					local restoreBackupWindow = Ext.IMGUI.NewWindow(Translator:translate("Armory: Restore Backed Up Preset"))
 					restoreBackupWindow.NoCollapse = true
 					restoreBackupWindow.AlwaysAutoResize = true
 
 					restoreBackupWindow:AddText(string.format(
-						"Preset '%s' was detected as the active preset for this save, but is not loaded in the config - however, a backup was found. Restore?",
+						Translator:translate("Preset '%s' was detected as the active preset for this save, but is not loaded in the config - however, a backup was found. Restore?"),
 						presetBackup.presets[presetId].Name)).TextWrapPos = 0
 
-					local restoreButton = restoreBackupWindow:AddButton("Restore Preset")
+					local restoreButton = restoreBackupWindow:AddButton(Translator:translate("Restore Preset"))
 					restoreButton.PositionOffset = { 300, 0 }
 					-- Green
 					restoreButton:SetColor("Button", { 144 / 255, 238 / 255, 144 / 255, .5 })
@@ -194,7 +196,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 						validatePreset()
 					end
 
-					local removeButton = restoreBackupWindow:AddButton("Delete Backup and Deactivate Preset")
+					local removeButton = restoreBackupWindow:AddButton(Translator:translate("Delete Backup and Deactivate Preset"))
 					removeButton.SameLine = true
 					removeButton.PositionOffset = { 200, 0 }
 					-- Red
@@ -233,3 +235,53 @@ Ext.ModEvents.BG3MCM["MCM_Mod_Tab_Activated"]:Subscribe(function(payload)
 		end
 	end
 end)
+
+Translator:RegisterTranslation({
+	["Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it)."] =
+	"h343957cb9d284aeb86930a5311c10f61a199",
+
+	["The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save"] =
+	"heeef36ef99d5401093a374888ccb2bc6b325",
+
+	["It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process don't fully complete until a reload (e.g. Armor type)"] =
+	"hb7bc2ec3130d492f912d638fffa06869c7e6",
+
+	["After creating a preset, you can start defining outfits using the options below. You can select combination of criteria (one item from each column, though Hireling and Origin are mutually exclusive, and you don't have to use all columns) - each combination will create a unique outfit"] =
+	"h22045f1bbdb6459a811165f3a5c6631c546d",
+
+	["Party members are automatically matched to the _most specific_ outfit defined - the columns in the criteria table are ordered from most specific to least specific."] =
+	"hd4eba786a08645ee80fae2adccc984d6a80a",
+
+	["For example, an outfit that only has Origin assigned to it will take precedence over an outfit that has Race/Subrace/BodyType, but Race/BodyType will take precedence over BodyType/Class/Subclass"] =
+	"h8b54792743254ac2ad067581d9d3bace1923",
+
+	["This allows you to create Presets that support a wide variety of party compositions while still adhering to a consistent theme, which can be exported via the Preset Manager for users to manual import or to package with mods (which will be automatically read in by Armory when present in the load order)"] =
+	"hb2e0c6f036da4fc49b793294c8cc9b825f69",
+
+	["When an outfit is matched to a character, all equipped items will be automatically transmogged and/or dyed according to the outfit (if a non-weapon slot is empty and a vanity item is defined, a junk item will spawn in that slot to allow the vanity item to show)"] =
+	"hcade6027c785411682b9fdfa3666b2a5efa3",
+
+	["When an item is unequipped, it will be unmogged/undyed _unless_ it's not contained within an inventory (e.g. throwing or dropping). This is intentional while I figure out what the preferred behavior is"] =
+	"h3b3f53c38b1d4e62bb0c3f66e4dc9ffa5gfg",
+
+	["Preset Manager"] = "he7ac5c315ea143849d7614f3eea5dc3c3ce6",
+	["Item Validation Report"] = "h87bb9fb4d984424b90bf2a07018fce4b7bb9",
+	["Settings"] = "h147cf2b184734696946b29f53af8634b2939",
+	["Show Slot Context Menu only when holding Left Shift"] = "h3cd833c3ceaf423982e2a4e5ccc5cde2617a",
+	["If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it"] =
+	"h204c96c088344a14a75291a07a5f994a3527",
+
+	["Generate Junk Items in Empty Slots For Transmog"] = "h6477215a59964b258c51ae8cc3042963197a",
+	["When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur."] =
+	"hf5af20f3b67c4eefb3f6de7db8a8705973f2",
+
+	["Choose A Preset"] = "hd7c30d7bd7824ca8b05690ed24cbba2575e4",
+	["Active Preset:"] = "hfdd58b6fefd94e89babdb0cf39c26cb4fa6b",
+	["Armory: Validation of Active Vanity Preset [%s] failed!"] = "h0d3f6797e7ed4d7ca30b60dfd2fb205a07b6",
+	["Armory: Restore Backed Up Preset"] = "h1ce43e8d6ff945fa9e26629c56367aecg181",
+	["Preset '%s' was detected as the active preset for this save, but is not loaded in the config - however, a backup was found. Restore?"] =
+	"h2ad4ba32de41497e80215ea9d3fe88188d00",
+
+	["Restore Preset"] = "h4243eab69148467d9787ab4a7f0e9927efe9",
+	["Delete Backup and Deactivate Preset"] = "hb902441c10684c4bb6cf4299accdbf77e6cb",
+})

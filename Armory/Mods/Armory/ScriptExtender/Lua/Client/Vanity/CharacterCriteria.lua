@@ -84,7 +84,7 @@ local criteriaGroup
 ---@param outfitToCopyTo VanityCriteriaCompositeKey?
 ---@param effectsToCopy {[string]: VanityEffect}?
 function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, parent, outfitToCopyTo, effectsToCopy)
-	local refreshButton = parent:AddButton("Refresh")
+	local refreshButton = parent:AddButton(Translator:translate("Refresh"))
 
 	local criteriaSelectionDisplayTable = parent:AddTable("ConfiguredCriteriaCombinations" .. parent.IDContext, 8)
 	criteriaSelectionDisplayTable.SizingStretchProp = true
@@ -116,7 +116,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 
 			local actionCell = row:AddCell()
 			local seeDependencyReport = actionCell:AddImageButton("seeFullThingy" .. criteriaCompositeKey, "Spell_Divination_SeeInvisibility", { 32, 32 })
-			seeDependencyReport:Tooltip():AddText("\t  See full dependency report for this outfit")
+			seeDependencyReport:Tooltip():AddText("\t  " .. Translator:translate("See full dependency report for this outfit"))
 			seeDependencyReport.OnClick = function()
 				VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
 			end
@@ -139,7 +139,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				copyButton.IDContext = copyButton.Label .. criteriaCompositeKey
 
 				if outfitToCopyTo then
-					copyButton:Tooltip():AddText("\t Copy all equipment/dyes/effects to your active outfit")
+					copyButton:Tooltip():AddText("\t  " .. Translator:translate("Copy all equipment/dyes/effects to your active outfit"))
 				end
 
 				local popup = row:AddPopup("CopyOutfit")
@@ -173,7 +173,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 
 					if preset.isModPreset then
 						Helpers:KillChildren(popup)
-						popup:AddText("Copy This Outfit To Your Preset(s)")
+						popup:AddText(Translator:translate("Copy This Outfit To Your Preset(s)"))
 
 						local boxGroup = popup:AddGroup("checkboxes")
 						for presetId, existingPreset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function (key)
@@ -182,7 +182,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 							boxGroup:AddCheckbox(existingPreset.Name).UserData = presetId
 						end
 
-						popup:AddButton("Copy").OnClick = function()
+						popup:AddButton(Translator:translate("Copy")).OnClick = function()
 							for _, child in pairs(boxGroup.Children) do
 								if child.Checked then
 									copyOutfit(ConfigurationStructure.config.vanity.presets[child.UserData], criteriaCompositeKey)
@@ -240,10 +240,10 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		return
 	end
 
-	local popupButton = criteriaGroup:AddButton("See Configured Outfits")
+	local popupButton = criteriaGroup:AddButton(Translator:translate("See Configured Outfits"))
 
 	if not popup then
-		popup = Ext.IMGUI.NewWindow("Configured Outfits")
+		popup = Ext.IMGUI.NewWindow(Translator:translate("Configured Outfits"))
 		popup.Closeable = true
 		popup.AlwaysAutoResize = true
 		popup.NoResize = true
@@ -261,7 +261,7 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 	self:BuildConfiguredCriteriaCombinationsTable(preset, popup)
 
-	local criteriaCollapse = criteriaGroup:AddCollapsingHeader("Select Character Criteria for Outfit")
+	local criteriaCollapse = criteriaGroup:AddCollapsingHeader(Translator:translate("Select Character Criteria for Outfit"))
 	local criteriaSelectionTable = criteriaCollapse:AddTable("CharacterCriteraSelection", 7)
 	criteriaSelectionTable.SizingStretchSame = true
 
@@ -357,8 +357,8 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 	end
 
 	for _, criteriaType in ipairs(VanityCharacterCriteriaType) do
-		criteriaSelectionHeaders:AddCell():AddText(criteriaType)
-		criteriaDisplayHeaders:AddCell():AddText(criteriaType)
+		criteriaSelectionHeaders:AddCell():AddText(Translator:translate(criteriaType))
+		criteriaDisplayHeaders:AddCell():AddText(Translator:translate(criteriaType))
 
 		selectedCriteriaDisplayRow:AddCell():AddText("---")
 
@@ -413,3 +413,14 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 		end
 	end
 end
+
+Translator:RegisterTranslation({
+	["Refresh"] = "hb35104d33791460c8b4c06cf50c8dd06b81b",
+	["See full dependency report for this outfit"] = "h669644fe8de44705b09b108b66b2b59b04g2",
+	["Copy all equipment/dyes/effects to your active outfit"] = "h445ed9a92e28469da14f492a0b8e8020902f",
+	["Copy This Outfit To Your Preset(s)"] = "hed6d19ee967542cebd5b729b33caa517360b",
+	["Copy"] = "h991dbf35893541b8b2fcabab0d8113427a00",
+	["See Configured Outfits"] = "hdef001a5c88042978f8cfb0ef435135fa1ab",
+	["Configured Outfits"] = "h3f8115bf9abd4797a69607745a357f501a19",
+	["Select Character Criteria for Outfit"] = "h25667b0948a04afbb3acfedab04911efe1be",
+})

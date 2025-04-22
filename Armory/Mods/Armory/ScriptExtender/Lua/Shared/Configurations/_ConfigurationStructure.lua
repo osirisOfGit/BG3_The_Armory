@@ -86,8 +86,6 @@ ConfigurationStructure.DynamicClassDefinitions = {}
 --- @class Configuration
 ConfigurationStructure.config = ConfigurationStructure:generate_recursive_metatable({}, real_config_table)
 
-Ext.Require("Shared/RarityEnum.lua")
-Ext.Require("Shared/SlotEnum.lua")
 Ext.Require("Shared/Configurations/VanityConfig.lua")
 
 local function CopyConfigsIntoReal(table_from_file, proxy_table)

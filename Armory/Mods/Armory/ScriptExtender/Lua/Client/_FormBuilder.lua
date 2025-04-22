@@ -30,7 +30,8 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 	Helpers:KillChildren(parent)
 
 	for _, formInput in pairs(formInputs) do
-		local label = parent:AddText(formInput.label)
+		local label = parent:AddText(Translator:translate(formInput.label))
+
 		if formInput.errorMessageIfEmpty then
 			label.Label = label.Label .. "*"
 		end
@@ -42,7 +43,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 
 			if formInput.type == "NumericText" then
 				input.CharsDecimal = true
-				input.Hint = "Numbers, periods, and slashes only"
+				input.Hint = Translator:translate("Numbers, periods, and slashes only")
 			elseif formInput.type == "Multiline" then
 				input.Multiline = true
 			end
@@ -57,7 +58,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 		formInput.input = input
 
 		if formInput.enumTable then
-			formInput.input.Hint = (formInput.input.Hint and "; " or "") .. "Must select from the list that appears on focus"
+			formInput.input.Hint = (formInput.input.Hint and "; " or "") .. Translator:translate("Must select from the list that appears on focus")
 			local displayToKeyMap, displayOrderedMap = formInput.enumTable()
 
 			if formInput.defaultValue then
@@ -168,7 +169,7 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 		return inputs
 	end
 
-	local submit = parent:AddButton("Submit")
+	local submit = parent:AddButton(Translator:translate("Submit"))
 	submit.OnClick = function()
 		local results = buildInputs()
 		if results then
@@ -178,3 +179,9 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 
 	return buildInputs
 end
+
+Translator:RegisterTranslation({
+	["Numbers, periods, and slashes only"] = "hac02ba6d6b2b4edab1eeb923591ccd4e6e7e",
+	["Must select from the list that appears on focus"] = "h22a13b7bb7414c7a9d31bc5c82c363c9af2g",
+	["Submit"] = "he104f70306a44117a9fbe8367c05d5bbe6ba",
+})

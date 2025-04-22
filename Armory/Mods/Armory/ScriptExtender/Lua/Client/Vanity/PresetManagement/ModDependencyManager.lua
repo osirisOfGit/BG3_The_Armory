@@ -35,7 +35,7 @@ function VanityModDependencyManager:GetModInfo(modDependency, excludeNotLoadedMe
 
 		return mod.Info.Name, ("v" .. table.concat(mod.Info.ModVersion, "."))
 	else
-		return string.format("%s%s", modDependency.Name or modDependency.Guid, not excludeNotLoadedMessage and "(Not Loaded)" or ""),
+		return string.format("%s%s", modDependency.Name or modDependency.Guid, not excludeNotLoadedMessage and Translator:translate("(Not Loaded)") or ""),
 			("v" .. table.concat(modDependency.Version, "."))
 	end
 end
@@ -53,7 +53,7 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 	if not preset then
 		return
 	end
-	
+
 	if not vanityContainer.miscNameCache then
 		vanityContainer.miscNameCache = {}
 	end
@@ -132,7 +132,7 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 
 		for criteria, value in pairs(displayCriteriaTable) do
 			if not cachedGuids[criteriaTable[criteria]] then
-				if string.match(value, "Not Found") then
+				if string.match(value, Translator:translate("Not Found")) then
 					if not validationErrors[displayCriteriaKey] then
 						validationErrors[displayCriteriaKey] = {}
 					end
@@ -143,7 +143,7 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 							for resource in string.gmatch(customDependency.Resources, "[^\n]+") do
 								if string.gsub(resource, "%s+", "") == criteriaTable[criteria] then
 									modInfo = TableUtils:DeeplyCopyTable(customDependency)
-									modInfo.Name = modInfo.Name .. " (Custom Dependency)"
+									modInfo.Name = modInfo.Name .. " " .. Translator:translate("(Custom Dependency)")
 									goto exit_loop
 								end
 							end
@@ -155,7 +155,7 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 						{
 							resourceId = criteriaTable[criteria],
 							displayValue = miscNamCache[criteriaTable[criteria]],
-							category = "Character Criteria: " .. criteria,
+							category = Translator:translate("Character Criteria:") .. " " .. criteria,
 							modInfo = modInfo
 						} --[[@as ValidationError]])
 				else
@@ -195,15 +195,15 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 		local parent = parentSupplier()
 		parent:AddNewLine()
 
-		local validationFailureHeader = parent:AddSeparatorText("Dependency Validation Failed!")
+		local validationFailureHeader = parent:AddSeparatorText(Translator:translate("Dependency Validation Failed!"))
 		validationFailureHeader:SetStyle("SeparatorTextAlign", 0.5)
 		validationFailureHeader.Font = "Large"
 		validationFailureHeader:SetColor("Text", { 1, 0.02, 0, 1 })
 
 		parent:AddText(
-			"Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)").TextWrapPos = 0
+			Translator:translate("Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)")).TextWrapPos = 0
 
-		parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
+		parent:AddText(Translator:translate("Columns can be resized by clicking and dragging on the vertical lines between columns")):SetStyle("Alpha", 0.7)
 
 		for outfitCriteria, validationErrorList in TableUtils:OrderedPairs(validationErrors) do
 			local header = parent:AddCollapsingHeader(outfitCriteria)
@@ -215,20 +215,20 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 
 			local headerRow = validationErrorTable:AddRow()
 			headerRow.Headers = true
-			headerRow:AddCell():AddText("ResourceID")
-			headerRow:AddCell():AddText("Display Name")
-			headerRow:AddCell():AddText("Resource Category")
-			headerRow:AddCell():AddText("Mod Info")
+			headerRow:AddCell():AddText(Translator:translate("ResourceID"))
+			headerRow:AddCell():AddText(Translator:translate("Display Name"))
+			headerRow:AddCell():AddText(Translator:translate("Resource Category"))
+			headerRow:AddCell():AddText(Translator:translate("Mod Info"))
 
 			for _, validationError in ipairs(validationErrorList) do
 				local row = validationErrorTable:AddRow()
 				row:AddCell():AddText(validationError.resourceId)
-				row:AddCell():AddText(validationError.displayValue or "Unknown")
+				row:AddCell():AddText(validationError.displayValue or Translator:translate("Unknown"))
 				row:AddCell():AddText(validationError.category)
 				if validationError.modInfo then
 					row:AddCell():AddText(string.format("%s (%s)", VanityModDependencyManager:GetModInfo(validationError.modInfo, true)))
 				else
-					row:AddCell():AddText("Unknown - check custom dependencies")
+					row:AddCell():AddText(Translator:translate("Unknown - check custom dependencies"))
 				end
 			end
 			parent:AddNewLine()
@@ -245,7 +245,7 @@ local dependencyWindow
 function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey, parent)
 	if not parent then
 		if not dependencyWindow then
-			dependencyWindow = Ext.IMGUI.NewWindow("Mod Dependencies")
+			dependencyWindow = Ext.IMGUI.NewWindow(Translator:translate("Mod Dependencies"))
 			dependencyWindow.AlwaysAutoResize = true
 			dependencyWindow.Closeable = true
 		else
@@ -257,7 +257,7 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 		Helpers:KillChildren(parent)
 	end
 
-	parent:AddText("Columns can be resized by clicking and dragging on the vertical lines between columns"):SetStyle("Alpha", 0.7)
+	parent:AddText(Translator:translate("Columns can be resized by clicking and dragging on the vertical lines between columns")):SetStyle("Alpha", 0.7)
 	local function generateOutfitSection(compositeKey)
 		local criteraTable = ConvertCriteriaTableToDisplay(ParseCriteriaCompositeKey(compositeKey))
 		local displayTable = {}
@@ -288,19 +288,19 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 
 		local headerRow = dependencyTable:AddRow()
 		headerRow.Headers = true
-		headerRow:AddCell():AddText("Slot")
-		headerRow:AddCell():AddText("Item")
-		headerRow:AddCell():AddText("Mod")
-		headerRow:AddCell():AddText("Dye")
-		headerRow:AddCell():AddText("Mod")
-		headerRow:AddCell():AddText("Effects")
+		headerRow:AddCell():AddText(Translator:translate("Slot"))
+		headerRow:AddCell():AddText(Translator:translate("Item"))
+		headerRow:AddCell():AddText(Translator:translate("Mod"))
+		headerRow:AddCell():AddText(Translator:translate("Dye"))
+		headerRow:AddCell():AddText(Translator:translate("Mod"))
+		headerRow:AddCell():AddText(Translator:translate("Effects"))
 
 		---@param row ExtuiTableRow
 		---@param itemEntry VanityOutfitItemEntry
 		local function buildCell(row, itemEntry)
 			if itemEntry and itemEntry.guid then
 				if itemEntry.guid == "Hide Appearance" then
-					row:AddCell():AddText("Appearance Hidden")
+					row:AddCell():AddText(Translator:translate("Appearance Hidden"))
 					row:AddCell():AddText("---")
 				else
 					---@type ItemTemplate
@@ -308,7 +308,7 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 					if template then
 						row:AddCell():AddText((template.DisplayName:Get() or template.Name) or template.Id)
 					else
-						row:AddCell():AddText((itemEntry.name or itemEntry.guid) .. " (Not Loaded)")
+						row:AddCell():AddText((itemEntry.name or itemEntry.guid) .. " " .. Translator:translate("(Not Loaded)"))
 					end
 
 					row:AddCell():AddText(string.format("%s (%s)", VanityModDependencyManager:GetModInfo(itemEntry.modDependency)))
@@ -373,3 +373,27 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 		end
 	end
 end
+
+Translator:RegisterTranslation({
+	["(Not Loaded)"] = "h30ebfb0890a94acfafd6fcb2c7055e95b3cc",
+	["Not Found"] = "h86454123313f4929bd5323d270167fcec8cg",
+	["(Custom Dependency)"] = "h793469ac5bc24c4987d5a1b09f7c7b89b714",
+	["Character Criteria:"] = "h00f60c3fa76548999a7841c7df32782d0ded",
+	["Dependency Validation Failed!"] = "he2c28fd2c0b44fa58a446bd615d758831a12",
+	["Please clear/delete the relevant outfit/slots/effects or load the missing mods! (Missing equipment/dyes will be cleared when the relevant outfit is opened in the Vanity tab)"] =
+	"h442cbe39c77f40a09e0509602f3a9fad604c",
+
+	["Columns can be resized by clicking and dragging on the vertical lines between columns"] = "heb24a0aa862a4d0380d2f5038a48f8bcdf01",
+	["ResourceID"] = "h8075c08128ba48c6a76e1315c1e02fd22dee",
+	["Display Name"] = "habe8e5de7a1f4962b043cf6c7023635886af",
+	["Resource Category"] = "h253b5aa5fb084ec1907b62ea91a50ef5af7e",
+	["Mod Info"] = "h066957084e8f4457a6d8be67e244f9c7cd1g",
+	["Unknown - check custom dependencies"] = "h24774f919e0148bcac988d09e6ec6b98231d",
+	["Mod Dependencies"] = "hc0010df89a234f54b7fd4d48dc82acaaeb3g",
+	["Slot"] = "h5e93f9fb5bac4a28904d1a16cf55f67c0f2e",
+	["Item"] = "h75e82a26e6c6488798ece79f67c38f277g5c",
+	["Dye"] = "h83253fe60dd1465192fbc54380e3b160bf7e",
+	["Mod"] = "h17bbaf1f69dd4ab7842d6abea3272eea7ebf",
+	["Effects"] = "h089952c189144c1bad82f5281bafef2397a8",
+	["Appearance Hidden"] = "hcf4a7001f0b840068800475066d499a8ge2g",
+})

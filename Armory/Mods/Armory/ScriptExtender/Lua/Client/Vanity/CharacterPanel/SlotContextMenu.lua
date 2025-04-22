@@ -54,10 +54,10 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 
 			Helpers:KillChildren(self.Popup)
 
-			self.Popup:AddSelectable(buttonType == "equipment" and "Pick Vanity Item" or "Pick Dye").OnActivate = defaultFunc
+			self.Popup:AddSelectable(buttonType == "equipment" and Translator:translate("Pick Vanity Item") or Translator:translate("Pick Dye")).OnActivate = defaultFunc
 
 			if slotButton.UserData then
-				self.Popup:AddSelectable("Clear").OnActivate = function()
+				self.Popup:AddSelectable(Translator:translate("Clear")).OnActivate = function()
 					outfitSlot[buttonType].delete = true
 					if not outfitSlot() then
 						outfitSlot.delete = true
@@ -70,10 +70,10 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 			if buttonType == "equipment" then
 				if not weaponType and not string.match(itemSlot, "Weapon") then
 					---@type ExtuiSelectable
-					local hideAppearanceSelectable = self.Popup:AddSelectable("Hide Appearance")
+					local hideAppearanceSelectable = self.Popup:AddSelectable(Translator:translate("Hide Appearance"))
 					hideAppearanceSelectable.Selected = (outfitSlot and outfitSlot[buttonType]) and outfitSlot[buttonType].guid == "Hide Appearance" or false
 					if hideAppearanceSelectable.Selected then
-						hideAppearanceSelectable.Label = "Show Appearance"
+						hideAppearanceSelectable.Label = Translator:translate("Show Appearance")
 					end
 					hideAppearanceSelectable.OnActivate = function()
 						local outfitSlot = self:GetOutfitSlot()
@@ -118,3 +118,11 @@ function SlotContextMenu:SubscribeToKeyEvents()
 		self.Subscription = nil
 	end
 end
+
+Translator:RegisterTranslation({
+	["Pick Vanity Item"] = "h260010c7678342f89f5a09832dd2ca101b0e",
+	["Pick Dye"] = "h7e4abc9883f2456585775e7b548c67f7eb86",
+	["Clear"] = "h770ae7fb135c42b09168469f28c9d4c0714c",
+	["Hide Appearance"] = "h6363d1da247f4d5d9999da5f43aa382bcf2b",
+	["Show Appearance"] = "h9a821af9dcff45c4b304e8a97265fb5a28e5",
+})
