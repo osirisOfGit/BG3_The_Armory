@@ -280,8 +280,10 @@ function VanityPresetManager:UpdatePresetView(presetID)
 				local tooltip = syncButton:Tooltip()
 				tooltip:AddText(string.format(Translator:translate([[
 	This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.
-Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.\nBackup will be removed if this option is disabled or the preset is deleted via this UI
-You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
+
+Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.
+Backup will be removed if this option is disabled or the preset is deleted via this UI
+You can view the current backup state in a save by executing !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
 ]]),
 					Translator:translate(isPresetInBackup and "is" or "is not"))).TextWrapPos = 1000
 
@@ -632,9 +634,11 @@ Translator:RegisterTranslation({
 	["Equipment"] = "hd5230f18925447c48ae1aa25225548fe4gc2",
 	[([[
 	This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.
-Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.\nBackup will be removed if this option is disabled or the preset is deleted via this UI
-You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
-	]])] = "hdb1ccb583441428d9969cd8399a69f4fad93",
+
+Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.
+Backup will be removed if this option is disabled or the preset is deleted via this UI
+You can view the current backup state in a save by executing !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
+]])] = "hdb1ccb583441428d9969cd8399a69f4fad93",
 	["is"] = "hc866d5f99b614659a916d385a2a169ff4fba",
 	["is not"] = "h655fa609aba94e4da173f288273bb164f327",
 	["Copied from %s v%s by %s"] = "h56e8b2c4fe22439f872e50563cd22980475g",

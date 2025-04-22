@@ -60,22 +60,23 @@
     <content contentuid="h64d7af3e35464776a935fc5f7fa36bfdb3b7" version="1">Prevents Dye</content>
     <!-- The below intentionally leaves out the message to the mod author, as mods use a lot of english values and most mod makers have to understand English to at least a readable extent -->
     <content contentuid="h405b02f82ed24dd3a43340655ad3a8cb5a9g" version="1">================ USER: READ THIS SECTION FIRST ================ 
-    This tool is not perfect by any stretch of the imagination - it has to make a lot of guesses based on available information, so it can be inaccurate depending on the type of issue.  Before providing this output to a mod author, please validate the following: 	
-        1. Check the template/stat name - does it have words like "test", "template", or is numbers (like "1", "2")? If so, the reported issue is probably known and expected 	
-        2. Make sure the mod reported for the template/stat makes sense - the SE provided modId isn't perfect, especially if multiple mods are modifying the same thing. 		
-            Any "Overhaul" or "Rebalance" mods are likely not the true owner of the item, and may or may not be responsible for the issue. 		
-            Any issues under Gustav(Dev) or Shared(Dev) are base-game items, so if they've been modified by a mod, disable that mod and see if the issue still occurs. If they haven't been modified, you'll need to patch the item yourself. 	
-        3. Ensure you aren't missing any optional downloads/patches from the mod author - sometimes the base mod will house stats/templates that aren't intended to be used unless a patch/additional mod is downloaded 	
-        4. Check the "Modified By" section and if present, ensure this issue persists without that mod loaded 	
-        5. Check the mod description/bugs/posts section to see if these issues are known and/or already reported - don't be a spammer!  
-    
-    Also, please respect any author's decision to not fix any of the issues identified here, regardless of their reasons. Be polite! 
-    Please don't bring these issues into the Larian discord / help channels unless you're looking to learn how to fix them yourself.  
-    
-    If the next section has a lot of reports, please upload it to https://pastebin.com first and provide the shareable link to the author so you don't bloat their mod page 
-    ===============================================================  
-    
-    ================ PROVIDE THE BELOW TO THE MOD AUTHOR ================</content>
+This tool is not perfect by any stretch of the imagination - it has to make a lot of guesses based on available information, so it can be inaccurate depending on the type of issue.  Before providing this output to a mod author, please validate the following: 	
+    1. Check the template/stat name - does it have words like "test", "template", or is numbers (like "1", "2")? If so, the reported issue is probably known and expected 	
+    2. Make sure the mod reported for the template/stat makes sense - the SE provided modId isn't perfect, especially if multiple mods are modifying the same thing. 		
+        Any "Overhaul" or "Rebalance" mods are likely not the true owner of the item, and may or may not be responsible for the issue. 		
+        Any issues under Gustav(Dev) or Shared(Dev) are base-game items, so if they've been modified by a mod, disable that mod and see if the issue still occurs. If they haven't been modified, you'll need to patch the item yourself. 	
+    3. Ensure you aren't missing any optional downloads/patches from the mod author - sometimes the base mod will house stats/templates that aren't intended to be used unless a patch/additional mod is downloaded 	
+    4. Check the "Modified By" section and if present, ensure this issue persists without that mod loaded 	
+    5. Check the mod description/bugs/posts section to see if these issues are known and/or already reported - don't be a spammer!  
+
+Also, please respect any author's decision to not fix any of the issues identified here, regardless of their reasons. Be polite! 
+Please don't bring these issues into the Larian discord / help channels unless you're looking to learn how to fix them yourself.  
+
+If the next section has a lot of reports, please upload it to https://pastebin.com first and provide the shareable link to the author so you don't bloat their mod page 
+===============================================================  
+
+================ PROVIDE THE BELOW TO THE MOD AUTHOR ================
+</content>
     <content contentuid="hc2bb0dd943924f5f99eab5f9e1aa71f381ae" version="1">Unknown</content>
     <!-- END Item Validation -->
 
@@ -143,7 +144,12 @@
     <!-- END Base Picker Class -->
 
     <!-- START Equipment Picker -->
-    <content contentuid="h916fc5f1979342aeb9848b362bded8865ge3" version="1">These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work</content>
+    <content contentuid="h916fc5f1979342aeb9848b362bded8865ge3" version="1">
+    These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids 
+These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template 
+This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models 
+Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. 
+For Strong types, Human Strongs and Orcs will generally work</content>
     <content contentuid="hb6ebd9f368894e11b9020f49ee3a8ec68dg5" version="1">By Equipment Race</content>
     <content contentuid="h4d1648200ebc4ccda856362ca12c087a03dc" version="1">By Armor Type</content>
     <content contentuid="hc7f094dd04e14c0fa607315cee3612f6ed80" version="1">These filters are determined by the Stat of the item, not the material of the item itself (since there's no way to do that)</content>
@@ -245,10 +251,12 @@
     <content contentuid="hcc2a773852c04c058bbb400119a6d59b89d7" version="1">Unknown - Mod Not Loaded</content>
     <content contentuid="ha9e7348b2fdf4b3c84d3e85d51bb7b828gge" version="1">Unknown</content>
     <content contentuid="hd5230f18925447c48ae1aa25225548fe4gc2" version="1">Equipment</content>
-    <content contentuid="hdb1ccb583441428d9969cd8399a69f4fad93" version="1">This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign. 
-    Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.
-    Backup will be removed if this option is disabled or the preset is deleted via this UI 
-    You can view the current backup state in a save by executing the !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console</content>
+    <content contentuid="hdb1ccb583441428d9969cd8399a69f4fad93" version="1">This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.
+
+Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.
+Backup will be removed if this option is disabled or the preset is deleted via this UI
+You can view the current backup state in a save by executing !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
+    </content>
     <!-- Below two are used as replacements for the %s above -->
     <content contentuid="hc866d5f99b614659a916d385a2a169ff4fba" version="1">is</content>
     <content contentuid="h655fa609aba94e4da173f288273bb164f327" version="1">is not</content>
