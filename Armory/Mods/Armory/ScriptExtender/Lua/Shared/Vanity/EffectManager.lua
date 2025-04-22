@@ -15,6 +15,46 @@ VanityEffect = {
 	cachedDisplayNames = {}
 }
 
+local defaultEffects = {
+	ARMORY_VANITY_EFFECT_Burning = {
+		Name = "ARMORY_VANITY_EFFECT_Burning",
+		effectProps = {
+			StatusEffect = "2156dd48-f83b-4060-9a4e-cab994da8857"
+		}
+	},
+	ARMORY_VANITY_EFFECT_Frozen = {
+		Name = "ARMORY_VANITY_EFFECT_Frozen",
+		effectProps = {
+			StatusEffect = "62318bbf-d36a-497c-91a4-bda8f7fb7af7"
+		}
+	},
+	ARMORY_VANITY_EFFECT_Golden_Shimmer = {
+		Name = "ARMORY_VANITY_EFFECT_Golden_Shimmer",
+		effectProps = {
+			StatusEffect = "d798b3cf-15ab-4911-9884-82799e6fd3ef"
+		}
+	},
+	ARMORY_VANITY_EFFECT_Invisible = {
+		Name = "ARMORY_VANITY_EFFECT_Invisible",
+		effectProps = {
+			StatusEffect = "d26436d4-d019-4dfc-b2f1-da0ac195575f"
+		}
+	},
+	ARMORY_VANITY_EFFECT_Running_Blood = {
+		Name = "ARMORY_VANITY_EFFECT_Running_Blood",
+		effectProps = {
+			StatusEffect = "6a8e81d8-dda5-438d-8414-01db0dc1f2ff"
+		}
+	},
+	ARMORY_VANITY_EFFECT_Mug = {
+		Name = "ARMORY_VANITY_EFFECT_Mug",
+		effectProps =
+		{
+			StatusEffect = "3edc688a-c08c-47dc-a25f-91a91789666c"
+		}
+	},
+}
+
 ---@param instance table
 ---@param name string
 ---@param effectProps VanityEffectProperties
@@ -334,7 +374,7 @@ if Ext.IsClient() then
 				inputs.Name = nil
 				effectToModify.effectProps = inputs
 
-				local success = pcall(function (...)
+				local success = pcall(function(...)
 					---@type ResourceMultiEffectInfo
 					local mei = Ext.StaticData.Get(effectToModify.effectProps.StatusEffect, "MultiEffectInfo")
 					effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
@@ -443,6 +483,21 @@ if Ext.IsClient() then
 		addNewEffectSelectable.OnClick = function()
 			self:buildCreateEffectForm(parentPopup)
 		end
+
+		---@type ExtuiSelectable
+		local restoreDefaults = menu:AddSelectable(Translator:translate("Restore Pre-Packaged Effects"), "DontClosePopups")
+		restoreDefaults.OnClick = function()
+			for effectName, effect in pairs(defaultEffects) do
+				local success = pcall(function(...)
+					---@type ResourceMultiEffectInfo
+					local mei = Ext.StaticData.Get(effect.effectProps.StatusEffect, "MultiEffectInfo")
+					effect.cachedDisplayNames[effect.effectProps.StatusEffect] = mei.Name
+				end)
+				ConfigurationStructure.config.vanity.effects[effectName] = effect
+			end
+			menu:Destroy()
+			self:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc)
+		end
 	end
 end
 
@@ -461,4 +516,5 @@ Translator:RegisterTranslation({
 	["Edit"] = "hca540bf66df845bc9fde931f58c0aaa71b3b",
 	["Delete"] = "h87dc5ed2db464ee9b73b29e2fcd22135100f",
 	["Create New Effect"] = "h16fdaad3e9c04689afcf6469c0bc2f453751",
+	["Restore Pre-Packaged Effects"] = "hf7fbcebf0543427487ff3e48b2e16a22e7g0"
 })

@@ -369,5 +369,6 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="hca540bf66df845bc9fde931f58c0aaa71b3b" version="1">Edit</content>
     <content contentuid="h87dc5ed2db464ee9b73b29e2fcd22135100f" version="1">Delete</content>
     <content contentuid="h16fdaad3e9c04689afcf6469c0bc2f453751" version="1">Create New Effect</content>
+    <content contentuid="hf7fbcebf0543427487ff3e48b2e16a22e7g0" version="1">Restore Pre-Packaged Effects</content>
     <!-- END Effect Manager -->
 </contentList>
