@@ -128,6 +128,25 @@ function VanityEffect:CopyEffectsToPresetOutfit(targetVanity, presetName, outfit
 	end
 end
 
+function VanityEffect:GetEffectOrMeiResource(effectString)
+	local success, resource = pcall(function(...)
+		---@type ResourceMultiEffectInfo
+		local mei = Ext.StaticData.Get(effectString or self.effectProps.StatusEffect, "MultiEffectInfo")
+		return mei
+	end)
+
+	if not success or not resource then
+		success, resource = pcall(function()
+			---@type ResourceEffectResource
+			local effect = Ext.Resource.Get(effectString or self.effectProps.StatusEffect, "Effect")
+			return effect
+		end)
+		return resource.EffectName, "Effect"
+	else
+		return resource.Name, "MEI"
+	end
+end
+
 if Ext.IsServer() then
 	function VanityEffect:createStat()
 		if not Ext.Stats.Get(self.Name) then
@@ -136,7 +155,8 @@ if Ext.IsServer() then
 			local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
 			for key, value in pairs(self.effectProps) do
 				if value and value ~= "" then
-					newStat[key] = value
+					local name, meiOrEffect = self:GetEffectOrMeiResource()
+					newStat[key] = meiOrEffect == "MEI" and value or name
 				end
 			end
 			newStat.StackId = self.Name
@@ -152,7 +172,8 @@ if Ext.IsServer() then
 			Logger:BasicDebug("Updating Effect %s to be %s", self.Name, Ext.Json.Stringify(self.effectProps))
 			for key, value in pairs(self.effectProps) do
 				if value and value ~= "" then
-					newStat[key] = value
+					local name, meiOrEffect = self:GetEffectOrMeiResource()
+					newStat[key] = meiOrEffect == "MEI" and value or name
 				else
 					newStat[key] = nil
 				end
@@ -272,6 +293,8 @@ if Ext.IsClient() then
 	---@type ExtuiWindow
 	local formPopup
 
+	local resourceEffectCache = {}
+
 	local effects = {}
 
 	local function buildStatusEffectBank()
@@ -284,21 +307,24 @@ if Ext.IsClient() then
 					effects[resource.ResourceUUID] = resource.Name
 				end
 			end)
-
 			if not success then
 				if string.find(effectString, "[:;]") then
 					for value in effectString:gmatch("([^;:]+)") do
-						if not value:find(":") then
-							effects[value] = value
+						if not value:find(":") and resourceEffectCache[value] then
+							effects[resourceEffectCache[value]] = value
 						end
 					end
-				else
-					effects[effectString] = effectString
+				elseif resourceEffectCache[effectString] then
+					effects[resourceEffectCache[effectString]] = effectString
 				end
 			end
 		end
 
 		if not next(effects) then
+			for _, effect in pairs(Ext.Resource.GetAll("Effect")) do
+				resourceEffectCache[Ext.Resource.Get(effect, "Effect").EffectName] = effect
+			end
+
 			for _, status in pairs(Ext.Stats.GetStats("StatusData")) do
 				---@type StatusData
 				status = Ext.Stats.Get(status)
@@ -495,11 +521,7 @@ if Ext.IsClient() then
 		local restoreDefaults = menu:AddSelectable(Translator:translate("Restore Pre-Packaged Effects"), "DontClosePopups")
 		restoreDefaults.OnClick = function()
 			for effectName, effect in pairs(defaultEffects) do
-				local success = pcall(function(...)
-					---@type ResourceMultiEffectInfo
-					local mei = Ext.StaticData.Get(effect.effectProps.StatusEffect, "MultiEffectInfo")
-					effect.cachedDisplayNames[effect.effectProps.StatusEffect] = mei.Name
-				end)
+				effect.cachedDisplayNames[effect.effectProps.StatusEffect] = self:GetEffectOrMeiResource(effect.effectProps.StatusEffect)
 				ConfigurationStructure.config.vanity.effects[effectName] = effect
 			end
 			menu:Destroy()
