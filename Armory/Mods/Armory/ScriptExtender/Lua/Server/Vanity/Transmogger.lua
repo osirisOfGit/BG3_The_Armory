@@ -370,8 +370,6 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 			end
 		end
 
-		Osi.RequestDelete(equippedItem)
-
 		createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 		if outfitSlot then
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
@@ -397,6 +395,8 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
 				Ext.Utils.MonotonicTime() - startTime)
 		end
+		
+		Osi.RequestDelete(equippedItem)
 	end)
 end
 
@@ -702,7 +702,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 		end
 
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
-		transmoggingLock = Ext.Timer.WaitFor(100, function()
+		transmoggingLock = Ext.Timer.WaitFor(200, function()
 			transmoggingLock = nil
 
 			-- Weird bug when swapping dual wielded items between slots, Ext.Entity can't fully inspect somehow?
