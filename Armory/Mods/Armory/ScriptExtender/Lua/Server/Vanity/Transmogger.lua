@@ -370,8 +370,6 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 			end
 		end
 
-		Osi.RequestDelete(equippedItem)
-
 		createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 		if outfitSlot then
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
@@ -397,6 +395,8 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
 				Ext.Utils.MonotonicTime() - startTime)
 		end
+		
+		Osi.RequestDelete(equippedItem)
 	end)
 end
 
