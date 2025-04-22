@@ -371,4 +371,21 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="h16fdaad3e9c04689afcf6469c0bc2f453751" version="1">Create New Effect</content>
     <content contentuid="hf7fbcebf0543427487ff3e48b2e16a22e7g0" version="1">Restore Pre-Packaged Effects</content>
     <!-- END Effect Manager -->
+
+    <!-- START Armor Type Enum -->
+    <content contentuid="hbedf5e3921484323aac266f87590e38f5ag6" version="1">None</content>
+    <content contentuid="h5dc48d9dc0554042aab7f3717e37595982a1" version="1">Cloth</content>
+    <content contentuid="hd38627438458474f81a22610795cfe6ffd38" version="1">Padded</content>
+    <content contentuid="h7b69d735d0034cae8307991387c8b7c5e0da" version="1">Leather</content>
+    <content contentuid="hf281eaf268ab4ef0a37b48d21c3eb508b50d" version="1">StuddedLeather</content>
+    <content contentuid="h5e8c9a964cbe447898aa5f5fc1ac8a97172d" version="1">Hide</content>
+    <content contentuid="h0b2bcdc1ef534b458b52d3a3f99af33138d1" version="1">ChainShirt</content>
+    <content contentuid="hf682404dc29545d5bedfb5ae300be21489f6" version="1">ScaleMail</content>
+    <content contentuid="h4749f88478954b318a8fc26e5efc10e86603" version="1">BreastPlate</content>
+    <content contentuid="hed98a9ef66f3487daafbff4d34041f54d2e8" version="1">HalfPlate</content>
+    <content contentuid="h901f8abfaa444c53a8589661470c687acgb0" version="1">RingMail</content>
+    <content contentuid="h4af1f7dce1f3411c987a49bd9ed6f5dff02e" version="1">ChainMail</content>
+    <content contentuid="he67556c5cd334e3b95059f53d78a0ecacb3b" version="1">Splint</content>
+    <content contentuid="he25527b08ccf4a7e9593c12ef25515185eea" version="1">Plate</content>
+    <!-- END Armor Type Enum -->
 </contentList>

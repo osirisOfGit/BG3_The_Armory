@@ -178,3 +178,22 @@ Translator:RegisterTranslation({
 	["DragonbornJaw"] = "hdc00b57acc944a3ea93f0313fa69cf4728b7",
 	["DragonbornChin"] = "h790059b0232d4fa681570a917e3d75bcfage",
 })
+
+
+-- I use Ext.Enums for this, but for translations sake adding here
+Translator:RegisterTranslation({
+	["None"] = "hbedf5e3921484323aac266f87590e38f5ag6",
+	["Cloth"] = "h5dc48d9dc0554042aab7f3717e37595982a1",
+	["Padded"] = "hd38627438458474f81a22610795cfe6ffd38",
+	["Leather"] = "h7b69d735d0034cae8307991387c8b7c5e0da",
+	["StuddedLeather"] = "hf281eaf268ab4ef0a37b48d21c3eb508b50d",
+	["Hide"] = "h5e8c9a964cbe447898aa5f5fc1ac8a97172d",
+	["ChainShirt"] = "h0b2bcdc1ef534b458b52d3a3f99af33138d1",
+	["ScaleMail"] = "hf682404dc29545d5bedfb5ae300be21489f6",
+	["BreastPlate"] = "h4749f88478954b318a8fc26e5efc10e86603",
+	["HalfPlate"] = "hed98a9ef66f3487daafbff4d34041f54d2e8",
+	["RingMail"] = "h901f8abfaa444c53a8589661470c687acgb0",
+	["ChainMail"] = "h4af1f7dce1f3411c987a49bd9ed6f5dff02e",
+	["Splint"] = "he67556c5cd334e3b95059f53d78a0ecacb3b",
+	["Plate"] = "he25527b08ccf4a7e9593c12ef25515185eea",
+})

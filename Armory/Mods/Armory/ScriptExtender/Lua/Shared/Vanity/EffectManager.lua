@@ -53,6 +53,13 @@ local defaultEffects = {
 			StatusEffect = "3edc688a-c08c-47dc-a25f-91a91789666c"
 		}
 	},
+	ARMORY_VANITY_EFFECT_True_Invisibility = {
+		Name = "ARMORY_VANITY_EFFECT_True_Invisibility",
+		effectProps =
+		{
+			StatusEffect = "b5aa3b03-feda-46fc-9c10-2aed4da05c05"
+		}
+	}
 }
 
 ---@param instance table
