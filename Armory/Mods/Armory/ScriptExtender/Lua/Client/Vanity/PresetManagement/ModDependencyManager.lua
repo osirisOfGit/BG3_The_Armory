@@ -95,9 +95,13 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 
 				if effectInstance then
 					if not cachedGuids[effectInstance.effectProps.StatusEffect] then
-						---@type ResourceMultiEffectInfo
-						local mei = Ext.StaticData.Get(effectInstance.effectProps.StatusEffect, "MultiEffectInfo")
-						if not mei then
+						local success, mei = pcall(function (...)
+							---@type ResourceMultiEffectInfo
+							local mei = Ext.StaticData.Get(effectInstance.effectProps.StatusEffect, "MultiEffectInfo")
+							return mei
+						end)
+
+						if not success or not mei then
 							if not validationErrors[criteriaKey] then
 								validationErrors[criteriaKey] = {}
 							end
