@@ -3,30 +3,6 @@ Ext.Require("Shared/Vanity/MissingEnums.lua")
 ---@type {[string]: VanityEffect}
 local effectCollection = {}
 
----@type ExtuiWindow
-local formPopup
-
----@param extClass Ext_StaticData|Ext_Resource
----@param type string
-local function buildEffectBankSupplier(extClass, type)
-	return function()
-		local displayOrderedMap = {}
-		local displayToKeyMap = {}
-		for _, key in ipairs(extClass.GetAll(type)) do
-			---@type ResourceMultiEffectInfo
-			local single = extClass.Get(key, type)
-			displayToKeyMap[type == "Sound" and key or single.Name] = key
-			table.insert(displayOrderedMap, type == "Sound" and key or single.Name)
-		end
-		table.sort(displayOrderedMap)
-		return displayToKeyMap, displayOrderedMap
-	end
-end
-
-local effectBanks = {
-	StatusEffect = buildEffectBankSupplier(Ext.StaticData, "MultiEffectInfo"),
-}
-
 ---@class VanityEffect
 VanityEffect = {
 	---@type string
@@ -35,12 +11,6 @@ VanityEffect = {
 	effectProps = {
 		---@type string?
 		StatusEffect = "",
-		-- ---@type string?
-		-- StatusEffectOnTurn = "",
-		-- ---@type string?
-		-- FormatColor = "",
-		-- ---@type string?
-		-- MaterialType = "",
 	},
 	cachedDisplayNames = {}
 }
@@ -252,6 +222,61 @@ end
 if Ext.IsClient() then
 	Ext.Require("Client/_FormBuilder.lua")
 
+	---@type ExtuiWindow
+	local formPopup
+
+	local effects = {}
+
+	local function buildStatusEffectBank()
+		local function addEffect(effectString)
+			local success, result = pcall(function(...)
+				---@type ResourceMultiEffectInfo?
+				local resource = Ext.StaticData.Get(effectString, "MultiEffectInfo")
+
+				if resource then
+					effects[resource.ResourceUUID] = resource.Name
+				end
+			end)
+
+			if not success then
+				if string.find(effectString, "[:;]") then
+					for value in effectString:gmatch("([^;:]+)") do
+						if not value:find(":") then
+							effects[value] = value
+						end
+					end
+				else
+					effects[effectString] = effectString
+				end
+			end
+		end
+
+		if not next(effects) then
+			for _, status in pairs(Ext.Stats.GetStats("StatusData")) do
+				---@type StatusData
+				status = Ext.Stats.Get(status)
+
+				if status.StatusEffect and status.StatusEffect ~= "" then
+					addEffect(status.StatusEffect)
+				end
+
+				if status.StatusEffectOverride and status.StatusEffectOverride ~= "" then
+					addEffect(status.StatusEffectOverride)
+				end
+
+				if status.StatusEffectOverrideForItems and status.StatusEffectOverrideForItems ~= "" then
+					addEffect(status.StatusEffectOverrideForItems)
+				end
+
+				if status.StatusEffectOnTurn and status.StatusEffectOnTurn ~= "" then
+					addEffect(status.StatusEffectOnTurn)
+				end
+			end
+		end
+
+		return effects
+	end
+
 	---@param parent ExtuiTreeParent
 	function VanityEffect:buildCreateEffectForm(parent)
 		if formPopup then
@@ -286,7 +311,7 @@ if Ext.IsClient() then
 				defaultValue = self.effectProps and self.effectProps[effectProp] or nil,
 				propertyField = effectProp,
 				type = type(value) == "number" and "NumericText" or "Text",
-				enumTable = effectBanks[effectProp],
+				enumTable = buildStatusEffectBank,
 				errorMessageIfEmpty = "Must select a value"
 			} --[[@as FormStructure]])
 		end
@@ -309,9 +334,11 @@ if Ext.IsClient() then
 				inputs.Name = nil
 				effectToModify.effectProps = inputs
 
-				---@type ResourceMultiEffectInfo
-				local mei = Ext.StaticData.Get(effectToModify.effectProps.StatusEffect, "MultiEffectInfo")
-				effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
+				local success = pcall(function (...)
+					---@type ResourceMultiEffectInfo
+					local mei = Ext.StaticData.Get(effectToModify.effectProps.StatusEffect, "MultiEffectInfo")
+					effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
+				end)
 
 				effectCollection[effectToModify.Name] = effectToModify
 				if ConfigurationStructure.config.vanity.effects[effectToModify.Name] then
@@ -422,7 +449,8 @@ end
 Translator:RegisterTranslation({
 	["Create Effect Form"] = "h6be19d3e032543a58900a528e1399bfefa2g",
 	["StatusEffect"] = "hf66bcec3350b4fa1b317a08b6d038e1d7eg6",
-	["Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"] = "h5f8facf0545f4d9b9871fc4ef0756c720e53",
+	["Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"] =
+	"h5f8facf0545f4d9b9871fc4ef0756c720e53",
 	["Must provide a name"] = "h3985d3d0bf8943f7b33cd0ac714e48020447",
 	["Must select a value"] = "h3ab9121338134e3b850376b2c36f65d5ca1b",
 	["Preview"] = "h38a45f57bdd7446bb5464ce2cfd4078bcegf",

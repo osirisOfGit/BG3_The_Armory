@@ -59,10 +59,10 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 
 		if formInput.enumTable then
 			formInput.input.Hint = (formInput.input.Hint and "; " or "") .. Translator:translate("Must select from the list that appears on focus")
-			local displayToKeyMap, displayOrderedMap = formInput.enumTable()
+			local keyToDisplayMap = formInput.enumTable()
 
 			if formInput.defaultValue then
-				for displayName, key in pairs(displayToKeyMap) do
+				for key, displayName in pairs(keyToDisplayMap) do
 					if formInput.defaultValue == key then
 						formInput.input.Text = displayName
 						formInput.input.UserData = key
@@ -76,19 +76,22 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 			resultsView.NoSavedSettings = true
 			resultsView.Visible = false
 			formInput.input.OnChange = function()
-				formInput.input.UserData = (displayOrderedMap and displayToKeyMap[formInput.input.Text] or formInput.input.Text) == formInput.input.UserData
+				local contains, key = TableUtils:ListContains(keyToDisplayMap, formInput.input.Text)
+				formInput.input.UserData = (contains and key or formInput.input.Text) == formInput.input.UserData
 					and formInput.input.UserData
 					or nil
 
 				Helpers:KillChildren(resultsView)
 				resultsView.Visible = true
-				for _, enumValue in ipairs(displayOrderedMap or displayToKeyMap) do
-					if #input.Text == 0 or input.UserData or string.match(string.upper(enumValue), string.upper(input.Text)) then
+				for key, displayName in TableUtils:OrderedPairs(keyToDisplayMap, function (key)
+					return keyToDisplayMap[key]
+				end) do
+					if #input.Text == 0 or input.UserData or string.match(string.upper(displayName), string.upper(input.Text)) then
 						---@type ExtuiSelectable
-						local enumSelectable = resultsView:AddSelectable(enumValue, "DontClosePopups")
+						local enumSelectable = resultsView:AddSelectable(displayName, "DontClosePopups")
 
 						enumSelectable.OnActivate = function()
-							formInput.input.UserData = displayOrderedMap and displayToKeyMap[enumSelectable.Label] or enumSelectable.Label
+							formInput.input.UserData = key
 							formInput.input.Text = enumSelectable.Label
 							resultsView.Visible = false
 						end
