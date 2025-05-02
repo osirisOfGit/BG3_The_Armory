@@ -155,9 +155,7 @@ function PickerBaseClass:InitializeSearchBank()
 								modName = modInfo.Name
 							else
 								local modFolder = template.FileName:match("([^/]+)/RootTemplates/")
-								if modFolder:match("_[0-9a-fA-F%-]+$") then
-									modFolder = modFolder:gsub("_[0-9a-fA-F%-]+$", "")
-								end
+								modFolder = modFolder and modFolder:gsub("_[0-9a-fA-F%-]+$", "") or template.FileName
 								modName = modFolder
 								modId = modFolder
 							end
@@ -371,32 +369,44 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 			---@type ItemTemplate
 			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
-			local failedPredicate
-			for label, filter in TableUtils:OrderedPairs(self.customFilters, function(key)
-				return self.customFilters[key].priority
-			end) do
-				if not filter:apply(itemTemplate) then
-					if not failedPredicate and filter.prepareFilterUI then
-						failedPredicate = label
-					else
-						goto next_template
+			local success, result = xpcall(function(...)
+				local failedPredicate
+				for label, filter in TableUtils:OrderedPairs(self.customFilters, function(key)
+					return self.customFilters[key].priority
+				end) do
+					if not filter:apply(itemTemplate) then
+						if not failedPredicate and filter.prepareFilterUI then
+							failedPredicate = label
+						else
+							goto next_template
+						end
 					end
 				end
-			end
 
-			for label, filter in pairs(filterBuildersToRun) do
-				if not failedPredicate or failedPredicate == label then
-					filter:prepareFilterUI(itemTemplate)
+				for label, filter in pairs(filterBuildersToRun) do
+					if not failedPredicate or failedPredicate == label then
+						filter:prepareFilterUI(itemTemplate)
+					end
 				end
-			end
 
-			if not failedPredicate then
-				self:DisplayResult(itemTemplate, self.favoritesGroup)
-				self:DisplayResult(itemTemplate, self.resultsGroup)
-				count = count + 1
-			end
+				if not failedPredicate then
+					self:DisplayResult(itemTemplate, self.favoritesGroup)
+					self:DisplayResult(itemTemplate, self.resultsGroup)
+					count = count + 1
+				end
+				::next_template::
+			end, debug.traceback)
 
-			::next_template::
+			if not success then
+				---@type Armor|Weapon|Object
+				local stat = Ext.Stats.Get(itemTemplate.Stats)
+				Logger:BasicError("Error while processing template %s from %s with stat %s (%s) - %s",
+					itemTemplate.DisplayName:Get() or itemTemplate.Name,
+					itemTemplate.FileName,
+					stat and stat.Name or itemTemplate.Stats,
+					stat and Ext.Mod.GetMod(stat.ModId).Info.Name,
+					result)
+			end
 		end
 
 		for _, filter in pairs(filterBuildersToRun) do
