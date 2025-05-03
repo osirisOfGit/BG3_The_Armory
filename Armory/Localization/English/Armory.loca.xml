@@ -24,6 +24,7 @@
     <content contentuid="hf5af20f3b67c4eefb3f6de7db8a8705973f2" version="1">When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur.</content>
     <content contentuid="hd7c30d7bd7824ca8b05690ed24cbba2575e4" version="1">Choose A Preset</content>
     <content contentuid="hfdd58b6fefd94e89babdb0cf39c26cb4fa6b" version="1">Active Preset:</content>
+    <content contentuid="hb1b115ff34254cb790ed71bdc1c0a48707b8" version="1">You are not the host - you can change your local presets, but activating your preset will not cause transmogs to occur - only the host can do that</content>
     <content contentuid="h0d3f6797e7ed4d7ca30b60dfd2fb205a07b6" version="1">Armory: Validation of Active Vanity Preset [%s] failed!</content>
     <content contentuid="h1ce43e8d6ff945fa9e26629c56367aecg181" version="1">Armory: Restore Backed Up Preset</content>
     <content contentuid="h2ad4ba32de41497e80215ea9d3fe88188d00" version="1">Preset '%s' was detected as the active preset for this save, but is not loaded in the config - however, a backup was found. Restore?</content>
