@@ -636,7 +636,7 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 						if originalItemStat then
 							---@type Weapon|Armor|Object?
 							local stat = Ext.Stats.Get(originalItemStat)
-							modInfo = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info or nil
+							modInfo = stat.OriginalModId and Ext.Mod.GetMod(stat.OriginalModId).Info or nil
 						end
 
 						---@type ItemTemplate
@@ -677,9 +677,7 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 					if not currentlyMogging then
 						Ext.Timer.WaitFor(20, function()
 							if vanityIsEquipped == 1 then
-								newItemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 								Osi.Equip(inventoryOwner, newItem)
-								Transmogger:ApplyDye(Ext.Entity.Get(inventoryOwner))
 							else
 								Osi.ToInventory(newItem, inventoryOwner, 1, 0, 1)
 							end
@@ -708,6 +706,9 @@ Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
 	Logger:BasicDebug("%s unequipped %s", character, item)
 	Ext.Timer.WaitFor(20, function()
 		Transmogger:UnMogItem(item)
+		Ext.Timer.WaitFor(20, function()
+			Transmogger:MogCharacter(Ext.Entity.Get(character))
+		end)
 	end)
 end)
 
