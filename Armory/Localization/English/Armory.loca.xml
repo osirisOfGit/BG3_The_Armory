@@ -48,6 +48,7 @@
     <content contentuid="h73ee2f1628a943f58d0346700a3bbf581cfd" version="1">ColorPreset %s does not exist</content>
     <content contentuid="h432aaf8e6247405fb8a66ae3b22924edd321" version="1">Does not have a Stat defined</content>
     <content contentuid="h0f1da9613b9e4b87a40d0791321648c744b6" version="1">Points to stat %s, but stat %s points to this template - template should point to the same stat that points to the template</content>
+    <content contentuid="h0aeaac2efeb947dc8605ef8b2354db58g354" version="1">Points to stat %s which is an invalid stat type of %s</content>
     <content contentuid="h8ed8091985cf4ea299f59edc7f46f0999gd7" version="1">Validator Report</content>
     <content contentuid="h75408c1818334a67ba10b5b250c56d040bd7" version="1">Filters</content>
     <content contentuid="hef8667af5d9d47cb882be6c94bfef135fg1g" version="1">Show Issues That Have Built-In Workarounds</content>
@@ -388,5 +389,4 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="he67556c5cd334e3b95059f53d78a0ecacb3b" version="1">Splint</content>
     <content contentuid="he25527b08ccf4a7e9593c12ef25515185eea" version="1">Plate</content>
     <!-- END Armor Type Enum -->
-    <content contentuid="h0aeaac2efeb947dc8605ef8b2354db58g354" version="1">Points to stat %s which is an invalid stat type of %s</content>
 </contentList>
