@@ -397,7 +397,8 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 				if outfitSlot then
 					ModEventsManager:TransmogCompleted({
 						character = character.Uuid.EntityUuid,
-						cosmeticItemId = vanityTemplate,
+						cosmeticItemId = createdVanityEntity.Uuid.EntityUuid,
+						cosmeticTemplateItemId = vanityTemplate,
 						equippedItemTemplateId = equippedItemEntity.ServerItem.Template.Id,
 						equippedItemId = equippedItem,
 						slot = actualSlot
@@ -657,6 +658,10 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 						newItem = Osi.CreateAt(itemEntity.ServerItem.Template.Id, 0, 0, 0, 0, 0, "")
 					end
 
+					if vanityIsEquipped == 1 then
+						itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+						Osi.Unequip(inventoryOwner, item)
+					end
 					Osi.RequestDelete(item)
 
 					---@type EntityHandle
@@ -678,6 +683,15 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 							else
 								Osi.ToInventory(newItem, inventoryOwner, 1, 0, 1)
 							end
+
+							ModEventsManager:TransmogRemoved({
+								character = inventoryOwner,
+								cosmeticItemId = item,
+								cosmeticTemplateItemId = itemEntity.ServerItem.Template.Id,
+								equippedItemId = newItem,
+								equippedItemTemplateId = originalItemTemplate,
+								slot = vanityIsEquipped == 1 and Ext.Stats.Get(newItemEntity.Data.StatsId).Slot or nil
+							})
 						end)
 					end
 
