@@ -510,8 +510,9 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	PickerBaseClass.OpenWindow(self,
 		slot,
 		function()
-			self.settingsMenu:AddText(Translator:translate("Number of Items Per Row")):Tooltip():AddText(Translator:translate("Only used for Favorites on Patch 8"))
+			self.settingsMenu:AddText(Translator:translate("Number of Items Per Row")):Tooltip():AddText("\t " .. Translator:translate("Only used for Favorites on Patch 8"))
 			local perRowSetting = self.settingsMenu:AddSliderInt("", self.settings.rowSize, 0, 10)
+			perRowSetting:Tooltip():AddText("\t " .. Translator:translate("Only used for Favorites on Patch 8"))
 			perRowSetting.OnChange = function()
 				self.settings.rowSize = perRowSetting.Value[1]
 				self:ProcessFilters()
@@ -536,7 +537,9 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 		local warningButton = Styler:ImageButton(self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 }))
 
 		local warningText = warningButton:Tooltip():AddText(
-			"\t  " .. Translator:translate("WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"))
+			"\t  " ..
+			Translator:translate(
+			"WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"))
 		warningText.TextWrapPos = 600
 		warningText:SetColor("Text", { 1, 0.02, 0, 1 })
 	end
@@ -665,7 +668,8 @@ Translator:RegisterTranslation({
 	 These filters are determined by the 'Visuals' section of the itemTemplate using what's internally referred to as Equipment Race Ids
 These do not represent the EquipmentRace guaranteed to show a given piece of equipment, but what EquipmentRace's the item has explicitly defined in their template
 This means that, for example, an item that doesn't define Elf Male is still highly likely to work if it defines Human Male, as they share similar/the same models
-Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work]])] = "h916fc5f1979342aeb9848b362bded8865ge3",
+Because of this, it's best to select multiple EquipmentRaces that look most similar to yours. For Strong types, Human Strongs and Orcs will generally work]])] =
+	"h916fc5f1979342aeb9848b362bded8865ge3",
 	["By Armor Type"] = "h4d1648200ebc4ccda856362ca12c087a03dc",
 	["These filters are determined by the Stat of the item, not the material of the item itself (since there's no way to do that)"] = "hc7f094dd04e14c0fa607315cee3612f6ed80",
 	["By Stat Slot"] = "heaec1ab79adf42eb89f43d5753f295df08be",
@@ -676,6 +680,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	["Number of Items Per Row"] = "h670f5005fae647019d884dcb37db31dd9a7g",
 	["Only used for Favorites on Patch 8"] = "h2b39a9f0f90840b19f8b602684ddbc7c4177",
 	["Apply Dye"] = "hd399ef020f5e4e319cf68affb8585f8d06b8",
-	["WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"] = "ha9c5c3919a744036925cf8010a1c7bb48a2f",
+	["WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"] =
+	"ha9c5c3919a744036925cf8010a1c7bb48a2f",
 	["Status Effect"] = "had9a379edf23424997655761c7dbbc6eb84g",
 })

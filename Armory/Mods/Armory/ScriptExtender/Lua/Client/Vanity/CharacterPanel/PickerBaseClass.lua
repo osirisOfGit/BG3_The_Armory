@@ -102,6 +102,8 @@ function PickerBaseClass:InitializeSearchBank()
 			local itemTemplate = stat.RootTemplate and Ext.ClientTemplate.GetRootTemplate(stat.RootTemplate) or nil
 			if not itemTemplate then
 				error(string.format("RootTemplate %s does not exist", stat.RootTemplate))
+			elseif not Ext.Stats.Get(itemTemplate.Stats) then
+				error(string.format("Stat %s on RootTemplate %s does not exist", itemTemplate.Stats, stat.RootTemplate))
 			end
 
 			indexShard.templateIdAndStat[stat.RootTemplate] = statString
@@ -141,6 +143,10 @@ function PickerBaseClass:InitializeSearchBank()
 						---@type Weapon|Armor
 						local stat = Ext.Stats.Get(template.Stats)
 
+						if not TableUtils:ListContains({ "Armor", "Weapon", "Object" }, stat.ModifierList) then
+							error(string.format("Stat %s is an invalid stat type of %s", stat.Name, stat.ModifierList))
+						end
+
 						if stat and stat.Slot then
 							itemCount = itemCount + 1
 
@@ -155,9 +161,7 @@ function PickerBaseClass:InitializeSearchBank()
 								modName = modInfo.Name
 							else
 								local modFolder = template.FileName:match("([^/]+)/RootTemplates/")
-								if modFolder:match("_[0-9a-fA-F%-]+$") then
-									modFolder = modFolder:gsub("_[0-9a-fA-F%-]+$", "")
-								end
+								modFolder = modFolder and modFolder:gsub("_[0-9a-fA-F%-]+$", "") or template.FileName
 								modName = modFolder
 								modId = modFolder
 							end
@@ -211,6 +215,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window = Ext.IMGUI.NewWindow(self.title)
 		self.window.Closeable = true
 		self.window.MenuBar = true
+		self.window:SetStyle("WindowMinSize", 250, 850)
 		self.window.OnClose = function()
 			Ext.Timer.WaitFor(60, function()
 				onCloseFunc()
@@ -243,9 +248,11 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.separator.Font = "Large"
 
 		local toggleFilterColumn = Styler:ImageButton(self.window:AddImageButton("filterCol", "ico_filter", { 40, 40 }))
+		toggleFilterColumn:Tooltip():AddText("\t " .. Translator:translate("Collapses left sidebar (which can also be resized by clicking and dragging the vertical yellow line)"))
 
 		local displayTable = self.window:AddTable("", 2)
-		displayTable:AddColumn("", "WidthFixed", 400)
+		displayTable.Resizable = true
+		displayTable:AddColumn("", "WidthFixed", 400 * Styler:ScaleFactor())
 		displayTable:AddColumn("", "WidthStretch")
 
 		local row = displayTable:AddRow()
@@ -371,32 +378,44 @@ function PickerBaseClass:ProcessFilters(listenerToIgnore)
 			---@type ItemTemplate
 			local itemTemplate = Ext.Template.GetRootTemplate(templateId)
 
-			local failedPredicate
-			for label, filter in TableUtils:OrderedPairs(self.customFilters, function(key)
-				return self.customFilters[key].priority
-			end) do
-				if not filter:apply(itemTemplate) then
-					if not failedPredicate and filter.prepareFilterUI then
-						failedPredicate = label
-					else
-						goto next_template
+			local success, result = xpcall(function(...)
+				local failedPredicate
+				for label, filter in TableUtils:OrderedPairs(self.customFilters, function(key)
+					return self.customFilters[key].priority
+				end) do
+					if not filter:apply(itemTemplate) then
+						if not failedPredicate and filter.prepareFilterUI then
+							failedPredicate = label
+						else
+							goto next_template
+						end
 					end
 				end
-			end
 
-			for label, filter in pairs(filterBuildersToRun) do
-				if not failedPredicate or failedPredicate == label then
-					filter:prepareFilterUI(itemTemplate)
+				for label, filter in pairs(filterBuildersToRun) do
+					if not failedPredicate or failedPredicate == label then
+						filter:prepareFilterUI(itemTemplate)
+					end
 				end
-			end
 
-			if not failedPredicate then
-				self:DisplayResult(itemTemplate, self.favoritesGroup)
-				self:DisplayResult(itemTemplate, self.resultsGroup)
-				count = count + 1
-			end
+				if not failedPredicate then
+					self:DisplayResult(itemTemplate, self.favoritesGroup)
+					self:DisplayResult(itemTemplate, self.resultsGroup)
+					count = count + 1
+				end
+				::next_template::
+			end, debug.traceback)
 
-			::next_template::
+			if not success then
+				---@type Armor|Weapon|Object
+				local stat = Ext.Stats.Get(itemTemplate.Stats)
+				Logger:BasicError("Error while processing template %s from %s with stat %s (%s) - %s",
+					itemTemplate.DisplayName:Get() or itemTemplate.Name,
+					itemTemplate.FileName,
+					stat and stat.Name or itemTemplate.Stats,
+					stat and Ext.Mod.GetMod(stat.ModId).Info.Name,
+					result)
+			end
 		end
 
 		for _, filter in pairs(filterBuildersToRun) do
@@ -611,4 +630,5 @@ Translator:RegisterTranslation({
 	["By UUID"] = "he6026f619cb34081b2bf00be3563b09801ea",
 	["Mod Name - Case-insensitive"] = "h35a82652afb94de4a417ccbda4a61caeg6c9",
 	["Clear Selected Mods"] = "h2a3702e0861c4c5cbe3ee7a1f332f774g91b",
+	["Collapses left sidebar (which can also be resized by clicking and dragging the vertical yellow line)"] = "h011a79d8553b4737824f3b10d34afc36c5f2"
 })

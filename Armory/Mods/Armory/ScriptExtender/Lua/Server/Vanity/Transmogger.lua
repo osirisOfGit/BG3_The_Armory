@@ -202,7 +202,8 @@ function Transmogger:MogCharacter(character)
 
 			local unmoggedId = Transmogger:UnMogItem(equippedItem, true)
 			equippedItem = unmoggedId or equippedItem
-			if not unmoggedId then
+			if Osi.IsEquipped(equippedItem) == 1 then
+				Ext.Entity.Get(equippedItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 				Osi.Unequip(character.Uuid.EntityUuid, equippedItem)
 			end
 		end
@@ -376,27 +377,39 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 		else
 			createdVanityEntity.Vars.TheArmory_Vanity_PreviewItem = character.Uuid.EntityUuid
 		end
-		if Osi.IsWeapon(createdVanityEntity.Uuid.EntityUuid) == 1 and Osi.HasMeleeWeaponEquipped(character.Uuid.EntityUuid, "Any") == 1 then
-			Logger:BasicDebug("%s has a weapon equipped currently, giving game time to catch up", character.Uuid.EntityUuid)
-			Ext.Timer.WaitFor(100, function()
+
+		local function finishMog(waitCounter)
+			waitCounter = waitCounter or 0
+			if (Osi.IsWeapon(createdVanityEntity.Uuid.EntityUuid) == 1 and Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)) and waitCounter <= 10 then
+				Logger:BasicDebug("%s has a weapon equipped currently, giving game time to catch up", character.Uuid.EntityUuid)
+				Ext.Timer.WaitFor(50, function()
+					finishMog(waitCounter + 1)
+				end)
+			else
 				Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
 				if outfitSlot and actualSlot then
 					self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
 				end
-				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItem, createdVanityEntity.Uuid.EntityUuid,
-					Ext.Utils.MonotonicTime() - startTime)
-			end)
-		else
-			Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
-			if outfitSlot and actualSlot then
-				self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
-			end
 
-			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
-				Ext.Utils.MonotonicTime() - startTime)
+				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
+					Ext.Utils.MonotonicTime() - startTime)
+
+				if outfitSlot then
+					ModEventsManager:TransmogCompleted({
+						character = character.Uuid.EntityUuid,
+						cosmeticItemId = createdVanityEntity.Uuid.EntityUuid,
+						cosmeticTemplateItemId = vanityTemplate,
+						equippedItemTemplateId = equippedItemEntity.ServerItem.Template.Id,
+						equippedItemId = equippedItem,
+						slot = actualSlot
+					})
+				end
+
+				Osi.RequestDelete(equippedItem)
+			end
 		end
-		
-		Osi.RequestDelete(equippedItem)
+
+		finishMog()
 	end)
 end
 
@@ -623,7 +636,7 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 						if originalItemStat then
 							---@type Weapon|Armor|Object?
 							local stat = Ext.Stats.Get(originalItemStat)
-							modInfo = stat.ModId and Ext.Mod.GetMod(stat.ModId).Info or nil
+							modInfo = stat.OriginalModId and Ext.Mod.GetMod(stat.OriginalModId).Info or nil
 						end
 
 						---@type ItemTemplate
@@ -645,6 +658,10 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 						newItem = Osi.CreateAt(itemEntity.ServerItem.Template.Id, 0, 0, 0, 0, 0, "")
 					end
 
+					if vanityIsEquipped == 1 then
+						itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+						Osi.Unequip(inventoryOwner, item)
+					end
 					Osi.RequestDelete(item)
 
 					---@type EntityHandle
@@ -660,12 +677,19 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 					if not currentlyMogging then
 						Ext.Timer.WaitFor(20, function()
 							if vanityIsEquipped == 1 then
-								newItemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 								Osi.Equip(inventoryOwner, newItem)
-								Transmogger:ApplyDye(Ext.Entity.Get(inventoryOwner))
 							else
 								Osi.ToInventory(newItem, inventoryOwner, 1, 0, 1)
 							end
+
+							ModEventsManager:TransmogRemoved({
+								character = inventoryOwner,
+								cosmeticItemId = item,
+								cosmeticTemplateItemId = itemEntity.ServerItem.Template.Id,
+								equippedItemId = newItem,
+								equippedItemTemplateId = originalItemTemplate,
+								slot = vanityIsEquipped == 1 and Ext.Stats.Get(newItemEntity.Data.StatsId).Slot or nil
+							})
 						end)
 					end
 
@@ -681,7 +705,12 @@ end
 Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
 	Logger:BasicDebug("%s unequipped %s", character, item)
 	Ext.Timer.WaitFor(20, function()
-		Transmogger:UnMogItem(item)
+		local newItem = Transmogger:UnMogItem(item)
+		if newItem and not Ext.Entity.Get(newItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging then
+			Ext.Timer.WaitFor(20, function()
+				Transmogger:MogCharacter(Ext.Entity.Get(character))
+			end)
+		end
 	end)
 end)
 

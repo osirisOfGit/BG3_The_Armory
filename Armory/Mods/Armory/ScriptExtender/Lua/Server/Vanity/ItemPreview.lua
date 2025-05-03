@@ -75,31 +75,37 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 		end)
 	else
 		if userPreview.previewItem then
-			---@type EntityHandle
-			local previewEntity = Ext.Entity.Get(userPreview.previewItem)
-			previewEntity.Vars.TheArmory_Vanity_PreviewItem = character
-			previewEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
-
-			Osi.Equip(character, userPreview.previewItem, 1, 0)
-
-			if payload.dye then
-				---@type EntityHandle
-				local itemEntity = Ext.Entity.Get(userPreview.previewItem)
-
-				if not itemEntity.ItemDye then
-					itemEntity:CreateComponent("ItemDye")
-				end
-
-				---@type ItemTemplate
-				local dyeTemplate = Ext.Template.GetTemplate(payload.dye)
-
-				---@type ResourceMaterialPresetResource
-				local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
-
-				itemEntity.ItemDye.Color = materialPreset.Guid
-
-				itemEntity:Replicate("ItemDye")
+			if userPreview.equippedItem then
+				Osi.Unequip(character, userPreview.equippedItem)
 			end
+
+			Ext.Timer.WaitFor(50, function()
+				---@type EntityHandle
+				local previewEntity = Ext.Entity.Get(userPreview.previewItem)
+				previewEntity.Vars.TheArmory_Vanity_PreviewItem = character
+				previewEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+
+				Osi.Equip(character, userPreview.previewItem, 1, 0)
+
+				if payload.dye then
+					---@type EntityHandle
+					local itemEntity = Ext.Entity.Get(userPreview.previewItem)
+
+					if not itemEntity.ItemDye then
+						itemEntity:CreateComponent("ItemDye")
+					end
+
+					---@type ItemTemplate
+					local dyeTemplate = Ext.Template.GetTemplate(payload.dye)
+
+					---@type ResourceMaterialPresetResource
+					local materialPreset = Ext.Resource.Get(dyeTemplate.ColorPreset, "MaterialPreset")
+
+					itemEntity.ItemDye.Color = materialPreset.Guid
+
+					itemEntity:Replicate("ItemDye")
+				end
+			end)
 		end
 	end
 end)

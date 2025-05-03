@@ -86,6 +86,7 @@ function VanityPresetManager:OpenManager()
 		Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
 		presetWindow = Ext.IMGUI.NewWindow(Translator:translate("Vanity Preset Manager"))
 		presetWindow.Closeable = true
+		presetWindow:SetStyle("WindowMinSize", 250, 850)
 
 		presetWindow.MenuBar = true
 		local menu = presetWindow:AddMainMenu()
@@ -125,7 +126,7 @@ function VanityPresetManager:OpenManager()
 		local presetTable = presetWindow:AddTable("PresetTable", 2)
 		presetTable.Resizable = true
 
-		presetTable:AddColumn("PresetSelection", "WidthFixed")
+		presetTable:AddColumn("PresetSelection", "WidthFixed", 400 * Styler:ScaleFactor())
 		presetTable:AddColumn("PresetInfo", "WidthStretch")
 
 		local row = presetTable:AddRow()
