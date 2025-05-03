@@ -318,7 +318,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				-- Formatting the page into columns
 				local metadataTable = presetGroup:AddTable("metadata", 3)
 				metadataTable:AddColumn("", "WidthStretch")
-				metadataTable:AddColumn("", "WidthFixed", 400)
+				metadataTable:AddColumn("", "WidthFixed", 400 * Styler:ScaleFactor())
 				metadataTable:AddColumn("", "WidthStretch")
 				metadataTable.SizingStretchSame = true
 
