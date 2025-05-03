@@ -81,3 +81,8 @@ function Styler:MiddleAlignedColumnLayout(parent, ...)
 		row:AddCell()
 	end
 end
+
+function Styler:ScaleFactor()
+	-- testing monitor for development is 1440p
+	return Ext.IMGUI.GetViewportSize()[2] / 1440
+end

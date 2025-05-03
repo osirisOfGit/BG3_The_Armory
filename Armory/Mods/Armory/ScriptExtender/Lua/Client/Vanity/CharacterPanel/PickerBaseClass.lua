@@ -143,6 +143,10 @@ function PickerBaseClass:InitializeSearchBank()
 						---@type Weapon|Armor
 						local stat = Ext.Stats.Get(template.Stats)
 
+						if not TableUtils:ListContains({ "Armor", "Weapon", "Object" }, stat.ModifierList) then
+							error(string.format("Stat %s is an invalid stat type of %s", stat.Name, stat.ModifierList))
+						end
+
 						if stat and stat.Slot then
 							itemCount = itemCount + 1
 
@@ -211,6 +215,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window = Ext.IMGUI.NewWindow(self.title)
 		self.window.Closeable = true
 		self.window.MenuBar = true
+		self.window:SetStyle("WindowMinSize", 250, 850)
 		self.window.OnClose = function()
 			Ext.Timer.WaitFor(60, function()
 				onCloseFunc()
@@ -245,7 +250,8 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		local toggleFilterColumn = Styler:ImageButton(self.window:AddImageButton("filterCol", "ico_filter", { 40, 40 }))
 
 		local displayTable = self.window:AddTable("", 2)
-		displayTable:AddColumn("", "WidthFixed", 400)
+		displayTable.Resizable = true
+		displayTable:AddColumn("", "WidthFixed", 400 * Styler:ScaleFactor())
 		displayTable:AddColumn("", "WidthStretch")
 
 		local row = displayTable:AddRow()
