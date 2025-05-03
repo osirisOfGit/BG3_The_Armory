@@ -705,10 +705,12 @@ end
 Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
 	Logger:BasicDebug("%s unequipped %s", character, item)
 	Ext.Timer.WaitFor(20, function()
-		Transmogger:UnMogItem(item)
-		Ext.Timer.WaitFor(20, function()
-			Transmogger:MogCharacter(Ext.Entity.Get(character))
-		end)
+		local newItem = Transmogger:UnMogItem(item)
+		if newItem and not Ext.Entity.Get(newItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging then
+			Ext.Timer.WaitFor(20, function()
+				Transmogger:MogCharacter(Ext.Entity.Get(character))
+			end)
+		end
 	end)
 end)
 
