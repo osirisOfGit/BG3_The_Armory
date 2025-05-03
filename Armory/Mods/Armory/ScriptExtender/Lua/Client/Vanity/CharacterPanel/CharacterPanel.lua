@@ -122,7 +122,8 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 
 	if preset.isModPreset then
 		local txt = panelGroup:AddText(
-			Translator:translate("Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first"))
+			Translator:translate(
+				"Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first"))
 		txt.Font = "Large"
 		txt.TextWrapPos = 0
 	else
@@ -349,32 +350,43 @@ function VanityCharacterPanel:RecordModDependency(itemTemplate, outfitSlotEntryF
 	outfitSlotEntryForItem.guid = itemTemplate.Id
 	outfitSlotEntryForItem.name = itemTemplate.DisplayName:Get() or itemTemplate.Name
 
-	if itemTemplate.Stats then
-		---@type Object
-		local stat = Ext.Stats.Get(itemTemplate.Stats)
-		local modInfo = Ext.Mod.GetMod(stat.ModId).Info
-		if modInfo then
-			outfitSlotEntryForItem.modDependency = {
-				Name = modInfo.Name,
-				Guid = modInfo.ModuleUUID,
-				Version = modInfo.ModVersion
-			}
-
-			if stat.OriginalModId ~= "" and stat.OriginalModId ~= stat.ModId then
-				local originalModInfo = Ext.Mod.GetMod(stat.OriginalModId).Info
-				if originalModInfo then
-					outfitSlotEntryForItem.modDependency.OriginalMod = {
-						Name = originalModInfo.Name,
-						Guid = originalModInfo.ModuleUUID,
-						Version = originalModInfo.ModVersion
-					}
+	local success, result = pcall(function(...)
+		if itemTemplate.Stats then
+			---@type Object
+			local stat = Ext.Stats.Get(itemTemplate.Stats)
+			if stat then
+				if stat.ModId ~= "" then
+					local modInfo = Ext.Mod.GetMod(stat.ModId).Info
+					if modInfo then
+						outfitSlotEntryForItem.modDependency = {
+							Name = modInfo.Name,
+							Guid = modInfo.ModuleUUID,
+							Version = modInfo.ModVersion
+						}
+					end
 				end
+				if stat.OriginalModId ~= "" and stat.OriginalModId ~= stat.ModId then
+					local originalModInfo = Ext.Mod.GetMod(stat.OriginalModId).Info
+					if originalModInfo then
+						outfitSlotEntryForItem.modDependency.OriginalMod = {
+							Name = originalModInfo.Name,
+							Guid = originalModInfo.ModuleUUID,
+							Version = originalModInfo.ModVersion
+						}
+					end
+				end
+			else
+				error(string.format("Stat %s does not exist", itemTemplate.Stats))
 			end
+		else
+			error("No stats object")
 		end
-	else
-		Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing Stats entry",
+	end)
+	if not success then
+		Logger:BasicWarning("Can't record the mod dependency for item %s (%s) due to missing %s",
 			itemTemplate.DisplayName:Get() or itemTemplate.Name,
-			itemTemplate.Id)
+			itemTemplate.Id,
+			result)
 	end
 end
 
@@ -406,7 +418,8 @@ function VanityCharacterPanel:InitializeOutfitSlot(itemSlot, weaponType)
 end
 
 Translator:RegisterTranslation({
-	["Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first"] = "h87888372190f4a01bd3c236148d79209d284",
+	["Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first"] =
+	"h87888372190f4a01bd3c236148d79209d284",
 	["Copy From Another Outfit"] = "h39a529d80937485fa0cbd44a4a57c13dc09g",
 	["This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)"] = "h0450b90e8cd74c91b1fba6749387ecfd4ec0",
 	["Hiding Appearance"] = "h88ee937b2cc54a608b75e7b6d1cd7682g54e",

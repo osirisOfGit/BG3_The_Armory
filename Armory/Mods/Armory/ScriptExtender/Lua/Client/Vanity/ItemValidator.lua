@@ -183,6 +183,8 @@ function ItemValidator:ValidateItems()
 
 					if not template.Stats or template.Stats == "" then
 						self:addEntry(template.Name .. "_" .. template.Id, template, "Template", Translator:translate("Does not have a Stat defined"), "Prevents Transmog")
+					elseif not Ext.Stats.Get(template.Stats) then
+						self:addEntry(template.Name .. "_" .. template.Id, template, "Template", string.format(Translator:translate("Points to stat %s which does not exist"), template.Stats), "Prevents Transmog")
 					elseif template.Stats ~= stat.Name then
 						self:addEntry(template.Name .. "_" .. template.Id,
 							template,

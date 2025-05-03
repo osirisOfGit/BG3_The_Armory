@@ -376,26 +376,35 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 		else
 			createdVanityEntity.Vars.TheArmory_Vanity_PreviewItem = character.Uuid.EntityUuid
 		end
-		if Osi.IsWeapon(createdVanityEntity.Uuid.EntityUuid) == 1 and Osi.HasMeleeWeaponEquipped(character.Uuid.EntityUuid, "Any") == 1 then
-			Logger:BasicDebug("%s has a weapon equipped currently, giving game time to catch up", character.Uuid.EntityUuid)
-			Ext.Timer.WaitFor(100, function()
+
+		local function finishMog(waitCounter)
+			waitCounter = waitCounter or 0
+			if (Osi.IsWeapon(createdVanityEntity.Uuid.EntityUuid) == 1 and Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)) and waitCounter <= 3 then
+				Logger:BasicDebug("%s has a weapon equipped currently, giving game time to catch up", character.Uuid.EntityUuid)
+				Ext.Timer.WaitFor(50, function()
+					finishMog(waitCounter + 1)
+				end)
+			else
 				Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
 				if outfitSlot and actualSlot then
 					self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
 				end
-				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItem, createdVanityEntity.Uuid.EntityUuid,
-					Ext.Utils.MonotonicTime() - startTime)
-			end)
-		else
-			Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
-			if outfitSlot and actualSlot then
-				self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
-			end
 
-			Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
-				Ext.Utils.MonotonicTime() - startTime)
+				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,
+					Ext.Utils.MonotonicTime() - startTime)
+
+				ModEventsManager:TransmogCompleted({
+					character = character.Uuid.EntityUuid,
+					cosmeticItemId = vanityTemplate,
+					equippedItemTemplateId = equippedItemEntity.ServerItem.Template.Id,
+					equippedItemId = equippedItem,
+					slot = actualSlot
+				})
+			end
 		end
-		
+
+		finishMog()
+
 		Osi.RequestDelete(equippedItem)
 	end)
 end
@@ -702,7 +711,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 		end
 
 		-- Otherwise damage dice starts duplicating for some reason. 50ms wasn't cutting it
-		transmoggingLock = Ext.Timer.WaitFor(200, function()
+		transmoggingLock = Ext.Timer.WaitFor(400, function()
 			transmoggingLock = nil
 
 			-- Weird bug when swapping dual wielded items between slots, Ext.Entity can't fully inspect somehow?

@@ -102,6 +102,8 @@ function PickerBaseClass:InitializeSearchBank()
 			local itemTemplate = stat.RootTemplate and Ext.ClientTemplate.GetRootTemplate(stat.RootTemplate) or nil
 			if not itemTemplate then
 				error(string.format("RootTemplate %s does not exist", stat.RootTemplate))
+			elseif not Ext.Stats.Get(itemTemplate.Stats) then
+				error(string.format("Stat %s on RootTemplate %s does not exist", itemTemplate.Stats, stat.RootTemplate))
 			end
 
 			indexShard.templateIdAndStat[stat.RootTemplate] = statString

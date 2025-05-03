@@ -10,6 +10,7 @@ Ext.Require("Shared/Vanity/PresetProxy.lua")
 
 Ext.Require("Server/Utility.lua")
 
+Ext.Require("Server/Vanity/ModEventManager.lua")
 Ext.Require("Server/Vanity/ItemPreview.lua")
 Ext.Require("Server/Vanity/MiscClientHelpers.lua")
 Ext.Require("Server/Vanity/DyePreview.lua")
