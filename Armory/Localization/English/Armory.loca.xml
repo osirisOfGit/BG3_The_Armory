@@ -388,4 +388,5 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="he67556c5cd334e3b95059f53d78a0ecacb3b" version="1">Splint</content>
     <content contentuid="he25527b08ccf4a7e9593c12ef25515185eea" version="1">Plate</content>
     <!-- END Armor Type Enum -->
+    <content contentuid="h0aeaac2efeb947dc8605ef8b2354db58g354" version="1">Points to stat %s which is an invalid stat type of %s</content>
 </contentList>

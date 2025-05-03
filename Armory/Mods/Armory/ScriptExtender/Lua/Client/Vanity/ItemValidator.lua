@@ -183,16 +183,26 @@ function ItemValidator:ValidateItems()
 
 					if not template.Stats or template.Stats == "" then
 						self:addEntry(template.Name .. "_" .. template.Id, template, "Template", Translator:translate("Does not have a Stat defined"), "Prevents Transmog")
-					elseif not Ext.Stats.Get(template.Stats) then
-						self:addEntry(template.Name .. "_" .. template.Id, template, "Template", string.format(Translator:translate("Points to stat %s which does not exist"), template.Stats), "Prevents Transmog")
-					elseif template.Stats ~= stat.Name then
-						self:addEntry(template.Name .. "_" .. template.Id,
-							template,
-							"Template",
-							string.format(
-								Translator:translate("Points to stat %s, but stat %s points to this template - template should point to the same stat that points to the template"),
-								template.Stats, stat.Name),
-							"Has Built-In Workaround")
+					else
+						---@type StatsObject
+						local statEntry = Ext.Stats.Get(template.Stats)
+						if not statEntry then
+							self:addEntry(template.Name .. "_" .. template.Id, template, "Template",
+								string.format(Translator:translate("Points to stat %s which does not exist"), template.Stats), "Prevents Transmog")
+						elseif not TableUtils:ListContains({ "Armor", "Weapon", "Object" }, statEntry.ModifierList) then
+							self:addEntry(template.Name .. "_" .. template.Id, template, "Template",
+								string.format(Translator:translate("Points to stat %s which is an invalid stat type of %s", stat, statEntry.ModifierList)),
+								"Prevents Transmog")
+						elseif template.Stats ~= statEntry.Name then
+							self:addEntry(template.Name .. "_" .. template.Id,
+								template,
+								"Template",
+								string.format(
+									Translator:translate(
+										"Points to stat %s, but stat %s points to this template - template should point to the same stat that points to the template"),
+									template.Stats, statEntry.Name),
+								"Has Built-In Workaround")
+						end
 					end
 				end
 			end)
@@ -502,6 +512,7 @@ Translator:RegisterTranslation({
 	["ColorPreset %s does not exist"] = "h73ee2f1628a943f58d0346700a3bbf581cfd",
 	["Does not have a Stat defined"] = "h432aaf8e6247405fb8a66ae3b22924edd321",
 	["Points to stat %s, but stat %s points to this template - template should point to the same stat that points to the template"] = "h0f1da9613b9e4b87a40d0791321648c744b6",
+	["Points to stat %s which is an invalid stat type of %s"] = "h0aeaac2efeb947dc8605ef8b2354db58g354",
 	["Validator Report"] = "h8ed8091985cf4ea299f59edc7f46f0999gd7",
 	["Filters"] = "h75408c1818334a67ba10b5b250c56d040bd7",
 	["Show Issues That Have Built-In Workarounds"] = "hef8667af5d9d47cb882be6c94bfef135fg1g",
