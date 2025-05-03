@@ -1,10 +1,10 @@
 ModEventsManager = {}
 
 ---@class TransmogCompleteEvent
----@field cosmeticItemId GUIDSTRING
+---@field cosmeticItemId GUIDSTRING will be destroyed by the time TransmogRemoved event fires
 ---@field cosmeticTemplateItemId GUIDSTRING
 ---@field equippedItemTemplateId GUIDSTRING
----@field equippedItemId GUIDSTRING will be destroyed by the time this event fires
+---@field equippedItemId GUIDSTRING will be destroyed by the time TransmogComplete event fires
 ---@field character CHARACTER
 ---@field slot ActualSlot? Shared/Vanity/MissingEnums - SE enum doesn't perfectly match OSI slot name - can be nil if unequipped item goes back into inventory
 
