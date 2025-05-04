@@ -7,15 +7,14 @@ Ext.Require("Client/Vanity/PresetManagement/ModDependencyManager.lua")
 ServerPresetManager = {}
 ServerPresetManager.userName = ""
 
-Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, userID)
-	ServerPresetManager.username = payload
-end)
-
 ---@type ExtuiWindow
 local presetWindow
 
 ---@type ExtuiGroup
 local userPresetSection
+
+---@type ExtuiGroup
+local otherUsersSection
 
 ---@type ExtuiGroup
 local modPresetSection
@@ -83,7 +82,10 @@ function ServerPresetManager:OpenManager()
 		presetWindow:SetFocus()
 		ServerPresetManager:UpdatePresetView()
 	elseif not presetWindow then
-		Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
+		Channels.GetUserName:RequestToServer({}, function(data)
+			self.userName = data.username
+		end)
+
 		presetWindow = Ext.IMGUI.NewWindow(Translator:translate("Vanity Preset Manager"))
 		presetWindow.Closeable = true
 		presetWindow:SetStyle("WindowMinSize", 250, 850)
@@ -119,7 +121,7 @@ function ServerPresetManager:OpenManager()
 			presetForm.Visible = not presetForm.Visible
 		end
 
-		Channels.GetUserPreset:RequestToServer({}, function(data)
+		Channels.GetActiveUserPreset:RequestToServer({}, function(data)
 			local presetId = data.presetId
 			if not presetId and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
 				createNewPresetButton.OnClick()
@@ -143,6 +145,12 @@ function ServerPresetManager:OpenManager()
 			userHeader:SetStyle("SeparatorTextAlign", 0.5)
 			userHeader.Font = "Large"
 			userHeader.UserData = "keep"
+
+			otherUsersSection = selectionCell:AddGroup("Other_User_Presets")
+			local otherUsersHeader = otherUsersSection:AddSeparatorText(Translator:translate("Other User's Presets"))
+			otherUsersHeader:SetStyle("SeparatorTextAlign", 0.5)
+			otherUsersHeader.Font = "Large"
+			otherUsersHeader.UserData = "keep"
 
 			selectionCell:AddNewLine()
 			modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
@@ -261,13 +269,12 @@ function ServerPresetManager:UpdatePresetView(presetID)
 
 	---@param vanityContainer Vanity
 	---@param presetCollection {[Guid]: VanityPreset}
-	---@param owningMod string?
-	local function buildSection(vanityContainer, presetCollection, owningMod)
-		local parentSection = owningMod and modPresetSection or userPresetSection
-
-		if owningMod then
+	---@param externalOwner string?
+	---@param parentSection ExtuiTreeParent
+	local function buildSection(vanityContainer, presetCollection, externalOwner, parentSection)
+		if externalOwner then
 			parentSection:AddSeparator():SetColor("Separator", { 1, 1, 1, 0.6 })
-			local sepText = parentSection:AddSeparatorText(owningMod)
+			local sepText = parentSection:AddSeparatorText(externalOwner)
 			sepText:SetStyle("SeparatorTextAlign", 0.5)
 			sepText:SetColor("Text", { 1, 1, 1, 0.6 })
 			parentSection:AddSeparator():SetColor("Separator", { 1, 1, 1, 0.6 })
@@ -277,7 +284,7 @@ function ServerPresetManager:UpdatePresetView(presetID)
 			return presetCollection[key].Name
 		end) do
 			-- Only user presets can be backed up
-			if not owningMod then
+			if not externalOwner then
 				local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
 				local syncButton = Styler:ImageButton(parentSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
 
@@ -301,7 +308,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 			---@type ExtuiSelectable
 			local presetSelectable = parentSection:AddSelectable(preset.Name)
 			presetSelectable.UserData = "select"
-			presetSelectable.SameLine = not owningMod
+			presetSelectable.SameLine = not externalOwner
 			presetSelectable.IDContext = guid
 
 			presetSelectable.OnClick = function()
@@ -342,7 +349,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				metadataText.Disabled = true
 				metadataRow:AddCell()
 
-				if not owningMod and preset.ModSourced then
+				if not externalOwner and preset.ModSourced then
 					local modRow = metadataTable:AddRow()
 					modRow:AddCell()
 					local mod = Ext.Mod.GetMod(preset.ModSourced.Guid)
@@ -387,7 +394,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					end
 				end
 
-				if not owningMod then
+				if not externalOwner then
 					local editButton = Styler:ImageButton(actionCell:AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
 					editButton:Tooltip():AddText("\t  " .. Translator:translate("Edit this preset's name/author/version/SFW flag"))
 					editButton.SameLine = true
@@ -404,24 +411,24 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				end
 
 				local copyButton = Styler:ImageButton(actionCell:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
-				copyButton:Tooltip():AddText(owningMod and ("\t  " .. Translator:translate("Clone this preset into your local config, making a copy you can edit"))
+				copyButton:Tooltip():AddText(externalOwner and ("\t  " .. Translator:translate("Clone this preset into your local config, making a copy you can edit"))
 					or ("\t  " .. Translator:translate("Duplicate this preset")))
 				copyButton.SameLine = true
 				copyButton.OnClick = function()
 					local newGuid = FormBuilder:generateGUID()
-					ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(owningMod and preset or
+					ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(externalOwner and preset or
 						ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
 
 					ConfigurationStructure.config.vanity.presets[newGuid].isExternalPreset = false
 
-					if not owningMod then
+					if not externalOwner then
 						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name ..
 							" " .. Translator:translate("(Copy)")
 					end
 					ServerPresetManager:UpdatePresetView(presetID)
 				end
 
-				if not owningMod then
+				if not externalOwner then
 					local deleteButton = Styler:ImageButton(actionCell:AddImageButton("Delete", "ico_red_x", { 32, 32 }))
 					deleteButton:Tooltip():AddText("\t  " .. Translator:translate("Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled")).TextWrapPos = 600
 					deleteButton.SameLine = true
@@ -446,7 +453,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				presetGroup:AddNewLine()
 				local customDependencyHeader = presetGroup:AddCollapsingHeader(Translator:translate("Custom Dependencies"))
 				local customDependencyButton = customDependencyHeader:AddButton(Translator:translate("Add Custom Dependency"))
-				customDependencyButton.Visible = not owningMod
+				customDependencyButton.Visible = not externalOwner
 
 				local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
 				customDepFormGroup.Visible = false
@@ -552,7 +559,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 							end
 						end
 
-						if not owningMod then
+						if not externalOwner then
 							local actionCell = row:AddCell()
 							actionCell:AddButton("Edit").OnClick = function()
 								buildCustomDepForm(customDependency)
@@ -585,7 +592,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					if generalSettings.outfitAndDependencyView == "universal" then
 						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Configured Outfits")):SetStyle("SeparatorTextAlign", 0.5)
 						VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup, nil,
-							owningMod and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
+							externalOwner and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
 						outfitsAndDependenciesGroup:AddNewLine()
 						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Mod Dependencies")):SetStyle("SeparatorTextAlign", 0.5)
 						buildDependencyTable(preset, outfitsAndDependenciesGroup)
@@ -609,17 +616,40 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 		end
 	end
 
-	buildSection(ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets)
+	buildSection(ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
+
+	Channels.GetUserPresetPool:RequestToServer({}, function(data)
+		if next(data) then
+			otherUsersSection.Visible = true
+
+			for user, presetIds in pairs(data) do
+				Channels.GetUserName:RequestToServer({ user = user }, function(data)
+					Channels.GetAllPresets:RequestToClient({}, user, function(vanity)
+						Logger:BasicInfo("Loading %s's presets", data.username)
+						
+						---@cast vanity Vanity
+						buildSection(vanity, vanity.presets, data.username, otherUsersSection)
+					end)
+				end)
+			end
+		else
+			otherUsersSection.Visible = false
+		end
+	end)
 
 	VanityModPresetManager:ImportPresetsFromMods()
-	for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
-		return Ext.Mod.GetMod(key).Info.Name
-	end) do
-		buildSection(vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name)
+	if next(VanityModPresetManager.ModPresetIndex) then
+		for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
+			return Ext.Mod.GetMod(key).Info.Name
+		end) do
+			buildSection(vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name, modPresetSection)
+		end
+	else
+		modPresetSection.Visible = false
 	end
 end
 
-Channels.GetUserPreset:SetRequestHandler(function(data, user)
+Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
 	local vanity = VanityModPresetManager:GetPresetFromMod(data.presetId)
 	if vanity then
 		return vanity
@@ -628,6 +658,10 @@ Channels.GetUserPreset:SetRequestHandler(function(data, user)
 	else
 		return {}
 	end
+end)
+
+Channels.GetAllPresets:SetRequestHandler(function(data, user)
+	return ConfigurationStructure:GetRealConfigCopy().vanity
 end)
 
 Translator:RegisterTranslation({
@@ -641,6 +675,7 @@ Translator:RegisterTranslation({
 	["Export"] = "he99b2e5a0ee74074a9958b5bfe5612f8558d",
 	["Import"] = "h7bb0a4f461a54390804603cc81c72341633b",
 	["Your Presets"] = "h9f20917d682d419cb126147a04f7cac54057",
+	["Other User's Presets"] = "h7b69751666eb450598eceda1786653afecfc",
 	["Mod Presets"] = "ha36a9cae681941d897becb20f0deb5873c5d",
 	["Preset Information"] = "hec26e6f59bdb43eb85700c98e7a19143c347",
 	["Dependencies"] = "hdf32fd262354456c9c1aec067af5220637bg",

@@ -419,8 +419,9 @@ end
 ---@param createdVanityEntity EntityHandle
 ---@param characterEntity EntityHandle
 function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
+	local effects = ServerPresetManager.ActiveVanityPresets[Osi.GetReservedUserID(characterEntity.Uuid.EntityUuid)].effects
+	
 	if outfitSlot.equipment and outfitSlot.equipment.effects then
-		local effects = ServerPresetManager.ActiveVanityPresets[Osi.GetReservedUserID(characterEntity.Uuid.EntityUuid)].effects
 		for _, effectName in ipairs(outfitSlot.equipment.effects) do
 			local effectProps = effects[effectName]
 			if effectProps then
@@ -446,7 +447,7 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 
 	local removeEffectMarker = true
 
-	for effectName, _ in pairs(PresetProxy.effects) do
+	for effectName, _ in pairs(effects) do
 		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
 			if not TableUtils:ListContains((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, effectName) then
 				Logger:BasicDebug("Removing effect status %s from %s", effectName,

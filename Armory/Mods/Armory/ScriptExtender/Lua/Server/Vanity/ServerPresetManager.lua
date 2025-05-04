@@ -32,7 +32,7 @@ local function initialize()
 			local userPreset = activePreset[Osi.GetUserProfileID(userId)]
 			if userPreset then
 				loadingLock[userId] = true
-				Channels.GetUserPreset:RequestToClient({
+				Channels.GetActiveUserPreset:RequestToClient({
 						presetId = userPreset
 					},
 					userId,
@@ -80,7 +80,7 @@ Ext.Events.ResetCompleted:Subscribe(function(e)
 	initialize()
 end)
 
-Channels.GetUserPreset:SetRequestHandler(function(data, user)
+Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
 	return {
 		presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset[Osi.GetUserProfileID(PeerToUserID(user))]
 	}

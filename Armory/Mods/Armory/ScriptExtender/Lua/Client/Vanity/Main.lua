@@ -109,8 +109,16 @@ function Vanity:ActivatePreset(presetId)
 
 	if presetId then
 		local preset = PresetProxy.presets[presetId]
-		separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
-		VanityCharacterCriteria:BuildModule(mainParent, preset)
+
+		if type(preset) == "function" then
+			preset(function(preset)
+				separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
+				VanityCharacterCriteria:BuildModule(mainParent, preset)
+			end)
+		else
+			separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
+			VanityCharacterCriteria:BuildModule(mainParent, preset)
+		end
 	else
 		separator.Label = Translator:translate("Choose a Preset")
 		VanityCharacterCriteria:BuildModule(mainParent)
@@ -130,7 +138,7 @@ function Vanity:UpdatePresetOnServer()
 		Channels.UpdateUserPreset:SendToServer({
 			presetId = self.ActivePresetId,
 			---@diagnostic disable-next-line: missing-fields
-			vanityPreset = VanityExportManager:ExportPresets({self.ActivePresetId})
+			vanityPreset = VanityExportManager:ExportPresets({ self.ActivePresetId })
 		})
 
 		VanityBackupManager:BackupPresets({ self.ActivePresetId })
@@ -148,29 +156,51 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 
 		Logger:BasicDebug("User has started running game - running check")
 
-		Channels.GetUserPreset:RequestToServer({}, function(data)
+		Channels.GetActiveUserPreset:RequestToServer({}, function(data)
 			Vanity.ActivePresetId = data.presetId
 
 			if Vanity.ActivePresetId then
 				local function validatePreset()
 					local preset = PresetProxy.presets[Vanity.ActivePresetId]
 
-					VanityModDependencyManager:DependencyValidator(PresetProxy, preset, function()
-						local validationErrorWindow = Ext.IMGUI.NewWindow(string.format(Translator:translate("Armory: Validation of Active Vanity Preset [%s] failed!"), preset.Name))
-						validationErrorWindow.Closeable = true
+					if type(preset) == "function" then
+						preset(function(preset)
+							VanityModDependencyManager:DependencyValidator(PresetProxy, preset, function()
+								local validationErrorWindow = Ext.IMGUI.NewWindow(string.format(Translator:translate("Armory: Validation of Active Vanity Preset [%s] failed!"),
+									preset.Name))
+								validationErrorWindow.Closeable = true
 
-						validationErrorWindow:AddButton("Open Preset").OnClick = function()
-							separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
-							VanityCharacterCriteria:BuildModule(mainParent, preset)
+								validationErrorWindow:AddButton("Open Preset").OnClick = function()
+									separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
+									VanityCharacterCriteria:BuildModule(mainParent, preset)
 
-							Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
-						end
+									Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
+								end
 
-						return validationErrorWindow
-					end)
+								return validationErrorWindow
+							end)
+						end)
+					else
+						VanityModDependencyManager:DependencyValidator(PresetProxy, preset, function()
+							local validationErrorWindow = Ext.IMGUI.NewWindow(string.format(Translator:translate("Armory: Validation of Active Vanity Preset [%s] failed!"),
+								preset.Name))
+							validationErrorWindow.Closeable = true
+
+							validationErrorWindow:AddButton("Open Preset").OnClick = function()
+								separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
+								VanityCharacterCriteria:BuildModule(mainParent, preset)
+
+								Mods.BG3MCM.IMGUIAPI:OpenModPage("Vanity", ModuleUUID)
+							end
+
+							return validationErrorWindow
+						end)
+					end
 				end
 
-				if not PresetProxy.presets[Vanity.ActivePresetId] and VanityBackupManager:IsPresetInBackup(Vanity.ActivePresetId) then
+				if (not PresetProxy.presets[Vanity.ActivePresetId] or type(PresetProxy.presets[Vanity.ActivePresetId]) == "function")
+					and VanityBackupManager:IsPresetInBackup(Vanity.ActivePresetId)
+				then
 					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
 
 					local presetBackup = TableUtils:DeeplyCopyTable(VanityBackupManager:RestorePresetFromExport(Vanity.ActivePresetId))

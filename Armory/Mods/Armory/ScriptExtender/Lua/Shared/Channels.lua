@@ -28,6 +28,7 @@ function NetChannel:RequestToClient(data, user, replyCallback) end
 ---@type {[string]: ExtenderNetChannel}
 Channels = {}
 
-Channels.GetUserPreset = Ext.Net.CreateChannel(ModuleUUID, "GetUserPreset")
+Channels.GetActiveUserPreset = Ext.Net.CreateChannel(ModuleUUID, "GetActiveUserPreset")
+Channels.GetUserName = Ext.Net.CreateChannel(ModuleUUID, "GetUserName")
 Channels.UpdateUserPreset = Ext.Net.CreateChannel(ModuleUUID, "UpdateUserPreset")
-
+Channels.GetAllPresets = Ext.Net.CreateChannel(ModuleUUID, "GetAllPresets")
