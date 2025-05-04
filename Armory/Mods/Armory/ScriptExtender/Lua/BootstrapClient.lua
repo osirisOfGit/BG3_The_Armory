@@ -8,6 +8,7 @@ Ext.Events.StatsLoaded:Subscribe(function()
 	Logger:ClearLogFile()
 end)
 
+Ext.Require("Shared/Channels.lua")
 Ext.Require("Shared/Vanity/PresetProxy.lua")
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
 

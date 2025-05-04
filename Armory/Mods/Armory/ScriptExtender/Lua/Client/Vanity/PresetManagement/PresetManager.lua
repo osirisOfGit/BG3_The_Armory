@@ -4,11 +4,11 @@ Ext.Require("Client/Vanity/PresetManagement/ExportManager.lua")
 Ext.Require("Client/Vanity/PresetManagement/BackupManager.lua")
 Ext.Require("Client/Vanity/PresetManagement/ModDependencyManager.lua")
 
-VanityPresetManager = {}
-VanityPresetManager.userName = ""
+ServerPresetManager = {}
+ServerPresetManager.userName = ""
 
 Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, userID)
-	VanityPresetManager.username = payload
+	ServerPresetManager.username = payload
 end)
 
 ---@type ExtuiWindow
@@ -47,12 +47,12 @@ local function buildPresetForm(parent, forPresetId)
 			ConfigurationStructure.config.vanity.presets[presetID] = values
 
 			parent.Visible = false
-			VanityPresetManager:UpdatePresetView(presetID)
+			ServerPresetManager:UpdatePresetView(presetID)
 		end,
 		{
 			{
 				label = "Author",
-				defaultValue = preset and preset.Author or VanityPresetManager.username,
+				defaultValue = preset and preset.Author or ServerPresetManager.username,
 				type = "Text",
 				errorMessageIfEmpty = "This is a required field",
 			},
@@ -77,11 +77,11 @@ local function buildPresetForm(parent, forPresetId)
 	)
 end
 
-function VanityPresetManager:OpenManager()
+function ServerPresetManager:OpenManager()
 	if presetWindow then
 		presetWindow.Open = true
 		presetWindow:SetFocus()
-		VanityPresetManager:UpdatePresetView()
+		ServerPresetManager:UpdatePresetView()
 	elseif not presetWindow then
 		Ext.Net.PostMessageToServer(ModuleUUID .. "UserName", "")
 		presetWindow = Ext.IMGUI.NewWindow(Translator:translate("Vanity Preset Manager"))
@@ -119,43 +119,46 @@ function VanityPresetManager:OpenManager()
 			presetForm.Visible = not presetForm.Visible
 		end
 
-		if not Ext.Vars.GetModVariables(ModuleUUID).ActivePreset and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
-			createNewPresetButton.OnClick()
-		end
+		Channels.GetUserPreset:RequestToServer({}, function(data)
+			local presetId = data.presetId
+			if not presetId and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
+				createNewPresetButton.OnClick()
+			end
 
-		local presetTable = presetWindow:AddTable("PresetTable", 2)
-		presetTable.Resizable = true
+			local presetTable = presetWindow:AddTable("PresetTable", 2)
+			presetTable.Resizable = true
 
-		presetTable:AddColumn("PresetSelection", "WidthFixed", 400 * Styler:ScaleFactor())
-		presetTable:AddColumn("PresetInfo", "WidthStretch")
+			presetTable:AddColumn("PresetSelection", "WidthFixed", 400 * Styler:ScaleFactor())
+			presetTable:AddColumn("PresetInfo", "WidthStretch")
 
-		local row = presetTable:AddRow()
+			local row = presetTable:AddRow()
 
-		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
-		selectionCell.NoSavedSettings = true
-		selectionCell:SetSizeConstraints({ 200, 0 })
-		presetTable.ColumnDefs[1].Width = 0
+			local selectionCell = row:AddCell():AddChildWindow("UserPresets")
+			selectionCell.NoSavedSettings = true
+			selectionCell:SetSizeConstraints({ 200, 0 })
+			presetTable.ColumnDefs[1].Width = 0
 
-		userPresetSection = selectionCell:AddGroup("User_Presets")
-		local userHeader = userPresetSection:AddSeparatorText(Translator:translate("Your Presets"))
-		userHeader:SetStyle("SeparatorTextAlign", 0.5)
-		userHeader.Font = "Large"
-		userHeader.UserData = "keep"
+			userPresetSection = selectionCell:AddGroup("User_Presets")
+			local userHeader = userPresetSection:AddSeparatorText(Translator:translate("Your Presets"))
+			userHeader:SetStyle("SeparatorTextAlign", 0.5)
+			userHeader.Font = "Large"
+			userHeader.UserData = "keep"
 
-		selectionCell:AddNewLine()
-		modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
-		local modHeader = modPresetSection:AddSeparatorText(Translator:translate("Mod Presets"))
-		modHeader:SetStyle("SeparatorTextAlign", 0.5)
-		modHeader.Font = "Large"
-		modHeader.UserData = "keep"
+			selectionCell:AddNewLine()
+			modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
+			local modHeader = modPresetSection:AddSeparatorText(Translator:translate("Mod Presets"))
+			modHeader:SetStyle("SeparatorTextAlign", 0.5)
+			modHeader.Font = "Large"
+			modHeader.UserData = "keep"
 
-		presetInfoSection = row:AddCell():AddChildWindow(Translator:translate("Preset Information"))
-		presetInfoSection.NoSavedSettings = true
-		presetInfoSection.HorizontalScrollbar = true
+			presetInfoSection = row:AddCell():AddChildWindow(Translator:translate("Preset Information"))
+			presetInfoSection.NoSavedSettings = true
+			presetInfoSection.HorizontalScrollbar = true
 
-		VanityBackupManager:RestorePresetBackup()
+			VanityBackupManager:RestorePresetBackup()
 
-		VanityPresetManager:UpdatePresetView()
+			ServerPresetManager:UpdatePresetView()
+		end)
 	end
 end
 
@@ -245,7 +248,7 @@ local function buildDependencyTable(preset, parent)
 	buildDependencyTab("Equipment", cachedDeps.equipment)
 end
 
-function VanityPresetManager:UpdatePresetView(presetID)
+function ServerPresetManager:UpdatePresetView(presetID)
 	Helpers:KillChildren(userPresetSection)
 	Helpers:KillChildren(modPresetSection)
 
@@ -254,7 +257,7 @@ function VanityPresetManager:UpdatePresetView(presetID)
 		presetActivelyViewing = nil
 	end
 
-	local activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+	local activePreset = Vanity.ActivePresetId
 
 	---@param vanityContainer Vanity
 	---@param presetCollection {[Guid]: VanityPreset}
@@ -291,7 +294,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 
 				syncButton.OnClick = function()
 					VanityBackupManager:FlipPresetBackupRegistration(guid)
-					VanityPresetManager:UpdatePresetView(guid)
+					ServerPresetManager:UpdatePresetView(guid)
 				end
 			end
 
@@ -374,13 +377,13 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Activate this preset (deactivates the active preset if there is one)"))
 					activateButton.OnClick = function()
 						Vanity:ActivatePreset(guid)
-						VanityPresetManager:UpdatePresetView(guid)
+						ServerPresetManager:UpdatePresetView(guid)
 					end
 				else
 					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Deactivate this preset"))
 					activateButton.OnClick = function()
 						Vanity:ActivatePreset()
-						VanityPresetManager:UpdatePresetView(guid)
+						ServerPresetManager:UpdatePresetView(guid)
 					end
 				end
 
@@ -392,7 +395,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					local infoGroup = presetGroup:AddGroup("info")
 					editButton.OnClick = function()
 						if editButton.UserData then
-							VanityPresetManager:UpdatePresetView(guid)
+							ServerPresetManager:UpdatePresetView(guid)
 						else
 							editButton.UserData = true
 							buildPresetForm(infoGroup, guid)
@@ -415,7 +418,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name ..
 							" " .. Translator:translate("(Copy)")
 					end
-					VanityPresetManager:UpdatePresetView(presetID)
+					ServerPresetManager:UpdatePresetView(presetID)
 				end
 
 				if not owningMod then
@@ -428,7 +431,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 						end
 						ConfigurationStructure.config.vanity.presets[guid].delete = true
 
-						VanityPresetManager:UpdatePresetView()
+						ServerPresetManager:UpdatePresetView()
 						if activePreset == guid then
 							Vanity:ActivatePreset()
 						end
@@ -472,7 +475,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 							else
 								table.insert(preset.CustomDependencies, results)
 							end
-							VanityPresetManager:UpdatePresetView(presetID)
+							ServerPresetManager:UpdatePresetView(presetID)
 						end,
 						{
 							{
@@ -562,7 +565,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 							deleteButton:SetColor("Text", { 1, 1, 1, 1 })
 							deleteButton.OnClick = function()
 								preset.CustomDependencies[index].delete = true
-								VanityPresetManager:UpdatePresetView(presetID)
+								ServerPresetManager:UpdatePresetView(presetID)
 							end
 						end
 					end
@@ -615,6 +618,17 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 		buildSection(vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name)
 	end
 end
+
+Channels.GetUserPreset:SetRequestHandler(function(data, user)
+	local vanity = VanityModPresetManager:GetPresetFromMod(data.presetId)
+	if vanity then
+		return vanity
+	elseif ConfigurationStructure.config.vanity.presets[data.presetId] then
+		return VanityExportManager:ExportPresets({ data.presetId })
+	else
+		return {}
+	end
+end)
 
 Translator:RegisterTranslation({
 	["This is a required field"] = "h2f93c88025444a8a8dc8692b89cd00749d82",

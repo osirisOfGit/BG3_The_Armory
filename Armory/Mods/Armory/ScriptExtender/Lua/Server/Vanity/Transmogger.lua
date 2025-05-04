@@ -112,7 +112,8 @@ Transmogger.saveLoadLock = false
 
 ---@param character EntityHandle
 function Transmogger:MogCharacter(character)
-	if not ActiveVanityPreset then
+	local characterPreset = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
+	if not characterPreset then
 		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
 		return
 	end
@@ -134,7 +135,7 @@ function Transmogger:MogCharacter(character)
 	end
 
 	---@type VanityOutfit
-	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
+	local outfit = characterPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
 	if not outfit then
 		Logger:BasicDebug("No active outfit found for %s, skipping transmog", character.Uuid.EntityUuid)
 		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
@@ -419,7 +420,7 @@ end
 ---@param characterEntity EntityHandle
 function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
 	if outfitSlot.equipment and outfitSlot.equipment.effects then
-		local effects = PresetProxy.effects
+		local effects = ServerPresetManager.ActiveVanityPresets[Osi.GetReservedUserID(characterEntity.Uuid.EntityUuid)].effects
 		for _, effectName in ipairs(outfitSlot.equipment.effects) do
 			local effectProps = effects[effectName]
 			if effectProps then
@@ -464,13 +465,15 @@ end
 
 ---@param character EntityHandle
 function Transmogger:ApplyDye(character)
-	if not ActiveVanityPreset then
+	local characterPreset = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
+
+	if not characterPreset then
 		return
 	end
 	Logger:BasicDebug("Beginning Dye process for %s", character.Uuid.EntityUuid)
 
 	---@type VanityOutfit
-	local outfit = ActiveVanityPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
+	local outfit = characterPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
 
 	for _, actualSlot in ipairs(SlotEnum) do
 		local success, error = pcall(function()

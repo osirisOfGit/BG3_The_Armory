@@ -54,8 +54,10 @@ function VanityModPresetManager:GetExportFromMod(modId)
 	end
 end
 
+local loadedMods
 function VanityModPresetManager:ImportPresetsFromMods()
-	if not next(VanityModPresetManager.PresetModIndex) then
+	if not next(self.PresetModIndex) and not loadedMods then
+		loadedMods = true
 		for _, uuid in ipairs(Ext.Mod.GetLoadOrder()) do
 			local presetExport, mod = self:GetExportFromMod(uuid)
 			if presetExport and presetExport.presets then
@@ -79,6 +81,8 @@ end
 ---@param presetId Guid
 ---@return Vanity?
 function VanityModPresetManager:GetPresetFromMod(presetId)
+	self:ImportPresetsFromMods()
+
 	if self.PresetModIndex[presetId] then
 		return self.ModPresetIndex[self.PresetModIndex[presetId]]
 	end
