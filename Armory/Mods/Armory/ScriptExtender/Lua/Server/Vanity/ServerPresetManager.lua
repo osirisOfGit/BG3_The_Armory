@@ -29,9 +29,9 @@ local function initialize()
 	for _, player in pairs(Osi.DB_Players:Get(nil)) do
 		local userId = Osi.GetReservedUserID(player[1])
 		if userId and not loadingLock[userId] then
-			loadingLock[userId] = true
 			local userPreset = activePreset[Osi.GetUserProfileID(userId)]
 			if userPreset then
+				loadingLock[userId] = true
 				Channels.GetUserPreset:RequestToClient({
 						presetId = userPreset
 					},
@@ -65,7 +65,7 @@ function ServerPresetManager:GetCharacterPreset(character)
 	local charUserId = Osi.GetReservedUserID(character)
 
 	Logger:BasicDebug("%s is assigned to user %s", character, Osi.GetUserName(charUserId))
-	
+
 	---@type Vanity?
 	local vanity = self.ActiveVanityPresets[charUserId]
 

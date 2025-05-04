@@ -121,7 +121,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteriaCompositeKey)
 			end
 
-			if not outfitToCopyTo and not preset.isModPreset then
+			if not outfitToCopyTo and not preset.isExternalPreset then
 				local deleteButton = actionCell:AddButton("X")
 				deleteButton.SameLine = true
 				deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
@@ -133,7 +133,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 				end
 			end
 
-			if outfitToCopyTo or preset.isModPreset then
+			if outfitToCopyTo or preset.isExternalPreset then
 				local copyButton = Styler:ImageButton(row:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
 				copyButton.SameLine = true
 				copyButton.IDContext = copyButton.Label .. criteriaCompositeKey
@@ -151,13 +151,13 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 							presetToCopyTo.Outfits[outfitCompositeKeyToCopyTo].delete = true
 						end
 
-						local outfitToCopy = preset.isModPreset
+						local outfitToCopy = preset.isExternalPreset
 							and outfit
 							or ConfigurationStructure:GetRealConfigCopy().vanity.presets[preset._parent_key].Outfits[criteriaCompositeKey]
 
 						outfitToCopy = TableUtils:DeeplyCopyTable(outfitToCopy)
 
-						if preset.isModPreset then
+						if preset.isExternalPreset then
 							VanityEffect:CopyEffectsToPresetOutfit(ConfigurationStructure.config.vanity,
 								preset.Name,
 								outfitToCopy,
@@ -171,7 +171,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 						Vanity:UpdatePresetOnServer()
 					end
 
-					if preset.isModPreset then
+					if preset.isExternalPreset then
 						Helpers:KillChildren(popup)
 						popup:AddText(Translator:translate("Copy This Outfit To Your Preset(s)"))
 

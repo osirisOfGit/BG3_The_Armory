@@ -70,7 +70,7 @@ function VanityModPresetManager:ImportPresetsFromMods()
 
 					if Ext.IsClient() then
 						preset.ModSourced = VanityModDependencyManager:RecordDependency(mod)
-						preset.isModPreset = true
+						preset.isExternalPreset = true
 					end
 				end
 			end

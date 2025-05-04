@@ -412,7 +412,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(owningMod and preset or
 						ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
 
-					ConfigurationStructure.config.vanity.presets[newGuid].isModPreset = false
+					ConfigurationStructure.config.vanity.presets[newGuid].isExternalPreset = false
 
 					if not owningMod then
 						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name ..
