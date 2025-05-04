@@ -5,8 +5,12 @@ VanityExportManager.ExportFilename = "Armory_Vanity_Mod_Presets.json"
 ---@param presetIds Guid[]
 ---@param existingExport Vanity?
 ---@param newIds boolean?
----@return Vanity
+---@return Vanity?
 function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
+	if not next(presetIds) then
+		return nil
+	end
+
 	local realConfig = ConfigurationStructure:GetRealConfigCopy()
 
 	---@type Vanity
@@ -193,7 +197,8 @@ function VanityExportManager:BuildImportManagerWindow()
 	local refreshButton = importWindow:AddButton(Translator:translate("Refresh"))
 
 	local errorText = importWindow:AddText(string.format(
-		Translator:translate("Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"),
+		Translator:translate(
+		"Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"),
 		self.ExportFilename))
 
 	errorText.Visible = false
@@ -221,7 +226,8 @@ function VanityExportManager:BuildImportManagerWindow()
 			errorText.Visible = false
 
 			for presetId, preset in pairs(exportedPresets.presets) do
-				local checkbox = presetGroup:AddCheckbox(string.format("%s v%s (%s)", preset.Name, preset.Version, preset.NSFW and Translator:translate("NSFW") or Translator:translate("SFW")))
+				local checkbox = presetGroup:AddCheckbox(string.format("%s v%s (%s)", preset.Name, preset.Version,
+					preset.NSFW and Translator:translate("NSFW") or Translator:translate("SFW")))
 				checkbox.Checked = true
 				checkbox.UserData = presetId
 			end
@@ -261,7 +267,8 @@ When exporting presets, an existing file will be completely overwritten with the
 	["File failed to save - check logs"] = "h7b62ce80af614dd997bb7655c0fee8f66016",
 	["Import Presets"] = "h7cea480a601c448882c6724413a67d36g1d6",
 	["Refresh"] = "hfe36d27abca34ce3be19669466742f648662",
-	["Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"] = "h2220039b944a417db15fe7c6d52a3c112c47",
+	["Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"] =
+	"h2220039b944a417db15fe7c6d52a3c112c47",
 	["Preset(s) successfully imported!"] = "he5f85c5b317b48f28d5744da796c66245a20",
 	["Import Selected Presets"] = "he795e262f136407c9b3c216e910d4d6fd495",
 	["NSFW"] = "h6ed4ff24fd8647b1a7ef56df74b19c5de707",

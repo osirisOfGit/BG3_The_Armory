@@ -21,10 +21,6 @@ function PartyOutfitManager:ApplyTransmogsPerPreset()
 
 		local activeOutfits
 		if activePreset then
-			Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active",
-				activePreset.Name,
-				activePreset.Author,
-				activePreset.Version)
 			activeOutfits = activePreset.Outfits
 		end
 

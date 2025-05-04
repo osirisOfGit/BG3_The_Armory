@@ -63,8 +63,11 @@ end
 ---@return VanityPreset?
 function ServerPresetManager:GetCharacterPreset(character)
 	local charUserId = Osi.GetReservedUserID(character)
+
+	Logger:BasicDebug("%s is assigned to user %s", character, Osi.GetUserName(charUserId))
+	
 	---@type Vanity?
-	local vanity = self.ActiveVanityPresets[charUserId] or self.ActiveVanityPresets[Osi.GetReservedUserID(Osi.GetHostCharacter())]
+	local vanity = self.ActiveVanityPresets[charUserId]
 
 	return vanity and vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset[Osi.GetUserProfileID(charUserId)]]
 end
@@ -89,7 +92,13 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 	activePresets[Osi.GetUserProfileID(user)] = data.presetId
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = activePresets
 
-	ServerPresetManager.ActiveVanityPresets[user] = data.VanityPreset
+	ServerPresetManager.ActiveVanityPresets[user] = data.vanityPreset
 
-	Logger:BasicInfo("User %s updated preset %s", Osi.GetUserName(user), ServerPresetManager.ActiveVanityPresets[user] and ServerPresetManager.ActiveVanityPresets[user].presets[data.presetId].Name or "unknwon")
+	if data.vanityPreset then
+		Logger:BasicInfo("User %s updated preset %s", Osi.GetUserName(user), data.vanityPreset.presets[data.presetId].Name)
+	else
+		Logger:BasicInfo("User %s deactivated preset", Osi.GetUserName(user))
+	end
+
+	PartyOutfitManager:ApplyTransmogsPerPreset()
 end)
