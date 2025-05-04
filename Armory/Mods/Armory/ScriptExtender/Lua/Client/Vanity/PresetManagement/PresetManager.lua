@@ -626,7 +626,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				Channels.GetUserName:RequestToServer({ user = user }, function(data)
 					Channels.GetAllPresets:RequestToClient({}, user, function(vanity)
 						Logger:BasicInfo("Loading %s's presets", data.username)
-						
+
 						---@cast vanity Vanity
 						buildSection(vanity, vanity.presets, data.username, otherUsersSection)
 					end)
