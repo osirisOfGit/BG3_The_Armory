@@ -102,3 +102,7 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 
 	PartyOutfitManager:ApplyTransmogsPerPreset()
 end)
+
+Ext.Osiris.RegisterListener("CharacterReservedUserIDChanged", 3, "after", function(character, oldUserID, newUserID)
+	PartyOutfitManager:ApplyTransmogsPerPreset()
+end)
