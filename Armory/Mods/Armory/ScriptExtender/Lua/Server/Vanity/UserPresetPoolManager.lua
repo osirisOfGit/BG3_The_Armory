@@ -1,5 +1,7 @@
 UserPresetPoolManager = {}
 
+Channels.GetUserPresetPool = Ext.Net.CreateChannel(ModuleUUID, "GetUserPresetPool")
+
 local function initialize()
 	
 end

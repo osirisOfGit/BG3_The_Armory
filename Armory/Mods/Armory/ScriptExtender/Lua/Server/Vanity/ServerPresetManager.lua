@@ -106,3 +106,11 @@ end)
 Ext.Osiris.RegisterListener("CharacterReservedUserIDChanged", 3, "after", function(character, oldUserID, newUserID)
 	PartyOutfitManager:ApplyTransmogsPerPreset()
 end)
+
+Ext.Osiris.RegisterListener("UserConnected", 3, "after", function(userID, userName, userProfileID)
+	initialize()
+end)
+
+Ext.Osiris.RegisterListener("UserDisconnected", 3, "after", function (userID, userName, userProfileID)
+	PartyOutfitManager:ApplyTransmogsPerPreset()
+end)
