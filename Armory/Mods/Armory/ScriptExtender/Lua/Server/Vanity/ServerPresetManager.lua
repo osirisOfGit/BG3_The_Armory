@@ -90,4 +90,6 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = activePresets
 
 	ServerPresetManager.ActiveVanityPresets[user] = data.VanityPreset
+
+	Logger:BasicInfo("User %s updated preset %s", Osi.GetUserName(user), ServerPresetManager.ActiveVanityPresets[user] and ServerPresetManager.ActiveVanityPresets[user].presets[data.presetId].Name or "unknwon")
 end)
