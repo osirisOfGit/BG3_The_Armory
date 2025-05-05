@@ -60,8 +60,12 @@ if Ext.IsServer() then
 		initialize()
 	end)
 
-	Channels.GetUserPresetPool:SetHandler(function(data, user)
-		user = PeerToUserID(user)
+
+	Channels.GetUserSpecificPreset:SetRequestHandler(function(data, user)
+		return UserPresetPoolManager.PresetPool[data.user]
+	end)
+
+	local function sendOutVanities(user, broadcast)
 		local presetTable = {}
 		for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
 			if otherUser ~= user then
@@ -69,11 +73,20 @@ if Ext.IsServer() then
 			end
 		end
 
-		Channels.UpdateUserPresetPool:Broadcast(presetTable, Osi.GetCurrentCharacter(user))
+		if not broadcast then
+		Channels.UpdateUserPresetPool:SendToClient(presetTable, user)
+		else
+			Channels.UpdateUserPresetPool:Broadcast(presetTable, Osi.GetCurrentCharacter(user))
+		end
+	end
+
+	Ext.Osiris.RegisterListener("UserConnected", 3, "after", function (userID, userName, userProfileID)
+		initialize()
+		sendOutVanities(user)
 	end)
 
-	Channels.GetUserSpecificPreset:SetRequestHandler(function(data, user)
-		return UserPresetPoolManager.PresetPool[data.user]
+	Channels.GetUserPresetPool:SetHandler(function(data, user)
+		sendOutVanities(PeerToUserID(user))
 	end)
 
 	Channels.UpdateUserPresetPool:SetHandler(function(vanity, user)
@@ -83,14 +96,7 @@ if Ext.IsServer() then
 
 		UserPresetPoolManager:hydrateClientsWithPools()
 
-		local presetPool = {}
-		for otherUser, otherVanity in pairs(UserPresetPoolManager.PresetPool) do
-			if user ~= otherUser then
-				presetPool[otherUser] = otherVanity
-			end
-		end
-
-		Channels.UpdateUserPresetPool:Broadcast(presetPool, Osi.GetCurrentCharacter(user))
+		sendOutVanities(user, true)
 	end)
 else
 	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)

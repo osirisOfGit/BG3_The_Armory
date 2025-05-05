@@ -642,10 +642,16 @@ end
 Channels.UpdateUserPresetPool:SetHandler(function(data, _)
 	Helpers:KillChildren(otherUsersSection)
 
-	for user, vanity in pairs(data) do
-		Channels.GetUserName:RequestToServer({user = user}, function (data)
-			PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
-		end)
+	if next(data) then
+		otherUsersSection.Visible = true
+		for user, vanity in pairs(data) do
+			Channels.GetUserName:RequestToServer({ user = user }, function(data)
+				Logger:BasicDebug("Populating user table for %s", data.username)
+				PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
+			end)
+		end
+	else
+		otherUsersSection.Visible = false
 	end
 end)
 
