@@ -121,6 +121,7 @@ function Vanity:ActivatePreset(presetId)
 	else
 		separator.Label = Translator:translate("Choose a Preset")
 		VanityCharacterCriteria:BuildModule(mainParent)
+		Vanity:UpdatePresetOnServer()
 	end
 end
 
