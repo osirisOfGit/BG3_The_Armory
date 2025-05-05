@@ -6,11 +6,42 @@ UserPresetPoolManager.PresetPool = {}
 Channels.GetUserPresetPool = Ext.Net.CreateChannel(ModuleUUID, "GetUserPresetPool")
 Channels.GetUserVanity = Ext.Net.CreateChannel(ModuleUUID, "GetUserVanity")
 Channels.SendOutPresetPools = Ext.Net.CreateChannel(ModuleUUID, "SendOutPresetPools")
-Channels.UpdateUserPresetPool = Ext.Net.CreateChannel(ModuleUUID, "UpdateUserPresetPool")
+Channels.UpdateUserVanityPool = Ext.Net.CreateChannel(ModuleUUID, "UpdateUserVanityPool")
 Channels.GetUserSpecificPreset = Ext.Net.CreateChannel(ModuleUUID, "GetUserSpecificPreset")
 
 if Ext.IsServer() then
 	local loadingLock = {}
+
+	function UserPresetPoolManager:GetVanitiesFromUsers(user)
+		if Osi.GetUserCount() > 1 then
+			if user then
+				loadingLock[user] = true
+				Channels.GetUserVanity:RequestToClient({},
+					user,
+					function(data)
+						Logger:BasicInfo("Loaded %s into the pool", Osi.GetUserName(user))
+						UserPresetPoolManager.PresetPool[user] = data
+						loadingLock[user] = nil
+					end)
+			else
+				for _, player in pairs(Osi.DB_Players:Get(nil)) do
+					local userId = Osi.GetReservedUserID(player[1])
+					if userId and not loadingLock[userId] then
+						loadingLock[userId] = true
+						Channels.GetUserVanity:RequestToClient({},
+							userId,
+							function(data)
+								Logger:BasicInfo("Loaded %s into the pool", Osi.GetUserName(userId))
+								UserPresetPoolManager.PresetPool[userId] = data
+								loadingLock[userId] = nil
+							end)
+					end
+				end
+			end
+
+			UserPresetPoolManager:hydrateClientsWithPools()
+		end
+	end
 
 	function UserPresetPoolManager:hydrateClientsWithPools()
 		if next(loadingLock) then
@@ -30,34 +61,17 @@ if Ext.IsServer() then
 				end
 
 				Channels.SendOutPresetPools:SendToClient(presetPool, user)
+				UserPresetPoolManager:sendOutVanities(user, true)
 			end
 		end
-	end
-
-	local function initialize()
-		for _, player in pairs(Osi.DB_Players:Get(nil)) do
-			local userId = Osi.GetReservedUserID(player[1])
-			if userId and not loadingLock[userId] then
-				loadingLock[userId] = true
-				Channels.GetUserVanity:RequestToClient({},
-					userId,
-					function(data)
-						Logger:BasicInfo("Loaded %s into the pool", Osi.GetUserName(userId))
-						UserPresetPoolManager.PresetPool[userId] = data
-						loadingLock[userId] = nil
-					end)
-			end
-		end
-
-		UserPresetPoolManager:hydrateClientsWithPools()
 	end
 
 	Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
-		initialize()
+		UserPresetPoolManager:GetVanitiesFromUsers()
 	end)
 
 	Ext.Events.ResetCompleted:Subscribe(function(e)
-		initialize()
+		UserPresetPoolManager:GetVanitiesFromUsers()
 	end)
 
 
@@ -66,7 +80,7 @@ if Ext.IsServer() then
 		return UserPresetPoolManager.PresetPool[tonumber(data.user)]
 	end)
 
-	local function sendOutVanities(user, broadcast)
+	function UserPresetPoolManager:sendOutVanities(user, broadcast)
 		local presetTable = {}
 
 		if not broadcast then
@@ -76,7 +90,7 @@ if Ext.IsServer() then
 				end
 			end
 
-			Channels.UpdateUserPresetPool:SendToClient(presetTable, user)
+			Channels.UpdateUserVanityPool:SendToClient(presetTable, user)
 		else
 			for user in pairs(UserPresetPoolManager.PresetPool) do
 				local presetPool = {}
@@ -85,28 +99,28 @@ if Ext.IsServer() then
 						presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
 					end
 				end
-				Channels.SendOutPresetPools:SendToClient(presetPool, user)
+				Channels.UpdateUserVanityPool:SendToClient(presetPool, user)
 			end
 		end
 	end
 
 	Ext.Osiris.RegisterListener("UserConnected", 3, "after", function(userID, userName, userProfileID)
-		initialize()
-		sendOutVanities(user, true)
+		UserPresetPoolManager:GetVanitiesFromUsers()
+		UserPresetPoolManager:sendOutVanities(user, true)
 	end)
 
 	Channels.GetUserPresetPool:SetHandler(function(data, user)
-		sendOutVanities(PeerToUserID(user))
+		UserPresetPoolManager:sendOutVanities(PeerToUserID(user))
 	end)
 
-	Channels.UpdateUserPresetPool:SetHandler(function(vanity, user)
+	Channels.UpdateUserVanityPool:SetHandler(function(vanity, user)
 		user = PeerToUserID(user)
 
 		UserPresetPoolManager.PresetPool[user] = vanity
 
 		UserPresetPoolManager:hydrateClientsWithPools()
 
-		sendOutVanities(user, true)
+		UserPresetPoolManager:sendOutVanities(user, true)
 	end)
 else
 	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)

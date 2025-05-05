@@ -102,16 +102,11 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 
 	PartyOutfitManager:ApplyTransmogsPerPreset()
 
-	local userPresetPool = UserPresetPoolManager.PresetPool[user] or {}
-	local isInPool = TableUtils:ListContains(userPresetPool, data.presetId)
-	if not isInPool then
-		table.insert(userPresetPool, data.presetId)
+	for otherUser, presetIds in pairs(UserPresetPoolManager.PresetPool) do
+		if TableUtils:ListContains(presetIds, data.presetId) and otherUser == user then
+			UserPresetPoolManager:GetVanitiesFromUsers(user)
+		end
 	end
-	UserPresetPoolManager.PresetPool[user] = userPresetPool
-
-	UserPresetPoolManager:hydrateClientsWithPools()
-
-	Channels.UpdateUserPreset:Broadcast(data, Osi.GetCurrentCharacter(user))
 end)
 
 Ext.Osiris.RegisterListener("CharacterReservedUserIDChanged", 3, "after", function(character, oldUserID, newUserID)

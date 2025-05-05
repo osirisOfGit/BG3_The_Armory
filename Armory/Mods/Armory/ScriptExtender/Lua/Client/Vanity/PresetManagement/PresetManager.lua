@@ -50,7 +50,7 @@ local function buildPresetForm(parent, forPresetId)
 
 			parent.Visible = false
 			PresetManager:UpdatePresetView(presetID)
-			Channels.UpdateUserPresetPool:SendToServer(ConfigurationStructure:GetRealConfigCopy().vanity)
+			Channels.UpdateUserVanityPool:SendToServer(ConfigurationStructure:GetRealConfigCopy().vanity)
 		end,
 		{
 			{
@@ -483,7 +483,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					if activePreset == guid then
 						Vanity:ActivatePreset()
 					end
-					Channels.UpdateUserPresetPool:SendToServer(ConfigurationStructure:GetRealConfigCopy().vanity)
+					Channels.UpdateUserVanityPool:SendToServer(ConfigurationStructure:GetRealConfigCopy().vanity)
 				end
 			end
 
@@ -658,30 +658,27 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 	end
 end
 
-Channels.UpdateUserPresetPool:SetHandler(function(data, _)
-	Helpers:KillChildren(otherUsersSection)
-
+Channels.UpdateUserVanityPool:SetHandler(function(data, _)
 	if next(data) then
 		userPresetPool = data
-		otherUsersSection.Visible = true
-		for user, vanity in pairs(data) do
-			---@cast vanity Vanity
-			Channels.GetUserName:RequestToServer({ user = user }, function(data)
-				Logger:BasicDebug("Populating user table for %s", data.username)
-				PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
-			end)
+		if presetWindow and presetWindow.Open then
+			Helpers:KillChildren(otherUsersSection)
+			otherUsersSection.Visible = true
+			for user, vanity in pairs(data) do
+				---@cast vanity Vanity
+				Channels.GetUserName:RequestToServer({ user = user }, function(data)
+					Logger:BasicDebug("Populating user table for %s", data.username)
+					PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
+				end)
+			end
 		end
-	else
+	elseif otherUsersSection then
 		otherUsersSection.Visible = false
 	end
 end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
 	PresetManager:UpdatePresetView(presetIdActivelyViewing)
-
-	if data.presetId == Vanity.ActivePresetId then
-		Vanity:ActivatePreset(Vanity.ActivePresetId)
-	end
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
