@@ -1,3 +1,14 @@
+---@type {[UserID] : Guid[]}
+local userPresetPool = {}
+
+Channels.SendOutPresetPools:SetHandler(function(data, user)
+	userPresetPool = data
+end)
+
+Channels.GetUserSpecificPreset:SetRequestHandler(function(data, user)
+	return VanityExportManager:ExportPresets({ data.presetId }, nil, true)
+end)
+
 ---@diagnostic disable: missing-fields
 ---@type Vanity
 PresetProxy = {
@@ -42,33 +53,33 @@ PresetProxy = {
 			end
 
 			if not presetExport then
-				local lock = true
-				Channels.GetUserSpecificPreset:RequestToServer({ presetId = k }, function(data)
-					if next(data) then
-						Channels.GetUserSpecificPreset:RequestToClient({ presetId = k }, data.user, function(data)
+				for user, presetIds in pairs(userPresetPool) do
+					if TableUtils:ListContains(presetIds, k) then
+						local lock = true
+						Channels.GetUserSpecificPreset:RequestToClient({ presetId = k }, user, function(data)
 							if next(data) then
 								presetExport = data
 							end
 
 							lock = false
 						end)
-					end
-				end)
 
-				local function waitFor(callback)
-					if lock then
-						Ext.Timer.WaitFor(20, function()
-							waitFor(callback)
-						end)
-					else
-						callback(setValue(presetExport))
+						local function waitFor(callback)
+							if lock then
+								Ext.Timer.WaitFor(20, function()
+									waitFor(callback)
+								end)
+							else
+								callback(setValue(presetExport))
+							end
+						end
+
+						return waitFor
 					end
 				end
-
-				return waitFor
-			else
-				return setValue(presetExport)
 			end
+
+			return setValue(presetExport)
 		end
 	})
 }

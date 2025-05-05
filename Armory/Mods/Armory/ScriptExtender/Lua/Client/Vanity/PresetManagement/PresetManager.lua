@@ -649,6 +649,14 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 	end
 end
 
+Channels.UpdateUserPreset:SetHandler(function (data, user)
+	ServerPresetManager:UpdatePresetView(Vanity.ActivePresetId)
+
+	if data.presetId == Vanity.ActivePresetId then
+		Vanity:ActivatePreset(Vanity.ActivePresetId)
+	end
+end)
+
 Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
 	local vanity = VanityModPresetManager:GetPresetFromMod(data.presetId)
 	if vanity then

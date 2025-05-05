@@ -101,6 +101,17 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 	end
 
 	PartyOutfitManager:ApplyTransmogsPerPreset()
+
+	local userPresetPool = UserPresetPoolManager.PresetPool[user] or {}
+	local isInPool = TableUtils:ListContains(userPresetPool, data.presetId)
+	if not isInPool then
+		table.insert(userPresetPool, data.presetId)
+	end
+	UserPresetPoolManager.PresetPool[user] = userPresetPool
+
+	UserPresetPoolManager:hydrateClientsWithPools()
+	
+	Channels.UpdateUserPreset:Broadcast(data, Osi.GetCurrentCharacter(user))
 end)
 
 Ext.Osiris.RegisterListener("CharacterReservedUserIDChanged", 3, "after", function(character, oldUserID, newUserID)
@@ -111,6 +122,6 @@ Ext.Osiris.RegisterListener("UserConnected", 3, "after", function(userID, userNa
 	initialize()
 end)
 
-Ext.Osiris.RegisterListener("UserDisconnected", 3, "after", function (userID, userName, userProfileID)
+Ext.Osiris.RegisterListener("UserDisconnected", 3, "after", function(userID, userName, userProfileID)
 	PartyOutfitManager:ApplyTransmogsPerPreset()
 end)

@@ -4,13 +4,34 @@ UserPresetPoolManager = {}
 UserPresetPoolManager.PresetPool = {}
 
 Channels.GetUserPresetPool = Ext.Net.CreateChannel(ModuleUUID, "GetUserPresetPool")
+Channels.SendOutPresetPools = Ext.Net.CreateChannel(ModuleUUID, "SendOutPresetPools")
 Channels.UpdateUserPresetPool = Ext.Net.CreateChannel(ModuleUUID, "UpdateUserPresetPool")
 Channels.GetUserSpecificPreset = Ext.Net.CreateChannel(ModuleUUID, "GetUserSpecificPreset")
 
 if Ext.IsServer() then
-	local function initialize()
-		local loadingLock = {}
+	local loadingLock = {}
 
+	function UserPresetPoolManager:hydrateClientsWithPools()
+		if next(loadingLock) then
+			Ext.Timer.WaitFor(20, function()
+				self:hydrateClientsWithPools()
+			end)
+		else
+			for user in pairs(self.PresetPool) do
+				local presetPool = {}
+				for otherUser, presetIds in pairs(self.PresetPool) do
+					if user ~= otherUser then
+						presetPool[otherUser] = presetIds
+					end
+				end
+
+
+				Channels.SendOutPresetPools:SendToClient(presetPool, user)
+			end
+		end
+	end
+
+	local function initialize()
 		for _, player in pairs(Osi.DB_Players:Get(nil)) do
 			local userId = Osi.GetReservedUserID(player[1])
 			if userId and not loadingLock[userId] then
@@ -24,6 +45,8 @@ if Ext.IsServer() then
 					end)
 			end
 		end
+
+		UserPresetPoolManager:hydrateClientsWithPools()
 	end
 
 	Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
@@ -32,16 +55,6 @@ if Ext.IsServer() then
 
 	Ext.Events.ResetCompleted:Subscribe(function(e)
 		initialize()
-	end)
-
-	Channels.UpdateUserPreset:SetHandler(function(data, user)
-		user = PeerToUserID(user)
-
-		UserPresetPoolManager.PresetPool[user] = data.presetIds
-
-		Channels.UpdateUserPreset:Broadcast({
-			[user] = data.presetIds
-		}, Osi.GetCurrentCharacter(user))
 	end)
 
 	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)
