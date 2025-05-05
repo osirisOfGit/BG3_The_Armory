@@ -77,13 +77,14 @@ if Ext.IsServer() then
 
 			Channels.UpdateUserPresetPool:SendToClient(presetTable, user)
 		else
-			for otherUser in pairs(UserPresetPoolManager.PresetPool) do
+			for user in pairs(UserPresetPoolManager.PresetPool) do
 				local presetPool = {}
-				if otherUser ~= user then
-					presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
+				for otherUser in pairs(UserPresetPoolManager.PresetPool) do
+					if otherUser ~= user then
+						presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
+					end
 				end
-
-				Channels.SendOutPresetPools:SendToClient(presetPool, otherUser)
+				Channels.SendOutPresetPools:SendToClient(presetPool, user)
 			end
 		end
 	end

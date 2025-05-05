@@ -338,7 +338,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 			end
 			presetIdActivelyViewing = guid
 
-			for _, selectable in TableUtils:CombinedPairs(userPresetSection.Children, modPresetSection.Children) do
+			for _, selectable in TableUtils:CombinedPairs(userPresetSection.Children, modPresetSection.Children, otherUsersSection.Children) do
 				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData == "select" then
 					selectable.Selected = false
 				end
@@ -615,7 +615,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				if generalSettings.outfitAndDependencyView == "universal" then
 					outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Configured Outfits")):SetStyle("SeparatorTextAlign", 0.5)
 					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup, nil,
-						externalOwner and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
+						externalOwner and TableUtils:DeeplyCopyTable(vanityContainer.effects))
 					outfitsAndDependenciesGroup:AddNewLine()
 					outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Mod Dependencies")):SetStyle("SeparatorTextAlign", 0.5)
 					buildDependencyTable(preset, outfitsAndDependenciesGroup)
