@@ -260,6 +260,8 @@ local function buildDependencyTable(preset, parent)
 	buildDependencyTab("Equipment", cachedDeps.equipment)
 end
 
+local userPresetPool = nil
+
 function PresetManager:UpdatePresetView(presetId)
 	presetIdActivelyViewing = presetId
 	Helpers:KillChildren(userPresetSection, modPresetSection, otherUsersSection)
@@ -271,7 +273,22 @@ function PresetManager:UpdatePresetView(presetId)
 
 	PresetManager:buildSection(presetId, ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
 
-	Channels.GetUserPresetPool:SendToServer({})
+	if not userPresetPool then
+		Channels.GetUserPresetPool:SendToServer({})
+	else
+		if next(userPresetPool) then
+			otherUsersSection.Visible = true
+			for user, vanity in pairs(userPresetPool) do
+				---@cast vanity Vanity
+				Channels.GetUserName:RequestToServer({ user = user }, function(data)
+					Logger:BasicDebug("Populating user table for %s", data.username)
+					PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
+				end)
+			end
+		else
+			otherUsersSection.Visible = false
+		end
+	end
 
 	VanityModPresetManager:ImportPresetsFromMods()
 	if next(VanityModPresetManager.ModPresetIndex) then
@@ -645,6 +662,7 @@ Channels.UpdateUserPresetPool:SetHandler(function(data, _)
 	Helpers:KillChildren(otherUsersSection)
 
 	if next(data) then
+		userPresetPool = data
 		otherUsersSection.Visible = true
 		for user, vanity in pairs(data) do
 			---@cast vanity Vanity
