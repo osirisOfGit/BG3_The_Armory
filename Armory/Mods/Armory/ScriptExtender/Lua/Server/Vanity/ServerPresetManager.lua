@@ -110,7 +110,7 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 	UserPresetPoolManager.PresetPool[user] = userPresetPool
 
 	UserPresetPoolManager:hydrateClientsWithPools()
-	
+
 	Channels.UpdateUserPreset:Broadcast(data, Osi.GetCurrentCharacter(user))
 end)
 

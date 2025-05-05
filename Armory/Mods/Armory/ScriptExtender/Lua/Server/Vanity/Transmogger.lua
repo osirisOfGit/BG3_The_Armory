@@ -112,7 +112,7 @@ Transmogger.saveLoadLock = false
 
 ---@param character EntityHandle
 function Transmogger:MogCharacter(character)
-	local characterPreset = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
+	local characterPreset = PresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
 	if not characterPreset then
 		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
 		return
@@ -419,7 +419,7 @@ end
 ---@param createdVanityEntity EntityHandle
 ---@param characterEntity EntityHandle
 function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
-	local effects = ServerPresetManager.ActiveVanityPresets[Osi.GetReservedUserID(characterEntity.Uuid.EntityUuid)].effects
+	local effects = PresetManager.ActiveVanityPresets[Osi.GetReservedUserID(characterEntity.Uuid.EntityUuid)].effects
 	
 	if outfitSlot.equipment and outfitSlot.equipment.effects then
 		for _, effectName in ipairs(outfitSlot.equipment.effects) do
@@ -466,7 +466,7 @@ end
 
 ---@param character EntityHandle
 function Transmogger:ApplyDye(character)
-	local characterPreset = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
+	local characterPreset = PresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
 
 	if not characterPreset then
 		return

@@ -249,7 +249,7 @@ function VanityExportManager:BuildImportManagerWindow()
 		if #presetsToImport > 0 then
 			VanityExportManager:ImportPreset(presetsToImport, exportedPresets)
 			successText.Visible = true
-			ServerPresetManager:UpdatePresetView()
+			PresetManager:UpdatePresetView()
 		end
 	end
 end

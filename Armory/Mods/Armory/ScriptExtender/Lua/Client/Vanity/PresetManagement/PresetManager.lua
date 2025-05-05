@@ -4,8 +4,8 @@ Ext.Require("Client/Vanity/PresetManagement/ExportManager.lua")
 Ext.Require("Client/Vanity/PresetManagement/BackupManager.lua")
 Ext.Require("Client/Vanity/PresetManagement/ModDependencyManager.lua")
 
-ServerPresetManager = {}
-ServerPresetManager.userName = ""
+PresetManager = {}
+PresetManager.userName = ""
 
 ---@type ExtuiWindow
 local presetWindow
@@ -46,13 +46,13 @@ local function buildPresetForm(parent, forPresetId)
 			ConfigurationStructure.config.vanity.presets[presetID] = values
 
 			parent.Visible = false
-			ServerPresetManager:UpdatePresetView(presetID)
+			PresetManager:UpdatePresetView(presetID)
 			Channels.UpdateUserPresetPool:SendToServer({})
 		end,
 		{
 			{
 				label = "Author",
-				defaultValue = preset and preset.Author or ServerPresetManager.username,
+				defaultValue = preset and preset.Author or PresetManager.username,
 				type = "Text",
 				errorMessageIfEmpty = "This is a required field",
 			},
@@ -77,11 +77,11 @@ local function buildPresetForm(parent, forPresetId)
 	)
 end
 
-function ServerPresetManager:OpenManager()
+function PresetManager:OpenManager()
 	if presetWindow then
 		presetWindow.Open = true
 		presetWindow:SetFocus()
-		ServerPresetManager:UpdatePresetView()
+		PresetManager:UpdatePresetView()
 	elseif not presetWindow then
 		Channels.GetUserName:RequestToServer({}, function(data)
 			self.userName = data.username
@@ -166,7 +166,7 @@ function ServerPresetManager:OpenManager()
 
 			VanityBackupManager:RestorePresetBackup()
 
-			ServerPresetManager:UpdatePresetView()
+			PresetManager:UpdatePresetView()
 		end)
 	end
 end
@@ -257,7 +257,7 @@ local function buildDependencyTable(preset, parent)
 	buildDependencyTab("Equipment", cachedDeps.equipment)
 end
 
-function ServerPresetManager:UpdatePresetView(presetID)
+function PresetManager:UpdatePresetView(presetID)
 	Helpers:KillChildren(userPresetSection)
 	Helpers:KillChildren(modPresetSection)
 
@@ -302,7 +302,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 
 				syncButton.OnClick = function()
 					VanityBackupManager:FlipPresetBackupRegistration(guid)
-					ServerPresetManager:UpdatePresetView(guid)
+					PresetManager:UpdatePresetView(guid)
 				end
 			end
 
@@ -385,13 +385,13 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Activate this preset (deactivates the active preset if there is one)"))
 					activateButton.OnClick = function()
 						Vanity:ActivatePreset(guid)
-						ServerPresetManager:UpdatePresetView(guid)
+						PresetManager:UpdatePresetView(guid)
 					end
 				else
 					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Deactivate this preset"))
 					activateButton.OnClick = function()
 						Vanity:ActivatePreset()
-						ServerPresetManager:UpdatePresetView(guid)
+						PresetManager:UpdatePresetView(guid)
 					end
 				end
 
@@ -403,7 +403,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 					local infoGroup = presetGroup:AddGroup("info")
 					editButton.OnClick = function()
 						if editButton.UserData then
-							ServerPresetManager:UpdatePresetView(guid)
+							PresetManager:UpdatePresetView(guid)
 						else
 							editButton.UserData = true
 							buildPresetForm(infoGroup, guid)
@@ -426,7 +426,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name ..
 							" " .. Translator:translate("(Copy)")
 					end
-					ServerPresetManager:UpdatePresetView(presetID)
+					PresetManager:UpdatePresetView(presetID)
 				end
 
 				if not externalOwner then
@@ -439,7 +439,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 						end
 						ConfigurationStructure.config.vanity.presets[guid].delete = true
 
-						ServerPresetManager:UpdatePresetView()
+						PresetManager:UpdatePresetView()
 						if activePreset == guid then
 							Vanity:ActivatePreset()
 						end
@@ -484,7 +484,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 							else
 								table.insert(preset.CustomDependencies, results)
 							end
-							ServerPresetManager:UpdatePresetView(presetID)
+							PresetManager:UpdatePresetView(presetID)
 						end,
 						{
 							{
@@ -574,7 +574,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 							deleteButton:SetColor("Text", { 1, 1, 1, 1 })
 							deleteButton.OnClick = function()
 								preset.CustomDependencies[index].delete = true
-								ServerPresetManager:UpdatePresetView(presetID)
+								PresetManager:UpdatePresetView(presetID)
 							end
 						end
 					end
@@ -625,7 +625,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 			otherUsersSection.Visible = true
 
 			for user, presetIds in pairs(data) do
-				Channels.GetUserName:RequestToServer({ user = user }, function(data)
+				Channels.GetUserName:RequestToServer({ ["user"] = user }, function(data)
 					Channels.GetAllPresets:RequestToClient({}, user, function(vanity)
 						Logger:BasicInfo("Loading %s's presets", data.username)
 
@@ -652,7 +652,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 end
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
-	ServerPresetManager:UpdatePresetView(Vanity.ActivePresetId)
+	PresetManager:UpdatePresetView(Vanity.ActivePresetId)
 
 	if data.presetId == Vanity.ActivePresetId then
 		Vanity:ActivatePreset(Vanity.ActivePresetId)

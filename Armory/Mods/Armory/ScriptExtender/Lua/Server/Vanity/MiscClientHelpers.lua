@@ -6,6 +6,6 @@ Channels.GetUserName:SetRequestHandler(function(data, user)
 	end
 
 	return {
-		username = Osi.GetUserName(user)
+		username = Osi.GetUserName(tonumber(user))
 	}
 end)
