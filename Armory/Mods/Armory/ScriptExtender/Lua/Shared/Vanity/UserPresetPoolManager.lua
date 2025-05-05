@@ -67,22 +67,30 @@ if Ext.IsServer() then
 
 	local function sendOutVanities(user, broadcast)
 		local presetTable = {}
-		for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
-			if otherUser ~= user then
-				presetTable[otherUser] = vanity
-			end
-		end
 
 		if not broadcast then
-		Channels.UpdateUserPresetPool:SendToClient(presetTable, user)
+			for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
+				if otherUser ~= user then
+					presetTable[otherUser] = vanity
+				end
+			end
+
+			Channels.UpdateUserPresetPool:SendToClient(presetTable, user)
 		else
-			Channels.UpdateUserPresetPool:Broadcast(presetTable, Osi.GetCurrentCharacter(user))
+			for otherUser in pairs(UserPresetPoolManager.PresetPool) do
+				local presetPool = {}
+				if otherUser ~= user then
+					presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
+				end
+
+				Channels.SendOutPresetPools:SendToClient(presetPool, otherUser)
+			end
 		end
 	end
 
-	Ext.Osiris.RegisterListener("UserConnected", 3, "after", function (userID, userName, userProfileID)
+	Ext.Osiris.RegisterListener("UserConnected", 3, "after", function(userID, userName, userProfileID)
 		initialize()
-		sendOutVanities(user)
+		sendOutVanities(user, true)
 	end)
 
 	Channels.GetUserPresetPool:SetHandler(function(data, user)
