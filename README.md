@@ -86,7 +86,6 @@ sequenceDiagram
 	participant 2PP as Preset Proxy
 	participant 2M as Main
 	end
-	
 
 	note over 2M: User Modifies Preset
 	activate 2M
@@ -106,7 +105,7 @@ sequenceDiagram
 	deactivate 2M
 ```
 
-### User 1 Activates User 2's Preset
+### User 1 Activates User 2's Preset, User 2 Modifies that preset
 
 ```mermaid
 sequenceDiagram
@@ -123,6 +122,7 @@ sequenceDiagram
 	participant 1M as Main
 	participant 1EM as Export Manager
 	end
+
 	note over 1PM: User Activates U2 Preset
 	1PM->>1M: Activate U2 Preset
 	1M->>1PP: Get Preset
@@ -142,4 +142,16 @@ sequenceDiagram
 			note over SPM: Check won't succeed, UPP won't be invoked
 		end
 	end
+	note over SPM,1M: User 2 modifies preset, see "User 2 Modifies Active Preset" section above
+
+	1PM->>1PM: buildSection(otherUsersSection)
+	1PM->>1M: updatePreset
+	1M-)SPM: UpdateUserPreset{presetId = presetId, vanityPreset = Export(vanity)}
+	SPM-->SPM: Save exported vanity to table, execute transmogs
+	loop for each user presetId[] in UPP 
+		opt If the updated presetId belongs to the same user that sent the update event
+			note over SPM: Check won't succeed, UPP won't be invoked
+		end
+	end
+
 ```
