@@ -62,7 +62,8 @@ if Ext.IsServer() then
 
 
 	Channels.GetUserSpecificPreset:SetRequestHandler(function(data, user)
-		return UserPresetPoolManager.PresetPool[data.user]
+		Logger:BasicDebug("%s requested Vanity for %s", Osi.GetUserName(PeerToUserID(user)), Osi.GetUserName(tonumber(data.user)))
+		return UserPresetPoolManager.PresetPool[tonumber(data.user)]
 	end)
 
 	local function sendOutVanities(user, broadcast)

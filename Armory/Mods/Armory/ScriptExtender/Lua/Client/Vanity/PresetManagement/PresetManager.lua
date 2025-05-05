@@ -324,6 +324,8 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				VanityBackupManager:FlipPresetBackupRegistration(guid)
 				PresetManager:UpdatePresetView(guid)
 			end
+		else
+			preset.isExternalPreset = true
 		end
 
 		---@type ExtuiSelectable
@@ -645,6 +647,7 @@ Channels.UpdateUserPresetPool:SetHandler(function(data, _)
 	if next(data) then
 		otherUsersSection.Visible = true
 		for user, vanity in pairs(data) do
+			---@cast vanity Vanity
 			Channels.GetUserName:RequestToServer({ user = user }, function(data)
 				Logger:BasicDebug("Populating user table for %s", data.username)
 				PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
@@ -664,14 +667,7 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
-	local vanity = VanityModPresetManager:GetPresetFromMod(data.presetId)
-	if vanity then
-		return vanity
-	elseif ConfigurationStructure.config.vanity.presets[data.presetId] then
-		return VanityExportManager:ExportPresets({ data.presetId })
-	else
-		return {}
-	end
+	return VanityExportManager:ExportPresets({ data.presetId })
 end)
 
 Translator:RegisterTranslation({

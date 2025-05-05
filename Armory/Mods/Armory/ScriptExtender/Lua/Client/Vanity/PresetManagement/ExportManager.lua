@@ -11,7 +11,6 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 		return nil
 	end
 
-	local realConfig = ConfigurationStructure:GetRealConfigCopy()
 
 	---@type Vanity
 	local export = existingExport or {
@@ -20,21 +19,25 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 		miscNameCache = {}
 	}
 
+	local realConfig = ConfigurationStructure:GetRealConfigCopy().vanity
+
 	for _, presetId in pairs(presetIds) do
-		local preset = realConfig.vanity.presets[presetId]
+		local vanity = ConfigurationStructure.config.vanity.presets[presetId] and realConfig or PresetProxy
+
+		local preset = vanity.presets[presetId]
 
 		for criteraKey, outfit in pairs(preset.Outfits) do
 			local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
 			for _, resourceId in pairs(criteriaTable) do
-				if realConfig.vanity.miscNameCache[resourceId] then
-					export.miscNameCache[resourceId] = realConfig.vanity.miscNameCache[resourceId]
+				if vanity.miscNameCache[resourceId] then
+					export.miscNameCache[resourceId] = vanity.miscNameCache[resourceId]
 				end
 			end
 
 			for _, outfitSlot in pairs(outfit) do
 				if outfitSlot.equipment and outfitSlot.equipment.effects then
 					for _, effect in pairs(outfitSlot.equipment.effects) do
-						export.effects[effect] = TableUtils:DeeplyCopyTable(realConfig.vanity.effects[effect])
+						export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
 					end
 				end
 
@@ -42,7 +45,7 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 					for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
 						if weaponSlot.equipment and weaponSlot.equipment.effects then
 							for _, effect in pairs(weaponSlot.equipment.effects) do
-								export.effects[effect] = TableUtils:DeeplyCopyTable(realConfig.vanity.effects[effect])
+								export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
 							end
 						end
 					end
@@ -198,7 +201,7 @@ function VanityExportManager:BuildImportManagerWindow()
 
 	local errorText = importWindow:AddText(string.format(
 		Translator:translate(
-		"Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"),
+			"Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"),
 		self.ExportFilename))
 
 	errorText.Visible = false

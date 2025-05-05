@@ -105,19 +105,18 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 function Vanity:ActivatePreset(presetId)
 	self.ActivePresetId = presetId
 
-	Vanity:UpdatePresetOnServer()
-
 	if presetId then
 		local preset = PresetProxy.presets[presetId]
-
 		if type(preset) == "function" then
 			preset(function(preset)
 				separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
 				VanityCharacterCriteria:BuildModule(mainParent, preset)
+				Vanity:UpdatePresetOnServer()
 			end)
 		else
 			separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
 			VanityCharacterCriteria:BuildModule(mainParent, preset)
+			Vanity:UpdatePresetOnServer()
 		end
 	else
 		separator.Label = Translator:translate("Choose a Preset")
