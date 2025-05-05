@@ -22,6 +22,9 @@ local modPresetSection
 ---@type ExtuiChildWindow
 local presetInfoSection
 
+---@type Guid
+local presetIdActivelyViewing
+
 ---@type ExtuiGroup?
 local presetActivelyViewing
 
@@ -47,7 +50,7 @@ local function buildPresetForm(parent, forPresetId)
 
 			parent.Visible = false
 			PresetManager:UpdatePresetView(presetID)
-			Channels.UpdateUserPresetPool:SendToServer({})
+			Channels.UpdateUserPresetPool:SendToServer(ConfigurationStructure:GetRealConfigCopy().vanity)
 		end,
 		{
 			{
@@ -257,402 +260,397 @@ local function buildDependencyTable(preset, parent)
 	buildDependencyTab("Equipment", cachedDeps.equipment)
 end
 
-function PresetManager:UpdatePresetView(presetID)
-	Helpers:KillChildren(userPresetSection)
-	Helpers:KillChildren(modPresetSection)
+function PresetManager:UpdatePresetView(presetId)
+	presetIdActivelyViewing = presetId
+	Helpers:KillChildren(userPresetSection, modPresetSection, otherUsersSection)
 
 	if presetActivelyViewing then
 		presetActivelyViewing:Destroy()
 		presetActivelyViewing = nil
 	end
 
-	local activePreset = Vanity.ActivePresetId
+	PresetManager:buildSection(presetId, ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
 
-	---@param vanityContainer Vanity
-	---@param presetCollection {[Guid]: VanityPreset}
-	---@param externalOwner string?
-	---@param parentSection ExtuiTreeParent
-	local function buildSection(vanityContainer, presetCollection, externalOwner, parentSection)
-		if externalOwner then
-			parentSection:AddSeparator():SetColor("Separator", { 1, 1, 1, 0.6 })
-			local sepText = parentSection:AddSeparatorText(externalOwner)
-			sepText:SetStyle("SeparatorTextAlign", 0.5)
-			sepText:SetColor("Text", { 1, 1, 1, 0.6 })
-			parentSection:AddSeparator():SetColor("Separator", { 1, 1, 1, 0.6 })
-		end
-
-		for guid, preset in TableUtils:OrderedPairs(presetCollection, function(key)
-			return presetCollection[key].Name
-		end) do
-			-- Only user presets can be backed up
-			if not externalOwner then
-				local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
-				local syncButton = Styler:ImageButton(parentSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
-
-				local tooltip = syncButton:Tooltip()
-				tooltip:AddText(string.format(Translator:translate([[
-	This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.
-
-Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.
-Backup will be removed if this option is disabled or the preset is deleted via this UI
-You can view the current backup state in a save by executing !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
-]]),
-					Translator:translate(isPresetInBackup and "is" or "is not"))).TextWrapPos = 1000
-
-
-				syncButton.OnClick = function()
-					VanityBackupManager:FlipPresetBackupRegistration(guid)
-					PresetManager:UpdatePresetView(guid)
-				end
-			end
-
-			---@type ExtuiSelectable
-			local presetSelectable = parentSection:AddSelectable(preset.Name)
-			presetSelectable.UserData = "select"
-			presetSelectable.SameLine = not externalOwner
-			presetSelectable.IDContext = guid
-
-			presetSelectable.OnClick = function()
-				if presetActivelyViewing then
-					presetActivelyViewing:Destroy()
-				end
-
-				for _, selectable in TableUtils:CombinedPairs(userPresetSection.Children, modPresetSection.Children) do
-					if selectable.Handle ~= presetSelectable.Handle and selectable.UserData == "select" then
-						selectable.Selected = false
-					end
-				end
-
-				local presetGroup = presetInfoSection:AddGroup(guid)
-				presetActivelyViewing = presetGroup
-
-				-- Formatting the page into columns
-				local metadataTable = presetGroup:AddTable("metadata", 3)
-				metadataTable:AddColumn("", "WidthStretch")
-				metadataTable:AddColumn("", "WidthFixed", 400 * Styler:ScaleFactor())
-				metadataTable:AddColumn("", "WidthStretch")
-				metadataTable.SizingStretchSame = true
-
-				local titleRow = metadataTable:AddRow()
-				titleRow:AddCell()
-				local titleText = titleRow:AddCell():AddSelectable(preset.Name)
-				-- There was no way of aligning pure text as of writing this
-				titleText:SetStyle("SelectableTextAlign", 0.5)
-				titleText.Disabled = true
-				titleText.Font = "Large"
-				titleRow:AddCell()
-
-				local metadataRow = metadataTable:AddRow()
-				metadataRow:AddCell()
-				local metadataText = metadataRow:AddCell():AddSelectable(string.format("%s | v%s | %s", Translator:translate(preset.NSFW and "NSFW" or "SFW"), preset.Version,
-					preset.Author))
-				metadataText:SetStyle("SelectableTextAlign", 0.5)
-				metadataText.Disabled = true
-				metadataRow:AddCell()
-
-				if not externalOwner and preset.ModSourced then
-					local modRow = metadataTable:AddRow()
-					modRow:AddCell()
-					local mod = Ext.Mod.GetMod(preset.ModSourced.Guid)
-					mod = mod and mod.Info or preset.ModSourced
-
-					local text = modRow:AddCell():AddSelectable(string.format(Translator:translate("Copied from %s v%s by %s"), mod.Name,
-						table.concat(mod.ModVersion or mod.Version, "."), mod.Author))
-					text.Disabled = true
-					text:SetStyle("SelectableTextAlign", 0.5)
-					text:SetStyle("Alpha", 0.8)
-				end
-
-				local actionContainerRow = metadataTable:AddRow()
-				actionContainerRow:AddCell()
-				local actionContainer = actionContainerRow:AddCell()
-				actionContainerRow:AddCell()
-
-				local actionTable = actionContainer:AddTable("ActionTable", 3)
-				actionTable:AddColumn("", "WidthStretch")
-				actionTable:AddColumn("", "WidthFixed")
-				actionTable:AddColumn("", "WidthStretch")
-				local actionRow = actionTable:AddRow()
-				actionRow:AddCell()
-				local actionCell = actionRow:AddCell()
-				actionRow:AddCell()
-
-				local activateButton = Styler:ImageButton(
-					actionCell:AddImageButton("Activate", activePreset ~= guid and "ico_active_button" or "ico_inactive_button", { 32, 32 })
-				)
-
-				if activePreset ~= guid then
-					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Activate this preset (deactivates the active preset if there is one)"))
-					activateButton.OnClick = function()
-						Vanity:ActivatePreset(guid)
-						PresetManager:UpdatePresetView(guid)
-					end
-				else
-					activateButton:Tooltip():AddText("\t  " .. Translator:translate("Deactivate this preset"))
-					activateButton.OnClick = function()
-						Vanity:ActivatePreset()
-						PresetManager:UpdatePresetView(guid)
-					end
-				end
-
-				if not externalOwner then
-					local editButton = Styler:ImageButton(actionCell:AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
-					editButton:Tooltip():AddText("\t  " .. Translator:translate("Edit this preset's name/author/version/SFW flag"))
-					editButton.SameLine = true
-
-					local infoGroup = presetGroup:AddGroup("info")
-					editButton.OnClick = function()
-						if editButton.UserData then
-							PresetManager:UpdatePresetView(guid)
-						else
-							editButton.UserData = true
-							buildPresetForm(infoGroup, guid)
-						end
-					end
-				end
-
-				local copyButton = Styler:ImageButton(actionCell:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
-				copyButton:Tooltip():AddText(externalOwner and ("\t  " .. Translator:translate("Clone this preset into your local config, making a copy you can edit"))
-					or ("\t  " .. Translator:translate("Duplicate this preset")))
-				copyButton.SameLine = true
-				copyButton.OnClick = function()
-					local newGuid = FormBuilder:generateGUID()
-					ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(externalOwner and preset or
-						ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
-
-					ConfigurationStructure.config.vanity.presets[newGuid].isExternalPreset = false
-
-					if not externalOwner then
-						ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name ..
-							" " .. Translator:translate("(Copy)")
-					end
-					PresetManager:UpdatePresetView(presetID)
-				end
-
-				if not externalOwner then
-					local deleteButton = Styler:ImageButton(actionCell:AddImageButton("Delete", "ico_red_x", { 32, 32 }))
-					deleteButton:Tooltip():AddText("\t  " .. Translator:translate("Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled")).TextWrapPos = 600
-					deleteButton.SameLine = true
-					deleteButton.OnClick = function()
-						if VanityBackupManager:IsPresetInBackup(guid) then
-							VanityBackupManager:FlipPresetBackupRegistration(guid)
-						end
-						ConfigurationStructure.config.vanity.presets[guid].delete = true
-
-						PresetManager:UpdatePresetView()
-						if activePreset == guid then
-							Vanity:ActivatePreset()
-						end
-						Channels.UpdateUserPresetPool:SendToServer({})
-					end
-				end
-
-				VanityModDependencyManager:DependencyValidator(vanityContainer, preset, function()
-					return presetGroup
-				end)
-
-				--#region Custom Dependencies
-				presetGroup:AddNewLine()
-				local customDependencyHeader = presetGroup:AddCollapsingHeader(Translator:translate("Custom Dependencies"))
-				local customDependencyButton = customDependencyHeader:AddButton(Translator:translate("Add Custom Dependency"))
-				customDependencyButton.Visible = not externalOwner
-
-				local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
-				customDepFormGroup.Visible = false
-
-				---@param existingCustomDependency ModDependency?
-				local function buildCustomDepForm(existingCustomDependency)
-					FormBuilder:CreateForm(customDepFormGroup,
-						function(results)
-							customDepFormGroup.Visible = false
-
-							local versionString = results["Version"]
-							results["Version"] = {}
-							for versionPart in string.gmatch(versionString, "[^%.]+") do
-								table.insert(results["Version"], versionPart)
-							end
-
-							if not preset.CustomDependencies then
-								preset.CustomDependencies = {}
-							end
-
-							if existingCustomDependency then
-								existingCustomDependency["Version"].delete = true
-								for key, value in pairs(results) do
-									existingCustomDependency[key] = value
-								end
-							else
-								table.insert(preset.CustomDependencies, results)
-							end
-							PresetManager:UpdatePresetView(presetID)
-						end,
-						{
-							{
-								["label"] = "Name",
-								["type"] = "Text",
-								["errorMessageIfEmpty"] = "Required Field",
-								["defaultValue"] = existingCustomDependency and existingCustomDependency.Name
-							},
-							{
-								["label"] = "Minimum Version",
-								["propertyField"] = "Version",
-								["type"] = "NumericText",
-								["errorMessageIfEmpty"] = "Required Field",
-								["defaultValue"] = existingCustomDependency and table.concat(existingCustomDependency.Version, ".")
-							},
-							{
-								["label"] = "UUID",
-								["propertyField"] = "Guid",
-								["type"] = "Text",
-								["defaultValue"] = existingCustomDependency and existingCustomDependency.Guid
-							},
-							{
-								["label"] = "UUIDs of Packaged Resources (i.e Classes, MultiEffect Info) - One UUID Per Line",
-								["propertyField"] = "Resources",
-								["type"] = "Multiline",
-								["defaultValue"] = existingCustomDependency and existingCustomDependency.Resources,
-							},
-							{
-								["label"] = "Notes",
-								["type"] = "Multiline",
-								["defaultValue"] = existingCustomDependency and existingCustomDependency.Notes
-							},
-						})
-				end
-				buildCustomDepForm()
-
-				customDependencyButton.OnClick = function()
-					customDepFormGroup.Visible = not customDepFormGroup.Visible
-				end
-
-				if preset.CustomDependencies and (preset.__call and preset.CustomDependencies() or next(preset.CustomDependencies)) then
-					local customDependencyTable = customDependencyHeader:AddTable("CustomDependency", 6)
-					customDependencyTable.Resizable = true
-
-					local headerRow = customDependencyTable:AddRow()
-					headerRow.Headers = true
-					headerRow:AddCell():AddText(Translator:translate("Name"))
-					headerRow:AddCell():AddText(Translator:translate("Minimum Version"))
-					headerRow:AddCell():AddText(Translator:translate("UUID"))
-					headerRow:AddCell():AddText(Translator:translate("Packaged Resource UUIDs"))
-					headerRow:AddCell():AddText(Translator:translate("Notes"))
-
-					for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function(key)
-						return preset.CustomDependencies[key].Name
-					end) do
-						local row = customDependencyTable:AddRow()
-
-						local nameCell = row:AddCell()
-						nameCell:AddText(customDependency.Name)
-
-						row:AddCell():AddText(table.concat(customDependency.Version, "."))
-						row:AddCell():AddText(customDependency.Guid or "---")
-						row:AddCell():AddText(customDependency.Resources)
-						row:AddCell():AddText(customDependency.Notes)
-
-						if customDependency.Guid and customDependency.Guid ~= "" then
-							local modInfo = Ext.Mod.GetMod(customDependency.Guid)
-							if not modInfo then
-								local warningImage = nameCell:AddImage("tutorial_warning_yellow", { 32, 32 })
-								warningImage.SameLine = true
-								warningImage:Tooltip():AddText(
-									"\t  " ..
-									Translator:translate("Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod"))
-							end
-						end
-
-						if not externalOwner then
-							local actionCell = row:AddCell()
-							actionCell:AddButton("Edit").OnClick = function()
-								buildCustomDepForm(customDependency)
-								customDepFormGroup.Visible = true
-							end
-
-							local deleteButton = actionCell:AddButton(Translator:translate("X"))
-							deleteButton.SameLine = true
-							deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
-							deleteButton:SetColor("Text", { 1, 1, 1, 1 })
-							deleteButton.OnClick = function()
-								preset.CustomDependencies[index].delete = true
-								PresetManager:UpdatePresetView(presetID)
-							end
-						end
-					end
-				end
-
-				--#endregion
-				presetGroup:AddNewLine()
-				local swapViewButton = Styler:ImageButton(presetGroup:AddImageButton("swap_view", "ico_randomize_d", { 32, 32 }))
-				swapViewButton:Tooltip():AddText("\t  " .. Translator:translate("Swap between Overall and Per-Outfit view"))
-
-				local generalSettings = ConfigurationStructure.config.vanity.settings.general
-
-				local outfitsAndDependenciesGroup = presetGroup:AddGroup("OutfitsAndDeps")
-				local function swapView()
-					Helpers:KillChildren(outfitsAndDependenciesGroup)
-
-					if generalSettings.outfitAndDependencyView == "universal" then
-						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Configured Outfits")):SetStyle("SeparatorTextAlign", 0.5)
-						VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup, nil,
-							externalOwner and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
-						outfitsAndDependenciesGroup:AddNewLine()
-						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Mod Dependencies")):SetStyle("SeparatorTextAlign", 0.5)
-						buildDependencyTable(preset, outfitsAndDependenciesGroup)
-					else
-						outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Outfit Report")):SetStyle("SeparatorTextAlign", 0.5)
-						VanityModDependencyManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
-					end
-				end
-				swapView()
-
-				swapViewButton.OnClick = function()
-					generalSettings.outfitAndDependencyView = generalSettings.outfitAndDependencyView == "universal" and "perOutfit" or "universal"
-					swapView()
-				end
-			end
-
-			if (not presetID and guid == activePreset) or presetID == guid then
-				presetSelectable.OnClick()
-				presetSelectable.Selected = true
-			end
-		end
-	end
-
-	buildSection(ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
-
-	Channels.GetUserPresetPool:RequestToServer({}, function(data)
-		if next(data) then
-			otherUsersSection.Visible = true
-
-			for user, presetIds in pairs(data) do
-				Channels.GetUserName:RequestToServer({ ["user"] = user }, function(data)
-					Channels.GetAllPresets:RequestToClient({}, user, function(vanity)
-						Logger:BasicInfo("Loading %s's presets", data.username)
-
-						---@cast vanity Vanity
-						buildSection(vanity, vanity.presets, data.username, otherUsersSection)
-					end)
-				end)
-			end
-		else
-			otherUsersSection.Visible = false
-		end
-	end)
+	Channels.GetUserPresetPool:SendToServer({})
 
 	VanityModPresetManager:ImportPresetsFromMods()
 	if next(VanityModPresetManager.ModPresetIndex) then
 		for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
 			return Ext.Mod.GetMod(key).Info.Name
 		end) do
-			buildSection(vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name, modPresetSection)
+			PresetManager:buildSection(presetId, vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name, modPresetSection)
 		end
 	else
 		modPresetSection.Visible = false
 	end
 end
 
+---@param presetId string
+---@param vanityContainer Vanity
+---@param presetCollection {[Guid]: VanityPreset}
+---@param externalOwner string?
+---@param parentSection ExtuiTreeParent
+function PresetManager:buildSection(presetId, vanityContainer, presetCollection, externalOwner, parentSection)
+	local activePreset = Vanity.ActivePresetId
+
+	if externalOwner then
+		parentSection:AddSeparator():SetColor("Separator", { 1, 1, 1, 0.6 })
+		local sepText = parentSection:AddSeparatorText(externalOwner)
+		sepText:SetStyle("SeparatorTextAlign", 0.5)
+		sepText:SetColor("Text", { 1, 1, 1, 0.6 })
+		parentSection:AddSeparator():SetColor("Separator", { 1, 1, 1, 0.6 })
+	end
+
+	for guid, preset in TableUtils:OrderedPairs(presetCollection, function(key)
+		return presetCollection[key].Name
+	end) do
+		-- Only user presets can be backed up
+		if not externalOwner then
+			local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
+			local syncButton = Styler:ImageButton(parentSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
+
+			local tooltip = syncButton:Tooltip()
+			tooltip:AddText(string.format(Translator:translate([[
+	This preset %s backed up in all saves created for this campaign while this option is enabled (save after changing this option) - the backup for applicable presets will be updated when the Preset Manager window is opened (so launch this window to ensure all presets have the latest configs in the backup if you edited them in other saves) and for _active_ presets when a change is made in this campaign.
+
+Backups will be restored when a save with the backup is loaded but the preset is not present in the local config.
+Backup will be removed if this option is disabled or the preset is deleted via this UI
+You can view the current backup state in a save by executing !Armory_Vanity_SeeBackedUpPresets and !Armory_Vanity_SeePresetBackupRegistry in the SE Console
+]]),
+				Translator:translate(isPresetInBackup and "is" or "is not"))).TextWrapPos = 1000
+
+
+			syncButton.OnClick = function()
+				VanityBackupManager:FlipPresetBackupRegistration(guid)
+				PresetManager:UpdatePresetView(guid)
+			end
+		end
+
+		---@type ExtuiSelectable
+		local presetSelectable = parentSection:AddSelectable(preset.Name)
+		presetSelectable.UserData = "select"
+		presetSelectable.SameLine = not externalOwner
+		presetSelectable.IDContext = guid
+
+		presetSelectable.OnClick = function()
+			if presetActivelyViewing then
+				presetActivelyViewing:Destroy()
+			end
+			presetIdActivelyViewing = guid
+
+			for _, selectable in TableUtils:CombinedPairs(userPresetSection.Children, modPresetSection.Children) do
+				if selectable.Handle ~= presetSelectable.Handle and selectable.UserData == "select" then
+					selectable.Selected = false
+				end
+			end
+
+			local presetGroup = presetInfoSection:AddGroup(guid)
+			presetActivelyViewing = presetGroup
+
+			-- Formatting the page into columns
+			local metadataTable = presetGroup:AddTable("metadata", 3)
+			metadataTable:AddColumn("", "WidthStretch")
+			metadataTable:AddColumn("", "WidthFixed", 400 * Styler:ScaleFactor())
+			metadataTable:AddColumn("", "WidthStretch")
+			metadataTable.SizingStretchSame = true
+
+			local titleRow = metadataTable:AddRow()
+			titleRow:AddCell()
+			local titleText = titleRow:AddCell():AddSelectable(preset.Name)
+			-- There was no way of aligning pure text as of writing this
+			titleText:SetStyle("SelectableTextAlign", 0.5)
+			titleText.Disabled = true
+			titleText.Font = "Large"
+			titleRow:AddCell()
+
+			local metadataRow = metadataTable:AddRow()
+			metadataRow:AddCell()
+			local metadataText = metadataRow:AddCell():AddSelectable(string.format("%s | v%s | %s", Translator:translate(preset.NSFW and "NSFW" or "SFW"), preset.Version,
+				preset.Author))
+			metadataText:SetStyle("SelectableTextAlign", 0.5)
+			metadataText.Disabled = true
+			metadataRow:AddCell()
+
+			if not externalOwner and preset.ModSourced then
+				local modRow = metadataTable:AddRow()
+				modRow:AddCell()
+				local mod = Ext.Mod.GetMod(preset.ModSourced.Guid)
+				mod = mod and mod.Info or preset.ModSourced
+
+				local text = modRow:AddCell():AddSelectable(string.format(Translator:translate("Copied from %s v%s by %s"), mod.Name,
+					table.concat(mod.ModVersion or mod.Version, "."), mod.Author))
+				text.Disabled = true
+				text:SetStyle("SelectableTextAlign", 0.5)
+				text:SetStyle("Alpha", 0.8)
+			end
+
+			local actionContainerRow = metadataTable:AddRow()
+			actionContainerRow:AddCell()
+			local actionContainer = actionContainerRow:AddCell()
+			actionContainerRow:AddCell()
+
+			local actionTable = actionContainer:AddTable("ActionTable", 3)
+			actionTable:AddColumn("", "WidthStretch")
+			actionTable:AddColumn("", "WidthFixed")
+			actionTable:AddColumn("", "WidthStretch")
+			local actionRow = actionTable:AddRow()
+			actionRow:AddCell()
+			local actionCell = actionRow:AddCell()
+			actionRow:AddCell()
+
+			local activateButton = Styler:ImageButton(
+				actionCell:AddImageButton("Activate", activePreset ~= guid and "ico_active_button" or "ico_inactive_button", { 32, 32 })
+			)
+
+			if activePreset ~= guid then
+				activateButton:Tooltip():AddText("\t  " .. Translator:translate("Activate this preset (deactivates the active preset if there is one)"))
+				activateButton.OnClick = function()
+					Vanity:ActivatePreset(guid)
+					PresetManager:UpdatePresetView(guid)
+				end
+			else
+				activateButton:Tooltip():AddText("\t  " .. Translator:translate("Deactivate this preset"))
+				activateButton.OnClick = function()
+					Vanity:ActivatePreset()
+					PresetManager:UpdatePresetView(guid)
+				end
+			end
+
+			if not externalOwner then
+				local editButton = Styler:ImageButton(actionCell:AddImageButton("Edit", "ico_edit_d", { 32, 32 }))
+				editButton:Tooltip():AddText("\t  " .. Translator:translate("Edit this preset's name/author/version/SFW flag"))
+				editButton.SameLine = true
+
+				local infoGroup = presetGroup:AddGroup("info")
+				editButton.OnClick = function()
+					if editButton.UserData then
+						PresetManager:UpdatePresetView(guid)
+					else
+						editButton.UserData = true
+						buildPresetForm(infoGroup, guid)
+					end
+				end
+			end
+
+			local copyButton = Styler:ImageButton(actionCell:AddImageButton("Copy", "ico_copy_d", { 32, 32 }))
+			copyButton:Tooltip():AddText(externalOwner and ("\t  " .. Translator:translate("Clone this preset into your local config, making a copy you can edit"))
+				or ("\t  " .. Translator:translate("Duplicate this preset")))
+			copyButton.SameLine = true
+			copyButton.OnClick = function()
+				local newGuid = FormBuilder:generateGUID()
+				ConfigurationStructure.config.vanity.presets[newGuid] = TableUtils:DeeplyCopyTable(externalOwner and preset or
+					ConfigurationStructure:GetRealConfigCopy().vanity.presets[guid])
+
+				ConfigurationStructure.config.vanity.presets[newGuid].isExternalPreset = false
+
+				if not externalOwner then
+					ConfigurationStructure.config.vanity.presets[newGuid].Name = ConfigurationStructure.config.vanity.presets[newGuid].Name ..
+						" " .. Translator:translate("(Copy)")
+				end
+				PresetManager:UpdatePresetView(presetId)
+			end
+
+			if not externalOwner then
+				local deleteButton = Styler:ImageButton(actionCell:AddImageButton("Delete", "ico_red_x", { 32, 32 }))
+				deleteButton:Tooltip():AddText("\t  " .. Translator:translate("Delete this preset, deactivating first to remove active transmogs if it's active and removing it from the backup if enabled")).TextWrapPos = 600
+				deleteButton.SameLine = true
+				deleteButton.OnClick = function()
+					if VanityBackupManager:IsPresetInBackup(guid) then
+						VanityBackupManager:FlipPresetBackupRegistration(guid)
+					end
+					ConfigurationStructure.config.vanity.presets[guid].delete = true
+
+					PresetManager:UpdatePresetView()
+					if activePreset == guid then
+						Vanity:ActivatePreset()
+					end
+					Channels.UpdateUserPresetPool:SendToServer(ConfigurationStructure:GetRealConfigCopy().vanity)
+				end
+			end
+
+			VanityModDependencyManager:DependencyValidator(vanityContainer, preset, function()
+				return presetGroup
+			end)
+
+			--#region Custom Dependencies
+			presetGroup:AddNewLine()
+			local customDependencyHeader = presetGroup:AddCollapsingHeader(Translator:translate("Custom Dependencies"))
+			local customDependencyButton = customDependencyHeader:AddButton(Translator:translate("Add Custom Dependency"))
+			customDependencyButton.Visible = not externalOwner
+
+			local customDepFormGroup = customDependencyHeader:AddGroup("CustomDependencyForm")
+			customDepFormGroup.Visible = false
+
+			---@param existingCustomDependency ModDependency?
+			local function buildCustomDepForm(existingCustomDependency)
+				FormBuilder:CreateForm(customDepFormGroup,
+					function(results)
+						customDepFormGroup.Visible = false
+
+						local versionString = results["Version"]
+						results["Version"] = {}
+						for versionPart in string.gmatch(versionString, "[^%.]+") do
+							table.insert(results["Version"], versionPart)
+						end
+
+						if not preset.CustomDependencies then
+							preset.CustomDependencies = {}
+						end
+
+						if existingCustomDependency then
+							existingCustomDependency["Version"].delete = true
+							for key, value in pairs(results) do
+								existingCustomDependency[key] = value
+							end
+						else
+							table.insert(preset.CustomDependencies, results)
+						end
+						PresetManager:UpdatePresetView(presetId)
+					end,
+					{
+						{
+							["label"] = "Name",
+							["type"] = "Text",
+							["errorMessageIfEmpty"] = "Required Field",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Name
+						},
+						{
+							["label"] = "Minimum Version",
+							["propertyField"] = "Version",
+							["type"] = "NumericText",
+							["errorMessageIfEmpty"] = "Required Field",
+							["defaultValue"] = existingCustomDependency and table.concat(existingCustomDependency.Version, ".")
+						},
+						{
+							["label"] = "UUID",
+							["propertyField"] = "Guid",
+							["type"] = "Text",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Guid
+						},
+						{
+							["label"] = "UUIDs of Packaged Resources (i.e Classes, MultiEffect Info) - One UUID Per Line",
+							["propertyField"] = "Resources",
+							["type"] = "Multiline",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Resources,
+						},
+						{
+							["label"] = "Notes",
+							["type"] = "Multiline",
+							["defaultValue"] = existingCustomDependency and existingCustomDependency.Notes
+						},
+					})
+			end
+			buildCustomDepForm()
+
+			customDependencyButton.OnClick = function()
+				customDepFormGroup.Visible = not customDepFormGroup.Visible
+			end
+
+			if preset.CustomDependencies and (preset.__call and preset.CustomDependencies() or next(preset.CustomDependencies)) then
+				local customDependencyTable = customDependencyHeader:AddTable("CustomDependency", 6)
+				customDependencyTable.Resizable = true
+
+				local headerRow = customDependencyTable:AddRow()
+				headerRow.Headers = true
+				headerRow:AddCell():AddText(Translator:translate("Name"))
+				headerRow:AddCell():AddText(Translator:translate("Minimum Version"))
+				headerRow:AddCell():AddText(Translator:translate("UUID"))
+				headerRow:AddCell():AddText(Translator:translate("Packaged Resource UUIDs"))
+				headerRow:AddCell():AddText(Translator:translate("Notes"))
+
+				for index, customDependency in TableUtils:OrderedPairs(preset.CustomDependencies, function(key)
+					return preset.CustomDependencies[key].Name
+				end) do
+					local row = customDependencyTable:AddRow()
+
+					local nameCell = row:AddCell()
+					nameCell:AddText(customDependency.Name)
+
+					row:AddCell():AddText(table.concat(customDependency.Version, "."))
+					row:AddCell():AddText(customDependency.Guid or "---")
+					row:AddCell():AddText(customDependency.Resources)
+					row:AddCell():AddText(customDependency.Notes)
+
+					if customDependency.Guid and customDependency.Guid ~= "" then
+						local modInfo = Ext.Mod.GetMod(customDependency.Guid)
+						if not modInfo then
+							local warningImage = nameCell:AddImage("tutorial_warning_yellow", { 32, 32 })
+							warningImage.SameLine = true
+							warningImage:Tooltip():AddText(
+								"\t  " ..
+								Translator:translate("Provided GUID is not loaded in the current game - this may or may not be expected, depending on the nature of the mod"))
+						end
+					end
+
+					if not externalOwner then
+						local actionCell = row:AddCell()
+						actionCell:AddButton("Edit").OnClick = function()
+							buildCustomDepForm(customDependency)
+							customDepFormGroup.Visible = true
+						end
+
+						local deleteButton = actionCell:AddButton(Translator:translate("X"))
+						deleteButton.SameLine = true
+						deleteButton:SetColor("Button", { 0.6, 0.02, 0, 0.5 })
+						deleteButton:SetColor("Text", { 1, 1, 1, 1 })
+						deleteButton.OnClick = function()
+							preset.CustomDependencies[index].delete = true
+							PresetManager:UpdatePresetView(presetId)
+						end
+					end
+				end
+			end
+
+			--#endregion
+			presetGroup:AddNewLine()
+			local swapViewButton = Styler:ImageButton(presetGroup:AddImageButton("swap_view", "ico_randomize_d", { 32, 32 }))
+			swapViewButton:Tooltip():AddText("\t  " .. Translator:translate("Swap between Overall and Per-Outfit view"))
+
+			local generalSettings = ConfigurationStructure.config.vanity.settings.general
+
+			local outfitsAndDependenciesGroup = presetGroup:AddGroup("OutfitsAndDeps")
+			local function swapView()
+				Helpers:KillChildren(outfitsAndDependenciesGroup)
+
+				if generalSettings.outfitAndDependencyView == "universal" then
+					outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Configured Outfits")):SetStyle("SeparatorTextAlign", 0.5)
+					VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, outfitsAndDependenciesGroup, nil,
+						externalOwner and TableUtils:DeeplyCopyTable(VanityModPresetManager:GetPresetFromMod(guid).effects))
+					outfitsAndDependenciesGroup:AddNewLine()
+					outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Mod Dependencies")):SetStyle("SeparatorTextAlign", 0.5)
+					buildDependencyTable(preset, outfitsAndDependenciesGroup)
+				else
+					outfitsAndDependenciesGroup:AddSeparatorText(Translator:translate("Outfit Report")):SetStyle("SeparatorTextAlign", 0.5)
+					VanityModDependencyManager:BuildOutfitDependencyReport(preset, nil, outfitsAndDependenciesGroup)
+				end
+			end
+			swapView()
+
+			swapViewButton.OnClick = function()
+				generalSettings.outfitAndDependencyView = generalSettings.outfitAndDependencyView == "universal" and "perOutfit" or "universal"
+				swapView()
+			end
+		end
+
+		if (not presetId and guid == activePreset) or presetId == guid then
+			presetSelectable.OnClick()
+			presetSelectable.Selected = true
+		end
+	end
+end
+
+Channels.UpdateUserPresetPool:SetHandler(function(data, _)
+	Helpers:KillChildren(otherUsersSection)
+
+	for user, vanity in pairs(data) do
+		Channels.GetUserName:RequestToServer({user = user}, function (data)
+			PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
+		end)
+	end
+end)
+
 Channels.UpdateUserPreset:SetHandler(function(data, user)
-	PresetManager:UpdatePresetView(Vanity.ActivePresetId)
+	PresetManager:UpdatePresetView(presetIdActivelyViewing)
 
 	if data.presetId == Vanity.ActivePresetId then
 		Vanity:ActivatePreset(Vanity.ActivePresetId)
@@ -668,10 +666,6 @@ Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
 	else
 		return {}
 	end
-end)
-
-Channels.GetAllPresets:SetRequestHandler(function(data, user)
-	return ConfigurationStructure:GetRealConfigCopy().vanity
 end)
 
 Translator:RegisterTranslation({

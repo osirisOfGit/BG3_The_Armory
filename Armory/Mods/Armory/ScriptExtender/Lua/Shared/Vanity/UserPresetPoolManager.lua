@@ -1,9 +1,10 @@
 UserPresetPoolManager = {}
 
----@type {[UserID] : Guid[]}
+---@type {[UserID] : Vanity}
 UserPresetPoolManager.PresetPool = {}
 
 Channels.GetUserPresetPool = Ext.Net.CreateChannel(ModuleUUID, "GetUserPresetPool")
+Channels.GetUserVanity = Ext.Net.CreateChannel(ModuleUUID, "GetUserVanity")
 Channels.SendOutPresetPools = Ext.Net.CreateChannel(ModuleUUID, "SendOutPresetPools")
 Channels.UpdateUserPresetPool = Ext.Net.CreateChannel(ModuleUUID, "UpdateUserPresetPool")
 Channels.GetUserSpecificPreset = Ext.Net.CreateChannel(ModuleUUID, "GetUserSpecificPreset")
@@ -19,12 +20,14 @@ if Ext.IsServer() then
 		else
 			for user in pairs(self.PresetPool) do
 				local presetPool = {}
-				for otherUser, presetIds in pairs(self.PresetPool) do
+				for otherUser, vanity in pairs(self.PresetPool) do
 					if user ~= otherUser then
-						presetPool[otherUser] = presetIds
+						presetPool[otherUser] = {}
+						for presetId in pairs(vanity.presets) do
+							table.insert(presetPool[otherUser], presetId)
+						end
 					end
 				end
-
 
 				Channels.SendOutPresetPools:SendToClient(presetPool, user)
 			end
@@ -36,11 +39,11 @@ if Ext.IsServer() then
 			local userId = Osi.GetReservedUserID(player[1])
 			if userId and not loadingLock[userId] then
 				loadingLock[userId] = true
-				Channels.GetUserPresetPool:RequestToClient({},
+				Channels.GetUserVanity:RequestToClient({},
 					userId,
 					function(data)
 						Logger:BasicInfo("Loaded %s into the pool", Osi.GetUserName(userId))
-						UserPresetPoolManager.PresetPool[userId] = data.presetIds
+						UserPresetPoolManager.PresetPool[userId] = data
 						loadingLock[userId] = nil
 					end)
 			end
@@ -57,36 +60,37 @@ if Ext.IsServer() then
 		initialize()
 	end)
 
-	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)
+	Channels.GetUserPresetPool:SetHandler(function(data, user)
 		user = PeerToUserID(user)
 		local presetTable = {}
-		for otherUser, presetIds in pairs(UserPresetPoolManager.PresetPool) do
+		for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
 			if otherUser ~= user then
-				presetTable[otherUser] = presetIds
+				presetTable[otherUser] = vanity
 			end
 		end
 
-		return presetTable
+		Channels.UpdateUserPresetPool:Broadcast(presetTable, Osi.GetCurrentCharacter(user))
 	end)
 
 	Channels.GetUserSpecificPreset:SetRequestHandler(function(data, user)
-		local presetID = data.presetId
+		return UserPresetPoolManager.PresetPool[data.user]
+	end)
 
-		for user, presetIds in pairs(UserPresetPoolManager.PresetPool) do
-			if TableUtils:ListContains(presetIds, presetID) then
-				return { user = user }
+	Channels.UpdateUserPresetPool:SetHandler(function(vanity, user)
+		user = PeerToUserID(user)
+
+		UserPresetPoolManager.PresetPool[user] = vanity
+
+		UserPresetPoolManager:hydrateClientsWithPools()
+
+		local presetPool = {}
+		for otherUser, otherVanity in pairs(UserPresetPoolManager.PresetPool) do
+			if user ~= otherUser then
+				presetPool[otherUser] = otherVanity
 			end
 		end
 
-		return {}
-	end)
-
-	Channels.UpdateUserPresetPool:SetHandler(function (_, user)
-		user = PeerToUserID(user)
-
-		Channels.GetUserPresetPool:RequestToClient({}, user, function (data)
-			UserPresetPoolManager.PresetPool[user] = data
-		end)
+		Channels.UpdateUserPresetPool:Broadcast(presetPool, Osi.GetCurrentCharacter(user))
 	end)
 else
 	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)

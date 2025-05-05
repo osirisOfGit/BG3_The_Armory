@@ -5,8 +5,8 @@ Channels.SendOutPresetPools:SetHandler(function(data, user)
 	userPresetPool = data
 end)
 
-Channels.GetUserSpecificPreset:SetRequestHandler(function(data, user)
-	return VanityExportManager:ExportPresets({ data.presetId }, nil, true)
+Channels.GetUserVanity:SetRequestHandler(function(data, user)
+	return ConfigurationStructure:GetRealConfigCopy().vanity
 end)
 
 ---@diagnostic disable: missing-fields
@@ -56,7 +56,7 @@ PresetProxy = {
 				for user, presetIds in pairs(userPresetPool) do
 					if TableUtils:ListContains(presetIds, k) then
 						local lock = true
-						Channels.GetUserSpecificPreset:RequestToClient({ presetId = k }, user, function(data)
+						Channels.GetUserSpecificPreset:RequestToServer({ user = user }, function(data)
 							if next(data) then
 								presetExport = data
 							end
