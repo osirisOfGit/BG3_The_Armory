@@ -80,6 +80,14 @@ if Ext.IsServer() then
 
 		return {}
 	end)
+
+	Channels.UpdateUserPresetPool:SetHandler(function (_, user)
+		user = PeerToUserID(user)
+
+		Channels.GetUserPresetPool:RequestToClient({}, user, function (data)
+			UserPresetPoolManager.PresetPool[user] = data
+		end)
+	end)
 else
 	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)
 		local presetTable = {}

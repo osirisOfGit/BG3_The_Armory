@@ -47,6 +47,7 @@ local function buildPresetForm(parent, forPresetId)
 
 			parent.Visible = false
 			ServerPresetManager:UpdatePresetView(presetID)
+			Channels.UpdateUserPresetPool:SendToServer({})
 		end,
 		{
 			{
@@ -442,6 +443,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 						if activePreset == guid then
 							Vanity:ActivatePreset()
 						end
+						Channels.UpdateUserPresetPool:SendToServer({})
 					end
 				end
 
@@ -649,7 +651,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 	end
 end
 
-Channels.UpdateUserPreset:SetHandler(function (data, user)
+Channels.UpdateUserPreset:SetHandler(function(data, user)
 	ServerPresetManager:UpdatePresetView(Vanity.ActivePresetId)
 
 	if data.presetId == Vanity.ActivePresetId then
