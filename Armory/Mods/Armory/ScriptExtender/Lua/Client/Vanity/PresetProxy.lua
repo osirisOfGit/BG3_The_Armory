@@ -77,9 +77,9 @@ PresetProxy = {
 						return waitFor
 					end
 				end
+			else
+				return setValue(presetExport)
 			end
-
-			return setValue(presetExport)
 		end
 	})
 }
