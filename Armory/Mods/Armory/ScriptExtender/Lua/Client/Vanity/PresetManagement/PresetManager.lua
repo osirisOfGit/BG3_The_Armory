@@ -671,6 +671,8 @@ Channels.UpdateUserVanityPool:SetHandler(function(data, _)
 					PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
 
 					if vanity.presets[Vanity.ActivePresetId] then
+						-- Force the cache to retrieve the latest vanity from the server
+						PresetProxy.presets[Vanity.ActivePresetId] = nil
 						Vanity:ActivatePreset(Vanity.ActivePresetId)
 					end
 				end)
