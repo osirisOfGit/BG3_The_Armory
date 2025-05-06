@@ -26,38 +26,40 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 
 		local preset = vanity.presets[presetId]
 
-		for criteraKey, outfit in pairs(preset.Outfits) do
-			local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
-			for _, resourceId in pairs(criteriaTable) do
-				if vanity.miscNameCache[resourceId] then
-					export.miscNameCache[resourceId] = vanity.miscNameCache[resourceId]
-				end
-			end
-
-			for _, outfitSlot in pairs(outfit) do
-				if outfitSlot.equipment and outfitSlot.equipment.effects then
-					for _, effect in pairs(outfitSlot.equipment.effects) do
-						export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
+		if preset then
+			for criteraKey, outfit in pairs(preset.Outfits) do
+				local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
+				for _, resourceId in pairs(criteriaTable) do
+					if vanity.miscNameCache[resourceId] then
+						export.miscNameCache[resourceId] = vanity.miscNameCache[resourceId]
 					end
 				end
 
-				if outfitSlot.weaponTypes then
-					for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
-						if weaponSlot.equipment and weaponSlot.equipment.effects then
-							for _, effect in pairs(weaponSlot.equipment.effects) do
-								export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
+				for _, outfitSlot in pairs(outfit) do
+					if outfitSlot.equipment and outfitSlot.equipment.effects then
+						for _, effect in pairs(outfitSlot.equipment.effects) do
+							export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
+						end
+					end
+
+					if outfitSlot.weaponTypes then
+						for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
+							if weaponSlot.equipment and weaponSlot.equipment.effects then
+								for _, effect in pairs(weaponSlot.equipment.effects) do
+									export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
+								end
 							end
 						end
 					end
 				end
 			end
-		end
 
-		if newIds then
-			presetId = FormBuilder:generateGUID()
-		end
+			if newIds then
+				presetId = FormBuilder:generateGUID()
+			end
 
-		export.presets[presetId] = preset
+			export.presets[presetId] = preset
+		end
 	end
 
 	return export

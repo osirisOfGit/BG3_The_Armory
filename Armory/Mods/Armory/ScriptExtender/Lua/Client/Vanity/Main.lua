@@ -208,7 +208,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 				then
 					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
 
-					local presetBackup = TableUtils:DeeplyCopyTable(VanityBackupManager:RestorePresetFromExport(Vanity.ActivePresetId))
+					local presetBackup = VanityBackupManager:GetPresetFromBackup(Vanity.ActivePresetId)
 					local restoreBackupWindow = Ext.IMGUI.NewWindow(Translator:translate("Armory: Restore Backed Up Preset"))
 					restoreBackupWindow.NoCollapse = true
 					restoreBackupWindow.AlwaysAutoResize = true

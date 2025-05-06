@@ -120,5 +120,6 @@ Ext.Osiris.RegisterListener("UserConnected", 3, "after", function(userID, userNa
 end)
 
 Ext.Osiris.RegisterListener("UserDisconnected", 3, "after", function(userID, userName, userProfileID)
+	ServerPresetManager.ActiveVanityPresets[userID] = nil
 	PartyOutfitManager:ApplyTransmogsPerPreset()
 end)
