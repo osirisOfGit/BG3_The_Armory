@@ -113,9 +113,14 @@ function Vanity:ActivatePreset(presetId)
 				VanityCharacterCriteria:BuildModule(mainParent, preset)
 				Vanity:UpdatePresetOnServer()
 			end)
-		else
+		elseif preset then
 			separator.Label = Translator:translate("Active Preset:") .. " " .. preset.Name
 			VanityCharacterCriteria:BuildModule(mainParent, preset)
+			Vanity:UpdatePresetOnServer()
+		else
+			self.ActivePresetId = nil
+			separator.Label = Translator:translate("Choose a Preset")
+			VanityCharacterCriteria:BuildModule(mainParent)
 			Vanity:UpdatePresetOnServer()
 		end
 	else

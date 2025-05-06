@@ -466,7 +466,7 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 	else
 		if createdVanityEntity.StatusContainer then
 			for _, statusName in pairs(createdVanityEntity.StatusContainer.Statuses) do
-				if statusName:find("ARMORY") then
+				if statusName:find("ARMORY_VANITY_EFFECT") then
 					Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, statusName)
 				end
 			end

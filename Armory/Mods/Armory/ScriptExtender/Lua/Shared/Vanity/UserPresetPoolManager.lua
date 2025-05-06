@@ -84,34 +84,42 @@ if Ext.IsServer() then
 	end)
 
 	function UserPresetPoolManager:sendOutVanities(user, broadcast)
-		local presetTable = {}
+		if Osi.GetUserCount() > 1 then
+			local presetTable = {}
 
-		if not broadcast then
-			for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
-				if otherUser ~= user then
-					presetTable[otherUser] = vanity
-				end
-			end
-
-			Logger:BasicTrace("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
-			Channels.UpdateUserVanityPool:SendToClient(presetTable, user)
-		else
-			for user in pairs(UserPresetPoolManager.PresetPool) do
-				local presetPool = {}
-				for otherUser in pairs(UserPresetPoolManager.PresetPool) do
+			if not broadcast then
+				for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
 					if otherUser ~= user then
-						presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
+						presetTable[otherUser] = vanity
 					end
 				end
+
 				Logger:BasicTrace("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
-				Channels.UpdateUserVanityPool:SendToClient(presetPool, user)
+				Channels.UpdateUserVanityPool:SendToClient(presetTable, user)
+			else
+				for user in pairs(UserPresetPoolManager.PresetPool) do
+					local presetPool = {}
+					for otherUser in pairs(UserPresetPoolManager.PresetPool) do
+						if otherUser ~= user then
+							presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
+						end
+					end
+					Logger:BasicTrace("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
+					Channels.UpdateUserVanityPool:SendToClient(presetPool, user)
+				end
 			end
 		end
 	end
 
 	Ext.Osiris.RegisterListener("UserConnected", 3, "after", function(userID, userName, userProfileID)
 		UserPresetPoolManager:GetVanitiesFromUsers()
-		UserPresetPoolManager:sendOutVanities(user, true)
+		UserPresetPoolManager:sendOutVanities(userID, true)
+	end)
+
+	Ext.Osiris.RegisterListener("UserDisconnected", 3, "after", function(userID, userName, userProfileID)
+		UserPresetPoolManager.PresetPool[userID] = nil
+		UserPresetPoolManager:GetVanitiesFromUsers()
+		UserPresetPoolManager:sendOutVanities(userID, true)
 	end)
 
 	Channels.GetUserPresetPool:SetHandler(function(data, user)
