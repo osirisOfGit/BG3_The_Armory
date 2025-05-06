@@ -16,6 +16,7 @@ if Ext.IsServer() then
 		if Osi.GetUserCount() > 1 then
 			if user then
 				loadingLock[user] = true
+				Logger:BasicDebug("Firing GetUserVanity to %s", Osi.GetUserName(user))
 				Channels.GetUserVanity:RequestToClient({},
 					user,
 					function(data)
@@ -60,9 +61,11 @@ if Ext.IsServer() then
 					end
 				end
 
+				Logger:BasicDebug("Firing SendOutPresetPools to %s", Osi.GetUserName(user))
 				Channels.SendOutPresetPools:SendToClient(presetPool, user)
-				UserPresetPoolManager:sendOutVanities(user, true)
 			end
+
+			UserPresetPoolManager:sendOutVanities(user, true)
 		end
 	end
 
@@ -90,6 +93,7 @@ if Ext.IsServer() then
 				end
 			end
 
+			Logger:BasicTrace("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
 			Channels.UpdateUserVanityPool:SendToClient(presetTable, user)
 		else
 			for user in pairs(UserPresetPoolManager.PresetPool) do
@@ -99,6 +103,7 @@ if Ext.IsServer() then
 						presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
 					end
 				end
+				Logger:BasicTrace("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
 				Channels.UpdateUserVanityPool:SendToClient(presetPool, user)
 			end
 		end

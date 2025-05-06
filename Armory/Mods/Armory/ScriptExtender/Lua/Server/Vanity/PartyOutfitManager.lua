@@ -27,6 +27,7 @@ function PartyOutfitManager:ApplyTransmogsPerPreset()
 		if activeOutfits and next(activeOutfits) then
 			PartyOutfitManager:FindAndApplyOutfit(player, activeOutfits)
 		else
+			Logger:BasicDebug("%s does not have an outfit, clearing their transmog", player)
 			Transmogger:ClearOutfit(player)
 		end
 	end

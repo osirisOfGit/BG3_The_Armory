@@ -88,6 +88,7 @@ end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
 	user = PeerToUserID(user)
+
 	local activePresets = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset or {}
 	activePresets[Osi.GetUserProfileID(user)] = data.presetId
 	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = activePresets
@@ -102,9 +103,10 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 
 	PartyOutfitManager:ApplyTransmogsPerPreset()
 
-	for otherUser, presetIds in pairs(UserPresetPoolManager.PresetPool) do
-		if TableUtils:ListContains(presetIds, data.presetId) and otherUser == user then
+	for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
+		if vanity.presets[data.presetId] and otherUser == user then
 			UserPresetPoolManager:GetVanitiesFromUsers(user)
+			break
 		end
 	end
 end)

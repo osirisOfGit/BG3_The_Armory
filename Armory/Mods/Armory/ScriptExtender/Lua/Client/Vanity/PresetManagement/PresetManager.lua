@@ -669,6 +669,10 @@ Channels.UpdateUserVanityPool:SetHandler(function(data, _)
 				Channels.GetUserName:RequestToServer({ user = user }, function(data)
 					Logger:BasicDebug("Populating user table for %s", data.username)
 					PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
+
+					if vanity.presets[Vanity.ActivePresetId] then
+						Vanity:ActivatePreset(Vanity.ActivePresetId)
+					end
 				end)
 			end
 		end

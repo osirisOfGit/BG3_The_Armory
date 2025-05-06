@@ -114,6 +114,7 @@ Transmogger.saveLoadLock = false
 function Transmogger:MogCharacter(character)
 	local characterPreset = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
 	if not characterPreset then
+		Logger:BasicDebug("%s does not have an outfit, clearing their transmog", (character.DisplayName and character.DisplayName.Name:Get()) or character.Uuid.EntityUuid)
 		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
 		return
 	end
@@ -419,47 +420,57 @@ end
 ---@param createdVanityEntity EntityHandle
 ---@param characterEntity EntityHandle
 function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, characterEntity)
-	local effects = ServerPresetManager.ActiveVanityPresets[Osi.GetReservedUserID(characterEntity.Uuid.EntityUuid)].effects
-	
-	if outfitSlot.equipment and outfitSlot.equipment.effects then
-		for _, effectName in ipairs(outfitSlot.equipment.effects) do
-			local effectProps = effects[effectName]
-			if effectProps then
-				if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 0 then
-					Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
-						effectName,
-						createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name,
-						Ext.Json.Stringify(effectProps))
+	local vanity = ServerPresetManager.ActiveVanityPresets[Osi.GetReservedUserID(characterEntity.Uuid.EntityUuid)]
+	if vanity then
+		local effects = vanity.effects
+		if outfitSlot.equipment and outfitSlot.equipment.effects then
+			for _, effectName in ipairs(outfitSlot.equipment.effects) do
+				local effectProps = effects[effectName]
+				if effectProps then
+					if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 0 then
+						Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
+							effectName,
+							createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name,
+							Ext.Json.Stringify(effectProps))
 
-					local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
-					effect:createStat()
-					Ext.Timer.WaitFor(50, function()
-						Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
-						createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = true
-					end)
+						local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
+						effect:createStat()
+						Ext.Timer.WaitFor(50, function()
+							Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
+							createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = true
+						end)
+					end
+				else
+					Logger:BasicWarning("Definition for effect %s assigned to slot %s in outfit assigned to %s was not found in the configs", effectName, actualSlot,
+						characterEntity.DisplayName.Name:Get())
 				end
-			else
-				Logger:BasicWarning("Definition for effect %s assigned to slot %s in outfit assigned to %s was not found in the configs", effectName, actualSlot,
-					characterEntity.DisplayName.Name:Get())
 			end
 		end
-	end
+		local removeEffectMarker = true
 
-	local removeEffectMarker = true
-
-	for effectName, _ in pairs(effects) do
-		if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
-			if not TableUtils:ListContains((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, effectName) then
-				Logger:BasicDebug("Removing effect status %s from %s", effectName,
-					createdVanityEntity.DisplayName and createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name)
-				Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
-			else
-				removeEffectMarker = false
+		for effectName, _ in pairs(effects) do
+			if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 1 then
+				if not TableUtils:ListContains((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, effectName) then
+					Logger:BasicDebug("Removing effect status %s from %s", effectName,
+						createdVanityEntity.DisplayName and createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name)
+					Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, effectName)
+				else
+					removeEffectMarker = false
+				end
 			end
 		end
-	end
 
-	if removeEffectMarker then
+		if removeEffectMarker then
+			createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = nil
+		end
+	else
+		if createdVanityEntity.StatusContainer then
+			for _, statusName in pairs(createdVanityEntity.StatusContainer.Statuses) do
+				if statusName:find("ARMORY") then
+					Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, statusName)
+				end
+			end
+		end
 		createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = nil
 	end
 end
