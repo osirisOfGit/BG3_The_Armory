@@ -321,8 +321,8 @@ function PresetManager:buildSection(presetId, vanityContainer, presetCollection,
 	for guid, preset in TableUtils:OrderedPairs(presetCollection, function(key)
 		return presetCollection[key].Name
 	end) do
-		-- Only user presets can be backed up
-		if not externalOwner then
+		-- Only user presets owned by the Host of the save can be backed up
+		if not externalOwner and Ext.ClientNet.IsHost() then
 			local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
 			local syncButton = Styler:ImageButton(parentSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
 

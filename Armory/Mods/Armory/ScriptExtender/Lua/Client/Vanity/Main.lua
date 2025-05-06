@@ -203,7 +203,7 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 					end
 				end
 
-				if (not PresetProxy.presets[Vanity.ActivePresetId] or type(PresetProxy.presets[Vanity.ActivePresetId]) == "function")
+				if Ext.ClientNet.IsHost() and (not PresetProxy.presets[Vanity.ActivePresetId] or type(PresetProxy.presets[Vanity.ActivePresetId]) == "function")
 					and VanityBackupManager:IsPresetInBackup(Vanity.ActivePresetId)
 				then
 					Logger:BasicDebug("Active preset not found in the config, but is in backup - launching restore prompt")
