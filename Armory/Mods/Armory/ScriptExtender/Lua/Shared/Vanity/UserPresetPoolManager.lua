@@ -94,7 +94,7 @@ if Ext.IsServer() then
 					end
 				end
 
-				Logger:BasicTrace("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
+				Logger:BasicDebug("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
 				Channels.UpdateUserVanityPool:SendToClient(presetTable, user)
 			else
 				for user in pairs(UserPresetPoolManager.PresetPool) do
@@ -104,7 +104,7 @@ if Ext.IsServer() then
 							presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
 						end
 					end
-					Logger:BasicTrace("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
+					Logger:BasicDebug("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
 					Channels.UpdateUserVanityPool:SendToClient(presetPool, user)
 				end
 			end

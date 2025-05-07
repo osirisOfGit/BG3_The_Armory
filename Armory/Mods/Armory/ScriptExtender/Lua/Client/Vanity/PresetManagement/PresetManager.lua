@@ -151,6 +151,7 @@ function PresetManager:OpenManager()
 			userHeader.UserData = "keep"
 
 			otherUsersSection = selectionCell:AddGroup("Other_User_Presets")
+			otherUsersSection.Visible = false
 			local otherUsersHeader = otherUsersSection:AddSeparatorText(Translator:translate("Other User's Presets"))
 			otherUsersHeader:SetStyle("SeparatorTextAlign", 0.5)
 			otherUsersHeader.Font = "Large"
@@ -348,7 +349,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 		---@type ExtuiSelectable
 		local presetSelectable = parentSection:AddSelectable(preset.Name)
 		presetSelectable.UserData = "select"
-		presetSelectable.SameLine = not externalOwner
+		presetSelectable.SameLine = not externalOwner and Ext.ClientNet.IsHost()
 		presetSelectable.IDContext = guid
 
 		presetSelectable.OnClick = function()
