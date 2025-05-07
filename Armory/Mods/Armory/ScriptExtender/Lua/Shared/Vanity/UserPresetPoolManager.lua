@@ -97,15 +97,17 @@ if Ext.IsServer() then
 				Logger:BasicDebug("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
 				Channels.UpdateUserVanityPool:SendToClient(presetTable, user)
 			else
-				for user in pairs(UserPresetPoolManager.PresetPool) do
-					local presetPool = {}
-					for otherUser in pairs(UserPresetPoolManager.PresetPool) do
-						if otherUser ~= user then
-							presetPool[otherUser] = UserPresetPoolManager.PresetPool[otherUser]
+				for otherUser in pairs(UserPresetPoolManager.PresetPool) do
+					if otherUser ~= user then
+						local presetPool = {}
+						for otherOtherUser in pairs(UserPresetPoolManager.PresetPool) do
+							if otherUser ~= otherOtherUser then
+								presetPool[otherOtherUser] = UserPresetPoolManager.PresetPool[otherOtherUser]
+							end
 						end
+						Logger:BasicDebug("Firing UpdateUserVanityPool to %s", Osi.GetUserName(otherUser))
+						Channels.UpdateUserVanityPool:SendToClient(presetPool, otherUser)
 					end
-					Logger:BasicDebug("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
-					Channels.UpdateUserVanityPool:SendToClient(presetPool, user)
 				end
 			end
 		end

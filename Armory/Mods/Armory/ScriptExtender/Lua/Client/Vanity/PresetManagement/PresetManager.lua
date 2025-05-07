@@ -55,7 +55,7 @@ local function buildPresetForm(parent, forPresetId)
 		{
 			{
 				label = "Author",
-				defaultValue = preset and preset.Author or PresetManager.username,
+				defaultValue = preset and preset.Author or PresetManager.userName,
 				type = "Text",
 				errorMessageIfEmpty = "This is a required field",
 			},
@@ -323,7 +323,7 @@ function PresetManager:buildSection(presetId, vanityContainer, presetCollection,
 		return presetCollection[key].Name
 	end) do
 		preset.isExternalPreset = externalOwner ~= nil
-		
+
 		-- Only user presets owned by the Host of the save can be backed up
 		if not externalOwner and Ext.ClientNet.IsHost() then
 
@@ -663,7 +663,7 @@ end
 Channels.UpdateUserVanityPool:SetHandler(function(data, _)
 	if next(data) then
 		userPresetPool = data
-		if presetWindow and presetWindow.Open then
+		if presetWindow then
 			Helpers:KillChildren(otherUsersSection)
 			otherUsersSection.Visible = true
 			for user, vanity in pairs(data) do
