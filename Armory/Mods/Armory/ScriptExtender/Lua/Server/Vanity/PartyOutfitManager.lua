@@ -14,23 +14,31 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 
 PartyOutfitManager = {}
 
+local transmogTimer
 function PartyOutfitManager:ApplyTransmogsPerPreset()
-	for _, player in pairs(Osi.DB_Players:Get(nil)) do
-		player = player[1]
-		local activePreset = ServerPresetManager:GetCharacterPreset(player)
-
-		local activeOutfits
-		if activePreset then
-			activeOutfits = activePreset.Outfits
-		end
-
-		if activeOutfits and next(activeOutfits) then
-			PartyOutfitManager:FindAndApplyOutfit(player, activeOutfits)
-		else
-			Logger:BasicDebug("%s does not have an outfit, clearing their transmog", player)
-			Transmogger:ClearOutfit(player)
-		end
+	if transmogTimer then
+		Ext.Timer.Cancel(transmogTimer)
 	end
+	
+	transmogTimer = Ext.Timer.WaitFor(100, function()
+		for _, player in pairs(Osi.DB_Players:Get(nil)) do
+			player = player[1]
+			local activePreset = ServerPresetManager:GetCharacterPreset(player)
+
+			local activeOutfits
+			if activePreset then
+				activeOutfits = activePreset.Outfits
+			end
+
+			if activeOutfits and next(activeOutfits) then
+				PartyOutfitManager:FindAndApplyOutfit(player, activeOutfits)
+			else
+				Logger:BasicDebug("%s does not have an outfit, clearing their transmog", player)
+				Transmogger:ClearOutfit(player)
+			end
+		end
+		transmogTimer = nil
+	end)
 end
 
 ---@param player string
@@ -116,7 +124,6 @@ function PartyOutfitManager:FindAndApplyOutfit(player, activeOutfits)
 		Transmogger:ClearOutfit(player)
 	end
 end
-
 
 Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(character)
 	PartyOutfitManager:ApplyTransmogsPerPreset()
