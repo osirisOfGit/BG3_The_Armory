@@ -132,8 +132,6 @@ if Ext.IsServer() then
 		UserPresetPoolManager.PresetPool[user] = vanity
 
 		UserPresetPoolManager:hydrateClientsWithPools()
-
-		UserPresetPoolManager:sendOutVanities(user, true)
 	end)
 else
 	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)

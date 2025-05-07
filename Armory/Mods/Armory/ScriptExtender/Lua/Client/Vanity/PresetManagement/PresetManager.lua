@@ -322,8 +322,11 @@ function PresetManager:buildSection(presetId, vanityContainer, presetCollection,
 	for guid, preset in TableUtils:OrderedPairs(presetCollection, function(key)
 		return presetCollection[key].Name
 	end) do
+		preset.isExternalPreset = externalOwner ~= nil
+		
 		-- Only user presets owned by the Host of the save can be backed up
 		if not externalOwner and Ext.ClientNet.IsHost() then
+
 			local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
 			local syncButton = Styler:ImageButton(parentSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
 
@@ -342,8 +345,6 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 				VanityBackupManager:FlipPresetBackupRegistration(guid)
 				PresetManager:UpdatePresetView(guid)
 			end
-		else
-			preset.isExternalPreset = true
 		end
 
 		---@type ExtuiSelectable
