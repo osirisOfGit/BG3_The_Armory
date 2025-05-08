@@ -296,8 +296,6 @@ Translator:RegisterTranslation({
 
 	["Choose A Preset"] = "hd7c30d7bd7824ca8b05690ed24cbba2575e4",
 	["Active Preset:"] = "hfdd58b6fefd94e89babdb0cf39c26cb4fa6b",
-	["You are not the host - you can change your local presets, but activating your preset will not cause transmogs to occur - only the host can do that"] =
-	"hb1b115ff34254cb790ed71bdc1c0a48707b8",
 	["Armory: Validation of Active Vanity Preset [%s] failed!"] = "h0d3f6797e7ed4d7ca30b60dfd2fb205a07b6",
 	["Armory: Restore Backed Up Preset"] = "h1ce43e8d6ff945fa9e26629c56367aecg181",
 	["Preset '%s' was detected as the active preset for this save, but is not loaded in the config - however, a backup was found. Restore?"] =
