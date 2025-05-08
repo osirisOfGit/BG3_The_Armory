@@ -1,3 +1,11 @@
-Ext.RegisterNetListener(ModuleUUID .. "UserName", function(channel, payload, peerId)
-	Ext.Net.PostMessageToUser(peerId, ModuleUUID .. "UserName", Osi.GetUserName(PeerToUserID(peerId)))
+Channels.GetUserName:SetRequestHandler(function(data, user)
+	if data.user then
+		user = data.user
+	else
+		user = PeerToUserID(user)
+	end
+
+	return {
+		username = Osi.GetUserName(tonumber(user))
+	}
 end)

@@ -1,14 +1,6 @@
 Ext.Require("Shared/Configurations/VanityCharacterCriteria.lua")
 Ext.Require("Server/Vanity/OutfitMatcher.lua")
-
-Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
-	Server = true,
-	Client = true,
-	WriteableOnServer = true,
-	WriteableOnClient = true,
-	SyncToClient = true,
-	SyncToServer = true
-})
+Ext.Require("Server/Vanity/ServerPresetManager.lua")
 
 Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 	Server = true,
@@ -20,18 +12,38 @@ Ext.Vars.RegisterUserVariable("TheArmory_Vanity_ActiveOutfit", {
 	SyncOnWrite = true
 })
 
----@type VanityPreset
-ActiveVanityPreset = nil
+PartyOutfitManager = {}
 
-Ext.Events.SessionLoaded:Subscribe(function(e)
-	VanityModPresetManager:ImportPresetsFromMods()
+local transmogTimer
+function PartyOutfitManager:ApplyTransmogsPerPreset()
+	if transmogTimer then
+		Ext.Timer.Cancel(transmogTimer)
+	end
+	
+	transmogTimer = Ext.Timer.WaitFor(100, function()
+		for _, player in pairs(Osi.DB_Players:Get(nil)) do
+			player = player[1]
+			local activePreset = ServerPresetManager:GetCharacterPreset(player)
 
-	ActiveVanityPreset = PresetProxy.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset]
-end)
+			local activeOutfits
+			if activePreset then
+				activeOutfits = activePreset.Outfits
+			end
+
+			if activeOutfits and next(activeOutfits) then
+				PartyOutfitManager:FindAndApplyOutfit(player, activeOutfits)
+			else
+				Logger:BasicDebug("%s does not have an outfit, clearing their transmog", player)
+				Transmogger:ClearOutfit(player)
+			end
+		end
+		transmogTimer = nil
+	end)
+end
 
 ---@param player string
 ---@param activeOutfits {[VanityCriteriaCompositeKey] : VanityOutfit}
-local function FindAndApplyOutfit(player, activeOutfits)
+function PartyOutfitManager:FindAndApplyOutfit(player, activeOutfits)
 	local startTime = Ext.Utils.MonotonicTime()
 
 	---@type {[VanityCharacterCriteriaType] : string}
@@ -113,48 +125,8 @@ local function FindAndApplyOutfit(player, activeOutfits)
 	end
 end
 
-local function ApplyTransmogsPerPreset()
-	local activePresetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-
-	local activeOutfits
-	if activePresetId and PresetProxy.presets[activePresetId] then
-		ActiveVanityPreset = PresetProxy.presets[activePresetId]
-
-		Logger:BasicInfo("Preset '%s' by '%s' (version %s) is now active", ActiveVanityPreset.Name, ActiveVanityPreset.Author, ActiveVanityPreset.Version)
-		activeOutfits = ActiveVanityPreset.Outfits
-	else
-		ActiveVanityPreset = nil
-	end
-
-	for _, player in pairs(Osi.DB_Players:Get(nil)) do
-		if activeOutfits and next(activeOutfits) then
-			FindAndApplyOutfit(player[1], activeOutfits)
-		else
-			Transmogger:ClearOutfit(player[1])
-		end
-	end
-end
-
-Ext.RegisterNetListener(ModuleUUID .. "_PresetUpdated", function(channel, payload, user)
-	local presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-	if presetId then
-		-- Force the proxy to update the preset on next access
-		PresetProxy.presets[presetId] = nil
-	end
-
-	ApplyTransmogsPerPreset()
-end)
-
-Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
-	Transmogger.saveLoadLock = true
-	ApplyTransmogsPerPreset()
-	Transmogger.saveLoadLock = false
-end)
-
 Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(character)
-	if ActiveVanityPreset and next(ActiveVanityPreset.Outfits) then
-		FindAndApplyOutfit(character, ActiveVanityPreset.Outfits)
-	end
+	PartyOutfitManager:ApplyTransmogsPerPreset()
 end)
 
 --#region Camp Outfit Autoswapper

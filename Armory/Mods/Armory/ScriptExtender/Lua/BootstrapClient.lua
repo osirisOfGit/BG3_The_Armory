@@ -8,7 +8,9 @@ Ext.Events.StatsLoaded:Subscribe(function()
 	Logger:ClearLogFile()
 end)
 
-Ext.Require("Shared/Vanity/PresetProxy.lua")
+Ext.Require("Shared/Channels.lua")
+Ext.Require("Shared/Vanity/UserPresetPoolManager.lua")
+Ext.Require("Client/Vanity/PresetProxy.lua")
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
 
 ConfigurationStructure:InitializeConfig()

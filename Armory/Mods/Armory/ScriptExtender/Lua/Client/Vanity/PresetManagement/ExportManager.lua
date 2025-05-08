@@ -5,9 +5,12 @@ VanityExportManager.ExportFilename = "Armory_Vanity_Mod_Presets.json"
 ---@param presetIds Guid[]
 ---@param existingExport Vanity?
 ---@param newIds boolean?
----@return Vanity
+---@return Vanity?
 function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
-	local realConfig = ConfigurationStructure:GetRealConfigCopy()
+	if not next(presetIds) then
+		return nil
+	end
+
 
 	---@type Vanity
 	local export = existingExport or {
@@ -16,41 +19,47 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 		miscNameCache = {}
 	}
 
+	local realConfig = ConfigurationStructure:GetRealConfigCopy().vanity
+
 	for _, presetId in pairs(presetIds) do
-		local preset = realConfig.vanity.presets[presetId]
+		local vanity = ConfigurationStructure.config.vanity.presets[presetId] and realConfig or PresetProxy
 
-		for criteraKey, outfit in pairs(preset.Outfits) do
-			local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
-			for _, resourceId in pairs(criteriaTable) do
-				if realConfig.vanity.miscNameCache[resourceId] then
-					export.miscNameCache[resourceId] = realConfig.vanity.miscNameCache[resourceId]
-				end
-			end
+		local preset = vanity.presets[presetId]
 
-			for _, outfitSlot in pairs(outfit) do
-				if outfitSlot.equipment and outfitSlot.equipment.effects then
-					for _, effect in pairs(outfitSlot.equipment.effects) do
-						export.effects[effect] = TableUtils:DeeplyCopyTable(realConfig.vanity.effects[effect])
+		if preset then
+			for criteraKey, outfit in pairs(preset.Outfits) do
+				local criteriaTable = ParseCriteriaCompositeKey(criteraKey)
+				for _, resourceId in pairs(criteriaTable) do
+					if vanity.miscNameCache[resourceId] then
+						export.miscNameCache[resourceId] = vanity.miscNameCache[resourceId]
 					end
 				end
 
-				if outfitSlot.weaponTypes then
-					for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
-						if weaponSlot.equipment and weaponSlot.equipment.effects then
-							for _, effect in pairs(weaponSlot.equipment.effects) do
-								export.effects[effect] = TableUtils:DeeplyCopyTable(realConfig.vanity.effects[effect])
+				for _, outfitSlot in pairs(outfit) do
+					if outfitSlot.equipment and outfitSlot.equipment.effects then
+						for _, effect in pairs(outfitSlot.equipment.effects) do
+							export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
+						end
+					end
+
+					if outfitSlot.weaponTypes then
+						for _, weaponSlot in pairs(outfitSlot.weaponTypes) do
+							if weaponSlot.equipment and weaponSlot.equipment.effects then
+								for _, effect in pairs(weaponSlot.equipment.effects) do
+									export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
+								end
 							end
 						end
 					end
 				end
 			end
-		end
 
-		if newIds then
-			presetId = FormBuilder:generateGUID()
-		end
+			if newIds then
+				presetId = FormBuilder:generateGUID()
+			end
 
-		export.presets[presetId] = preset
+			export.presets[presetId] = preset
+		end
 	end
 
 	return export
@@ -193,7 +202,8 @@ function VanityExportManager:BuildImportManagerWindow()
 	local refreshButton = importWindow:AddButton(Translator:translate("Refresh"))
 
 	local errorText = importWindow:AddText(string.format(
-		Translator:translate("Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"),
+		Translator:translate(
+			"Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"),
 		self.ExportFilename))
 
 	errorText.Visible = false
@@ -221,7 +231,8 @@ function VanityExportManager:BuildImportManagerWindow()
 			errorText.Visible = false
 
 			for presetId, preset in pairs(exportedPresets.presets) do
-				local checkbox = presetGroup:AddCheckbox(string.format("%s v%s (%s)", preset.Name, preset.Version, preset.NSFW and Translator:translate("NSFW") or Translator:translate("SFW")))
+				local checkbox = presetGroup:AddCheckbox(string.format("%s v%s (%s)", preset.Name, preset.Version,
+					preset.NSFW and Translator:translate("NSFW") or Translator:translate("SFW")))
 				checkbox.Checked = true
 				checkbox.UserData = presetId
 			end
@@ -243,7 +254,7 @@ function VanityExportManager:BuildImportManagerWindow()
 		if #presetsToImport > 0 then
 			VanityExportManager:ImportPreset(presetsToImport, exportedPresets)
 			successText.Visible = true
-			VanityPresetManager:UpdatePresetView()
+			PresetManager:UpdatePresetView()
 		end
 	end
 end
@@ -261,7 +272,8 @@ When exporting presets, an existing file will be completely overwritten with the
 	["File failed to save - check logs"] = "h7b62ce80af614dd997bb7655c0fee8f66016",
 	["Import Presets"] = "h7cea480a601c448882c6724413a67d36g1d6",
 	["Refresh"] = "hfe36d27abca34ce3be19669466742f648662",
-	["Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"] = "h2220039b944a417db15fe7c6d52a3c112c47",
+	["Could not find or load %s - ensure it's present in %%localappdata%%\\Larian Studios\\Baldur's Gate 3\\Script Extender\\Armory\\ and not malformed! Check logs for more details"] =
+	"h2220039b944a417db15fe7c6d52a3c112c47",
 	["Preset(s) successfully imported!"] = "he5f85c5b317b48f28d5744da796c66245a20",
 	["Import Selected Presets"] = "he795e262f136407c9b3c216e910d4d6fd495",
 	["NSFW"] = "h6ed4ff24fd8647b1a7ef56df74b19c5de707",

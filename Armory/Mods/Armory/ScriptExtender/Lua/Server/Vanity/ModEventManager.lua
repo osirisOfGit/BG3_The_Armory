@@ -11,12 +11,12 @@ ModEventsManager = {}
 ---@param payload TransmogCompleteEvent
 function ModEventsManager:TransmogCompleted(payload)
 	Ext.ModEvents['Armory']["TransmogCompleted"]:Throw(payload)
-	Logger:BasicDebug("Fired TransmogCompleted event with %s", Ext.Json.Stringify(payload))
+	Logger:BasicTrace("Fired TransmogCompleted event with %s", Ext.Json.Stringify(payload))
 end
 
 
 ---@param payload TransmogCompleteEvent
 function ModEventsManager:TransmogRemoved(payload)
 	Ext.ModEvents['Armory']["TransmogRemoved"]:Throw(payload)
-	Logger:BasicDebug("Fired TransmogRemoved event with %s", Ext.Json.Stringify(payload))
+	Logger:BasicTrace("Fired TransmogRemoved event with %s", Ext.Json.Stringify(payload))
 end

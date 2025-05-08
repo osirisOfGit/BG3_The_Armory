@@ -103,6 +103,16 @@ function VanityBackupManager:BackupPresets(presetIds)
 	Logger:BasicInfo("Selected presets backed up successfully")
 end
 
+---@param presetId Guid
+---@return Vanity?
+function VanityBackupManager:GetPresetFromBackup(presetId)
+	cachedBackup = cachedBackup or Ext.Vars.GetModVariables(ModuleUUID).SavedPresets
+
+	if cachedBackup and cachedBackup.presets[presetId] then
+		return TableUtils:DeeplyCopyTable(cachedBackup)
+	end
+end
+
 ---@param presetId Guid?
 ---@param presetBackup Vanity?
 function VanityBackupManager:RestorePresetBackup(presetId, presetBackup)

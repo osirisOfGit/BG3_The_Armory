@@ -59,9 +59,7 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 			if slotButton.UserData then
 				self.Popup:AddSelectable(Translator:translate("Clear")).OnActivate = function()
 					outfitSlot[buttonType].delete = true
-					if not outfitSlot() then
-						outfitSlot.delete = true
-					end
+					Helpers:ClearEmptyTablesInProxyTree(outfitSlot)
 
 					onCloseFunc()
 				end

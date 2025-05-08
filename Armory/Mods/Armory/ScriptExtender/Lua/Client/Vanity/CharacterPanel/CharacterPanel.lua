@@ -120,7 +120,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 		return
 	end
 
-	if preset.isModPreset then
+	if preset.isExternalPreset then
 		local txt = panelGroup:AddText(
 			Translator:translate(
 				"Viewing a mod-provided preset, which can't be edited - if you wish to make changes, copy this preset to your local config via the Preset Manager first"))
@@ -229,7 +229,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 
 						Helpers:BuildTooltip(imageButton:Tooltip(), itemTemplate.DisplayName:Get(), Ext.Stats.Get(itemTemplate.Stats))
 					else
-						if not self.activePreset.isModPreset then
+						if not self.activePreset.isExternalPreset then
 							outfitSlotEntry.equipment.guid = nil
 							if outfitSlotEntry.equipment.modDependency then
 								outfitSlotEntry.equipment.modDependency.delete = true
@@ -249,7 +249,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			imageButton.Image.Size = { 60, 60 }
 			imageButton.PositionOffset = { (not verticalSlots and i % 2 == 0) and 100 or 0, 0 }
 
-			if not self.activePreset.isModPreset then
+			if not self.activePreset.isExternalPreset then
 				SlotContextMenu:buildMenuForSlot(itemSlot,
 					weaponType,
 					outfitSlotEntry,
@@ -291,7 +291,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 					dyeButton.UserData = dyeTemplate
 					Helpers:BuildTooltip(dyeButton:Tooltip(), dyeTemplate.DisplayName:Get(), Ext.Stats.Get(dyeTemplate.Stats))
 				else
-					if not self.activePreset.isModPreset then
+					if not self.activePreset.isExternalPreset then
 						outfitSlotEntry.dye.delete = true
 					end
 					dyeButton = supplementaryGroup:AddImageButton(itemSlot .. " Dye", "Item_LOOT_Dye_Remover", { 32, 32 })
@@ -302,7 +302,7 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 
 			dyeButton.IDContext = itemSlotOrWeaponTypeEntry[1] .. " Dye"
 
-			if not self.activePreset.isModPreset then
+			if not self.activePreset.isExternalPreset then
 				SlotContextMenu:buildMenuForSlot(itemSlot,
 					weaponType,
 					outfitSlotEntry,
