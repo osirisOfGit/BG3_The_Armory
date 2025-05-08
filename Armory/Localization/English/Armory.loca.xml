@@ -252,6 +252,7 @@ For Strong types, Human Strongs and Orcs will generally work</content>
     <content contentuid="h7bb0a4f461a54390804603cc81c72341633b" version="1">Import</content>
     <content contentuid="h9f20917d682d419cb126147a04f7cac54057" version="1">Your Presets</content>
     <content contentuid="ha36a9cae681941d897becb20f0deb5873c5d" version="1">Mod Presets</content>
+    <content contentuid="h7b69751666eb450598eceda1786653afecfc" version="1">Other User's Presets</content>
     <content contentuid="hec26e6f59bdb43eb85700c98e7a19143c347" version="1">Preset Information</content>
     <content contentuid="hdf32fd262354456c9c1aec067af5220637bg" version="1">Dependencies</content>
     <content contentuid="hcc2a773852c04c058bbb400119a6d59b89d7" version="1">Unknown - Mod Not Loaded</content>
@@ -391,5 +392,4 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="he67556c5cd334e3b95059f53d78a0ecacb3b" version="1">Splint</content>
     <content contentuid="he25527b08ccf4a7e9593c12ef25515185eea" version="1">Plate</content>
     <!-- END Armor Type Enum -->
-    <content contentuid="h7b69751666eb450598eceda1786653afecfc" version="1">Other User's Presets</content>
 </contentList>
