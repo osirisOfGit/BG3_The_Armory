@@ -17,6 +17,10 @@ ServerPresetManager.ActiveVanityPresets = {}
 local function initialize()
 	VanityModPresetManager:ImportPresetsFromMods()
 
+	if not Ext.Vars.GetModVariables(ModuleUUID).ActivePreset then
+		Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = {}
+	end
+
 	local activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
 	if type(activePreset) == "string" then
 		local hostId = Osi.GetReservedUserID(Osi.GetHostCharacter())
