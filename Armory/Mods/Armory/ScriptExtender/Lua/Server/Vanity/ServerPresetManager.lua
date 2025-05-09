@@ -4,7 +4,7 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
 	WriteableOnServer = true,
 	WriteableOnClient = true,
 	SyncToClient = true,
-	SyncToServer = true
+	SyncToServer = true,
 })
 
 ServerPresetManager = {}
@@ -14,18 +14,13 @@ ServerPresetManager = {}
 ---@type {[string]: Vanity}
 ServerPresetManager.ActiveVanityPresets = {}
 
+local activePresets
 local function initialize()
-	VanityModPresetManager:ImportPresetsFromMods()
+	activePresets = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset or {}
 
-	if not Ext.Vars.GetModVariables(ModuleUUID).ActivePreset then
-		Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = {}
-	end
-
-	local activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
-	if type(activePreset) == "string" then
+	if type(activePresets) == "string" then
 		local hostId = Osi.GetReservedUserID(Osi.GetHostCharacter())
-		Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = { [Osi.GetUserProfileID(hostId)] = activePreset }
-		activePreset = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset
+		activePresets = { [Osi.GetUserProfileID(hostId)] = activePresets }
 	end
 
 	local loadingLock = {}
@@ -33,8 +28,9 @@ local function initialize()
 	for _, player in pairs(Osi.DB_Players:Get(nil)) do
 		local userId = Osi.GetReservedUserID(player[1])
 		if userId and not loadingLock[userId] then
-			local userPreset = activePreset[Osi.GetUserProfileID(userId)]
+			local userPreset = activePresets[Osi.GetUserProfileID(userId)]
 			if userPreset then
+				Logger:BasicDebug("Retrieving preset %s for user %s", userPreset, Osi.GetUserName(userId))
 				loadingLock[userId] = true
 				Channels.GetActiveUserPreset:RequestToClient({
 						presetId = userPreset
@@ -54,6 +50,9 @@ local function initialize()
 				initiateTransmog()
 			end)
 		else
+			Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = activePresets
+
+			Logger:BasicDebug("Initialization completed - applying transmogs")
 			Transmogger.saveLoadLock = true
 			PartyOutfitManager:ApplyTransmogsPerPreset()
 			Transmogger.saveLoadLock = false
@@ -64,7 +63,7 @@ local function initialize()
 end
 
 ---@param character string
----@return VanityPreset?
+---@return VanityPreset?, string UserId
 function ServerPresetManager:GetCharacterPreset(character)
 	local charUserId = Osi.GetReservedUserID(character)
 
@@ -73,7 +72,7 @@ function ServerPresetManager:GetCharacterPreset(character)
 	---@type Vanity?
 	local vanity = self.ActiveVanityPresets[charUserId]
 
-	return vanity and vanity.presets[Ext.Vars.GetModVariables(ModuleUUID).ActivePreset[Osi.GetUserProfileID(charUserId)]]
+	return (vanity and vanity.presets[activePresets[Osi.GetUserProfileID(charUserId)]]), charUserId
 end
 
 Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
@@ -86,44 +85,52 @@ end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
 	return {
-		presetId = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset[Osi.GetUserProfileID(PeerToUserID(user))]
+		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
 	}
 end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
-	user = PeerToUserID(user)
+	if activePresets then
+		user = PeerToUserID(user)
 
-	local activePresets = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset or {}
-	activePresets[Osi.GetUserProfileID(user)] = data.presetId
-	Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = activePresets
+		activePresets[Osi.GetUserProfileID(user)] = data.presetId
+		Ext.Vars.GetModVariables(ModuleUUID).ActivePreset = activePresets
 
-	ServerPresetManager.ActiveVanityPresets[user] = data.vanityPreset
+		ServerPresetManager.ActiveVanityPresets[user] = data.vanityPreset
 
-	if data.vanityPreset then
-		Logger:BasicInfo("User %s updated preset %s", Osi.GetUserName(user), data.vanityPreset.presets[data.presetId].Name)
-	else
-		Logger:BasicInfo("User %s deactivated preset", Osi.GetUserName(user))
-	end
+		if data.vanityPreset then
+			Logger:BasicInfo("User %s updated preset %s", Osi.GetUserName(user), data.vanityPreset.presets[data.presetId].Name)
+		else
+			Logger:BasicInfo("User %s deactivated preset", Osi.GetUserName(user))
+		end
 
-	PartyOutfitManager:ApplyTransmogsPerPreset()
+		PartyOutfitManager:ApplyTransmogsPerPreset(user)
 
-	for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
-		if vanity.presets[data.presetId] and otherUser == user then
-			UserPresetPoolManager:GetVanitiesFromUsers(user)
-			break
+		for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
+			if vanity.presets[data.presetId] and otherUser == user then
+				UserPresetPoolManager:GetVanitiesFromUsers(user)
+				break
+			end
 		end
 	end
 end)
 
 Ext.Osiris.RegisterListener("CharacterReservedUserIDChanged", 3, "after", function(character, oldUserID, newUserID)
-	PartyOutfitManager:ApplyTransmogsPerPreset()
+	if activePresets then
+		Logger:BasicDebug("UserID changed for character %s from %s to %s", character, oldUserID, newUserID)
+		PartyOutfitManager:ApplyTransmogsPerPreset(newUserID)
+	end
 end)
 
 Ext.Osiris.RegisterListener("UserConnected", 3, "after", function(userID, userName, userProfileID)
+	Logger:BasicDebug("User %s connected with profile ID %s", userName, userProfileID)
 	initialize()
 end)
 
 Ext.Osiris.RegisterListener("UserDisconnected", 3, "after", function(userID, userName, userProfileID)
-	ServerPresetManager.ActiveVanityPresets[userID] = nil
-	PartyOutfitManager:ApplyTransmogsPerPreset()
+	if activePresets then
+		Logger:BasicDebug("User %s disconnected with profile ID %s", userName, userProfileID)
+		ServerPresetManager.ActiveVanityPresets[userID] = nil
+		PartyOutfitManager:ApplyTransmogsPerPreset()
+	end
 end)

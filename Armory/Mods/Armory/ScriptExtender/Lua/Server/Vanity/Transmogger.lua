@@ -608,7 +608,7 @@ Ext.Events.SessionLoaded:Subscribe(function(e)
 			end
 		end
 	end
-end)
+end, {Once = true})
 
 function Transmogger:ClearOutfit(character)
 	---@type EntityHandle

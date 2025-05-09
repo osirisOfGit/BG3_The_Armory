@@ -149,17 +149,3 @@ function ConfigurationStructure:InitializeConfig()
 	initialized = true
 	Logger:BasicDebug("Successfully loaded the config!")
 end
-
-function ConfigurationStructure:UpdateConfigForServer()
-	return ConfigurationStructure:GetRealConfigCopy()
-end
-
-if Ext.IsClient() then
-	Ext.Events.SessionLoaded:Subscribe(function()
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_UpdateConfiguration", "")
-	end)
-end
-
-Ext.RegisterNetListener(ModuleUUID .. "_UpdateConfiguration", function(channel, payload, user)
-	ConfigurationStructure:InitializeConfig()
-end)
