@@ -19,3 +19,12 @@ Ext.Require("Client/Vanity/PresetProxy.lua")
 Ext.Require("Client/RandomHelpers.lua")
 Ext.Require("Client/Styler.lua")
 Ext.Require("Client/Vanity/Main.lua")
+
+Ext.Vars.RegisterModVariable(ModuleUUID, "CharacterAssignedCache", {
+	Server = true,
+	Client = true,
+	WriteableOnServer = true,
+	WriteableOnClient = true,
+	SyncToClient = true,
+	SyncToServer = true,
+})

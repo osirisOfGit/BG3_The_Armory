@@ -23,8 +23,16 @@ function PartyOutfitManager:ApplyTransmogsPerPreset(userId)
 	end
 
 	transmogTimer = Ext.Timer.WaitFor(100, function()
-		for _, player in pairs(Osi.DB_Players:Get(nil)) do
-			player = player[1]
+		local dedup = {}
+		for _, player in TableUtils:CombinedPairs(Osi.DB_Players:Get(nil), Ext.Entity.GetAllEntitiesWithComponent("CampPresence")) do
+			player = type(player) == "table" and player[1] or player.Uuid.EntityUuid
+
+			if dedup[player] then
+				goto continue
+			else
+				dedup[player] = true
+			end
+
 			local activePreset, charOwner = ServerPresetManager:GetCharacterPreset(player)
 
 			if (not userId or charOwner == userId) and charOwner then
@@ -40,6 +48,7 @@ function PartyOutfitManager:ApplyTransmogsPerPreset(userId)
 					Transmogger:ClearOutfit(player)
 				end
 			end
+			::continue::
 		end
 		transmogTimer = nil
 	end)

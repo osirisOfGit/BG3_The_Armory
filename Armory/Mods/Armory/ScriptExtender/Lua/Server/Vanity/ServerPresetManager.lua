@@ -7,6 +7,15 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "ActivePreset", {
 	SyncToServer = true,
 })
 
+Ext.Vars.RegisterModVariable(ModuleUUID, "CharacterAssignedCache", {
+	Server = true,
+	Client = true,
+	WriteableOnServer = true,
+	WriteableOnClient = true,
+	SyncToClient = true,
+	SyncToServer = true,
+})
+
 ServerPresetManager = {}
 
 ---@alias UserID string
@@ -17,7 +26,6 @@ ServerPresetManager.ActiveVanityPresets = {}
 local activePresets
 local function initialize()
 	activePresets = Ext.Vars.GetModVariables(ModuleUUID).ActivePreset or {}
-
 	if type(activePresets) == "string" then
 		local hostId = Osi.GetReservedUserID(Osi.GetHostCharacter())
 		activePresets = { [Osi.GetUserProfileID(hostId)] = activePresets }
@@ -65,12 +73,33 @@ end
 ---@param character string
 ---@return VanityPreset?, string UserId
 function ServerPresetManager:GetCharacterPreset(character)
+	local charAssignedCache = Ext.Vars.GetModVariables(ModuleUUID).CharacterAssignedCache or {}
+
 	local charUserId = Osi.GetReservedUserID(character)
 
-	Logger:BasicDebug("%s is assigned to user %s", character, Osi.GetUserName(charUserId))
+	charUserId = tonumber(charUserId) > 0 and charUserId or nil
 
 	---@type Vanity?
 	local vanity = self.ActiveVanityPresets[charUserId]
+
+	if not charUserId then
+		if charAssignedCache[character] then
+			if not self.ActiveVanityPresets[charAssignedCache[character]] then
+				charAssignedCache[character] = Osi.GetReservedUserID(Osi.GetHostCharacter())
+			end
+		else
+			charAssignedCache[character] = Osi.GetReservedUserID(Osi.GetHostCharacter())
+		end
+
+		vanity = self.ActiveVanityPresets[charAssignedCache[character]]
+		charUserId = charAssignedCache[character]
+	else
+		charAssignedCache[character] = charUserId
+	end
+
+	Ext.Vars.GetModVariables(ModuleUUID).CharacterAssignedCache = charAssignedCache
+
+	Logger:BasicDebug("%s is assigned to user %s", character, Osi.GetUserName(charUserId))
 
 	return (vanity and vanity.presets[activePresets[Osi.GetUserProfileID(charUserId)]]), charUserId
 end
