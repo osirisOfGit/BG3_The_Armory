@@ -112,12 +112,15 @@ Transmogger.saveLoadLock = false
 
 ---@param character EntityHandle
 function Transmogger:MogCharacter(character)
-	local characterPreset = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
+	local characterPreset, charUserId = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
+
 	if not characterPreset then
 		Logger:BasicDebug("%s does not have an outfit, clearing their transmog", (character.DisplayName and character.DisplayName.Name:Get()) or character.Uuid.EntityUuid)
 		Transmogger:ClearOutfit(character.Uuid.EntityUuid)
 		return
 	end
+
+	local vanity = ServerPresetManager.ActiveVanityPresets[charUserId]
 
 	-- characters that are wildshaped in a save when it's loaded will not start with their equipment, it gets added back by the game,
 	-- but Vanity triggers before that happens, giving the player default items and blocking the requipment of the original ones
@@ -177,7 +180,7 @@ function Transmogger:MogCharacter(character)
 		end
 
 		if not equippedItem then
-			if self.defaultPieces[actualSlot] and ConfigurationStructure.config.vanity.settings.general.fillEmptySlots then
+			if self.defaultPieces[actualSlot] and (vanity.settings and vanity.settings.general.fillEmptySlots) then
 				equippedItem = Osi.CreateAt(self.defaultPieces[actualSlot], 0, 0, 0, 0, 0, "")
 			else
 				goto continue
@@ -325,7 +328,6 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 
 					for _, subComponentToCopy in pairs(componentToCopy) do
 						Logger:BasicTrace("Cloning component %s under %s", subComponentToCopy, key)
-						componentBeingCopied = equippedItemEntity[key][subComponentToCopy]
 						if type(equippedItemEntity[key][subComponentToCopy]) == "string" then
 							createdVanityEntity[key][subComponentToCopy] = equippedItemEntity[key][subComponentToCopy]
 						else
@@ -374,7 +376,7 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 		end
 
 		createdVanityEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
-		if outfitSlot then
+		if actualSlot then
 			createdVanityEntity.Vars.TheArmory_Vanity_Item_ReplicationComponents = varComponentsToReplicateOnRefresh
 		else
 			createdVanityEntity.Vars.TheArmory_Vanity_PreviewItem = character.Uuid.EntityUuid
@@ -389,8 +391,8 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 				end)
 			else
 				Osi.Equip(character.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid, 1, 0, 1)
-				if outfitSlot and actualSlot then
-					self:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEntity, character)
+				if actualSlot then
+					self:ApplyEffectStatus(outfitSlot[actualSlot], actualSlot, createdVanityEntity, character)
 				end
 
 				Logger:BasicTrace("========== FINISHED MOG FOR %s to %s in %dms ==========", equippedItemEntity.Uuid.EntityUuid, createdVanityEntity.Uuid.EntityUuid,

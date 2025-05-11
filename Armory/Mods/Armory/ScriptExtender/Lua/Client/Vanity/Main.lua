@@ -91,9 +91,7 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		placeholderItemSetting.OnClick = function()
 			generalSettings.fillEmptySlots = placeholderItemSetting.Selected
 
-			if generalSettings.fillEmptySlots then
-				Vanity:UpdatePresetOnServer()
-			end
+			Vanity:UpdatePresetOnServer()
 		end
 		--#endregion
 
@@ -140,10 +138,16 @@ function Vanity:UpdatePresetOnServer()
 	updatePresetOnServerTimer = Ext.Timer.WaitFor(350, function()
 		updatePresetOnServerTimer = nil
 
+		local vanityPreset = VanityExportManager:ExportPresets({ self.ActivePresetId })
+		vanityPreset.settings = {
+			general = {
+				fillEmptySlots = ConfigurationStructure.config.vanity.settings.general.fillEmptySlots
+			}
+		}
 		Channels.UpdateUserPreset:SendToServer({
 			presetId = self.ActivePresetId,
 			---@diagnostic disable-next-line: missing-fields
-			vanityPreset = VanityExportManager:ExportPresets({ self.ActivePresetId })
+			vanityPreset = vanityPreset,
 		})
 
 		VanityBackupManager:BackupPresets({ self.ActivePresetId })

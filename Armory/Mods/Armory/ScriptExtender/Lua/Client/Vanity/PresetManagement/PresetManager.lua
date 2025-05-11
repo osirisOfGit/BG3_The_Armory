@@ -326,7 +326,6 @@ function PresetManager:buildSection(presetId, vanityContainer, presetCollection,
 
 		-- Only user presets owned by the Host of the save can be backed up
 		if not externalOwner and Ext.ClientNet.IsHost() then
-
 			local isPresetInBackup = VanityBackupManager:IsPresetInBackup(guid)
 			local syncButton = Styler:ImageButton(parentSection:AddImageButton("Synced" .. guid, isPresetInBackup and "ico_cloud" or "ico_cancel_h", { 26, 26 }))
 
@@ -690,7 +689,16 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
-	return VanityExportManager:ExportPresets({ data.presetId })
+	local vanityPreset = VanityExportManager:ExportPresets({ data.presetId })
+	if vanityPreset then
+		vanityPreset.settings = {
+			general = {
+				fillEmptySlots = ConfigurationStructure.config.vanity.settings.general.fillEmptySlots
+			}
+		}
+	end
+	
+	return vanityPreset
 end)
 
 Translator:RegisterTranslation({
