@@ -25,7 +25,7 @@ function PartyOutfitManager:ApplyTransmogsPerPreset(userId)
 	transmogTimer = Ext.Timer.WaitFor(100, function()
 		local dedup = {}
 		for _, player in TableUtils:CombinedPairs(Osi.DB_Players:Get(nil), Ext.Entity.GetAllEntitiesWithComponent("CampPresence")) do
-			player = type(player) == "table" and player[1] or player.Uuid.EntityUuid
+			player = type(player) == "table" and player[1]:sub(-36) or player.Uuid.EntityUuid
 
 			if dedup[player] then
 				goto continue
