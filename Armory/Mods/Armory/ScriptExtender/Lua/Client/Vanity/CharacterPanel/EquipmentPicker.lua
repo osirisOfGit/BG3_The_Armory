@@ -499,23 +499,38 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 end
 
 local nextPreview
-function EquipmentPicker:executePreview(itemTemplateId)
-	if not nextPreview then
-		Channels.StartItemPreview:RequestToServer({
-			templateId = itemTemplateId,
-			dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
-			slot = self.slot
-		}, function(_)
-			if nextPreview then
-				Channels.EndItemPreview:RequestToServer({
-						templateId = itemTemplateId
-					},
-					function(_)
+local lock
+function EquipmentPicker:executePreview(itemTemplateId, ignoreLock)
+	if not lock or ignoreLock then
+		lock = true
+		Channels.EndItemPreview:RequestToServer({}, function(data)
+			Ext.Timer.WaitFor(300, function()
+				if next(data) then
+					if not nextPreview then
+						self:executePreview(itemTemplateId, true)
+					else
 						local preview = nextPreview
 						nextPreview = nil
-						self:executePreview(preview)
+						self:executePreview(preview, true)
+					end
+				elseif itemTemplateId then
+					Channels.StartItemPreview:RequestToServer({
+						templateId = itemTemplateId,
+						dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
+						slot = self.slot
+					}, function(response)
+						if nextPreview then
+							local preview = nextPreview
+							nextPreview = nil
+							self:executePreview(preview, true)
+						else
+							lock = nil
+						end
 					end)
-			end
+				else
+					lock = nil
+				end
+			end)
 		end)
 	else
 		nextPreview = itemTemplateId
@@ -635,15 +650,16 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 
 	icon.OnHoverLeave = function()
 		nextPreview = nil
-		Channels.EndItemPreview:SendToServer({})
+		self:executePreview()
 	end
 
 	icon.OnClick = function()
 		self.window.Open = false
 		nextPreview = nil
-
+		lock = nil
+		
 		-- Covers scenario where user hovers over one item, then super quickly moves to another and instantly clicks on it
-		Ext.Timer.WaitFor(150, function()
+		Ext.Timer.WaitFor(300, function()
 			Channels.EndItemPreview:SendToServer({})
 			self.onSelectFunc(itemTemplate)
 		end)
