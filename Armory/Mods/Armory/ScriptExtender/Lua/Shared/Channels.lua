@@ -31,3 +31,6 @@ Channels = {}
 Channels.GetActiveUserPreset = Ext.Net.CreateChannel(ModuleUUID, "GetActiveUserPreset")
 Channels.GetUserName = Ext.Net.CreateChannel(ModuleUUID, "GetUserName")
 Channels.UpdateUserPreset = Ext.Net.CreateChannel(ModuleUUID, "UpdateUserPreset")
+
+Channels.StartItemPreview = Ext.Net.CreateChannel(ModuleUUID, "StartItemPreview")
+Channels.EndItemPreview = Ext.Net.CreateChannel(ModuleUUID, "EndItemPreview")

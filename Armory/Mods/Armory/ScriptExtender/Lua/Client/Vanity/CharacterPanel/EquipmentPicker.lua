@@ -498,6 +498,30 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	end
 end
 
+local nextPreview
+function EquipmentPicker:executePreview(itemTemplateId)
+	if not nextPreview then
+		Channels.StartItemPreview:RequestToServer({
+			templateId = itemTemplateId,
+			dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
+			slot = self.slot
+		}, function(_)
+			if nextPreview then
+				Channels.EndItemPreview:RequestToServer({
+						templateId = itemTemplateId
+					},
+					function(_)
+						local preview = nextPreview
+						nextPreview = nil
+						self:executePreview(preview)
+					end)
+			end
+		end)
+	else
+		nextPreview = itemTemplateId
+	end
+end
+
 ---@param slot ActualSlot
 ---@param weaponType ActualWeaponType?
 ---@param outfitSlot VanityOutfitSlot
@@ -526,7 +550,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			end
 		end,
 		function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+			Channels.EndItemPreview:SendToServer({})
 		end)
 
 	clearStatSlotChildren()
@@ -539,7 +563,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 		local warningText = warningButton:Tooltip():AddText(
 			"\t  " ..
 			Translator:translate(
-			"WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"))
+				"WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"))
 		warningText.TextWrapPos = 600
 		warningText:SetColor("Text", { 1, 0.02, 0, 1 })
 	end
@@ -606,33 +630,23 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	end
 
 	icon.OnHoverEnter = function()
-		self.equipmentPreviewTimer = Ext.Timer.WaitFor(300, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", Ext.Json.Stringify({
-				templateId = itemTemplate.Id,
-				dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
-				slot = self.slot
-			}))
-
-			self.equipmentPreviewTimer = nil
-		end)
+		self:executePreview(itemTemplate.Id)
 	end
 
 	icon.OnHoverLeave = function()
-		if self.equipmentPreviewTimer then
-			Ext.Timer.Cancel(self.equipmentPreviewTimer)
-			self.equipmentPreviewTimer = nil
-		end
-
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		nextPreview = nil
+		Channels.EndItemPreview:SendToServer({})
 	end
 
 	icon.OnClick = function()
+		self.window.Open = false
+		nextPreview = nil
+
 		-- Covers scenario where user hovers over one item, then super quickly moves to another and instantly clicks on it
 		Ext.Timer.WaitFor(150, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+			Channels.EndItemPreview:SendToServer({})
+			self.onSelectFunc(itemTemplate)
 		end)
-		self.onSelectFunc(itemTemplate)
-		self.window.Open = false
 	end
 
 	if self.settings.showNames then

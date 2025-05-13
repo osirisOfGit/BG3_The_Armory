@@ -12,8 +12,7 @@ local previewingItemTable = {}
 
 local resetSetTimer
 
-Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload, user)
-	payload = Ext.Json.Parse(payload)
+Channels.StartItemPreview:SetRequestHandler(function(payload, user)
 	local templateUUID = payload.templateId
 	local slot = payload.slot
 
@@ -52,9 +51,15 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 
 	Logger:BasicDebug("%s started previewing %s", character, templateUUID)
 
-	userPreview.equippedItem = Osi.GetEquippedItem(character, slot)
-	if userPreview.equippedItem then
-		Ext.Entity.Get(userPreview.equippedItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+	if not userPreview.equippedItem then
+		local equippedItem = Osi.GetEquippedItem(character, slot)
+		if equippedItem then
+			local equippedEntity = Ext.Entity.Get(equippedItem)
+			if not equippedEntity.Vars.TheArmory_Vanity_PreviewItem then
+				userPreview.equippedItem = equippedItem
+				equippedEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+			end
+		end
 	end
 
 	local correctArmorSet = string.find(slot, "Vanity") and 1 or 0
@@ -62,8 +67,10 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 
 	-- Non-weapons use cross-slot mogging with the default pieces, but weapons are just equipped as-is
 	if not string.find(slot, "Weapon") then
+		local junkItem = Osi.CreateAt(Transmogger.defaultPieces[slot], 0, 0, 0, 0, 0, "")
+
 		Transmogger:TransmogItem(templateUUID,
-			Osi.CreateAt(Transmogger.defaultPieces[slot], 0, 0, 0, 0, 0, ""),
+			junkItem,
 			Ext.Entity.Get(character)
 		)
 
@@ -108,16 +115,34 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 			end)
 		end
 	end
+
+	return
 end)
+
+local deleteLock = {}
 
 local function DeleteItem(character, userPreview)
 	Logger:BasicDebug("%s stopped previewing %s", character, userPreview.previewItem)
 
+	if userPreview.armorSet then
+		if resetSetTimer then
+			Ext.Timer.Cancel(resetSetTimer)
+			resetSetTimer = nil
+		end
+
+		resetSetTimer = Ext.Timer.WaitFor(1000, function()
+			Osi.SetArmourSet(character, userPreview.armorSet)
+			userPreview.armorSet = nil
+		end)
+	end
+
 	for _, item in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_PreviewItem") or {}) do
 		local itemEntity = Ext.Entity.Get(item)
 		if itemEntity and itemEntity.Vars.TheArmory_Vanity_PreviewItem == character then
-			itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
-			Osi.Unequip(character, item)
+			if Osi.IsEquipped(item) == 1 then
+				itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
+				Osi.Unequip(character, item)
+			end
 			Osi.RequestDelete(item)
 		end
 	end
@@ -130,24 +155,32 @@ local function DeleteItem(character, userPreview)
 	userPreview.previewItem = nil
 end
 
-Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, payload, user)
+Channels.EndItemPreview:SetHandler(function(data, user)
 	user = PeerToUserID(user)
-	local character = Osi.GetCurrentCharacter(user)
+	if not deleteLock[user] then
+		deleteLock[user] = true
+		local character = Osi.GetCurrentCharacter(user)
 
-	local userPreview = previewingItemTable[user]
-	if userPreview then
-		if userPreview.armorSet then
-			if resetSetTimer then
-				Ext.Timer.Cancel(resetSetTimer)
-				resetSetTimer = nil
-			end
-
-			resetSetTimer = Ext.Timer.WaitFor(1000, function()
-				Osi.SetArmourSet(character, userPreview.armorSet)
-				userPreview.armorSet = nil
-			end)
+		local userPreview = previewingItemTable[user]
+		if userPreview then
+			DeleteItem(character, userPreview)
 		end
-
-		DeleteItem(character, userPreview)
+		deleteLock[user] = nil
 	end
+end)
+
+Channels.EndItemPreview:SetRequestHandler(function(data, user)
+	user = PeerToUserID(user)
+	if not deleteLock[user] then
+		deleteLock[user] = true
+		local character = Osi.GetCurrentCharacter(user)
+
+		local userPreview = previewingItemTable[user]
+		if userPreview then
+			DeleteItem(character, userPreview)
+		end
+		deleteLock[user] = nil
+	end
+
+	return
 end)
