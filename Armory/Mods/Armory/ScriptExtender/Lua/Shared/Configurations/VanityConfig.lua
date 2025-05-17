@@ -20,7 +20,8 @@ ConfigurationStructure.config.vanity.settings = {
 		imageSize = 90,
 		rowSize = 6,
 		showNames = true,
-		applyDyesWhenPreviewingEquipment = true
+		applyDyesWhenPreviewingEquipment = true,
+		requireModifierForPreview = false
 	},
 	---@class DyeSettings
 	dyes = {

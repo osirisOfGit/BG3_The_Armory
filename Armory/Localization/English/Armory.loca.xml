@@ -168,6 +168,9 @@ For Strong types, Human Strongs and Orcs will generally work</content>
     <content contentuid="hd399ef020f5e4e319cf68affb8585f8d06b8" version="1">Apply Dye</content>
     <content contentuid="ha9c5c3919a744036925cf8010a1c7bb48a2f" version="1">WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots</content>
     <content contentuid="had9a379edf23424997655761c7dbbc6eb84g" version="1">Status Effect</content>
+    <content contentuid="h4ad0af6a98204eb5aa05ce21fb216b68515c" version="1">Require holding 'Shift' to trigger hover preview</content>
+    <content contentuid="h1def6ed3b47543629552444734f5757e83b7" version="1">Must be held before hovering over the item</content>
+
     <!-- END Equipment Picker -->
 
     <!-- START Dye Picker -->

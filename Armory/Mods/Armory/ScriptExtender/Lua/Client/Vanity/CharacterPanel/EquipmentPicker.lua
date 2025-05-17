@@ -524,6 +524,13 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			applyDyeCheckbox.OnChange = function()
 				self.settings.applyDyesWhenPreviewingEquipment = applyDyeCheckbox.Checked
 			end
+
+			local requirePreviewModifierCheckbox = self.settingsMenu:AddCheckbox(Translator:translate("Require holding 'Shift' to trigger hover preview"),
+				self.settings.requireModifierForPreview)
+				requirePreviewModifierCheckbox:Tooltip():AddText("\t " .. Translator:translate("Must be held before hovering over the item"))
+			requirePreviewModifierCheckbox.OnChange = function()
+				self.settings.requireModifierForPreview = requirePreviewModifierCheckbox.Checked
+			end
 		end,
 		function()
 			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
@@ -539,7 +546,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 		local warningText = warningButton:Tooltip():AddText(
 			"\t  " ..
 			Translator:translate(
-			"WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"))
+				"WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"))
 		warningText.TextWrapPos = 600
 		warningText:SetColor("Text", { 1, 0.02, 0, 1 })
 	end
@@ -606,15 +613,17 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	end
 
 	icon.OnHoverEnter = function()
-		self.equipmentPreviewTimer = Ext.Timer.WaitFor(300, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", Ext.Json.Stringify({
-				templateId = itemTemplate.Id,
-				dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
-				slot = self.slot
-			}))
+		if not self.settings.requireModifierForPreview or Ext.ClientInput.GetInputManager().PressedModifiers == "Shift" then
+			self.equipmentPreviewTimer = Ext.Timer.WaitFor(300, function()
+				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", Ext.Json.Stringify({
+					templateId = itemTemplate.Id,
+					dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
+					slot = self.slot
+				}))
 
-			self.equipmentPreviewTimer = nil
-		end)
+				self.equipmentPreviewTimer = nil
+			end)
+		end
 	end
 
 	icon.OnHoverLeave = function()
@@ -683,4 +692,6 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	["WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"] =
 	"ha9c5c3919a744036925cf8010a1c7bb48a2f",
 	["Status Effect"] = "had9a379edf23424997655761c7dbbc6eb84g",
+	["Require holding 'Shift' to trigger hover preview"] = "h4ad0af6a98204eb5aa05ce21fb216b68515c",
+	["Must be held before hovering over the item"] = "h1def6ed3b47543629552444734f5757e83b7"
 })
