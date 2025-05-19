@@ -682,7 +682,9 @@ function Transmogger:UnMogItem(item, currentlyMogging)
 						itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 						Osi.Unequip(inventoryOwner, item)
 					end
-					Osi.RequestDelete(item)
+					Ext.Timer.WaitFor(200, function()
+						Osi.RequestDelete(item)
+					end)
 
 					---@type EntityHandle
 					local newItemEntity = Ext.Entity.Get(newItem)

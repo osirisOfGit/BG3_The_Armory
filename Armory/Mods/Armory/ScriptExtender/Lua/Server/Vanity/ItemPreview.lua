@@ -118,7 +118,9 @@ local function DeleteItem(character, userPreview)
 		if itemEntity and itemEntity.Vars.TheArmory_Vanity_PreviewItem == character then
 			itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = true
 			Osi.Unequip(character, item)
-			Osi.RequestDelete(item)
+			Ext.Timer.WaitFor(200, function()
+				Osi.RequestDelete(item)
+			end)
 		end
 	end
 
