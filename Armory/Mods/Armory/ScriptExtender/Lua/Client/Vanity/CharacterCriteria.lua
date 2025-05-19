@@ -33,7 +33,9 @@ local function PopulateClassesAndSubclasses()
 		---@type ResourceClassDescription
 		local class = Ext.StaticData.Get(classGuid, "ClassDescription")
 
-		if class.ParentGuid == "00000000-0000-0000-0000-000000000000" and not classesAndSubclasses[class.ResourceUUID] then
+		if not Ext.StaticData.Get(class.ParentGuid, "ClassDescription")
+			and not classesAndSubclasses[class.ResourceUUID]
+		then
 			classesAndSubclasses[class.ResourceUUID] = {}
 		else
 			if not classesAndSubclasses[class.ParentGuid] then
@@ -176,7 +178,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 						popup:AddText(Translator:translate("Copy This Outfit To Your Preset(s)"))
 
 						local boxGroup = popup:AddGroup("checkboxes")
-						for presetId, existingPreset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function (key)
+						for presetId, existingPreset in TableUtils:OrderedPairs(ConfigurationStructure.config.vanity.presets, function(key)
 							return ConfigurationStructure.config.vanity.presets[key].Name
 						end) do
 							boxGroup:AddCheckbox(existingPreset.Name).UserData = presetId

@@ -63,7 +63,6 @@ local function initialize()
 			Logger:BasicDebug("Initialization completed - applying transmogs")
 			Transmogger.saveLoadLock = true
 			PartyOutfitManager:ApplyTransmogsPerPreset()
-			Transmogger.saveLoadLock = false
 		end
 	end
 

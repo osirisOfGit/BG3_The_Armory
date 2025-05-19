@@ -181,7 +181,7 @@ end
 function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, slot)
 	Helpers:KillChildren(parentContainer)
 
-	local outfit = self.activePreset.Outfits[self.criteriaCompositeKey]
+	local outfit = self.activePreset.Outfits and self.activePreset.Outfits[self.criteriaCompositeKey]
 
 	for i, itemSlotOrWeaponTypeEntry in ipairs(group) do
 		local imageButton

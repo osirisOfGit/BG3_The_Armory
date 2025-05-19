@@ -518,16 +518,14 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 				self:ProcessFilters()
 			end
 
-			self.settingsMenu:AddText(Translator:translate("Apply Dye?"))
-			local applyDyeCheckbox = self.settingsMenu:AddCheckbox("", self.settings.applyDyesWhenPreviewingEquipment)
-			applyDyeCheckbox.SameLine = true
+			local applyDyeCheckbox = self.settingsMenu:AddCheckbox(Translator:translate("Apply Dye?"), self.settings.applyDyesWhenPreviewingEquipment)
 			applyDyeCheckbox.OnChange = function()
 				self.settings.applyDyesWhenPreviewingEquipment = applyDyeCheckbox.Checked
 			end
 
 			local requirePreviewModifierCheckbox = self.settingsMenu:AddCheckbox(Translator:translate("Require holding 'Shift' to trigger hover preview"),
 				self.settings.requireModifierForPreview)
-				requirePreviewModifierCheckbox:Tooltip():AddText("\t " .. Translator:translate("Must be held before hovering over the item"))
+			requirePreviewModifierCheckbox:Tooltip():AddText("\t " .. Translator:translate("Must be held before hovering over the item"))
 			requirePreviewModifierCheckbox.OnChange = function()
 				self.settings.requireModifierForPreview = requirePreviewModifierCheckbox.Checked
 			end

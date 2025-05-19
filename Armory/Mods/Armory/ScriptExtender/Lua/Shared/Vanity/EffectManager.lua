@@ -521,6 +521,7 @@ if Ext.IsClient() then
 		local restoreDefaults = menu:AddSelectable(Translator:translate("Restore Pre-Packaged Effects"), "DontClosePopups")
 		restoreDefaults.OnClick = function()
 			for effectName, effect in pairs(defaultEffects) do
+				effect.cachedDisplayNames = effect.cachedDisplayNames or {}
 				effect.cachedDisplayNames[effect.effectProps.StatusEffect] = self:GetEffectOrMeiResource(effect.effectProps.StatusEffect)
 				ConfigurationStructure.config.vanity.effects[effectName] = effect
 			end

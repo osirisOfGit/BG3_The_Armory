@@ -50,6 +50,7 @@ function PartyOutfitManager:ApplyTransmogsPerPreset(userId)
 			end
 			::continue::
 		end
+		Transmogger.saveLoadLock = false
 		transmogTimer = nil
 	end)
 end

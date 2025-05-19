@@ -11,7 +11,8 @@ ConfigurationStructure.config.vanity.settings = {
 		---@alias outfitAndDependencyView "universal"|"perOutfit"
 		---@type outfitAndDependencyView
 		outfitAndDependencyView = "universal",
-		itemValidator_ShowWorkaroundErrors = false
+		itemValidator_ShowWorkaroundErrors = false,
+		removeBladesongStatusOnReload = false
 	},
 	---@class EquipmentSettings
 	equipment = {

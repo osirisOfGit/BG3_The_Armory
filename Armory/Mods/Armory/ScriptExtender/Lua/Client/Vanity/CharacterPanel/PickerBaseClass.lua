@@ -226,8 +226,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.settingsMenu:SetColor("PopupBg", { 0, 0, 0, 1 })
 
 		self.settingsMenu:AddSeparator()
-		self.settingsMenu:AddText(Translator:translate("Show Item Names?"))
-		local showNameCheckbox = self.settingsMenu:AddCheckbox("", self.settings.showNames)
+		local showNameCheckbox = self.settingsMenu:AddCheckbox(Translator:translate("Show Item Names?"), self.settings.showNames)
 		showNameCheckbox.SameLine = true
 		showNameCheckbox.OnChange = function()
 			self.settings.showNames = showNameCheckbox.Checked

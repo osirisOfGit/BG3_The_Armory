@@ -93,6 +93,16 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 
 			Vanity:UpdatePresetOnServer()
 		end
+
+		menuPopup:AddSeparator()
+		---@type ExtuiSelectable
+		local removeBladesongStatusOnLevelLoad = menuPopup:AddSelectable(Translator:translate("Remove Bladesong Impediment statuses on reload"))
+		removeBladesongStatusOnLevelLoad.Selected = generalSettings.removeBladesongStatusOnReload
+		removeBladesongStatusOnLevelLoad.OnClick = function()
+			generalSettings.removeBladesongStatusOnReload = removeBladesongStatusOnLevelLoad.Selected
+
+			Vanity:UpdatePresetOnServer()
+		end
 		--#endregion
 
 		separator = tabHeader:AddSeparatorText(Translator:translate("Choose A Preset"))
@@ -141,7 +151,8 @@ function Vanity:UpdatePresetOnServer()
 		local vanityPreset = VanityExportManager:ExportPresets({ self.ActivePresetId })
 		vanityPreset.settings = {
 			general = {
-				fillEmptySlots = ConfigurationStructure.config.vanity.settings.general.fillEmptySlots
+				fillEmptySlots = ConfigurationStructure.config.vanity.settings.general.fillEmptySlots,
+				removeBladesongStatusOnReload = ConfigurationStructure.config.vanity.settings.general.removeBladesongStatusOnReload
 			}
 		}
 		Channels.UpdateUserPreset:SendToServer({
@@ -293,6 +304,7 @@ Translator:RegisterTranslation({
 	["Show Slot Context Menu only when holding Left Shift"] = "h3cd833c3ceaf423982e2a4e5ccc5cde2617a",
 	["If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it"] =
 	"h204c96c088344a14a75291a07a5f994a3527",
+	["Remove Bladesong Impediment statuses on reload"] = "h2a832d8c75c24861977ba76a659d90c3b462",
 
 	["Generate Junk Items in Empty Slots For Transmog"] = "h6477215a59964b258c51ae8cc3042963197a",
 	["When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur."] =
