@@ -394,4 +394,5 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="he67556c5cd334e3b95059f53d78a0ecacb3b" version="1">Splint</content>
     <content contentuid="he25527b08ccf4a7e9593c12ef25515185eea" version="1">Plate</content>
     <!-- END Armor Type Enum -->
+    <content contentuid="h2a832d8c75c24861977ba76a659d90c3b462" version="1">Remove Bladesong Impediment statuses on reload</content>
 </contentList>

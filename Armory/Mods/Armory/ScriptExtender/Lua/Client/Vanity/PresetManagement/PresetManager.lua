@@ -693,7 +693,8 @@ Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
 	if vanityPreset then
 		vanityPreset.settings = {
 			general = {
-				fillEmptySlots = ConfigurationStructure.config.vanity.settings.general.fillEmptySlots
+				fillEmptySlots = ConfigurationStructure.config.vanity.settings.general.fillEmptySlots,
+				removeBladesongStatusOnReload = ConfigurationStructure.config.vanity.settings.general.removeBladesongStatusOnReload,
 			}
 		}
 	end
