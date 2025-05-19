@@ -33,7 +33,8 @@ local function PopulateClassesAndSubclasses()
 		---@type ResourceClassDescription
 		local class = Ext.StaticData.Get(classGuid, "ClassDescription")
 
-		if not Ext.StaticData.Get(class.ParentGuid, "ClassDescription") and not classesAndSubclasses[class.ResourceUUID]
+		if not Ext.StaticData.Get(class.ParentGuid, "ClassDescription")
+			and not classesAndSubclasses[class.ResourceUUID]
 		then
 			classesAndSubclasses[class.ResourceUUID] = {}
 		else
