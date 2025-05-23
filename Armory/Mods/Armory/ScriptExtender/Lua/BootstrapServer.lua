@@ -38,3 +38,29 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "PresetBackupRegistry", {
 	SyncToServer = true,
 	SyncOnWrite = true
 })
+
+Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
+	if levelName == "SYS_CC_I" then return end
+
+	for _, item in pairs(Ext.Entity.GetAllEntitiesWithComponent("Equipable")) do
+		if item.ServerItem.Template.Id == item.Uuid.EntityUuid then
+			local slot = Ext.Stats.Get(item.Data.StatsId).Slot
+			if SlotEnum[slot] <= 7 and SlotEnum[slot] >= 13 then
+				Osi.ApplyStatus(item.Uuid.EntityUuid, "ARMORY_VANITY_UNIQUE_ITEM", -1, 1)
+			end
+		end
+	end
+end)
+
+Ext.Osiris.RegisterListener("AddedTo", 3, "after", function(object, inventoryHolder, addType)
+	if Osi.IsEquipable(object) == 1 then
+		---@type EntityHandle
+		local item = Ext.Entity.Get(object)
+		if item.ServerItem.Template.Id == item.Uuid.EntityUuid then
+			local slot = Ext.Stats.Get(item.Data.StatsId).Slot
+			if SlotEnum[slot] <= 7 and SlotEnum[slot] >= 13 then
+				Osi.ApplyStatus(item.Uuid.EntityUuid, "ARMORY_VANITY_UNIQUE_ITEM", -1, 1)
+			end
+		end
+	end
+end)

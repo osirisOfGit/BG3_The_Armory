@@ -171,7 +171,7 @@ function Transmogger:MogCharacter(character)
 			---@type Weapon
 			local itemStat = Ext.Stats.Get(Ext.Entity.Get(equippedItem).Data.StatsId)
 			for _, proficiencyGroup in pairs(itemStat["Proficiency Group"]) do
-				if outfitSlot.weaponTypes[proficiencyGroup] then
+				if outfitSlot.weaponTypes[proficiencyGroup] and outfitSlot.weaponTypes[proficiencyGroup].equipment then
 					outfitSlot = outfitSlot.weaponTypes[proficiencyGroup]
 					vanityTemplate = outfitSlot.equipment.guid
 					break

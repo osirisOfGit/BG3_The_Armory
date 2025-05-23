@@ -395,4 +395,6 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="he67556c5cd334e3b95059f53d78a0ecacb3b" version="1">Splint</content>
     <content contentuid="he25527b08ccf4a7e9593c12ef25515185eea" version="1">Plate</content>
     <!-- END Armor Type Enum -->
+    <content contentuid="hf5eaf133134b4a99bbcd336b9c1df434af1d" version="1">Unique Item - Can't Transmog</content>
+    <content contentuid="hc60b8ef2b9cf469cb767fa2d8b9ac5c8ea23" version="1">This is a completely unique item, and can't be transmogged by Armory. You can still apply dyes and effects</content>
 </contentList>
