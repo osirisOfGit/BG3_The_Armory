@@ -538,7 +538,9 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 	self.customFilters["StatSlot"].selectedFilters[slot] = true
 
 	Helpers:KillChildren(self.warningGroup)
+	self.warningGroup.Visible = false
 	if string.match(self.slot, "Offhand") then
+		self.warningGroup.Visible = true
 		local warningButton = Styler:ImageButton(self.warningGroup:AddImageButton("warningButton", "ico_exclamation_01", { 64, 64 }))
 
 		local warningText = warningButton:Tooltip():AddText(

@@ -394,7 +394,7 @@ function Transmogger:TransmogItem(vanityTemplate, equippedItem, character, outfi
 
 		local function finishMog(waitCounter)
 			waitCounter = waitCounter or 0
-			if (Osi.IsWeapon(createdVanityEntity.Uuid.EntityUuid) == 1 and Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot)) and waitCounter <= 10 then
+			if (Osi.IsWeapon(createdVanityEntity.Uuid.EntityUuid) == 1 and (actualSlot and Osi.GetEquippedItem(character.Uuid.EntityUuid, actualSlot))) and waitCounter <= 10 then
 				Logger:BasicDebug("%s has a weapon equipped currently, giving game time to catch up", character.Uuid.EntityUuid)
 				Ext.Timer.WaitFor(50, function()
 					finishMog(waitCounter + 1)

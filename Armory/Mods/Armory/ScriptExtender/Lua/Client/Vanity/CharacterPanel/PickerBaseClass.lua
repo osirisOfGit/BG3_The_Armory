@@ -250,9 +250,9 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		toggleFilterColumn:Tooltip():AddText("\t " .. Translator:translate("Collapses left sidebar (which can also be resized by clicking and dragging the vertical yellow line)"))
 
 		local displayTable = self.window:AddTable("", 2)
-		displayTable.Resizable = true
-		displayTable:AddColumn("", "WidthFixed", 400 * Styler:ScaleFactor())
-		displayTable:AddColumn("", "WidthStretch")
+		-- displayTable.Resizable = true
+		displayTable:AddColumn("left", "WidthFixed", 400 * Styler:ScaleFactor())
+		displayTable:AddColumn("right", "WidthStretch")
 
 		local row = displayTable:AddRow()
 
@@ -323,6 +323,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.otherGroup = row:AddCell():AddGroup("RestOfTheOwl")
 
 		self.warningGroup = self.otherGroup:AddGroup("WarningGroup")
+		self.warningGroup.Visible = false
 
 		self.favoritesGroup = self.otherGroup:AddCollapsingHeader(Translator:translate("Favorites"))
 		self.favoritesGroup.IDContext = self.title .. "Favorites"

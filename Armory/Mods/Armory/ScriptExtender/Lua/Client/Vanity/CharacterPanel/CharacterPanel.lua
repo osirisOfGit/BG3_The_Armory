@@ -138,7 +138,6 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 	end
 
 	local displayTable = panelGroup:AddTable("SlotDisplayTable", 5)
-	displayTable.ScrollY = true
 	displayTable:AddColumn("Equipment", "WidthFixed")
 	local displayRow = displayTable:AddRow()
 	local equipmentCell = displayRow:AddCell()

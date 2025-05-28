@@ -45,7 +45,7 @@ Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelNa
 	for _, item in pairs(Ext.Entity.GetAllEntitiesWithComponent("Equipable")) do
 		if item.ServerItem.Template.Id == item.Uuid.EntityUuid then
 			local slot = Ext.Stats.Get(item.Data.StatsId).Slot
-			if SlotEnum[slot] <= 7 and SlotEnum[slot] >= 13 then
+			if SlotEnum[slot] and (SlotEnum[slot] <= 7 and SlotEnum[slot] >= 13) then
 				Osi.ApplyStatus(item.Uuid.EntityUuid, "ARMORY_VANITY_UNIQUE_ITEM", -1, 1)
 			end
 		end
@@ -58,7 +58,7 @@ Ext.Osiris.RegisterListener("AddedTo", 3, "after", function(object, inventoryHol
 		local item = Ext.Entity.Get(object)
 		if item.ServerItem.Template.Id == item.Uuid.EntityUuid then
 			local slot = Ext.Stats.Get(item.Data.StatsId).Slot
-			if SlotEnum[slot] <= 7 and SlotEnum[slot] >= 13 then
+			if SlotEnum[slot] and (SlotEnum[slot] <= 7 and SlotEnum[slot] >= 13) then
 				Osi.ApplyStatus(item.Uuid.EntityUuid, "ARMORY_VANITY_UNIQUE_ITEM", -1, 1)
 			end
 		end
