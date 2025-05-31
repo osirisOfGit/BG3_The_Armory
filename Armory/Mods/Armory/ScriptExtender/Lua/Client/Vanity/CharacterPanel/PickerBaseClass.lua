@@ -247,7 +247,7 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.separator.Font = "Large"
 
 		local toggleFilterColumn = Styler:ImageButton(self.window:AddImageButton("filterCol", "ico_filter", { 40, 40 }))
-		toggleFilterColumn:Tooltip():AddText("\t " .. Translator:translate("Collapses left sidebar (which can also be resized by clicking and dragging the vertical yellow line)"))
+		toggleFilterColumn:Tooltip():AddText("\t " .. Translator:translate("Collapses left sidebar"))
 
 		local displayTable = self.window:AddTable("", 2)
 		-- displayTable.Resizable = true
@@ -630,5 +630,5 @@ Translator:RegisterTranslation({
 	["By UUID"] = "he6026f619cb34081b2bf00be3563b09801ea",
 	["Mod Name - Case-insensitive"] = "h35a82652afb94de4a417ccbda4a61caeg6c9",
 	["Clear Selected Mods"] = "h2a3702e0861c4c5cbe3ee7a1f332f774g91b",
-	["Collapses left sidebar (which can also be resized by clicking and dragging the vertical yellow line)"] = "h011a79d8553b4737824f3b10d34afc36c5f2"
+	["Collapses left sidebar"] = "h011a79d8553b4737824f3b10d34afc36c5f2"
 })
