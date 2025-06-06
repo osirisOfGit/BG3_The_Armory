@@ -92,10 +92,12 @@ end
 function ItemValidator:ValidateItems()
 	if not next(self.Results) then
 		for _, template in pairs(Ext.Template.GetAllRootTemplates()) do
-			if template.TemplateType == "item" and template.Equipment and template.Equipment.Slot and #template.Equipment.Slot > 0 then
-				---@cast template ItemTemplate
+			local success, error = pcall(function()
+				if template.TemplateType == "item" and ((template.Equipment and template.Equipment.Slot and #template.Equipment.Slot > 0) or TableUtils:ListContains(template.Tags.Tags, function (value)
+					return value == "dc9e09f0-b2ba-4720-bd28-ee9ddbdef2f1"
+				end)) then
+					---@cast template ItemTemplate
 
-				local success, error = pcall(function()
 					if not template.Stats or template.Stats == "" then
 						self:addEntry(template.Name .. "_" .. template.Id, template, "Template", Translator:translate("Does not have an associated Stat"), "Prevents Transmog")
 						return
@@ -132,10 +134,10 @@ function ItemValidator:ValidateItems()
 							end
 						end
 					end
-				end)
-				if not success then
-					self:addEntry(template.Name .. "_" .. template.Id, template, "Template", error or Translator:translate("Unknown error ocurred"), "Prevents Transmog")
 				end
+			end)
+			if not success then
+				self:addEntry(template.Name .. "_" .. template.Id, template, "Template", error or Translator:translate("Unknown error ocurred"), "Prevents Transmog")
 			end
 		end
 
