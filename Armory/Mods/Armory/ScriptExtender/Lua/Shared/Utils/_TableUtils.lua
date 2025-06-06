@@ -132,6 +132,9 @@ end
 ---@param str string|fun(value: V): boolean
 ---@return boolean, any?
 function TableUtils:ListContains(list, str)
+	if not list then
+		return false
+	end
 	for i, value in pairs(list) do
 		if type(str) == "string" then
 			if value == str then

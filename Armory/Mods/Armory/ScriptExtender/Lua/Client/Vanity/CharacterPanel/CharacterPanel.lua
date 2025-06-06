@@ -180,6 +180,10 @@ end
 function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, slot)
 	Helpers:KillChildren(parentContainer)
 
+	if not self.activePreset.Outfits then
+		self.activePreset.Outfits = TableUtils:DeeplyCopyTable(ConfigurationStructure.DynamicClassDefinitions.vanity.outfit)
+	end
+
 	local outfit = self.activePreset.Outfits and self.activePreset.Outfits[self.criteriaCompositeKey]
 
 	for i, itemSlotOrWeaponTypeEntry in ipairs(group) do
