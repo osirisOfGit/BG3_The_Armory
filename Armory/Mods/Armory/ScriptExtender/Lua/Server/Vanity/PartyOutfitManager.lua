@@ -164,16 +164,22 @@ end)
 
 Ext.Osiris.RegisterListener("TeleportedToCamp", 1, "after", function(character)
 	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_STATUS") == 1 then
-		if Osi.GetArmourSet(character) == 0 then
-			Osi.SetArmourSet(character, 1)
+		for _, player_char in pairs(Osi.DB_Players:Get(nil)) do
+			player_char = player_char[1]
+			if Osi.GetArmourSet(player_char) == 0 then
+				Osi.SetArmourSet(player_char, 1)
+			end
 		end
 	end
 end)
 
 Ext.Osiris.RegisterListener("TeleportedFromCamp", 1, "after", function(character)
 	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_STATUS") == 1 then
-		if Osi.GetArmourSet(character) == 1 then
-			Osi.SetArmourSet(character, 0)
+		for _, player_char in pairs(Osi.DB_Players:Get(nil)) do
+			player_char = player_char[1]
+			if Osi.GetArmourSet(player_char) == 1 then
+				Osi.SetArmourSet(player_char, 0)
+			end
 		end
 	end
 end)
