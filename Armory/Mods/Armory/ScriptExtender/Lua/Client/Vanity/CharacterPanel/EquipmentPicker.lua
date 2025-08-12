@@ -688,7 +688,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	["Vanilla cloaks don't use this value for some reason - use stat slots to find those"] = "h5eb8683de63b4131a1ebc9593a91e953b6a7",
 	["Number of Items Per Row"] = "h670f5005fae647019d884dcb37db31dd9a7g",
 	["Only used for Favorites on Patch 8"] = "h2b39a9f0f90840b19f8b602684ddbc7c4177",
-	["Apply Dye"] = "hd399ef020f5e4e319cf68affb8585f8d06b8",
+	["Apply Dye?"] = "hd399ef020f5e4e319cf68affb8585f8d06b8",
 	["WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"] =
 	"ha9c5c3919a744036925cf8010a1c7bb48a2f",
 	["Status Effect"] = "had9a379edf23424997655761c7dbbc6eb84g",

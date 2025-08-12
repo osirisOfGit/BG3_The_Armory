@@ -6,6 +6,8 @@
     <!-- START Main MCM Menu -->
     <content contentuid="h14895335e14d4041a1427fdc5ec80db6458a" version="1">Show Camp Clothes Out Of Combat</content>
     <content contentuid="h5b5f354b7dd846ca9027d4d6710518e4d2d9" version="1">When enabled the character will automatically have camp clothes shown when out of combat, and main armor shown when entering combat. Only executes this functionality when entering/exiting combat. (Owned by Armory mod)</content>
+    <content contentuid="heed701ea4fc64422b00b730ab01efcaa5c62" version="1">Show Camp Clothes while in Camp</content>
+    <content contentuid="hc5a9429bb41c4e90b02289e4067a25af56a1" version="1">When enabled the character will automatically have camp clothes shown when teleporting to Camp, and main armor shown when teleporting from Camp. (Owned by Armory mod)</content>
     <content contentuid="h343957cb9d284aeb86930a5311c10f61a199" version="1">Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it).</content>
     <content contentuid="heeef36ef99d5401093a374888ccb2bc6b325" version="1">The preset will only be active in saves that were created while it was active - if you load a save before you activated the preset, it must be activated for that specific save</content>
     <content contentuid="hb7bc2ec3130d492f912d638fffa06869c7e6" version="1">It's recommended you save and reload after finalizing your outfit, as parts of the Transmog process don't fully complete until a reload (e.g. Armor type)</content>
