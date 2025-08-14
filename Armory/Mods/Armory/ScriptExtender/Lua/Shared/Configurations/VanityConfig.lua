@@ -6,7 +6,7 @@ ConfigurationStructure.config.vanity = {}
 --#region User Settings
 ConfigurationStructure.config.vanity.settings = {
 	general = {
-		showSlotContextMenuModifier = nil,
+		showSlotContextMenuOnRightClick = false,
 		fillEmptySlots = true,
 		---@alias outfitAndDependencyView "universal"|"perOutfit"
 		---@type outfitAndDependencyView

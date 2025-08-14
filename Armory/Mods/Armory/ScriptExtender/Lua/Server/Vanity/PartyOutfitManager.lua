@@ -163,9 +163,9 @@ Ext.Osiris.RegisterListener("LeftCombat", 2, "after", function(character, combat
 end)
 
 Ext.Osiris.RegisterListener("TeleportedToCamp", 1, "after", function(character)
-	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_STATUS") == 1 then
-		for _, player_char in pairs(Osi.DB_Players:Get(nil)) do
-			player_char = player_char[1]
+	for _, player_char in pairs(Osi.DB_Players:Get(nil)) do
+		player_char = player_char[1]
+		if Osi.HasActiveStatus(player_char, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_STATUS") == 1 then
 			if Osi.GetArmourSet(player_char) == 0 then
 				Osi.SetArmourSet(player_char, 1)
 			end
@@ -174,9 +174,9 @@ Ext.Osiris.RegisterListener("TeleportedToCamp", 1, "after", function(character)
 end)
 
 Ext.Osiris.RegisterListener("TeleportedFromCamp", 1, "after", function(character)
-	if Osi.HasActiveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_STATUS") == 1 then
-		for _, player_char in pairs(Osi.DB_Players:Get(nil)) do
-			player_char = player_char[1]
+	for _, player_char in pairs(Osi.DB_Players:Get(nil)) do
+		player_char = player_char[1]
+		if Osi.HasActiveStatus(player_char, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_STATUS") == 1 then
 			if Osi.GetArmourSet(player_char) == 1 then
 				Osi.SetArmourSet(player_char, 0)
 			end
@@ -209,19 +209,6 @@ Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(charact
 
 	if Osi.HasPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_PASSIVE") == 0 then
 		Osi.AddPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_PASSIVE")
-	end
-end)
-
----@param character CHARACTER
-Ext.Osiris.RegisterListener("CharacterLeftParty", 1, "after", function(character)
-	if Osi.HasPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE") == 1 then
-		Osi.RemovePassive(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_PASSIVE")
-		Osi.RemoveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_COMBAT_STATUS")
-	end
-
-	if Osi.HasPassive(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_PASSIVE") == 1 then
-		Osi.RemovePassive(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_PASSIVE")
-		Osi.RemoveStatus(character, "ARMOR_VANITY_CAMP_CLOTHES_CAMP_STATUS")
 	end
 end)
 --#endregion

@@ -11,7 +11,6 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 		return nil
 	end
 
-
 	---@type Vanity
 	local export = existingExport or {
 		presets = {},

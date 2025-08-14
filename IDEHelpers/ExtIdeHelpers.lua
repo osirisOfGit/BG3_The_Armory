@@ -63,6 +63,8 @@ Osi = {}
 --- @alias PersistentRegistryEntry any
 --- @alias Ref any
 --- @alias RegistryEntry any
+--- @alias ScratchBuffer string
+--- @alias ScratchString string
 --- @alias StringView string
 --- @alias UserId integer
 --- @alias UserReturn any
@@ -123,6 +125,8 @@ Osi = {}
 --- @field AdvantageBoost AdvantageBoostComponent?
 --- @field AiArchetypeOverrideBoost AiArchetypeOverrideBoostComponent?
 --- @field Ambushing AmbushingComponent?
+--- @field AnimationSet AnimationSetComponent?
+--- @field AnimationUpdate AnimationUpdateComponent?
 --- @field AnimationWaterfall AnimationWaterfallComponent?
 --- @field AppearanceOverride AppearanceOverrideComponent?
 --- @field ApprovalRatings ApprovalRatingsComponent?
@@ -134,7 +138,6 @@ Osi = {}
 --- @field AttitudesToPlayers AttitudesToPlayersComponent?
 --- @field AttributeBoost AttributeBoostComponent?
 --- @field AttributeFlags AttributeFlagsComponent?
---- @field AvailableLevel AvailableLevelComponent?
 --- @field Avatar AvatarComponent?
 --- @field Background BackgroundComponent?
 --- @field BackgroundPassives BackgroundPassivesComponent?
@@ -150,7 +153,6 @@ Osi = {}
 --- @field Camera CameraComponent?
 --- @field CanBeDisarmed CanBeDisarmedComponent?
 --- @field CanBeLooted CanBeLootedComponent?
---- @field CanBeWielded CanBeWieldedComponent?
 --- @field CanDeflectProjectiles CanDeflectProjectilesComponent?
 --- @field CanDoActions CanDoActionsComponent?
 --- @field CanDoRest CanDoRestComponent?
@@ -164,6 +166,7 @@ Osi = {}
 --- @field CanShootThroughBoost CanShootThroughBoostComponent?
 --- @field CanShootThrough CanShootThroughComponent?
 --- @field CanSpeak CanSpeakComponent?
+--- @field CanTrade CanTradeComponent?
 --- @field CanTravel CanTravelComponent?
 --- @field CanTriggerRandomCasts CanTriggerRandomCastsComponent?
 --- @field CanWalkThroughBoost CanWalkThroughBoostComponent?
@@ -185,6 +188,7 @@ Osi = {}
 --- @field CriticalHitExtraDiceBoost CriticalHitExtraDiceBoostComponent?
 --- @field Cull CullComponent?
 --- @field CustomIcon CustomIconComponent?
+--- @field CustomIconsStorage CustomIconsStorageSingletonComponent?
 --- @field CustomName CustomNameComponent?
 --- @field CustomStats CustomStatsComponent?
 --- @field DamageBonusBoost DamageBonusBoostComponent?
@@ -195,9 +199,6 @@ Osi = {}
 --- @field DarkvisionRangeMinBoost DarkvisionRangeMinBoostComponent?
 --- @field DarkvisionRangeOverrideBoost DarkvisionRangeOverrideBoostComponent?
 --- @field Data DataComponent?
---- @field DeadByDefault DeadByDefaultComponent?
---- @field Death DeathComponent?
---- @field DeathState DeathStateComponent?
 --- @field DefaultCameraBehavior DefaultCameraBehavior?
 --- @field Detached DetachedComponent?
 --- @field DetectCrimesBlockBoost DetectCrimesBlockBoostComponent?
@@ -218,7 +219,6 @@ Osi = {}
 --- @field EocLevel EocLevelComponent?
 --- @field Equipable EquipableComponent?
 --- @field EquipmentVisual EquipmentVisualComponent?
---- @field Experience ExperienceComponent?
 --- @field ExpertiseBonusBoost ExpertiseBonusBoostComponent?
 --- @field Expertise ExpertiseComponent?
 --- @field Faction FactionComponent?
@@ -235,6 +235,7 @@ Osi = {}
 --- @field God GodComponent?
 --- @field GodTag GodTagComponent?
 --- @field GravityDisabled GravityDisabledComponent?
+--- @field GravityDisabledUntilMoved GravityDisabledUntilMovedComponent?
 --- @field GuaranteedChanceRollOutcomeBoost GuaranteedChanceRollOutcomeBoostComponent?
 --- @field HalveWeaponDamageBoost HalveWeaponDamageBoostComponent?
 --- @field HasExclamationDialog HasExclamationDialogComponent?
@@ -253,8 +254,10 @@ Osi = {}
 --- @field InitiativeBoost InitiativeBoostComponent?
 --- @field InteractionFilter InteractionFilterComponent?
 --- @field Invisibility InvisibilityComponent?
+--- @field IsFalling IsFallingComponent?
 --- @field IsGlobal IsGlobalComponent?
 --- @field IsInTurnBasedMode IsInTurnBasedModeComponent?
+--- @field IsSeeThrough IsSeeThroughComponent?
 --- @field IsSummon IsSummonComponent?
 --- @field ItemBoosts ItemBoostsComponent?
 --- @field JumpMaxDistanceBonusBoost JumpMaxDistanceBonusBoostComponent?
@@ -266,6 +269,8 @@ Osi = {}
 --- @field Loot LootComponent?
 --- @field LootingState LootingStateComponent?
 --- @field MaterialParameterOverride MaterialParameterOverrideComponent?
+--- @field HealMaxIncoming MaxIncomingComponent?
+--- @field HealMaxOutgoing MaxOutgoingComponent?
 --- @field MaximizeHealingBoost MaximizeHealingBoostComponent?
 --- @field MaximumRollResultBoost MaximumRollResultBoostComponent?
 --- @field MinimumRollResultBoost MinimumRollResultBoostComponent?
@@ -288,6 +293,7 @@ Osi = {}
 --- @field Passive PassiveComponent?
 --- @field PassiveContainer PassiveContainerComponent?
 --- @field Pathing PathingComponent?
+--- @field PathingDistanceChanged PathingDistanceChangedOneFrameComponent?
 --- @field PhysicalForceRangeBonusBoost PhysicalForceRangeBonusBoostComponent?
 --- @field Physics PhysicsComponent?
 --- @field PickingState PickingStateComponent?
@@ -318,7 +324,6 @@ Osi = {}
 --- @field SceneAttach SceneAttachComponent?
 --- @field ShapeshiftState ShapeshiftStateComponent?
 --- @field ShootThroughType ShootThroughTypeComponent?
---- @field ShortRest ShortRestComponent?
 --- @field SightRangeAdditiveBoost SightRangeAdditiveBoostComponent?
 --- @field SightRangeMaximumBoost SightRangeMaximumBoostComponent?
 --- @field SightRangeMinimumBoost SightRangeMinimumBoostComponent?
@@ -405,17 +410,16 @@ Osi = {}
 --- @field CCFullRespec CharacterCreationDefinitionFullRespecComponent?
 --- @field CCDefinitionLevelUp CharacterCreationDefinitionLevelUpComponent?
 --- @field CCRespec CharacterCreationDefinitionRespecComponent?
---- @field IsCombatPaused CombatIsCombatPausedComponent?
---- @field IsInCombat CombatIsInCombatComponent?
---- @field CombatParticipant CombatParticipantComponent?
---- @field CombatState CombatStateComponent?
---- @field ThreatRange CombatThreatRangeComponent?
---- @field TurnBased CombatTurnBasedComponent?
---- @field TurnOrder CombatTurnOrderComponent?
+--- @field DeadByDefault DeathDeadByDefaultComponent?
+--- @field DeathState DeathDeathStateComponent?
+--- @field DeathType DeathDeathTypeComponent?
+--- @field Downed DeathDownedComponent?
 --- @field CameraCombatTarget EclCameraCombatTargetComponent?
 --- @field CameraSelectorMode EclCameraSelectorModeComponent?
 --- @field CameraTarget EclCameraTargetComponent?
 --- @field ClientCharacter EclCharacter?
+--- @field ClientCharacterIconRequest EclCharacterIconRequestComponent?
+--- @field ClientCharacterIconResult EclCharacterIconResultComponent?
 --- @field ClientTimelineActorControl EclClientTimelineActorControlComponent?
 --- @field ClientEquipmentVisuals EclEquipmentVisualsComponent?
 --- @field GameCameraBehavior EclGameCameraBehavior?
@@ -430,15 +434,43 @@ Osi = {}
 --- @field ClientCCDummyDefinition EclCharacterCreationDummyDefinitionComponent?
 --- @field ClientCCFullRespecDefinition EclCharacterCreationFullRespecDefinitionComponent?
 --- @field ClientCCLevelUpDefinition EclCharacterCreationLevelUpDefinitionComponent?
+--- @field ClientVisualsDesiredState EclEquipmentVisualsDesiredStateComponent?
+--- @field ClientEquipmentVisibilityState EclEquipmentVisualsVisibilityStateComponent?
 --- @field ClientInterruptPlayerDecision EclInterruptPlayerDecisionComponent?
 --- @field BackgroundGoals EocBackgroundGoalsComponent?
 --- @field CalendarDaysPassed EocCalendarDaysPassedComponent?
 --- @field CalendarStartingDate EocCalendarStartingDateComponent?
+--- @field CombatDelayedFanfare EocCombatDelayedFanfareComponent?
+--- @field IsCombatPaused EocCombatIsCombatPausedComponent?
+--- @field IsInCombat EocCombatIsInCombatComponent?
+--- @field CombatIsThreatened EocCombatIsThreatenedComponent?
+--- @field CombatParticipant EocCombatParticipantComponent?
+--- @field CombatState EocCombatStateComponent?
+--- @field ThreatRange EocCombatThreatRangeComponent?
+--- @field TurnBased EocCombatTurnBasedComponent?
+--- @field TurnOrder EocCombatTurnOrderComponent?
+--- @field AvailableLevel EocExpAvailableLevelComponent?
+--- @field CanLevelUp EocExpCanLevelUpComponent?
+--- @field Experience EocExpExperienceComponent?
+--- @field FTBPaused EocFtbIsFtbPausedComponent?
+--- @field IsInFTB EocFtbIsInFtbComponent?
 --- @field FTBParticipant EocFtbParticipantComponent?
---- @field FTBRespect EocFtbRespectComponent?
 --- @field FTBZoneBlockReason EocFtbZoneBlockReasonComponent?
 --- @field HotbarContainer EocHotbarContainerComponent?
 --- @field HotbarDecks EocHotbarHotbarCurrentDecksComponent?
+--- @field CanBeWielded EocImprovisedWeaponCanBeWieldedComponent?
+--- @field ImprovisedWeaponWielded EocImprovisedWeaponWieldedComponent?
+--- @field ImprovisedWeaponWielding EocImprovisedWeaponWieldingComponent?
+--- @field PickUpExecuting EocPickupPickUpExecutingComponent?
+--- @field PickUpRequest EocPickupPickUpRequestComponent?
+--- @field LongRestInScriptPhase EocRestLongRestInScriptPhase?
+--- @field LongRestState EocRestLongRestStateComponent?
+--- @field LongRestTimeline EocRestLongRestTimeline?
+--- @field LongRestTimers EocRestLongRestTimers?
+--- @field LongRestUsers EocRestLongRestUsers?
+--- @field RestingEntities EocRestRestingEntities?
+--- @field ShortRest EocRestShortRestComponent?
+--- @field ActionResourceChangeResults EsvActionResourceChangeResultsSingletonComponent?
 --- @field ServerActivationGroupContainer EsvActivationGroupContainerComponent?
 --- @field ServerAnubisTag EsvAnubisTagComponent?
 --- @field ServerBaseData EsvBaseDataComponent?
@@ -450,13 +482,7 @@ Osi = {}
 --- @field ServerBreadcrumb EsvBreadcrumbComponent?
 --- @field ServerCharacter EsvCharacter?
 --- @field ServerDarknessActive EsvDarknessActiveComponent?
---- @field DeathApplyKnockedOut EsvDeathApplyKnockedOutOneFrameComponent?
---- @field DeathAssignEntityToUserRequest EsvDeathAssignEntityToUserRequestOneFrameComponent?
---- @field ServerDeathContinue EsvDeathContinueComponent?
---- @field DeathDeadByDefaultRequest EsvDeathDeadByDefaultRequestOneFrameComponent?
---- @field ServerDelayDeathCause EsvDelayDeathCauseComponent?
 --- @field ServerDialogTag EsvDialogTagComponent?
---- @field DiedEvent EsvDiedEventOneFrameComponent?
 --- @field ServerDisarmAttempt EsvDisarmAttemptComponent?
 --- @field ServerDisplayNameList EsvDisplayNameListComponent?
 --- @field ServerExperienceGaveOut EsvExperienceGaveOutComponent?
@@ -471,16 +497,18 @@ Osi = {}
 --- @field InventoryPropertyIsTradable EsvInventoryPropertyIsTradableComponent?
 --- @field ServerIsLightBlocker EsvIsLightBlockerComponent?
 --- @field IsMarkedForDeletion EsvIsMarkedForDeletionComponent?
---- @field ServerIsUnsummoning EsvIsUnsummoningComponent?
 --- @field ServerIsVisionBlocker EsvIsVisionBlockerComponent?
 --- @field ServerItem EsvItem?
 --- @field JumpFollow EsvJumpFollowComponent?
---- @field ServerKiller EsvKillerComponent?
 --- @field ServerLeader EsvLeaderComponent?
+--- @field ServerMusicVolumeTriggerState EsvMusicVolumeTriggerStateComponent?
 --- @field Net EsvNetComponent?
 --- @field ServerHotbarOrder EsvOrderComponent?
+--- @field ServerOsirisPingRequestSingleton EsvOsirisPingRequestSingletonComponent?
 --- @field ServerPeersInRange EsvPeersInRangeComponent?
 --- @field ServerPickpocket EsvPickpocketComponent?
+--- @field ServerPingCooldownSingleton EsvPingCooldownSingletonComponent?
+--- @field ServerPingRequestSingleton EsvPingRequestSingletonComponent?
 --- @field ServerProficiencyGroupStats EsvProficiencyGroupStatsComponent?
 --- @field ServerRaceTag EsvRaceTagComponent?
 --- @field ServerRecruitedBy EsvRecruitedByComponent?
@@ -490,7 +518,6 @@ Osi = {}
 --- @field ScriptPropertyCanBePickpocketed EsvScriptPropertyCanBePickpocketedComponent?
 --- @field ScriptPropertyIsDroppedOnDeath EsvScriptPropertyIsDroppedOnDeathComponent?
 --- @field ScriptPropertyIsTradable EsvScriptPropertyIsTradableComponent?
---- @field ServerDeathState EsvStateComponent?
 --- @field ServerSurface EsvSurfaceComponent?
 --- @field HistoryTargetUUID EsvTargetUUIDComponent?
 --- @field ServerTemplateTag EsvTemplateTagComponent?
@@ -504,12 +531,17 @@ Osi = {}
 --- @field ServerAiArchetype EsvAiCombatArchetypeComponent?
 --- @field ServerAiInterestedInItems EsvAiCombatInterestedInItemsComponent?
 --- @field ServerAiInterestingItem EsvAiCombatInterestingItemComponent?
+--- @field ServerRatingsChanged EsvApprovalRatingsChangedOneFrameComponent?
 --- @field BoostBaseUpdated EsvBoostBaseUpdatedOneFrameComponent?
 --- @field ServerBoostBase EsvBoostBoostBaseComponent?
 --- @field BoostChangedEvent EsvBoostChangedEventOneFrameComponent?
+--- @field BoostChangedEventsSingleton EsvBoostChangedEventsSingletonComponent?
+--- @field BoostConditionalState EsvBoostConditionalStateComponent?
+--- @field BoostProvider EsvBoostProviderComponent?
 --- @field ServerStatusBoostsProcessed EsvBoostStatusBoostsProcessedComponent?
 --- @field StatusBoostsRefreshed EsvBoostStatusBoostsRefreshedOneFrameComponent?
 --- @field ServerCCAppearanceVisualTag EsvCharacterCreationAppearanceVisualTagComponent?
+--- @field ServerCCCustomIcon EsvCharacterCreationCustomIconComponent?
 --- @field ServerCCEquipmentSetRequest EsvCharacterCreationEquipmentSetRequestComponent?
 --- @field ServerCCGod EsvCharacterCreationGodComponent?
 --- @field ServerCCIsCustom EsvCharacterCreationIsCustomComponent?
@@ -518,21 +550,44 @@ Osi = {}
 --- @field ServerCombatGroupMapping EsvCombatCombatGroupMappingComponent?
 --- @field CombatScheduledForDelete EsvCombatCombatScheduledForDeleteOneFrameComponent?
 --- @field CombatStartedEvent EsvCombatCombatStartedEventOneFrameComponent?
+--- @field CombatSwitched EsvCombatCombatSwitchedComponent?
 --- @field CombatantKilledEvent EsvCombatCombatantKilledEventOneFrameComponent?
 --- @field DelayedFanfareRemovedDuringCombatEvent EsvCombatDelayedFanfareRemovedDuringCombatEventOneFrameComponent?
 --- @field ServerEnterRequest EsvCombatEnterRequestComponent?
 --- @field ServerFleeBlocked EsvCombatFleeBlockedComponent?
+--- @field CombatFleeRequest EsvCombatFleeRequestComponent?
+--- @field CombatFleeSuccess EsvCombatFleeSuccessOneFrameComponent?
+--- @field GlobalCombatRequests EsvCombatGlobalCombatRequests?
 --- @field ServerImmediateJoin EsvCombatImmediateJoinComponent?
+--- @field CombatantJoinEvent EsvCombatJoinEventOneFrameComponent?
 --- @field CombatJoinInCurrentRoundFailedEvent EsvCombatJoinInCurrentRoundFailedEventOneFrameComponent?
 --- @field CombatJoinInCurrentRound EsvCombatJoinInCurrentRoundOneFrameComponent?
+--- @field CombatJoining EsvCombatJoiningComponent?
+--- @field CombatLateJoinPenalty EsvCombatLateJoinPenaltyComponent?
+--- @field ServerCombatLeaveRequest EsvCombatLeaveRequestComponent?
 --- @field CombatLeftEvent EsvCombatLeftEventOneFrameComponent?
+--- @field CombatMerge EsvCombatMergeComponent?
 --- @field CombatRequestCompletedEvent EsvCombatRequestCompletedEventOneFrameComponent?
+--- @field CombatSurfaceTeamSingleton EsvCombatSurfaceTeamSingletonComponent?
 --- @field CombatSurprisedJoinRequest EsvCombatSurprisedJoinRequestOneFrameComponent?
 --- @field CombatSurprisedStealthRequest EsvCombatSurprisedStealthRequestOneFrameComponent?
 --- @field CombatThreatRangeChangedEvent EsvCombatThreatRangeChangedEventOneFrameComponent?
 --- @field ConcentrationChanged EsvConcentrationConcentrationChangedOneFrameComponent?
 --- @field ConcentrationDamageCheck EsvConcentrationDamageCheckOneFrameComponent?
 --- @field ConcentrationClearedEvent EsvConcentrationOnConcentrationClearedEventOneFrameComponent?
+--- @field DeathApplyKnockedOut EsvDeathDeathApplyKnockedOutOneFrameComponent?
+--- @field DeathAssignEntityToUserRequest EsvDeathDeathAssignEntityToUserRequestOneFrameComponent?
+--- @field ServerDeathContinue EsvDeathDeathContinueComponent?
+--- @field DeathDeadByDefaultRequest EsvDeathDeathDeadByDefaultRequestOneFrameComponent?
+--- @field ServerDeathRequest EsvDeathDeathRequestOneFrameComponent?
+--- @field ServerDelayDeathCause EsvDeathDelayDeathCauseComponent?
+--- @field ServerDelayDeath EsvDeathDelayedDeathComponent?
+--- @field DiedEvent EsvDeathDiedEventOneFrameComponent?
+--- @field DownedEvent EsvDeathDownedEventOneFrameComponent?
+--- @field ServerKiller EsvDeathKillerComponent?
+--- @field ServerModifyDelayDeathRequest EsvDeathModifyDelayDeathRequestOneFrameComponent?
+--- @field ServerResurrectedEvent EsvDeathResurrectedEventOneFrameComponent?
+--- @field ServerDeathState EsvDeathStateComponent?
 --- @field AbilityCheckEvent EsvEcsstatsAbilityCheckEventOneFrameComponent?
 --- @field AttributeFlagsChangedEvent EsvEcsstatsAttributeFlagsChangedEventOneFrameComponent?
 --- @field ClassesChangedEvent EsvEcsstatsClassesChangedEventOneFrameComponent?
@@ -552,9 +607,18 @@ Osi = {}
 --- @field FTBPlayersTurnEndedEvent EsvFtbPlayersTurnEndedEventOneFrameComponent?
 --- @field FTBPlayersTurnStartedEvent EsvFtbPlayersTurnStartedEventOneFrameComponent?
 --- @field FTBRoundEndedEvent EsvFtbRoundEndedEventOneFrameComponent?
+--- @field FTBSurfaceTeamSingleton EsvFtbSurfaceTeamSingletonComponent?
+--- @field FTBTimeFactorRequests EsvFtbTimeFactorRequestsSingletonComponent?
+--- @field FTBTimeFactorResetRequests EsvFtbTimeFactorResetRequestsSingletonComponent?
+--- @field FTBTurnBasedChangesRequest EsvFtbTurnBasedChangesRequestSingletonComponent?
+--- @field FTBZone EsvFtbZoneComponent?
+--- @field FTBZoneInstigator EsvFtbZoneInstigatorComponent?
 --- @field HitAnimationRequest EsvHitHitAnimationRequestOneFrameComponent?
+--- @field HitNotification EsvHitHitNotificationEventOneFrameComponent?
+--- @field HitNotificationRequest EsvHitHitNotificationRequestOneFrameComponent?
 --- @field HitResultEvent EsvHitHitResultEventOneFrameComponent?
 --- @field HitJoinCombatRequest EsvHitOnHitJoinCombatRequestOneFrameComponent?
+--- @field UnresolvedHitNotification EsvHitUnresolvedHitNotificationComponent?
 --- @field ServerInterruptActionRequests EsvInterruptActionRequestsComponent?
 --- @field ServerInterruptAddRemoveRequests EsvInterruptAddRemoveRequestsComponent?
 --- @field ServerInterruptDataSingleton EsvInterruptDataSingletonComponent?
@@ -565,6 +629,7 @@ Osi = {}
 --- @field ServerInterruptZoneRequests EsvInterruptZoneRequestsComponent?
 --- @field CharacterHasGeneratedTradeTreasure EsvInventoryCharacterHasGeneratedTradeTreasureComponent?
 --- @field ServerInventoryContainerData EsvInventoryContainerDataComponent?
+--- @field HasGeneratedTreasure EsvInventoryEntityHasGeneratedTreasureComponent?
 --- @field ServerInventoryGroupCheck EsvInventoryGroupCheckComponent?
 --- @field ServerInventoryIsReplicatedWith EsvInventoryIsReplicatedWithComponent?
 --- @field ReadyToBeAddedToInventory EsvInventoryReadyToBeAddedToInventoryComponent?
@@ -577,6 +642,7 @@ Osi = {}
 --- @field ServerOwneeHistory EsvOwnershipOwneeHistoryComponent?
 --- @field ServerOwneeRequest EsvOwnershipOwneeRequestComponent?
 --- @field ServerUserSnapshot EsvPartyUserSnapshotComponent?
+--- @field ServerPassiveBoosts EsvPassiveBoostsComponent?
 --- @field PassiveConditionalRollInterruptEvent EsvPassiveConditionalRollInterruptEventOneFrameComponent?
 --- @field ServerPassiveBase EsvPassivePassiveBaseComponent?
 --- @field PassivesUpdatedEvent EsvPassivePassivesUpdatedEventOneFrameComponent?
@@ -594,6 +660,10 @@ Osi = {}
 --- @field ServerProjectileSpell EsvProjectileSpellComponent?
 --- @field ProjectileSplitThrowableObjectRequest EsvProjectileSplitThrowableObjectRequestOneFrameComponent?
 --- @field ProjectileUpdateTargetTracking EsvProjectileUpdateTargetTrackingOneFrameComponent?
+--- @field ServerRestPendingType EsvRestPendingTypeComponent?
+--- @field ServerRestTypeChosenEvent EsvRestRestTypeChosenEventOneFrameComponent?
+--- @field ShortRestConsumeResources EsvRestShortRestConsumeResourcesComponent?
+--- @field ServerShortRestResultEvent EsvRestShortRestResultEventOneFrameComponent?
 --- @field ServerRollFinishedEvent EsvRollRollFinishedEventOneFrameComponent?
 --- @field ShapeshiftHealthReservation EsvShapeshiftHealthReservationComponent?
 --- @field ServerShapeshiftStates EsvShapeshiftStatesComponent?
@@ -603,6 +673,7 @@ Osi = {}
 --- @field SpellsLearnedEvent EsvSpellSpellsLearnedEventOneFrameComponent?
 --- @field ServerSpellCastCache EsvSpellCastCacheComponent?
 --- @field ServerSpellCastHitDelay EsvSpellCastCastHitDelayComponent?
+--- @field ServerSpellCastRequests EsvSpellCastCastRequestsComponent?
 --- @field ServerSpellCastResponsible EsvSpellCastCastResponsibleComponent?
 --- @field ServerSpellClientInitiated EsvSpellCastClientInitiatedComponent?
 --- @field ServerSpellExternals EsvSpellCastExternalsComponent?
@@ -612,10 +683,17 @@ Osi = {}
 --- @field SpellCastInterruptsUsed EsvSpellCastInterruptsUsedOneFrameComponent?
 --- @field SpellCastMoveDuringCastUpdateEvent EsvSpellCastMoveDuringCastUpdateEventOneFrameComponent?
 --- @field SpellCastMovementAndPrecalculationEndEvent EsvSpellCastMovementAndPrecalculationEndEventOneFrameComponent?
+--- @field ServerSpellCastMovement EsvSpellCastMovementComponent?
+--- @field ServerSpellCastMovementInfo EsvSpellCastMovementInfoComponent?
+--- @field ServerSpellCastPendingRequests EsvSpellCastPendingRequestsComponent?
 --- @field ServerProjectileCache EsvSpellCastProjectileCacheComponent?
+--- @field ServerSpellCastProjectilePathfindCache EsvSpellCastProjectilePathfindCacheComponent?
 --- @field SpellCastRequestTargetTracking EsvSpellCastRequestTargetTrackingOneFrameComponent?
 --- @field ServerSpellCastState EsvSpellCastStateComponent?
+--- @field ServerSpellCastUnsheathFallbackTimer EsvSpellCastUnsheathFallbackTimerComponent?
 --- @field SpellCastUpdateTargetTracking EsvSpellCastUpdateTargetTrackingOneFrameComponent?
+--- @field SpellCastWeaponSetChangeRequest EsvSpellCastWeaponSetChangeRequestOneFrameComponent?
+--- @field ServerSpellCastZoneRange EsvSpellCastZoneRangeComponent?
 --- @field ServerStatusActive EsvStatusActiveComponent?
 --- @field ServerStatusAddEvent EsvStatusAddEventOneFrameComponent?
 --- @field ServerStatusAddedFromSaveLoad EsvStatusAddedFromSaveLoadComponent?
@@ -637,6 +715,7 @@ Osi = {}
 --- @field ServerStatusScheduledForDeletion EsvStatusScheduledForDeletionOneFrameComponent?
 --- @field ServerStatus EsvStatusStatusComponent?
 --- @field ServerStatusEvent EsvStatusStatusEventOneFrameComponent?
+--- @field ServerStatusRequests EsvStatusStatusRequestsComponent?
 --- @field ServerStatusTurnStartEvent EsvStatusTurnStartEventOneFrameComponent?
 --- @field ServerStatusUnique EsvStatusUniqueComponent?
 --- @field ServerStatusUpdateTargetTracking EsvStatusUpdateTargetTrackingOneFrameComponent?
@@ -645,6 +724,7 @@ Osi = {}
 --- @field SummonAttachToProjectileRequest EsvSummonAttachToProjectileRequestOneFrameComponent?
 --- @field SummonDespawnRequest EsvSummonDespawnRequestOneFrameComponent?
 --- @field SummonExpiredRequest EsvSummonExpiredRequestOneFrameComponent?
+--- @field ServerIsUnsummoning EsvSummonIsUnsummoningComponent?
 --- @field SummonLateJoinPenalty EsvSummonLateJoinPenaltyOneFrameComponent?
 --- @field SummonOwnerSetEvent EsvSummonOwnerSetEventOneFrameComponent?
 --- @field SummonPlaceInInventoryRequest EsvSummonPlaceInInventoryRequestOneFrameComponent?
@@ -653,8 +733,20 @@ Osi = {}
 --- @field TagsChangedEvent EsvTagsTagsChangedEventOneFrameComponent?
 --- @field ServerTemplateChangedEvent EsvTemplatesTemplateChangedOneFrameComponent?
 --- @field ServerTemplateTransformedEvent EsvTemplatesTemplateTransformedOneFrameComponent?
+--- @field ServerTriggerCachedLeaveEvents EsvTriggerCachedLeaveEventsComponent?
+--- @field ServerTriggerEventConfig EsvTriggerEventConfigComponent?
+--- @field ServerTriggerLoadedHandled EsvTriggerLoadedHandledComponent?
+--- @field ServerTriggerRegisteredFor EsvTriggerRegisteredForComponent?
+--- @field ServerRegistrationSettings EsvTriggerRegistrationSettingsComponent?
+--- @field ServerTriggerWorldAutoTriggered EsvTriggerTriggerWorldAutoTriggeredComponent?
+--- @field ServerUpdatedRegisteredFor EsvTriggerUpdatedRegisteredForComponent?
+--- @field ServerUpdatedRegisteredForItems EsvTriggerUpdatedRegisteredForItemsComponent?
+--- @field Pause GamePauseComponent?
+--- @field PauseExcluded GamePauseExcludedComponent?
 --- @field HealBlock HealBlockComponent?
 --- @field HitAttacker HitAttackerComponent?
+--- @field HitLifetime HitLifetimeComponent?
+--- @field HitMeta HitMetaComponent?
 --- @field HitProxy HitProxyComponent?
 --- @field HitProxyOwner HitProxyOwnerComponent?
 --- @field HitReaction HitReactionComponent?
@@ -677,6 +769,7 @@ Osi = {}
 --- @field InventoryContainer InventoryContainerComponent?
 --- @field InventoryData InventoryDataComponent?
 --- @field DropOnDeathBlocked InventoryDropOnDeathBlockedComponent?
+--- @field InventoryLocked InventoryIsLockedComponent?
 --- @field InventoryIsOwned InventoryIsOwnedComponent?
 --- @field InventoryMember InventoryMemberComponent?
 --- @field InventoryMemberTransform InventoryMemberTransformComponent?
@@ -685,15 +778,21 @@ Osi = {}
 --- @field InventoryOwner InventoryOwnerComponent?
 --- @field InventoryStack InventoryStackComponent?
 --- @field InventoryStackMember InventoryStackMemberComponent?
+--- @field InventoryTopOwner InventoryTopOwnerComponent?
+--- @field TradeBuybackData InventoryTradeBuybackDataComponent?
 --- @field InventoryWeight InventoryWeightComponent?
 --- @field Wielded InventoryWieldedComponent?
+--- @field WieldingHistory InventoryWieldingHistoryComponent?
 --- @field ItemDestroyed ItemDestroyedComponent?
+--- @field ItemDestroying ItemDestroyingComponent?
 --- @field IsDoor ItemDoorComponent?
 --- @field ItemDye ItemDyeComponent?
 --- @field ExamineDisabled ItemExamineDisabledComponent?
 --- @field ItemHasMoved ItemHasMovedComponent?
 --- @field HasOpened ItemHasOpenedComponent?
+--- @field ItemInUse ItemInUseComponent?
 --- @field IsGold ItemIsGoldComponent?
+--- @field ItemIsPoisoned ItemIsPoisonedComponent?
 --- @field IsItem ItemItemComponent?
 --- @field MapMarkerStyle ItemMapMarkerStyleComponent?
 --- @field NewInInventory ItemNewInInventoryComponent?
@@ -708,6 +807,8 @@ Osi = {}
 --- @field Ladder ItemTemplateLadderComponent?
 --- @field UseAction ItemTemplateUseActionComponent?
 --- @field WalkOn ItemTemplateWalkOnComponent?
+--- @field MultiplayerHost MultiplayerHostComponent?
+--- @field MultiplayerUser MultiplayerUserComponent?
 --- @field OwnedAsLoot OwnershipOwnedAsLootComponent?
 --- @field OwneeCurrent OwnershipOwneeCurrentComponent?
 --- @field BlockFollow PartyBlockFollowComponent?
@@ -719,20 +820,29 @@ Osi = {}
 --- @field PartyRecipes PartyRecipesComponent?
 --- @field PartyView PartyViewComponent?
 --- @field PartyWaypoints PartyWaypointsComponent?
+--- @field ProgressionAbilityImprovements ProgressionAbilityImprovementsComponent?
 --- @field ProgressionContainer ProgressionContainerComponent?
+--- @field ProgressionFeat ProgressionFeatComponent?
 --- @field LevelUp ProgressionLevelUpComponent?
 --- @field ProgressionMeta ProgressionMetaComponent?
+--- @field ProgressionPassives ProgressionPassivesComponent?
+--- @field ProgressionReplicatedFeat ProgressionReplicatedFeatComponent?
+--- @field ProgressionSkills ProgressionSkillsComponent?
+--- @field ProgressionSpells ProgressionSpellsComponent?
 --- @field ProjectileSource ProjectileSourceInfoComponent?
 --- @field Recruiter RecruitRecruiterComponent?
 --- @field SightData SightDataComponent?
 --- @field SightEntityViewshed SightEntityViewshedComponent?
+--- @field IgnoreSurfaces SightIgnoreSurfacesComponent?
 --- @field Sight SightSightBaseComponent?
 --- @field AddedSpells SpellAddedSpellsComponent?
+--- @field AttackSpellOverride SpellAttackSpellOverrideComponent?
 --- @field SpellBook SpellBookComponent?
 --- @field SpellBookPrepares SpellBookPreparesComponent?
 --- @field CCPrepareSpell SpellCCPrepareSpellComponent?
 --- @field LearnedSpells SpellLearnedSpellsComponent?
 --- @field PlayerPrepareSpell SpellPlayerPrepareSpellComponent?
+--- @field ScriptedExplosion SpellScriptedExplosionComponent?
 --- @field SpellAiConditions SpellSpellAiConditionsComponent?
 --- @field SpellBookCooldowns SpellSpellBookCooldownsComponent?
 --- @field SpellContainer SpellSpellContainerComponent?
@@ -741,15 +851,21 @@ Osi = {}
 --- @field SpellCastAnimationRequest SpellCastAnimationRequestOneFrameComponent?
 --- @field SpellCastCache SpellCastCacheComponent?
 --- @field SpellCastCanBeTargeted SpellCastCanBeTargetedComponent?
+--- @field SpellCastEvent SpellCastCastEventOneFrameComponent?
 --- @field SpellCastHitEvent SpellCastCastHitEventOneFrameComponent?
 --- @field SpellCastTextKeyEvent SpellCastCastTextKeyEventOneFrameComponent?
 --- @field SpellCastCounteredEvent SpellCastCounteredEventOneFrameComponent?
+--- @field SpellCastDataCache SpellCastDataCacheSingletonComponent?
 --- @field SpellCastDestroyEvent SpellCastDestroyEventOneFrameComponent?
+--- @field SpellCastExecutionTime SpellCastExecutionTimeComponent?
+--- @field SpellCastFinishedEvent SpellCastFinishedEventOneFrameComponent?
 --- @field SpellCastInterruptResults SpellCastInterruptResultsComponent?
 --- @field SpellCastIsCasting SpellCastIsCastingComponent?
 --- @field SpellCastJumpStartEvent SpellCastJumpStartEventOneFrameComponent?
 --- @field SpellCastLogicExecutionEndEvent SpellCastLogicExecutionEndEventOneFrameComponent?
+--- @field SpellCastLogicExecutionStartEvent SpellCastLogicExecutionStartEventOneFrameComponent?
 --- @field SpellCastMovement SpellCastMovementComponent?
+--- @field SpellCastOutcome SpellCastOutcomeComponent?
 --- @field SpellCastPrepareEndEvent SpellCastPrepareEndEventOneFrameComponent?
 --- @field SpellCastPrepareStartEvent SpellCastPrepareStartEventOneFrameComponent?
 --- @field SpellCastPreviewEndEvent SpellCastPreviewEndEventOneFrameComponent?
@@ -766,13 +882,23 @@ Osi = {}
 --- @field StatusContainer StatusContainerComponent?
 --- @field StatusID StatusIDComponent?
 --- @field StatusIncapacitated StatusIncapacitatedComponent?
+--- @field StatusIndicateDarkness StatusIndicateDarknessComponent?
 --- @field StatusLifetime StatusLifetimeComponent?
+--- @field StatusLoseControl StatusLoseControlComponent?
 --- @field StatusVisualDisabled StatusVisualDisabledComponent?
 --- @field FullIllithid TadpoleTreeFullIllithidComponent?
 --- @field HalfIllithid TadpoleTreeHalfIllithidComponent?
 --- @field TadpolePowers TadpoleTreePowerContainerComponent?
 --- @field Tadpoled TadpoleTreeTadpoledComponent?
 --- @field TadpoleTreeState TadpoleTreeTreeStateComponent?
+--- @field TranslateChanged TranslateChangedComponent?
+--- @field TranslateChangedEvent TranslateChangedEventOneFrameComponent?
+--- @field TriggerArea TriggerAreaComponent?
+--- @field TriggerContainer TriggerContainerComponent?
+--- @field TriggerIsInsideOf TriggerIsInsideOfComponent?
+--- @field TriggerType TriggerTriggerTypeComponent?
+--- @field TriggerUpdatedContainer TriggerUpdatedContainerComponent?
+--- @field TriggerUpdatedPhysics TriggerUpdatedPhysicsComponent?
 
 
 --- @alias AIBoundType string|"Hit"|"Move"|"Stand"
@@ -780,11 +906,13 @@ Osi = {}
 --- @alias AIShapeType string|"Box"|"Cylinder"|"None"
 --- @alias AbilityId string|"Charisma"|"Constitution"|"Dexterity"|"Intelligence"|"None"|"Sentinel"|"Strength"|"Wisdom"
 --- @alias ActionDataType string|"Book"|"Combine"|"Constrain"|"Consume"|"CreatePuddle"|"CreateSurface"|"Destroy"|"DestroyParameters"|"DisarmTrap"|"Door"|"Equip"|"Insert"|"Ladder"|"LearnSpell"|"Lie"|"Lockpick"|"OpenClose"|"PlaySound"|"Recipe"|"ShowStoryElementUI"|"Sit"|"SpawnCharacter"|"SpellBook"|"Stand"|"StoryUse"|"StoryUseInInventory"|"Teleport"|"Throw"|"Unknown"|"Unknown31"|"Unknown34"|"Unknown35"|"UseSpell"
---- @alias AdvantageBoostType string|"Advantage"|"Disadvantage"
+--- @alias AdvantageBoostType string|"Advantage"|"Disadvantage"|"None"
 --- @alias AdvantageContext string|"Ability"|"AllAbilities"|"AllSavingThrows"|"AllSkills"|"AttackRoll"|"AttackTarget"|"Concentration"|"DeathSavingThrow"|"SavingThrow"|"Skill"|"SourceDialogue"
 --- @alias AiBaseFlags string|"Blocker"|"CanClimbOn"|"CloudSurfaceBlock"|"Door"|"DoorItemBlock"|"GroundSurfaceBlock"|"Indestructible"|"Portal"|"PortalTarget"|"ShootBlock"|"ShootBlockCharacter"|"ShootBlockItem"|"SubgridEdge"|"Trap"|"UnknownBlock1"|"UnknownBlock2"|"UnknownBlock3"|"UnknownBlock4"|"UnknownBlock5"|"WalkBlock"|"WalkBlock2"|"WalkBlockCharacter"|"WalkBlockItem"
 --- @alias AnimationSetAnimationFlags string|"AlwaysIgnore"|"NoFallback"
 --- @alias AppliedMaterialFlags string|"Instantiated"|"IsOverlay"|"OverlayOriginalMapsSet"
+--- @alias ApprovalReactionScope string|"Dialog"|"Global"|"Local"
+--- @alias ArmorSetState string|"Normal"|"Vanity"
 --- @alias ArmorType string|"BreastPlate"|"ChainMail"|"ChainShirt"|"Cloth"|"HalfPlate"|"Hide"|"Leather"|"None"|"Padded"|"Plate"|"RingMail"|"ScaleMail"|"Sentinel"|"Splint"|"StuddedLeather"
 --- @alias AttackFlags string|"DamagedAfterMiss"|"FirstAttack"|"FromSneak"|"InstantKill"|"LastAttack"|"Reaction"
 --- @alias AttackRoll string|"Charisma"|"Constitution"|"Dexterity"|"Intelligence"|"None"|"SpellCastingAbility"|"Strength"|"UnarmedAttackAbility"|"WeaponAttackAbility"|"Wisdom"
@@ -798,7 +926,7 @@ Osi = {}
 --- @alias CanInteractFlags string|"CanInteract"|"CanUseFlag8"|"CanUseLadder"|"CanUsePortals"
 --- @alias CanMoveFlags string|"CanBeTeleported"|"CanFollow"|"CanMove"|"CanWorldClimb"|"CanWorldDrop"
 --- @alias CastRequirementFlags string|"ActionResources"|"Cooldowns"|"EquipmentProficiency"|"ItemCharges"|"Range"|"Shield"|"Somatic"|"Speech"|"SpellCast"|"SpellPrepared"|"StatsConditions"|"WeaponRequirements"
---- @alias CauseType string|"AURA"|"Attack"|"InventoryItem"|"None"|"Offhand"|"StatusEnter"|"StatusTick"|"SurfaceCreate"|"SurfaceMove"|"SurfaceStatus"|"WorldItemThrow"
+--- @alias CauseType string|"AURA"|"Attack"|"InventoryItem"|"None"|"Offhand"|"StatusEnter"|"StatusTick"|"SurfaceCreate"|"SurfaceMove"|"SurfaceStatus"|"Unknown11"|"WorldItemThrow"
 --- @alias ClientCharacterFlags string|"Active"|"Airborne"|"Climbing"|"HasCharacterLight"|"InDialog"|"IsPlayer"|"VisibleOffStage"
 --- @alias ClientCharacterFlags2 string|"CustomVisuals"|"LootingRequested"|"PickpocketRequested"|"Pickpocketing"|"ReloadingVisuals"|"RemovingFromLevel"
 --- @alias ClientCharacterFlags3 string|"CanTrade"|"HasCustomVisualAfterDeath"|"HasDialog"|"WasInputControllerActive"
@@ -812,6 +940,7 @@ Osi = {}
 --- @alias CombatParticipantFlags string|"CanFight"|"CanJoinCombat"|"IsBoss"|"IsInspector"|"StayInAiHints"
 --- @alias CombatPauseSourceType string|"Script"|"Unknown"
 --- @alias ConditionRollType string|"AbilityCheckRoll"|"AttackRoll"|"DifficultyRoll"|"SavingThrowRoll"|"SkillCheckRoll"
+--- @alias ContainerInteractionType string|"Scatter"|"Sort"
 --- @alias CriticalHitAttackFlags string|"AttackRoll"|"AttackTarget"
 --- @alias CriticalHitSuccessFlags string|"Failure"|"FailureNever"|"Success"|"SuccessNever"
 --- @alias CursorType string|"Arrow"|"ArrowWarning"|"Backstab"|"BackstabWarning"|"Bow"|"BowGround"|"BowWarning"|"CameraRotation"|"Cast"|"CastWarning"|"Combine"|"CombineWarning"|"InputText"|"ItemMove"|"ItemMoveWarning"|"ItemPickup"|"ItemPickupWarning"|"ItemUse"|"ItemUseWarning"|"Listen"|"ListenWarning"|"Lock"|"LockWarning"|"LootedContainer"|"Melee"|"MeleeGround"|"MeleeWarning"|"None"|"OpenContainer"|"OpenContainerNew"|"OpenContainerWarning"|"OpenDoor"|"OpenDoorWarning"|"PickPocket"|"PickPocketWarning"|"Shovel"|"ShovelWarning"|"System"|"Talk"|"TalkWarning"|"Walk"|"WalkWarning"|"Wand"|"WandGround"|"WandWarning"
@@ -821,23 +950,28 @@ Osi = {}
 --- @alias DealDamageWeaponType string|"ImprovisedWeapon"|"MainMeleeWeapon"|"MainRangedWeapon"|"MainWeapon"|"None"|"OffhandMeleeWeapon"|"OffhandRangedWeapon"|"OffhandWeapon"|"SourceWeapon"|"ThrownWeapon"|"UnarmedDamage"
 --- @alias DialogNodeFlags string|"AllowGrouping"|"IsEndAllDialogs"|"IsEndNode"|"IsExclusive"|"IsGameplayNode"|"IsGreetingNode"|"IsOptional"|"IsRootNode"|"ShowOnlyOnce"|"SuppressSubtitle"
 --- @alias DiceSizeId string|"D10"|"D100"|"D12"|"D20"|"D4"|"D6"|"D8"|"Default"
+--- @alias DisplayNameType string|"CharacterCreation"|"None"|"Stats"|"Story"|"Template"|"Transform"|"Unknown"
+--- @alias DisplayTitleType string|"Story"|"Template"|"Transform"
+--- @alias DualWieldingRequestType string|"ActionResourceChanged"|"BoostChanged"|"OnItemEquipped"|"OnItemEquipped2"|"ToggleDualWielding"|"ToggleOnCharacterControlChanged"
 --- @alias DynamicModifierType string|"Consumable"|"ItemSpell"|"None"|"Spell"|"ToggledPassive"
 --- @alias ECSComponentChangeFlags string|"Create"|"Destroy"|"OneFrame"|"Replicate"|"ReplicatedComponent"
 --- @alias ECSEntityChangeFlags string|"Create"|"Dead"|"Destroy"|"Ignore"|"Immediate"
+--- @alias EEquipmentType string|"Armor"|"Sentinel"|"Shield"|"Unknown1"|"Weapon"
 --- @alias EffectFlags string|"Active"|"Forget"|"FullyInitialized"|"FullyInitialized2"|"Interrupted"|"Playing"|"Pooled"|"Stopped"
 --- @alias EffectPropertyType string|"Base"|"Boolean"|"ColorARGBKeyFrame"|"FixedFunction"|"FixedString"|"Float"|"FloatKeyFrame"|"FloatRange"|"Integer"|"IntegerRange"|"String"|"Vector3"
 --- @alias EquipmentStatsType string|"Armor"|"Shield"|"Weapon"
 --- @alias ExecuteWeaponFunctorsType string|"BothHands"|"MainHand"|"OffHand"|"Undefined"
---- @alias ExtComponentType string|"ACOverrideFormulaBoost"|"AbilityBoost"|"AbilityCheckEvent"|"AbilityFailedSavingThrowBoost"|"AbilityOverrideMinimumBoost"|"ActionResourceBlockBoost"|"ActionResourceConsumeMultiplierBoost"|"ActionResourceEvents"|"ActionResourceMultiplierBoost"|"ActionResourcePreventReductionBoost"|"ActionResourceReplenishTypeOverrideBoost"|"ActionResourceSpendEvent"|"ActionResourceValueBoost"|"ActionResources"|"ActionType"|"ActionUseConditions"|"Active"|"ActiveCharacterLight"|"ActiveCharacterLightBoost"|"ActiveSkeletonSlots"|"AddTagBoost"|"AddedSpells"|"AdvanceSpellsBoost"|"AdvantageBoost"|"AiArchetypeOverrideBoost"|"Ambushing"|"AnimationBlueprint"|"AnimationGameplayEvents"|"AnimationGameplayEventsSingleton"|"AnimationSet"|"AnimationTextKeyEvents"|"AnimationTextKeyEventsSingleton"|"AnimationTriggeredEvents"|"AnimationWaterfall"|"AppearanceOverride"|"ApprovalRatings"|"Armor"|"ArmorAbilityModifierCapOverrideBoost"|"ArmorClassBoost"|"ArmorSetState"|"AttackSpellOverrideBoost"|"AttitudesToPlayers"|"AttributeBoost"|"AttributeFlags"|"AttributeFlagsChangedEvent"|"AvailableLevel"|"Avatar"|"Background"|"BackgroundGoals"|"BackgroundPassives"|"BackgroundTag"|"BaseHp"|"BaseStats"|"BlockAbilityModifierFromACBoost"|"BlockFollow"|"BlockRegainHPBoost"|"BodyType"|"BoostBaseUpdated"|"BoostChangedEvent"|"BoostCondition"|"BoostInfo"|"BoostsContainer"|"Bound"|"CCChangeAppearanceDefinition"|"CCCharacterDefinition"|"CCCompanionDefinition"|"CCCreation"|"CCDefinitionCommon"|"CCDefinitionLevelUp"|"CCFullRespec"|"CCFullRespecDefinition"|"CCLevelUp"|"CCLevelUpDefinition"|"CCPrepareSpell"|"CCRespec"|"CCRespecDefinition"|"CCSessionCommon"|"CCState"|"CalendarDaysPassed"|"CalendarStartingDate"|"Camera"|"CameraCombatTarget"|"CameraInSelectorMode"|"CameraSelectorMode"|"CameraSpellTracking"|"CameraTarget"|"CampChest"|"CampEndTheDayState"|"CampPresence"|"CampQuality"|"CampSettings"|"CampSupply"|"CampTotalSupplies"|"CanBeDisarmed"|"CanBeInInventory"|"CanBeLooted"|"CanBeWielded"|"CanDeflectProjectiles"|"CanDoActions"|"CanDoRest"|"CanEnterChasm"|"CanInteract"|"CanModifyHealth"|"CanMove"|"CanSeeThrough"|"CanSeeThroughBoost"|"CanSense"|"CanShootThrough"|"CanShootThroughBoost"|"CanSpeak"|"CanTravel"|"CanTriggerRandomCasts"|"CanWalkThrough"|"CanWalkThroughBoost"|"CannotBePickpocketed"|"CannotBeTakenOut"|"CannotHarmCauseEntityBoost"|"CarryCapacityMultiplierBoost"|"CharacterCreationAppearance"|"CharacterCreationStats"|"CharacterCreationTemplateOverride"|"CharacterHasGeneratedTradeTreasure"|"CharacterUnarmedDamageBoost"|"CharacterWeaponDamageBoost"|"ClassTag"|"Classes"|"ClassesChangedEvent"|"ClientCCBaseDefinitionState"|"ClientCCChangeAppearanceDefinition"|"ClientCCCompanionDefinition"|"ClientCCDefinitionState"|"ClientCCDefinitionStateEx"|"ClientCCDummyDefinition"|"ClientCCFullRespecDefinition"|"ClientCCLevelUpDefinition"|"ClientCharacter"|"ClientControl"|"ClientEquipmentVisuals"|"ClientInterruptPlayerDecision"|"ClientItem"|"ClientPaperdoll"|"ClientProjectile"|"ClientTimelineActorControl"|"ClimbOn"|"Clock"|"CombatJoinInCurrentRound"|"CombatJoinInCurrentRoundFailedEvent"|"CombatLeftEvent"|"CombatParticipant"|"CombatRequestCompletedEvent"|"CombatScheduledForDelete"|"CombatStartedEvent"|"CombatState"|"CombatSurprisedJoinRequest"|"CombatSurprisedStealthRequest"|"CombatThreatRangeChangedEvent"|"CombatantKilledEvent"|"Concentration"|"ConcentrationChanged"|"ConcentrationClearedEvent"|"ConcentrationDamageCheck"|"ConcentrationIgnoreDamageBoost"|"CriticalHitBoost"|"CriticalHitExtraDiceBoost"|"Cull"|"CurrentlyFollowingParty"|"CustomIcon"|"CustomName"|"CustomStats"|"DamageBonusBoost"|"DamageReductionBoost"|"DamageTakenBonusBoost"|"Darkness"|"DarkvisionRangeBoost"|"DarkvisionRangeMinBoost"|"DarkvisionRangeOverrideBoost"|"Data"|"DeadByDefault"|"Death"|"DeathApplyKnockedOut"|"DeathAssignEntityToUserRequest"|"DeathDeadByDefaultRequest"|"DeathState"|"DefaultCameraBehavior"|"DelayedFanfareRemovedDuringCombatEvent"|"Detached"|"DetectCrimesBlockBoost"|"DialogState"|"DiedEvent"|"DifficultyCheck"|"DisabledEquipment"|"Disarmable"|"DisplayName"|"DodgeAttackRollBoost"|"DownedStatusBoost"|"DropOnDeathBlocked"|"DualWielding"|"DualWieldingBoost"|"DynamicAnimationTags"|"Effect"|"EffectCameraBehavior"|"EncumbranceState"|"EncumbranceStats"|"EntityThrowDamageBoost"|"EocLevel"|"Equipable"|"EquipmentSlotChangedEvent"|"EquipmentVisual"|"EscortFollower"|"EscortHasStragglers"|"EscortLeader"|"EscortLeaderPriority"|"EscortMember"|"EscortStragglersTracker"|"ExamineDisabled"|"Experience"|"Expertise"|"ExpertiseBonusBoost"|"FTBModeChangedEvent"|"FTBParticipant"|"FTBPlayersTurnEndedEvent"|"FTBPlayersTurnStartedEvent"|"FTBRespect"|"FTBRoundEndedEvent"|"FTBZoneBlockReason"|"Faction"|"FactionOverrideBoost"|"FallDamageMultiplierBoost"|"FallToProne"|"FleeCapability"|"Floating"|"FullIllithid"|"GameCameraBehavior"|"GameObjectVisual"|"GameplayLight"|"GameplayLightBoost"|"GameplayObscurityBoost"|"GlobalLongRestDisabled"|"GlobalShortRestDisabled"|"God"|"GodTag"|"GravityDisabled"|"GravityDisabledUntilMoved"|"GuaranteedChanceRollOutcomeBoost"|"HalfIllithid"|"HalveWeaponDamageBoost"|"HasExclamationDialog"|"HasOpened"|"HealBlock"|"Health"|"Hearing"|"HistoryTargetUUID"|"HitAnimationRequest"|"HitAttacker"|"HitJoinCombatRequest"|"HitProxy"|"HitProxyOwner"|"HitReaction"|"HitResultEvent"|"HitTarget"|"HitThrownObject"|"HitWeapon"|"HorizontalFOVOverrideBoost"|"HotbarContainer"|"HotbarDecks"|"Icon"|"Identity"|"IdentityState"|"IgnoreDamageThresholdMinBoost"|"IgnoreLowGroundPenaltyBoost"|"IgnorePointBlankDisadvantageBoost"|"IgnoreResistanceBoost"|"IgnoreSurfaceCoverBoost"|"IncreaseMaxHPBoost"|"InitiativeBoost"|"InteractionDisabled"|"InteractionFilter"|"InterruptActionState"|"InterruptConditionallyDisabled"|"InterruptContainer"|"InterruptData"|"InterruptDecision"|"InterruptPreferences"|"InterruptPrepared"|"InterruptZone"|"InterruptZoneParticipant"|"InterruptZoneSource"|"InventoryContainer"|"InventoryData"|"InventoryIsOwned"|"InventoryMember"|"InventoryMemberTransform"|"InventoryOwner"|"InventoryPropertyCanBePickpocketed"|"InventoryPropertyIsDroppedOnDeath"|"InventoryPropertyIsTradable"|"InventoryStack"|"InventoryStackMember"|"InventoryWeight"|"Invisibility"|"IsCharacter"|"IsCombatPaused"|"IsDoor"|"IsGlobal"|"IsGold"|"IsInCombat"|"IsInTurnBasedMode"|"IsItem"|"IsMarkedForDeletion"|"IsStoryItem"|"IsSummon"|"ItemBoosts"|"ItemCanMove"|"ItemDestroyed"|"ItemDye"|"ItemHasGeneratedTreasure"|"ItemHasMoved"|"ItemPortal"|"ItemTemplateDestroyed"|"JumpFollow"|"JumpMaxDistanceBonusBoost"|"JumpMaxDistanceMultiplierBoost"|"Key"|"Ladder"|"LearnedSpells"|"Level"|"LevelChanged"|"LevelUp"|"Light"|"Lock"|"LockBoost"|"Loot"|"LootingState"|"MapMarkerStyle"|"MaterialParameterOverride"|"Max"|"MaximizeHealingBoost"|"MaximumRollResultBoost"|"MinimumRollResultBoost"|"MonkWeaponDamageDiceOverrideBoost"|"Movement"|"MovementSpeedLimitBoost"|"Net"|"NewInInventory"|"NewItemsInside"|"NewSpellsAddedEvent"|"NonTradable"|"NullifyAbilityBoost"|"ObjectInteraction"|"ObjectSize"|"ObjectSizeBoost"|"ObjectSizeOverrideBoost"|"OffStage"|"OnDamageSpells"|"Origin"|"OriginAppearanceTag"|"OriginPassives"|"OriginTag"|"OriginalIdentity"|"OriginalTemplate"|"OwnedAsLoot"|"OwneeCurrent"|"PartyComposition"|"PartyFollower"|"PartyMember"|"PartyPortals"|"PartyRecipes"|"PartyView"|"PartyWaypoints"|"Passive"|"PassiveConditionalRollInterruptEvent"|"PassiveContainer"|"PassiveRequestTargetTracking"|"PassiveUpdateTargetTracking"|"PassiveUsageCount"|"PassivesUpdatedEvent"|"PasssiveUsageCountIncrementedEvent"|"Pathing"|"PhysicalForceRangeBonusBoost"|"Physics"|"PickingState"|"Player"|"PlayerPrepareSpell"|"Proficiency"|"ProficiencyBonusBoost"|"ProficiencyBonusIncreaseBoost"|"ProficiencyBonusOverrideBoost"|"ProficiencyBoost"|"ProficiencyGroup"|"ProgressionChangedContainers"|"ProgressionContainer"|"ProgressionLevelUpChanged"|"ProgressionMeta"|"ProjectileDeflectBoost"|"ProjectileImpactEvent"|"ProjectileRequestTargetTracking"|"ProjectileSource"|"ProjectileSplitThrowableObjectRequest"|"ProjectileUpdateTargetTracking"|"Race"|"ReadyToBeAddedToInventory"|"ReceivingCriticalDamageOnHitBoost"|"Recruiter"|"RedirectDamageBoost"|"ReduceCriticalAttackThresholdBoost"|"Relation"|"Repose"|"RequestedRoll"|"RerollBoost"|"ResistanceBoost"|"Resistances"|"RollBonusBoost"|"RollInProgress"|"RollModifiers"|"Ruleset"|"RulesetModifiers"|"SavantBoost"|"Savegame"|"SavingThrowRolledEvent"|"ScaleMultiplierBoost"|"SceneAttach"|"Scenery"|"ScriptPropertyCanBePickpocketed"|"ScriptPropertyIsDroppedOnDeath"|"ScriptPropertyIsTradable"|"ServerActivationGroupContainer"|"ServerAddedStatusAuraEffectEvent"|"ServerAiArchetype"|"ServerAiInterestedInItems"|"ServerAiInterestingItem"|"ServerAiModifiers"|"ServerAnubisExecutor"|"ServerAnubisTag"|"ServerBaseData"|"ServerBaseProficiency"|"ServerBaseSize"|"ServerBaseStats"|"ServerBaseWeapon"|"ServerBoostBase"|"ServerBoostTag"|"ServerBreadcrumb"|"ServerCCAppearanceVisualTag"|"ServerCCEquipmentSetRequest"|"ServerCCGod"|"ServerCCIsCustom"|"ServerCCUpdates"|"ServerCanStartCombat"|"ServerCharacter"|"ServerCombatGroupMapping"|"ServerDarknessActive"|"ServerDeathContinue"|"ServerDeathState"|"ServerDelayDeathCause"|"ServerDialogTag"|"ServerDisarmAttempt"|"ServerDisplayNameList"|"ServerDynamicLayerOwner"|"ServerEnterRequest"|"ServerExperienceGaveOut"|"ServerFleeBlocked"|"ServerGameTimer"|"ServerGameplayLightChanges"|"ServerGameplayLightEquipment"|"ServerHotbarOrder"|"ServerIconList"|"ServerImmediateJoin"|"ServerInterruptActionRequests"|"ServerInterruptAddRemoveRequests"|"ServerInterruptDataSingleton"|"ServerInterruptInitialParticipants"|"ServerInterruptTurnOrderInZone"|"ServerInterruptUsed"|"ServerInterruptZoneRequests"|"ServerInventoryContainerData"|"ServerInventoryGroupCheck"|"ServerInventoryIsReplicatedWith"|"ServerInventoryItemDataPopulated"|"ServerIsCurrentOwner"|"ServerIsLatestOwner"|"ServerIsLightBlocker"|"ServerIsOriginalOwner"|"ServerIsPreviousLatestOwner"|"ServerIsPreviousOwner"|"ServerIsUnsummoning"|"ServerIsVisionBlocker"|"ServerItem"|"ServerKiller"|"ServerLeader"|"ServerOsirisTag"|"ServerOwneeHistory"|"ServerOwneeRequest"|"ServerPassiveBase"|"ServerPassivePersistentData"|"ServerPeersInRange"|"ServerPickpocket"|"ServerProficiencyGroupStats"|"ServerProjectile"|"ServerProjectileAttachment"|"ServerProjectileCache"|"ServerProjectileInitialization"|"ServerProjectileSpell"|"ServerRaceTag"|"ServerRecruitedBy"|"ServerRemovedStatusAuraEffectEvent"|"ServerReplicationDependency"|"ServerReplicationDependencyOwner"|"ServerRollFinishedEvent"|"ServerRollInProgress"|"ServerRollStartRequest"|"ServerRollStartSpellRequest"|"ServerSafePosition"|"ServerScriptPassives"|"ServerShapeshiftEquipmentHistory"|"ServerShapeshiftStates"|"ServerSpellCastCache"|"ServerSpellCastHitDelay"|"ServerSpellCastInterrupt"|"ServerSpellCastResponsible"|"ServerSpellCastState"|"ServerSpellClientInitiated"|"ServerSpellExternals"|"ServerSpellHitRegister"|"ServerSpellInterruptRequests"|"ServerSpellInterruptResults"|"ServerStatus"|"ServerStatusActive"|"ServerStatusAddEvent"|"ServerStatusAddedFromSaveLoad"|"ServerStatusApplyEvent"|"ServerStatusAttemptEvent"|"ServerStatusAttemptFailedEvent"|"ServerStatusAura"|"ServerStatusAuraContainer"|"ServerStatusBoostsProcessed"|"ServerStatusCause"|"ServerStatusDifficultyModifiers"|"ServerStatusDispelRollCheck"|"ServerStatusDownedChangedEvent"|"ServerStatusEvent"|"ServerStatusOwnership"|"ServerStatusPerforming"|"ServerStatusRefreshed"|"ServerStatusRemoveEvent"|"ServerStatusScheduledForDeletion"|"ServerStatusTurnStartEvent"|"ServerStatusUnique"|"ServerStatusUpdateTargetTracking"|"ServerSurface"|"ServerTemplateChangedEvent"|"ServerTemplateTag"|"ServerTemplateTransformedEvent"|"ServerToggledPassives"|"ServerUnsheath"|"ServerUnsheathScriptOverride"|"ServerUserSnapshot"|"ServerVariableManager"|"ShapeshiftHealthReservation"|"ShapeshiftState"|"ShootThroughType"|"ShortRest"|"ShouldDestroyOnSpellCast"|"Sight"|"SightData"|"SightEntityViewshed"|"SightRangeAdditiveBoost"|"SightRangeMaximumBoost"|"SightRangeMinimumBoost"|"SightRangeOverrideBoost"|"SimpleCharacter"|"SkillBoost"|"SkillCheckEvent"|"Sound"|"SourceAdvantageBoost"|"Speaker"|"SpellAiConditions"|"SpellBook"|"SpellBookChanged"|"SpellBookCooldowns"|"SpellBookPrepares"|"SpellCastAnimationInfo"|"SpellCastAnimationRequest"|"SpellCastCache"|"SpellCastCanBeTargeted"|"SpellCastCounteredEvent"|"SpellCastDestroyEvent"|"SpellCastHitEvent"|"SpellCastInterruptResults"|"SpellCastInterruptsUsed"|"SpellCastIsCasting"|"SpellCastJumpStartEvent"|"SpellCastLogicExecutionEndEvent"|"SpellCastMoveDuringCastUpdateEvent"|"SpellCastMovement"|"SpellCastMovementAndPrecalculationEndEvent"|"SpellCastPrepareEndEvent"|"SpellCastPrepareStartEvent"|"SpellCastPreviewEndEvent"|"SpellCastRequestTargetTracking"|"SpellCastRolls"|"SpellCastSpellRollAbortEvent"|"SpellCastState"|"SpellCastTargetHitEvent"|"SpellCastTargetHitInterruptEvent"|"SpellCastTargetReactionEvent"|"SpellCastTargetsChangedEvent"|"SpellCastTextKeyEvent"|"SpellCastThrowPickupPositionChangedEvent"|"SpellCastUpdateTargetTracking"|"SpellContainer"|"SpellModificationContainer"|"SpellResistanceBoost"|"SpellSaveDCBoost"|"SpellSyncTargeting"|"SpellWeaponSetChangeRequest"|"SpellsLearnedEvent"|"StaticPhysics"|"Stats"|"StatsAppliedEvent"|"StatusBoostsRefreshed"|"StatusCause"|"StatusContainer"|"StatusID"|"StatusImmunities"|"StatusImmunityBoost"|"StatusIncapacitated"|"StatusLifetime"|"StatusVisualDisabled"|"Stealth"|"Steering"|"StoryShortRestDisabled"|"SummonAddConcentrationRequest"|"SummonAddToExistingConcentrationRequest"|"SummonAttachToProjectileRequest"|"SummonContainer"|"SummonCreatedEvent"|"SummonDespawnRequest"|"SummonExpiredRequest"|"SummonLateJoinPenalty"|"SummonLifetime"|"SummonOwnerSetEvent"|"SummonPlaceInInventoryRequest"|"SummonSetLifetimeRequest"|"SurfacePathInfluences"|"TLPreviewDummy"|"TadpolePowers"|"TadpoleTreeState"|"Tadpoled"|"Tag"|"TagsChangedEvent"|"TemplateAnimationSetOverride"|"TemporaryHPBoost"|"ThreatRange"|"TimeFactor"|"TimelineActorData"|"Trader"|"Transform"|"TurnBased"|"TurnOrder"|"UnlockInterruptBoost"|"UnlockSpellBoost"|"UnlockSpellVariantBoost"|"Unsheath"|"Use"|"UseAction"|"UseBoosts"|"UseSocket"|"UserAvatar"|"UserReservedFor"|"Uuid"|"UuidToHandleMapping"|"Value"|"Visual"|"Voice"|"VoiceTag"|"WalkOn"|"Weapon"|"WeaponAttackRollAbilityOverrideBoost"|"WeaponAttackRollBonusBoost"|"WeaponAttackTypeOverrideBoost"|"WeaponDamageBoost"|"WeaponDamageDieOverrideBoost"|"WeaponDamageResistanceBoost"|"WeaponDamageTypeOverrideBoost"|"WeaponEnchantmentBoost"|"WeaponPropertiesChangedEvent"|"WeaponPropertyBoost"|"WeaponSet"|"WeightBoost"|"WeightCategoryBoost"|"Wielded"|"Wielding"
+--- @alias ExtComponentType string|"ACOverrideFormulaBoost"|"AbilityBoost"|"AbilityCheckEvent"|"AbilityFailedSavingThrowBoost"|"AbilityOverrideMinimumBoost"|"ActionResourceBlockBoost"|"ActionResourceChangeResults"|"ActionResourceConsumeMultiplierBoost"|"ActionResourceEvents"|"ActionResourceMultiplierBoost"|"ActionResourcePreventReductionBoost"|"ActionResourceReplenishTypeOverrideBoost"|"ActionResourceSpendEvent"|"ActionResourceValueBoost"|"ActionResources"|"ActionType"|"ActionUseConditions"|"Active"|"ActiveCharacterLight"|"ActiveCharacterLightBoost"|"ActiveSkeletonSlots"|"AddTagBoost"|"AddedSpells"|"AdvanceSpellsBoost"|"AdvantageBoost"|"AiArchetypeOverrideBoost"|"Ambushing"|"AnimationBlueprint"|"AnimationGameplayEvents"|"AnimationGameplayEventsSingleton"|"AnimationSet"|"AnimationTextKeyEvents"|"AnimationTextKeyEventsSingleton"|"AnimationTriggeredEvents"|"AnimationUpdate"|"AnimationWaterfall"|"AppearanceOverride"|"ApprovalRatings"|"Armor"|"ArmorAbilityModifierCapOverrideBoost"|"ArmorClassBoost"|"ArmorSetState"|"AttackSpellOverride"|"AttackSpellOverrideBoost"|"AttitudesToPlayers"|"AttributeBoost"|"AttributeFlags"|"AttributeFlagsChangedEvent"|"AvailableLevel"|"Avatar"|"Background"|"BackgroundGoals"|"BackgroundPassives"|"BackgroundTag"|"BaseHp"|"BaseStats"|"BlockAbilityModifierFromACBoost"|"BlockFollow"|"BlockRegainHPBoost"|"BodyType"|"BoostBaseUpdated"|"BoostChangedEvent"|"BoostChangedEventsSingleton"|"BoostCondition"|"BoostConditionalState"|"BoostInfo"|"BoostProvider"|"BoostsContainer"|"Bound"|"CCChangeAppearanceDefinition"|"CCCharacterDefinition"|"CCCompanionDefinition"|"CCCreation"|"CCDefinitionCommon"|"CCDefinitionLevelUp"|"CCFullRespec"|"CCFullRespecDefinition"|"CCLevelUp"|"CCLevelUpDefinition"|"CCPrepareSpell"|"CCRespec"|"CCRespecDefinition"|"CCSessionCommon"|"CCState"|"CalendarDaysPassed"|"CalendarStartingDate"|"Camera"|"CameraCombatTarget"|"CameraInSelectorMode"|"CameraSelectorMode"|"CameraSpellTracking"|"CameraTarget"|"CampChest"|"CampEndTheDayState"|"CampPresence"|"CampQuality"|"CampSettings"|"CampSupply"|"CampTotalSupplies"|"CanBeDisarmed"|"CanBeInInventory"|"CanBeLooted"|"CanBeWielded"|"CanDeflectProjectiles"|"CanDoActions"|"CanDoRest"|"CanEnterChasm"|"CanInteract"|"CanLevelUp"|"CanModifyHealth"|"CanMove"|"CanSeeThrough"|"CanSeeThroughBoost"|"CanSense"|"CanShootThrough"|"CanShootThroughBoost"|"CanSpeak"|"CanTrade"|"CanTravel"|"CanTriggerRandomCasts"|"CanWalkThrough"|"CanWalkThroughBoost"|"CannotBePickpocketed"|"CannotBeTakenOut"|"CannotHarmCauseEntityBoost"|"CarryCapacityMultiplierBoost"|"CharacterCreationAppearance"|"CharacterCreationStats"|"CharacterCreationTemplateOverride"|"CharacterHasGeneratedTradeTreasure"|"CharacterUnarmedDamageBoost"|"CharacterWeaponDamageBoost"|"ClassTag"|"Classes"|"ClassesChangedEvent"|"ClientCCBaseDefinitionState"|"ClientCCChangeAppearanceDefinition"|"ClientCCCompanionDefinition"|"ClientCCDefinitionState"|"ClientCCDefinitionStateEx"|"ClientCCDummyDefinition"|"ClientCCFullRespecDefinition"|"ClientCCLevelUpDefinition"|"ClientCharacter"|"ClientCharacterIconRequest"|"ClientCharacterIconResult"|"ClientControl"|"ClientEquipmentVisibilityState"|"ClientEquipmentVisuals"|"ClientInterruptPlayerDecision"|"ClientItem"|"ClientPaperdoll"|"ClientProjectile"|"ClientTimelineActorControl"|"ClientVisualsDesiredState"|"ClientVisualsVisibilityState"|"ClimbOn"|"Clock"|"CombatDelayedFanfare"|"CombatFleeRequest"|"CombatFleeSuccess"|"CombatIsThreatened"|"CombatJoinInCurrentRound"|"CombatJoinInCurrentRoundFailedEvent"|"CombatJoining"|"CombatLateJoinPenalty"|"CombatLeftEvent"|"CombatMerge"|"CombatParticipant"|"CombatRequestCompletedEvent"|"CombatScheduledForDelete"|"CombatStartedEvent"|"CombatState"|"CombatSurfaceTeamSingleton"|"CombatSurprisedJoinRequest"|"CombatSurprisedStealthRequest"|"CombatSwitched"|"CombatThreatRangeChangedEvent"|"CombatantJoinEvent"|"CombatantKilledEvent"|"CombinedLight"|"Concentration"|"ConcentrationChanged"|"ConcentrationClearedEvent"|"ConcentrationDamageCheck"|"ConcentrationIgnoreDamageBoost"|"Construction"|"ConstructionFilling"|"ConstructionTile"|"CriticalHitBoost"|"CriticalHitExtraDiceBoost"|"Cull"|"CurrentlyFollowingParty"|"CustomIcon"|"CustomIconsStorage"|"CustomName"|"CustomStats"|"DamageBonusBoost"|"DamageReductionBoost"|"DamageTakenBonusBoost"|"Darkness"|"DarkvisionRangeBoost"|"DarkvisionRangeMinBoost"|"DarkvisionRangeOverrideBoost"|"Data"|"DeadByDefault"|"Death"|"DeathApplyKnockedOut"|"DeathAssignEntityToUserRequest"|"DeathDeadByDefaultRequest"|"DeathState"|"DeathType"|"DefaultCameraBehavior"|"DelayedFanfareRemovedDuringCombatEvent"|"Detached"|"DetectCrimesBlockBoost"|"DialogState"|"DiedEvent"|"DifficultyCheck"|"DisabledEquipment"|"Disarmable"|"DisplayName"|"DodgeAttackRollBoost"|"Downed"|"DownedEvent"|"DownedStatusBoost"|"DropOnDeathBlocked"|"DualWielding"|"DualWieldingBoost"|"DynamicAnimationTags"|"Effect"|"EffectCameraBehavior"|"EncumbranceState"|"EncumbranceStats"|"EntityThrowDamageBoost"|"EocLevel"|"Equipable"|"EquipmentSlotChangedEvent"|"EquipmentVisual"|"EscortFollower"|"EscortHasStragglers"|"EscortLeader"|"EscortLeaderPriority"|"EscortMember"|"EscortStragglersTracker"|"ExamineDisabled"|"Experience"|"Expertise"|"ExpertiseBonusBoost"|"FTBModeChangedEvent"|"FTBParticipant"|"FTBPaused"|"FTBPlayersTurnEndedEvent"|"FTBPlayersTurnStartedEvent"|"FTBRespect"|"FTBRoundEndedEvent"|"FTBSurfaceTeamSingleton"|"FTBTimeFactorRequests"|"FTBTimeFactorResetRequests"|"FTBTurnBasedChangesRequest"|"FTBZone"|"FTBZoneBlockReason"|"FTBZoneInstigator"|"Faction"|"FactionOverrideBoost"|"FallDamageMultiplierBoost"|"FallToProne"|"FleeCapability"|"Floating"|"FogVolumeRequest"|"FullIllithid"|"GameCameraBehavior"|"GameObjectVisual"|"GameplayLight"|"GameplayLightBoost"|"GameplayObscurityBoost"|"GlobalCombatRequests"|"GlobalLongRestDisabled"|"GlobalShortRestDisabled"|"God"|"GodTag"|"GravityDisabled"|"GravityDisabledUntilMoved"|"GuaranteedChanceRollOutcomeBoost"|"HalfIllithid"|"HalveWeaponDamageBoost"|"HasExclamationDialog"|"HasGeneratedTreasure"|"HasOpened"|"HealBlock"|"HealMaxIncoming"|"HealMaxOutgoing"|"Health"|"Hearing"|"HistoryTargetUUID"|"HitAnimationRequest"|"HitAttacker"|"HitJoinCombatRequest"|"HitLifetime"|"HitMeta"|"HitNotification"|"HitNotificationRequest"|"HitProxy"|"HitProxyOwner"|"HitReaction"|"HitResultEvent"|"HitTarget"|"HitThrownObject"|"HitWeapon"|"HorizontalFOVOverrideBoost"|"HotbarContainer"|"HotbarDecks"|"Icon"|"Identity"|"IdentityState"|"IgnoreDamageThresholdMinBoost"|"IgnoreLowGroundPenaltyBoost"|"IgnorePointBlankDisadvantageBoost"|"IgnoreResistanceBoost"|"IgnoreSurfaceCoverBoost"|"IgnoreSurfaces"|"ImprovisedWeaponWielded"|"ImprovisedWeaponWielding"|"IncreaseMaxHPBoost"|"InitiativeBoost"|"InteractionDisabled"|"InteractionFilter"|"InterruptActionState"|"InterruptConditionallyDisabled"|"InterruptContainer"|"InterruptData"|"InterruptDecision"|"InterruptPreferences"|"InterruptPrepared"|"InterruptZone"|"InterruptZoneParticipant"|"InterruptZoneSource"|"InventoryContainer"|"InventoryData"|"InventoryIsOwned"|"InventoryLocked"|"InventoryMember"|"InventoryMemberTransform"|"InventoryOwner"|"InventoryPropertyCanBePickpocketed"|"InventoryPropertyIsDroppedOnDeath"|"InventoryPropertyIsTradable"|"InventoryStack"|"InventoryStackMember"|"InventoryTopOwner"|"InventoryWeight"|"Invisibility"|"IsCharacter"|"IsCombatPaused"|"IsDoor"|"IsFalling"|"IsGlobal"|"IsGold"|"IsInCombat"|"IsInFTB"|"IsInTurnBasedMode"|"IsItem"|"IsMarkedForDeletion"|"IsSeeThrough"|"IsStoryItem"|"IsSummon"|"ItemBoosts"|"ItemCanMove"|"ItemDestroyed"|"ItemDestroying"|"ItemDye"|"ItemHasGeneratedTreasure"|"ItemHasMoved"|"ItemInUse"|"ItemIsPoisoned"|"ItemPortal"|"ItemTemplateDestroyed"|"JumpFollow"|"JumpMaxDistanceBonusBoost"|"JumpMaxDistanceMultiplierBoost"|"Key"|"Ladder"|"LearnedSpells"|"Level"|"LevelChanged"|"LevelUp"|"Light"|"Lock"|"LockBoost"|"LongRestInScriptPhase"|"LongRestState"|"LongRestTimeline"|"LongRestTimers"|"LongRestUsers"|"Loot"|"LootingState"|"MapMarkerStyle"|"MaterialParameterOverride"|"Max"|"MaximizeHealingBoost"|"MaximumRollResultBoost"|"MinimumRollResultBoost"|"MonkWeaponDamageDiceOverrideBoost"|"Movement"|"MovementSpeedLimitBoost"|"MultiplayerHost"|"MultiplayerUser"|"Net"|"NewInInventory"|"NewItemsInside"|"NewSpellsAddedEvent"|"NonTradable"|"NullifyAbilityBoost"|"ObjectInteraction"|"ObjectSize"|"ObjectSizeBoost"|"ObjectSizeOverrideBoost"|"OffStage"|"OnDamageSpells"|"Origin"|"OriginAppearanceTag"|"OriginPassives"|"OriginTag"|"OriginalIdentity"|"OriginalTemplate"|"OwnedAsLoot"|"OwneeCurrent"|"PartyComposition"|"PartyFollower"|"PartyMember"|"PartyPortals"|"PartyRecipes"|"PartyView"|"PartyWaypoints"|"Passive"|"PassiveConditionalRollInterruptEvent"|"PassiveContainer"|"PassiveRequestTargetTracking"|"PassiveUpdateTargetTracking"|"PassiveUsageCount"|"PassivesUpdatedEvent"|"PasssiveUsageCountIncrementedEvent"|"Pathing"|"PathingDistanceChanged"|"Pause"|"PauseExcluded"|"PhysicalForceRangeBonusBoost"|"Physics"|"PickUpExecuting"|"PickUpRequest"|"PickingState"|"Player"|"PlayerPrepareSpell"|"Proficiency"|"ProficiencyBonusBoost"|"ProficiencyBonusIncreaseBoost"|"ProficiencyBonusOverrideBoost"|"ProficiencyBoost"|"ProficiencyGroup"|"ProgressionAbilityImprovements"|"ProgressionChangedContainers"|"ProgressionContainer"|"ProgressionFeat"|"ProgressionLevelUpChanged"|"ProgressionMeta"|"ProgressionPassives"|"ProgressionReplicatedFeat"|"ProgressionSkills"|"ProgressionSpells"|"ProjectileDeflectBoost"|"ProjectileImpactEvent"|"ProjectileRequestTargetTracking"|"ProjectileSource"|"ProjectileSplitThrowableObjectRequest"|"ProjectileUpdateTargetTracking"|"Race"|"ReadyToBeAddedToInventory"|"ReceivingCriticalDamageOnHitBoost"|"Recruiter"|"RedirectDamageBoost"|"ReduceCriticalAttackThresholdBoost"|"Relation"|"Repose"|"RequestedRoll"|"RerollBoost"|"ResistanceBoost"|"Resistances"|"RestingEntities"|"RollBonusBoost"|"RollInProgress"|"RollModifiers"|"Ruleset"|"RulesetModifiers"|"SavantBoost"|"Savegame"|"SavingThrowRolledEvent"|"ScaleMultiplierBoost"|"SceneAttach"|"Scenery"|"ScriptPropertyCanBePickpocketed"|"ScriptPropertyIsDroppedOnDeath"|"ScriptPropertyIsTradable"|"ScriptedExplosion"|"ServerAIHintAreaTrigger"|"ServerActivationGroupContainer"|"ServerAddedStatusAuraEffectEvent"|"ServerAiArchetype"|"ServerAiGridAreaTrigger"|"ServerAiInterestedInItems"|"ServerAiInterestingItem"|"ServerAiModifiers"|"ServerAnubisExecutor"|"ServerAnubisTag"|"ServerAtmosphereTrigger"|"ServerAvatarContainerTrigger"|"ServerBaseData"|"ServerBaseProficiency"|"ServerBaseSize"|"ServerBaseStats"|"ServerBaseWeapon"|"ServerBlockBronzeTimelinePlacementTrigger"|"ServerBoostBase"|"ServerBoostTag"|"ServerBreadcrumb"|"ServerCCAppearanceVisualTag"|"ServerCCCustomIcon"|"ServerCCEquipmentSetRequest"|"ServerCCGod"|"ServerCCIsCustom"|"ServerCCUpdates"|"ServerCampChestTrigger"|"ServerCampRegionTrigger"|"ServerCanStartCombat"|"ServerCharacter"|"ServerChasmRegionTrigger"|"ServerChasmSeederTrigger"|"ServerCombatGroupMapping"|"ServerCombatLeaveRequest"|"ServerCrimeAreaTrigger"|"ServerCrimeRegionTrigger"|"ServerCrowdCharacterTrigger"|"ServerDarknessActive"|"ServerDeathContinue"|"ServerDeathRequest"|"ServerDeathState"|"ServerDelayDeath"|"ServerDelayDeathCause"|"ServerDialogTag"|"ServerDisarmAttempt"|"ServerDisplayNameList"|"ServerDynamicLayerOwner"|"ServerEnterRequest"|"ServerEocAreaTrigger"|"ServerEocPointTrigger"|"ServerEventTrigger"|"ServerExperienceGaveOut"|"ServerExplorationTrigger"|"ServerFleeBlocked"|"ServerFloorTrigger"|"ServerGameTimer"|"ServerGameplayLightChanges"|"ServerGameplayLightEquipment"|"ServerHotbarOrder"|"ServerIconList"|"ServerImmediateJoin"|"ServerInterruptActionRequests"|"ServerInterruptAddRemoveRequests"|"ServerInterruptDataSingleton"|"ServerInterruptInitialParticipants"|"ServerInterruptTurnOrderInZone"|"ServerInterruptUsed"|"ServerInterruptZoneRequests"|"ServerInventoryContainerData"|"ServerInventoryGroupCheck"|"ServerInventoryIsReplicatedWith"|"ServerInventoryItemDataPopulated"|"ServerIsCurrentOwner"|"ServerIsLatestOwner"|"ServerIsLightBlocker"|"ServerIsOriginalOwner"|"ServerIsPreviousLatestOwner"|"ServerIsPreviousOwner"|"ServerIsUnsummoning"|"ServerIsVisionBlocker"|"ServerItem"|"ServerKiller"|"ServerLeader"|"ServerLightingTrigger"|"ServerModifyDelayDeathRequest"|"ServerMusicVolumeTrigger"|"ServerMusicVolumeTriggerState"|"ServerOsirisPingRequestSingleton"|"ServerOsirisTag"|"ServerOwneeHistory"|"ServerOwneeRequest"|"ServerPassiveBase"|"ServerPassiveBoosts"|"ServerPassivePersistentData"|"ServerPeersInRange"|"ServerPickpocket"|"ServerPingCooldownSingleton"|"ServerPingRequestSingleton"|"ServerPortalTrigger"|"ServerProficiencyGroupStats"|"ServerProjectile"|"ServerProjectileAttachment"|"ServerProjectileCache"|"ServerProjectileInitialization"|"ServerProjectileSpell"|"ServerRaceTag"|"ServerRatingsChanged"|"ServerRecruitedBy"|"ServerRegionTrigger"|"ServerRegistrationSettings"|"ServerRemovedStatusAuraEffectEvent"|"ServerReplicationDependency"|"ServerReplicationDependencyOwner"|"ServerRestPendingType"|"ServerRestTypeChosenEvent"|"ServerResurrectedEvent"|"ServerRollFinishedEvent"|"ServerRollInProgress"|"ServerRollStartRequest"|"ServerRollStartSpellRequest"|"ServerRoomTrigger"|"ServerSafePosition"|"ServerScriptPassives"|"ServerShapeshiftEquipmentHistory"|"ServerShapeshiftStates"|"ServerShortRestResultEvent"|"ServerSoundVolumeTrigger"|"ServerSpellCastCache"|"ServerSpellCastHitDelay"|"ServerSpellCastInterrupt"|"ServerSpellCastMovement"|"ServerSpellCastMovementInfo"|"ServerSpellCastPendingRequests"|"ServerSpellCastProjectilePathfindCache"|"ServerSpellCastRequests"|"ServerSpellCastResponsible"|"ServerSpellCastState"|"ServerSpellCastUnsheathFallbackTimer"|"ServerSpellCastZoneRange"|"ServerSpellClientInitiated"|"ServerSpellExternals"|"ServerSpellHitRegister"|"ServerSpellInterruptRequests"|"ServerSpellInterruptResults"|"ServerStartTrigger"|"ServerStatsAreaTrigger"|"ServerStatus"|"ServerStatusActive"|"ServerStatusAddEvent"|"ServerStatusAddedFromSaveLoad"|"ServerStatusApplyEvent"|"ServerStatusAttemptEvent"|"ServerStatusAttemptFailedEvent"|"ServerStatusAura"|"ServerStatusAuraContainer"|"ServerStatusBoostsProcessed"|"ServerStatusCause"|"ServerStatusDifficultyModifiers"|"ServerStatusDispelRollCheck"|"ServerStatusDownedChangedEvent"|"ServerStatusEvent"|"ServerStatusOwnership"|"ServerStatusPerforming"|"ServerStatusRefreshed"|"ServerStatusRemoveEvent"|"ServerStatusRequests"|"ServerStatusScheduledForDeletion"|"ServerStatusTurnStartEvent"|"ServerStatusUnique"|"ServerStatusUpdateTargetTracking"|"ServerSurface"|"ServerTeleportTrigger"|"ServerTemplateChangedEvent"|"ServerTemplateTag"|"ServerTemplateTransformedEvent"|"ServerTimelineSceneTrigger"|"ServerToggledPassives"|"ServerTriggerCachedLeaveEvents"|"ServerTriggerEventConfig"|"ServerTriggerLoadedHandled"|"ServerTriggerRegisteredFor"|"ServerTriggerWorldAutoTriggered"|"ServerUnsheath"|"ServerUnsheathScriptOverride"|"ServerUpdatedRegisteredFor"|"ServerUpdatedRegisteredForItems"|"ServerUserSnapshot"|"ServerVariableManager"|"ShapeshiftHealthReservation"|"ShapeshiftState"|"ShootThroughType"|"ShortRest"|"ShortRestConsumeResources"|"ShouldDestroyOnSpellCast"|"Sight"|"SightData"|"SightEntityViewshed"|"SightRangeAdditiveBoost"|"SightRangeMaximumBoost"|"SightRangeMinimumBoost"|"SightRangeOverrideBoost"|"SimpleCharacter"|"SkillBoost"|"SkillCheckEvent"|"Sound"|"SourceAdvantageBoost"|"Speaker"|"SpellAiConditions"|"SpellBook"|"SpellBookChanged"|"SpellBookCooldowns"|"SpellBookPrepares"|"SpellCastAnimationInfo"|"SpellCastAnimationRequest"|"SpellCastCache"|"SpellCastCanBeTargeted"|"SpellCastCounteredEvent"|"SpellCastDataCache"|"SpellCastDestroyEvent"|"SpellCastEvent"|"SpellCastExecutionTime"|"SpellCastFinishedEvent"|"SpellCastHitEvent"|"SpellCastInterruptResults"|"SpellCastInterruptsUsed"|"SpellCastIsCasting"|"SpellCastJumpStartEvent"|"SpellCastLogicExecutionEndEvent"|"SpellCastLogicExecutionStartEvent"|"SpellCastMoveDuringCastUpdateEvent"|"SpellCastMovement"|"SpellCastMovementAndPrecalculationEndEvent"|"SpellCastMovementInfo"|"SpellCastOutcome"|"SpellCastPrepareEndEvent"|"SpellCastPrepareStartEvent"|"SpellCastPreviewEndEvent"|"SpellCastRequestTargetTracking"|"SpellCastRolls"|"SpellCastSpellRollAbortEvent"|"SpellCastState"|"SpellCastTargetHitEvent"|"SpellCastTargetHitInterruptEvent"|"SpellCastTargetReactionEvent"|"SpellCastTargetsChangedEvent"|"SpellCastTextKeyEvent"|"SpellCastThrowPickupPositionChangedEvent"|"SpellCastUpdateTargetTracking"|"SpellCastWeaponSetChangeRequest"|"SpellContainer"|"SpellModificationContainer"|"SpellResistanceBoost"|"SpellSaveDCBoost"|"SpellSyncTargeting"|"SpellsLearnedEvent"|"StaticPhysics"|"Stats"|"StatsAppliedEvent"|"StatusBoostsRefreshed"|"StatusCause"|"StatusContainer"|"StatusID"|"StatusImmunities"|"StatusImmunityBoost"|"StatusIncapacitated"|"StatusIndicateDarkness"|"StatusLifetime"|"StatusLoseControl"|"StatusVisualDisabled"|"Stealth"|"Steering"|"StoryShortRestDisabled"|"SummonAddConcentrationRequest"|"SummonAddToExistingConcentrationRequest"|"SummonAttachToProjectileRequest"|"SummonContainer"|"SummonCreatedEvent"|"SummonDespawnRequest"|"SummonExpiredRequest"|"SummonLateJoinPenalty"|"SummonLifetime"|"SummonOwnerSetEvent"|"SummonPlaceInInventoryRequest"|"SummonSetLifetimeRequest"|"SurfacePathInfluences"|"TLPreviewDummy"|"TadpolePowers"|"TadpoleTreeState"|"Tadpoled"|"Tag"|"TagsChangedEvent"|"TemplateAnimationSetOverride"|"TemporaryHPBoost"|"ThreatRange"|"TimeFactor"|"TimelineActorData"|"TradeBuybackData"|"Trader"|"Transform"|"TranslateChanged"|"TranslateChangedEvent"|"TriggerArea"|"TriggerContainer"|"TriggerIsInsideOf"|"TriggerType"|"TriggerUpdatedContainer"|"TriggerUpdatedPhysics"|"TurnBased"|"TurnOrder"|"UnlockInterruptBoost"|"UnlockSpellBoost"|"UnlockSpellVariantBoost"|"UnresolvedHitNotification"|"Unsheath"|"Use"|"UseAction"|"UseBoosts"|"UseSocket"|"UserAvatar"|"UserReservedFor"|"Uuid"|"UuidToHandleMapping"|"Value"|"Visual"|"Voice"|"VoiceTag"|"WalkOn"|"Weapon"|"WeaponAttackRollAbilityOverrideBoost"|"WeaponAttackRollBonusBoost"|"WeaponAttackTypeOverrideBoost"|"WeaponDamageBoost"|"WeaponDamageDieOverrideBoost"|"WeaponDamageResistanceBoost"|"WeaponDamageTypeOverrideBoost"|"WeaponEnchantmentBoost"|"WeaponPropertiesChangedEvent"|"WeaponPropertyBoost"|"WeaponSet"|"WeightBoost"|"WeightCategoryBoost"|"Wielded"|"Wielding"|"WieldingHistory"
 --- @alias ExtQueryType string|"Max"|"UuidToHandleMapping"
 --- @alias ExtResourceManagerType string|"AbilityDefaultValues"|"AbilityDistributionPreset"|"AbilityList"|"ActionResource"|"ActionResourceGroup"|"AnimationSetPriority"|"ApprovalRating"|"AreaLevelOverride"|"AvatarContainerTemplate"|"Background"|"BackgroundGoal"|"CalendarDayRange"|"CampChestTemplate"|"CharacterCreationAccessorySet"|"CharacterCreationAppearanceMaterial"|"CharacterCreationAppearanceVisual"|"CharacterCreationEquipmentIcons"|"CharacterCreationEyeColor"|"CharacterCreationHairColor"|"CharacterCreationIconSettings"|"CharacterCreationMaterialOverride"|"CharacterCreationPassiveAppearance"|"CharacterCreationPreset"|"CharacterCreationSharedVisual"|"CharacterCreationSkinColor"|"CharacterCreationVOLine"|"CinematicArenaFrequencyGroup"|"ClassDescription"|"ColorDefinition"|"CompanionPreset"|"ConditionError"|"CustomDice"|"DLC"|"DeathTypeEffect"|"DifficultyClass"|"DisturbanceProperty"|"EncumbranceType"|"EquipmentDefaultValues"|"EquipmentList"|"EquipmentType"|"ExperienceReward"|"Faction"|"Feat"|"FeatDefaultValues"|"FeatDescription"|"FeatSoundState"|"FixedHotBarSlot"|"Flag"|"FlagSoundState"|"God"|"GoldReward"|"Gossip"|"ItemThrowParams"|"ItemWallTemplate"|"LevelMap"|"LimbsMapping"|"LongRestCost"|"ManagedStatusVFX"|"Max"|"MultiEffectInfo"|"Origin"|"OriginIntroEntity"|"PassiveDefaultValues"|"PassiveList"|"PassiveVFX"|"PreparedSpellDefaultValues"|"Progression"|"ProgressionDescription"|"ProjectileDefault"|"Race"|"RandomCastOutcome"|"Ruleset"|"RulesetModifier"|"RulesetModifierOption"|"RulesetSelectionPreset"|"RulesetValue"|"ScriptMaterialParameterOverride"|"ScriptMaterialPresetOverride"|"ShapeshiftRule"|"SkillDefaultValues"|"SkillList"|"SpellDefaultValues"|"SpellList"|"SpellMetaCondition"|"SpellSoundTrajectory"|"StatusSoundState"|"SurfaceCursorMessage"|"TadpolePower"|"Tag"|"TagSoundState"|"TooltipExtraText"|"TooltipUpcastDescription"|"TrajectoryRules"|"TutorialEntries"|"TutorialEvent"|"TutorialModalEntries"|"TutorialUnifiedEntry"|"VFX"|"VisualLocatorAttachment"|"Voice"|"WeaponAnimationSet"|"WeightCategory"
---- @alias ExtSystemType string|"AnimationBlueprint"|"Max"|"PickingHelper"|"ServerActionResource"|"ServerBoost"|"ServerCastRequest"|"ServerCombat"|"ServerDialog"|"ServerPassive"|"ServerRoll"|"ServerShapeshift"|"ServerSpell"|"ServerStats"
+--- @alias ExtSystemType string|"AnimationBlueprint"|"ClientCharacterIconRender"|"ClientCharacterManager"|"ClientEquipmentVisuals"|"ClientVisual"|"ClientVisualsVisibilityState"|"Max"|"PickingHelper"|"ServerActionResource"|"ServerAttitude"|"ServerBodyType"|"ServerBoost"|"ServerCapabilities"|"ServerCastRequest"|"ServerCombat"|"ServerConcentration"|"ServerDialog"|"ServerDisplayName"|"ServerDualWielding"|"ServerExperience"|"ServerFTBZone"|"ServerFalling"|"ServerGod"|"ServerGravity"|"ServerHit"|"ServerInterruptDecision"|"ServerInterruptManagement"|"ServerInterruptRequests"|"ServerInventoryCanPlace"|"ServerInventoryEquipment"|"ServerInventoryInteraction"|"ServerInventoryInteractionRequest"|"ServerInventoryLocking"|"ServerInventoryManagement"|"ServerInventoryReceivalNotification"|"ServerInventoryStack"|"ServerLeader"|"ServerLongRest"|"ServerMagicPocketsTracking"|"ServerNewInventoryMember"|"ServerParty"|"ServerPartyTeleport"|"ServerPassive"|"ServerPingRequest"|"ServerPlatform"|"ServerProgression"|"ServerRating"|"ServerRestore"|"ServerRoll"|"ServerShapeshift"|"ServerShortRest"|"ServerSpell"|"ServerSpellCooldown"|"ServerSpellLearning"|"ServerStats"|"ServerStatusRequest"|"ServerSummonDespawn"|"ServerSummonSpawn"|"ServerTemplateChange"|"ServerTradeBuyback"|"ServerTreasureGeneration"|"ServerTurnOrder"|"ServerVisual"|"SoundRouting"
 --- @alias FleeErrorFlags string|"CantMove"|"Condition"|"Downed"|"EnemyTooClose"|"Incapacitated"|"PartyFollower"|"Region"|"Summon"
 --- @alias ForceFunctorAggression string|"Aggressive"|"Friendly"|"Neutral"|"Undefined"
 --- @alias ForceFunctorOrigin string|"OriginToEntity"|"OriginToTarget"|"TargetToEntity"|"Undefined"
 --- @alias FunctorContextType string|"AttackPosition"|"AttackTarget"|"Equip"|"Interrupt"|"Move"|"NearbyAttacked"|"NearbyAttacking"|"None"|"Source"|"Target"
 --- @alias GameActionType string|"GameObjectMoveAction"|"PathAction"|"RainAction"|"StatusDomeAction"|"StormAction"|"TornadoAction"|"WallAction"
 --- @alias Gender string|"Female"|"Male"
+--- @alias GravityType string|"Disabled"|"DisabledUntilMove"|"Enabled"
 --- @alias GuiButtonFlags string|"MouseButtonLeft"|"MouseButtonMiddle"|"MouseButtonRight"
 --- @alias GuiChildFlags string|"AlwaysUseWindowPadding"|"AutoResizeX"|"AutoResizeY"|"Border"|"ChildAlwaysAutoResize"|"FrameStyle"|"NavFlattened"|"ResizeX"|"ResizeY"
 --- @alias GuiColor string|"Border"|"BorderShadow"|"Button"|"ButtonActive"|"ButtonHovered"|"CheckMark"|"ChildBg"|"DragDropTarget"|"FrameBg"|"FrameBgActive"|"FrameBgHovered"|"Header"|"HeaderActive"|"HeaderHovered"|"MenuBarBg"|"ModalWindowDimBg"|"NavHighlight"|"NavWindowingDimBg"|"NavWindowingHighlight"|"PlotHistogram"|"PlotHistogramHovered"|"PlotLines"|"PlotLinesHovered"|"PopupBg"|"ResizeGrip"|"ResizeGripActive"|"ResizeGripHovered"|"ScrollbarBg"|"ScrollbarGrab"|"ScrollbarGrabActive"|"ScrollbarGrabHovered"|"Separator"|"SeparatorActive"|"SeparatorHovered"|"SliderGrab"|"SliderGrabActive"|"Tab"|"TabActive"|"TabDimmedSelectedOverline"|"TabHovered"|"TabUnfocused"|"TabUnfocusedActive"|"TableBorderLight"|"TableBorderStrong"|"TableHeaderBg"|"TableRowBg"|"TableRowBgAlt"|"Text"|"TextDisabled"|"TextLink"|"TextSelectedBg"|"TitleBg"|"TitleBgActive"|"TitleBgCollapsed"|"WindowBg"
@@ -867,15 +1001,23 @@ Osi = {}
 --- @alias HealEffect string|"Behavior"|"Heal"|"HealSharing"|"HealSharingReflected"|"Lifesteal"|"Necromantic"|"NegativeDamage"|"None"|"ResistDeath"|"Script"|"Sitting"|"Surface"|"Unknown4"|"Unknown9"
 --- @alias HitType string|"DoT"|"Magic"|"Melee"|"Ranged"|"Reflected"|"Surface"|"WeaponDamage"
 --- @alias HitWith string|"CrushByFall"|"FallDamage"|"Item"|"Magic"|"None"|"Projectile"|"Redirection"|"Surface"|"Trap"|"Unknown10"|"Unknown11"|"Weapon"
+--- @alias IdentityType string|"Female"|"Male"
 --- @alias IngredientTransformType string|"Boost"|"Consume"|"None"|"Poison"|"Transform"
 --- @alias IngredientType string|"Category"|"None"|"Object"|"Property"
 --- @alias InputModifier string|"Alt"|"Ctrl"|"Gui"|"Shift"
 --- @alias InputRawType string|"a"|"apostrophe"|"audio_mute"|"audio_next"|"audio_play"|"audio_prev"|"audio_stop"|"b"|"back"|"backslash"|"backspace"|"backtick"|"c"|"capslock"|"comma"|"controller_a"|"controller_b"|"controller_x"|"controller_y"|"d"|"del"|"dot"|"down"|"dpad_down"|"dpad_left"|"dpad_right"|"dpad_up"|"e"|"end"|"enter"|"equals"|"escape"|"f"|"f1"|"f10"|"f11"|"f12"|"f13"|"f14"|"f15"|"f16"|"f17"|"f18"|"f19"|"f2"|"f20"|"f21"|"f22"|"f23"|"f24"|"f3"|"f4"|"f5"|"f6"|"f7"|"f8"|"f9"|"g"|"guide"|"h"|"home"|"hyphen"|"i"|"insert"|"item1"|"item10"|"item11"|"item2"|"item3"|"item4"|"item5"|"item6"|"item7"|"item8"|"item9"|"j"|"k"|"kp_0"|"kp_1"|"kp_2"|"kp_3"|"kp_4"|"kp_5"|"kp_6"|"kp_7"|"kp_8"|"kp_9"|"kp_divide"|"kp_enter"|"kp_minus"|"kp_multiply"|"kp_period"|"kp_plus"|"l"|"lalt"|"lctrl"|"left"|"left2"|"leftbracket"|"leftshoulder"|"leftstick"|"leftstick_x"|"leftstick_xneg"|"leftstick_xpos"|"leftstick_y"|"leftstick_yneg"|"leftstick_ypos"|"leftstickpress"|"lefttrigger"|"lgui"|"lshift"|"m"|"middle"|"mode"|"motion"|"motion_xneg"|"motion_xpos"|"motion_yneg"|"motion_ypos"|"n"|"num_0"|"num_1"|"num_2"|"num_3"|"num_4"|"num_5"|"num_6"|"num_7"|"num_8"|"num_9"|"numlock"|"o"|"p"|"pagedown"|"pageup"|"pause"|"printscreen"|"q"|"r"|"ralt"|"rctrl"|"rgui"|"right"|"right2"|"rightbracket"|"rightshoulder"|"rightstick"|"rightstick_x"|"rightstick_xneg"|"rightstick_xpos"|"rightstick_y"|"rightstick_yneg"|"rightstick_ypos"|"rightstickpress"|"righttrigger"|"rshift"|"s"|"scrolllock"|"slash"|"space"|"space2"|"start"|"t"|"tab"|"touch_flick"|"touch_hold"|"touch_pinch_in"|"touch_pinch_out"|"touch_press"|"touch_rotate"|"touch_tap"|"u"|"up"|"v"|"volume_down"|"volume_up"|"w"|"wheel_xneg"|"wheel_xpos"|"wheel_yneg"|"wheel_ypos"|"x"|"x1"|"x2"|"y"|"z"
 --- @alias InputState string|"Pressed"|"Released"
 --- @alias InputType string|"AcceleratedRepeat"|"ClearOnRelease"|"Hold"|"Press"|"Release"|"Repeat"|"ValueChange"
+--- @alias InterruptRequestSource string|"Boost"|"Debug"|"LearnedSpell"
+--- @alias InventoryLockChange string|"Lock"|"Toggle"|"Unlock"
+--- @alias InventoryType string|"Equipment"|"KeyChainTest"|"Main"|"Other"|"PotionBeltTest"|"Reward"|"Trade"
+--- @alias IsTradableType string|"Default"|"NonTradable"|"Tradable"
 --- @alias ItemDataRarity string|"Common"|"Divine"|"Epic"|"Legendary"|"Rare"|"Sentinel"|"Uncommon"|"Unique"
 --- @alias ItemSlot string|"Amulet"|"Boots"|"Breast"|"Cloak"|"Gloves"|"Helmet"|"Horns"|"MainHand"|"MeleeMainHand"|"MeleeOffHand"|"MusicalInstrument"|"OffHand"|"Overhead"|"RangedMainHand"|"RangedOffHand"|"Ring"|"Ring2"|"Underwear"|"VanityBody"|"VanityBoots"|"Wings"
 --- @alias ItemUseType string|"Arrow"|"Consumable"|"Grenade"|"None"|"Potion"|"Scroll"|"Throwable"|"Unknown1"
+--- @alias LongRestState string|"Cancelled"|"Created"|"Finished"|"ReadyForDelete"|"RestTypeRequest"|"ScriptPhaseDenied"|"ScriptPhasePending"|"ScriptPhaseRequested"|"ScriptPhaseStart"|"ScriptPhaseTimeout"|"Validation"
+--- @alias LongRestType string|"CanceledByObserver"|"CanceledByOwner"|"CantRest"|"Exhausted"|"Full"|"None"
+--- @alias LongRestUserState string|"Finished"|"Finishing"|"Initial"|"RequestingData"|"Resting"|"StartingRest"|"WaitingConfirmation"|"WaitingOthers"
 --- @alias LuaTypeId string|"Any"|"Array"|"Boolean"|"Enumeration"|"Float"|"Function"|"Integer"|"Map"|"Module"|"Nullable"|"Object"|"Set"|"String"|"Tuple"|"Unknown"|"Variant"|"Void"
 --- @alias MultiEffectFlags string|"DetachSource"|"DetachTarget"|"Enabled"|"KeepRotation"|"KeepScale"|"MainHand"|"OffHand"|"UseDistance"|"UseOrientDirection"|"UseScaleOverride"
 --- @alias NarrativeCombatRequestType string|"ClearInNarrativeCombat"|"Create"|"Destroy"|"SetInNarrativeCombat"
@@ -893,6 +1035,7 @@ Osi = {}
 --- @alias ObscurityState string|"Clear"|"HeavilyObscured"|"LightlyObscured"
 --- @alias OsiFunctionType string|"Call"|"DB"|"Event"|"Proc"|"Query"
 --- @alias OsirisTaskType string|"Appear"|"AutomatedDialog"|"Combine"|"Disappear"|"Drop"|"FleeFromEntity"|"FleeFromGrid"|"FleeFromRelation"|"FollowNPC"|"FollowOwnerOrLeader"|"LookAt"|"MoveInRange"|"MoveItem"|"MoveToAndTalk"|"MoveToLocation"|"MoveToObject"|"PickupItem"|"PlayAnimation"|"RateLimitedAutomatedDialog"|"Resurrect"|"Steer"|"TeleportToLocation"|"Timer"|"UseItem"|"UseSpell"|"Wander"
+--- @alias PassiveSourceType string|"Debug"|"Equipment"|"Feat"|"Progression"|"Progression2"|"Script"|"Stats"|"Status"|"Tadpole"
 --- @alias PathRootType string|"Bin"|"Bin2"|"Data"|"Debug"|"EngineMod"|"GameMod"|"LocalAppData"|"Localization"|"Mods"|"Projects"|"Public"|"Public2"|"Root"|"Scripts"|"UserProfile"|"WorkingDir"
 --- @alias PhysicsExtraFlags string|"BlockAoEDamage"|"ShootThroughType0"|"ShootThroughType1"|"ShootThroughType2"|"ShootThroughType3"|"ShootThroughType4"|"ShootThroughType5"
 --- @alias PhysicsGroupFlags string|"AttackableWhenClickThrough"|"CanClickThrough"|"CanClimbOn"|"CanSeeThrough"|"CanSeeThrough2"|"CanShineThrough"|"CanShootThrough"|"CanWalkOn"|"Character"|"ClimbableTileConstruction"|"Dead"|"DisableBoundCollision"|"Dragging"|"Fadeable"|"Falling"|"Group01"|"Group02"|"Group04"|"Group08"|"Group100"|"Group10000000"|"Group40"|"Group80"|"IsDecorative"|"Item"|"PlatformOwner"|"PointerBlocker"|"Scenery"|"Terrain"|"TimelinePreview"|"VisibleItem"|"Wadable"
@@ -907,6 +1050,7 @@ Osi = {}
 --- @alias ResistanceBoostFlags string|"BelowDamageThreshold"|"ImmuneToMagical"|"ImmuneToNonMagical"|"ResistantToMagical"|"ResistantToNonMagical"|"VulnerableToMagical"|"VulnerableToNonMagical"
 --- @alias ResourceBankType string|"Animation"|"AnimationBlueprint"|"AnimationSet"|"Atmosphere"|"BlendSpace"|"CharacterVisual"|"ClothCollider"|"ColorList"|"Dialog"|"DiffusionProfile"|"Effect"|"FCurve"|"IKRig"|"LightCookie"|"Lighting"|"Material"|"MaterialPreset"|"MaterialSet"|"MeshProxy"|"Physics"|"Script"|"Sentinel"|"Skeleton"|"SkeletonMirrorTable"|"SkinPreset"|"Sound"|"TerrainBrush"|"Texture"|"TileSet"|"Timeline"|"TimelineScene"|"VirtualTexture"|"Visual"|"VisualSet"|"VoiceBark"
 --- @alias ResourceReplenishType string|"Combat"|"Default"|"ExhaustedRest"|"FullRest"|"Never"|"Rest"|"ShortRest"
+--- @alias RestCancelReason string|"AnotherPlayerCanceled"|"ForcedCancelOnLoad"|"None"|"RestTypeSelectionCanceled"|"Script"|"Validation"|"ValidationChangedDuringSelection"
 --- @alias RestErrorFlags string|"Combat"|"Dialog"|"DownedOrDead"|"DropInCCActive"|"FTB"|"GlobalDisabled"|"Location"|"NotEnoughResources"|"Script"
 --- @alias RestFlags string|"CanLongRest"|"CanShortRest"|"Unknown0x04"
 --- @alias RollCritical string|"Fail"|"None"|"Success"
@@ -922,10 +1066,13 @@ Osi = {}
 --- @alias ServerCharacterFlags string|"Activated"|"CanShootThrough"|"CannotAttachToGroups"|"CannotDie"|"CannotMove"|"CannotRun"|"CharCreationInProgress"|"CharacterControl"|"CharacterCreationFinished"|"CoverAmount"|"CustomLookEnabled"|"Deactivated"|"Dead"|"DeferredRemoveEscapist"|"Detached"|"DisableCulling"|"DisableWaypointUsage"|"DoNotFaceFlag"|"DontCacheTemplate"|"FightMode"|"FindValidPositionOnActivate"|"Floating"|"GMReroll"|"HasOwner"|"HostControl"|"IgnoresTriggers"|"InDialog"|"InParty"|"Invisible"|"Invulnerable"|"IsCompanion_M"|"IsHuge"|"IsPlayer"|"IsTrading"|"LevelTransitionPending"|"Loaded"|"Multiplayer"|"NeedsMakePlayerUpdate"|"OffStage"|"PartyFollower"|"RegisteredForAutomatedDialog"|"RequestStartTurn"|"ReservedForDialog"|"SpotSneakers"|"SteeringEnabled"|"StoryControlled"|"StoryNPC"|"Summon"|"Temporary"|"Totem"|"Unknown10000000000"|"Unknown40000000000"|"Unknown8000"|"Unknown80000000"|"Unknown80000000000000"|"WalkThrough"
 --- @alias ServerCharacterFlags2 string|"CanGossip"|"Global"|"IsLeveledByStory"|"IsPet"|"IsResurrected"|"TeleportingPartyHack"|"Trader"|"TreasureGeneratedForTrader"
 --- @alias ServerCharacterFlags3 string|"CrimeWarningsEnabled"|"NeedsPlacementSnapping"|"SpreadActivation"|"TreasureEquip"
+--- @alias ServerConcentrationRequestType string|"AddTarget"|"RemoveTarget"
+--- @alias ServerDestroyStatusRequestType string|"Cause"|"Death"|"DifficultyStatus"|"RestingEntityInventory"|"SourceEquippedItem"|"StatusEntity"|"StatusHandle"|"StatusID"|"StatusType"
 --- @alias ServerGameState string|"BuildStory"|"Disconnect"|"Exit"|"Idle"|"Init"|"LoadLevel"|"LoadModule"|"LoadSession"|"Paused"|"ReloadStory"|"Running"|"Save"|"Sync"|"Uninitialized"|"Unknown"|"UnloadLevel"|"UnloadModule"|"UnloadSession"
 --- @alias ServerItemFlags string|"Activated"|"CanBeMoved"|"CanBePickedUp"|"CanClimbOn"|"CanOnlyBeUsedByOwner"|"CanShootThrough"|"CanUse"|"ClientSync1"|"Destroy"|"Destroyed"|"DisableInventoryView80"|"DisableSync"|"DontAddToHotbar"|"Floating"|"ForceAffectedByAura"|"ForceClientSync"|"ForceSync"|"FreezeGravity"|"Frozen"|"GMFolding"|"HideHP"|"InAutomatedDialog"|"InPartyInventory"|"InUse"|"InteractionDisabled"|"Invisible"|"Invisible2"|"Invulnerable2"|"IsContainer"|"IsDoor"|"IsLadder"|"IsMoving"|"IsSecretDoor"|"IsSurfaceBlocker"|"IsSurfaceCloudBlocker"|"Known"|"LevelTransitionPending"|"LoadedTemplate"|"LuckyFind"|"NoCover"|"OffStage"|"PinnedContainer"|"PositionChanged"|"ReservedForDialog"|"SourceContainer"|"Sticky"|"StoryItem"|"Summon"|"TeleportOnUse"|"Totem"|"TransformChanged"|"WakePhysics"|"WalkOn"|"WalkThrough"
 --- @alias ServerItemFlags2 string|"Global"|"TreasureGenerated"|"UnEquipLocked"|"UnsoldGenerated"|"UseRemotely"
 --- @alias ServerMovementType string|"Climbing"|"Falling"|"Idle"|"MoveTo"|"MoveToSync"|"Repose"
+--- @alias ServerSpellCastSystemEventType string|"AddDelayedCastHit"|"AddMovementInfo"|"AddProjectileCache"|"AddServerMovement"|"AddSharedMovement"|"AddZoneRange"|"AdvanceInterruptAnimationIndex"|"AdvanceReaction"|"AdvanceRoll"|"CacheFlagChange"|"Cast"|"CastHit"|"CastHitRemove"|"CastOptionsChange"|"CastRemove"|"CastTextKey"|"CastTextKeyIndexIncrease"|"CastTextKeyRemove"|"ChangeCastEndPosition"|"ChangeCastHitDelayTimer"|"ChangeCastPosition"|"ChangeMovementTransactionID"|"ChangeProjectileDelayTimer"|"ChangeStoryActionId"|"CounteredSpellCast"|"CreateWall"|"CreateZone"|"DestroyEventRemove"|"DestroySpellCastEntity"|"DoTeleport"|"Finish"|"FinishRemove"|"FireProjectile"|"InitializeIntermediateTargets"|"InitializeRolls"|"InterruptApplyResult"|"InterruptEnd"|"InterruptEventChange"|"InterruptStart"|"IsCastingRemove"|"JumpStart"|"LogicExecutionEnd"|"LogicExecutionStart"|"LogicExecutionStartRemove"|"LogicExecutionUpdate"|"MoveDuringCastEnd"|"MoveDuringCastInitialize"|"MoveDuringCastStart"|"MoveDuringCastUpdate"|"MovementEnd"|"PathfindCleanup"|"PathfindRequest"|"PathfindResults"|"PhaseChange"|"PlayAnimation"|"PopDelayedCastHit"|"PopDelayedProjectile"|"PrecalculatedConditionals"|"PrecalculatedInterruptors"|"PrecalculationEnd"|"PreparationEnd"|"PreparationStart"|"PreparationStarting"|"PreviewEnd"|"PurgePausedAnimationEvents"|"PushPausedAnimationEvents"|"SpellRollAbort"|"TargetHit"|"TargetHitInterruptRemove"|"TargetHitRemove"|"TargetReactionRemove"|"TargetsChange"|"TargetsChanged"|"ThrowPickupPositionChanged"|"UpdateConditionals"|"UpdateInterruptors"|"UseCostsChange"|"WeaponSetRequest"|"ZoneRangeUpdate"
 --- @alias ServerStatusFlags string|"ForceFailStatus"|"ForceStatus"|"IgnoreStacking"|"Loaded"|"RequestClientSync"|"RequestDelete"|"RequestDeleteAtTurnEnd"|"Started"
 --- @alias ServerStatusFlags2 string|"DontTickWhileOnSurface"|"Influence"|"InitiateCombat"|"IsChanneled"|"IsFromItem"|"IsLifeTimeSet"|"IsOnSourceSurface"|"KeepAlive"
 --- @alias ServerStatusFlags3 string|"DisableImmunityOverhead"|"IsUnique"|"NotifiedPlanManager"|"StatusFlags3_0x08"|"StatusFlags3_0x10"|"StatusFlags3_0x20"|"StatusFlags3_0x40"|"StatusFlags3_0x80"
@@ -936,9 +1083,15 @@ Osi = {}
 --- @alias ShapeshiftChangeType string|"Add"|"Multiply"|"Override"
 --- @alias ShapeshiftSpellSource string|"ShapeshiftRule"|"Template"|"Unknown"
 --- @alias SkillId string|"Acrobatics"|"AnimalHandling"|"Arcana"|"Athletics"|"Deception"|"History"|"Insight"|"Intimidation"|"Invalid"|"Investigation"|"Medicine"|"Nature"|"Perception"|"Performance"|"Persuasion"|"Religion"|"Sentinel"|"SleightOfHand"|"Stealth"|"Survival"
---- @alias SourceAdvantageType string|"SourceAdvantageOnAttack"|"SourceAllyAdvantageOnAttack"
+--- @alias SoundEventFlags string|"EnableGetSourcePlayPosition"|"SoundCache"|"UnloadCallback"|"WaitForLoad"
+--- @alias SoundEventType string|"Ambient"|"CineHUD"|"HUD"|"Music"|"Sound"
+--- @alias SourceAdvantageType string|"None"|"SourceAdvantageOnAttack"|"SourceAllyAdvantageOnAttack"
+--- @alias SpellAnimationCastEvent string|"Cancel"|"Cast"|"CastContinue"|"Finished"|"Prepare"|"TargetingInfo"
 --- @alias SpellAttackType string|"DirectHit"|"MeleeOffHandWeaponAttack"|"MeleeSpellAttack"|"MeleeUnarmedAttack"|"MeleeWeaponAttack"|"None"|"RangedOffHandWeaponAttack"|"RangedSpellAttack"|"RangedUnarmedAttack"|"RangedWeaponAttack"
 --- @alias SpellAttackTypeOverride string|"Projectile_MainHandAttack"|"Projectile_OffhandAttack"|"Target_MainHandAttack"|"Target_OffhandAttack"|"Target_UnarmedAttack"
+--- @alias SpellCastFailReason string|"BlockedRequiredMove"|"Canceled"|"CantCast"|"CantFindCastPosition"|"CantMove"|"CantSpendUseCosts"|"CantUseSource"|"Countered"|"DeadCaster"|"DeadTarget"|"EqualTargets"|"InvalidCastPosition"|"InvalidSpell"|"InvalidTarget"|"MissingAnimations"|"MissingCaster"|"MissingTarget"|"MissingTargetPosition"|"MovementFailed"|"None"|"ServerTimeout"|"SpellRollFailure"|"TooFewTargets"|"TooManyTargets"|"UnsheathFailure"
+--- @alias SpellCastOptions string|"AvoidAoO"|"AvoidDangerousAuras"|"CheckProjectileTargets"|"DestroySource"|"Forced"|"FromClient"|"IgnoreCastChecks"|"IgnoreHasSpell"|"IgnoreSpellRolls"|"IgnoreTargetChecks"|"Immediate"|"IsHoverPreview"|"IsInterrupt"|"IsPreview"|"IsReaction"|"IsRoll"|"NoMovement"|"NoUnsheath"|"ShowPrepareAnimation"|"Silent"|"Unknown100000"
+--- @alias SpellCastPhase string|"Finished"|"LogicExecutionEnd"|"LogicExecutionFinished"|"LogicExecutionInterrupted"|"LogicExecutionStart"|"LogicExecutionUpdate"|"MovementFinished"|"MovementStart"|"MovementSteering"|"MovementUpdate"|"None"|"PrecalculationFinished"|"PrecalculationStart"|"PrepareEnd"|"PrepareFinished"|"PrepareStart"|"PrepareUpdate"|"ValidationFindCastEndPosition"|"ValidationFindCastPosition"|"ValidationFinished"|"ValidationPathfind"|"ValidationStart"
 --- @alias SpellCooldownType string|"Default"|"OncePerCombat"|"OncePerShortRestPerItem"|"OncePerTurn"|"OncePerTurnNoRealtime"|"UntilPerRestPerItem"|"UntilRest"|"UntilShortRest"
 --- @alias SpellFlags string|"AbortOnSecondarySpellRollFail"|"AbortOnSpellRollFail"|"AddFallDamageOnLand"|"AddWeaponRange"|"AllowMoveAndCast"|"CallAlliesSpell"|"CanAreaDamageEvade"|"CanDualWield"|"CannotRotate"|"CannotTargetCharacter"|"CannotTargetItems"|"CannotTargetTerrain"|"CombatLogSetSingleLineRoll"|"ConcentrationIgnoresResting"|"DisableBlood"|"DisplayInItemTooltip"|"DontAbortPerforming"|"HasHighGroundRangeExtension"|"HasSomaticComponent"|"HasVerbalComponent"|"HideInItemTooltip"|"IgnoreAoO"|"IgnorePreviouslyPickedEntities"|"IgnoreSilence"|"IgnoreVisionBlock"|"ImmediateCast"|"InventorySelection"|"Invisible"|"IsAttack"|"IsConcentration"|"IsDefaultWeaponAction"|"IsEnemySpell"|"IsHarmful"|"IsJump"|"IsLinkedSpellContainer"|"IsMelee"|"IsSpell"|"IsSwarmAttack"|"IsTrap"|"NoAOEDamageOnLand"|"NoCameraMove"|"NoCooldownOnMiss"|"NoSurprise"|"PickupEntityAndMove"|"RangeIgnoreBlindness"|"RangeIgnoreSourceBounds"|"RangeIgnoreTargetBounds"|"RangeIgnoreVerticalThreshold"|"Stealth"|"TargetClosestEqualGroundSurface"|"Temporary"|"TrajectoryRules"|"UNUSED_D"|"UNUSED_E"|"UnavailableInDialogs"|"Wildshape"
 --- @alias SpellLearningStrategy string|"AddChildren"|"MostPowerful"|"Singular"
@@ -985,11 +1138,13 @@ Osi = {}
 --- @alias TextureType string|"T1D"|"T1DArray"|"T2D"|"T2DArray"|"T2DCube"|"T2DCubeArray"|"T2DRenderTarget"|"T3D"|"T3DArray"
 --- @alias TravelErrorFlags string|"CannotFastTravel"|"Condition"|"DangerZone"|"Dialog"|"FTB"|"InDanger"
 --- @alias TravelFlags string|"BlockCampTravel"|"BlockFastTravel"
+--- @alias UnequipType string|"SwapHands"|"ToParentInventory"|"ToParentOrCreatedInventory"
 --- @alias VisualAttachmentFlags string|"DestroyWithParent"|"DoNotUpdate"|"EffectComponent_M"|"ExcludeFromBounds"|"Hair"|"HasSkeleton"|"InheritAnimations"|"KeepRot"|"KeepScale"|"ParticleSystem"|"SupportsVertexColorMask"|"TextKeyEffect_M"|"UseLocalTransform"|"VisualSet"
 --- @alias VisualCullFlags string|"CullDecal"|"CullNonProxy"|"CullRenderView1"|"CullRenderView2"|"CullScenery"|"CullShadow"|"CullShadow2"|"CullShadow3"|"CullShadow4"|"CullShadowProxy"
 --- @alias VisualFlags string|"AllowReceiveDecalWhenAnimated"|"AllowTPose"|"CastShadow"|"DisableCulling"|"DisableLOD"|"HasBlueprint"|"HasSkeleton"|"IsEffect"|"IsScenery"|"IsShadowProxy"|"IsWall"|"PlayingAttachedEffects"|"PreparedDestroyed"|"PreparedDestroyed2"|"ReceiveColorFromParent"|"ReceiveDecal"|"Reflecting"|"SeeThrough"|"ShowMesh"|"Unknown200"
 --- @alias VisualObjectType string|"Beard"|"Ears"|"Head"|"Horns"|"Type01"|"Type02"|"Type04"
 --- @alias WeaponFlags string|"AddToHotbar"|"Ammunition"|"Dippable"|"Finesse"|"Heavy"|"Lance"|"Light"|"Loading"|"Magical"|"Melee"|"NeedDualWieldingBoost"|"Net"|"NoDualWield"|"NotSheathable"|"Range"|"Reach"|"Thrown"|"Torch"|"Twohanded"|"Unstowable"|"Versatile"
+--- @alias WeaponSetType string|"Melee"|"Ranged"|"Unknown"
 --- @alias WeaponType string|"Arrow"|"Axe"|"Bow"|"Club"|"Crossbow"|"Knife"|"None"|"Rifle"|"Sentinel"|"Spear"|"Staff"|"Sword"|"Wand"
 
 
@@ -1362,6 +1517,10 @@ Osi = {}
 --- @field Width int32
 
 
+--- @class AiHintAreaTriggerData:ITriggerData
+--- @field IsAnchor boolean
+
+
 --- @class AiIgnoreMask
 --- @field AggregateFlags AiFlags
 --- @field AiGrid AiGrid
@@ -1591,9 +1750,24 @@ Osi = {}
 --- @field Event TextKeyEvent
 
 
+--- @class AnimationSetComponent:BaseComponent
+--- @field Entries AnimationSetEntry[]
+--- @field FallbackSubSet FixedString
+
+
+--- @class AnimationSetEntry
+--- @field Dynamic boolean
+--- @field Resource FixedString
+--- @field Slot FixedString
+--- @field Type FixedString
+
+
 --- @class AnimationTag
 --- @field Tag Guid
 --- @field field_10 uint8
+
+
+--- @class AnimationUpdateComponent:BaseComponent
 
 
 --- @class AnimationWaterfallComponent:BaseComponent
@@ -1636,6 +1810,9 @@ Osi = {}
 --- @field field_70 Set_Guid
 
 
+--- @class AreaTrigger:Trigger
+
+
 --- @class ArmorAbilityModifierCapOverrideBoostComponent:BaseComponent
 --- @field ArmorType ArmorType
 --- @field Value int32
@@ -1650,11 +1827,17 @@ Osi = {}
 --- @field ArmorClass int32
 --- @field ArmorClassAbility uint8
 --- @field ArmorType int32
---- @field Shield uint8
+--- @field EquipmentType EEquipmentType
 
 
 --- @class ArmorSetStateComponent:BaseComponent
---- @field State uint8
+--- @field State ArmorSetState
+
+
+--- @class AtmosphereTrigger:AreaTrigger
+--- @field AtmosphereResourceIDs FixedString[]
+--- @field CurrentAtmosphereResourceID FixedString
+--- @field field_84 number
 
 
 --- @class AttackDesc
@@ -1672,10 +1855,10 @@ Osi = {}
 
 
 --- @class AttitudeIdentifier
---- @field field_0 EntityHandle
---- @field field_10 Guid
---- @field field_20 uint8
---- @field field_8 uint8
+--- @field BodyType uint8
+--- @field Character EntityHandle
+--- @field Identity IdentityType
+--- @field Race Guid
 
 
 --- @class AttitudesToPlayersComponent:BaseComponent
@@ -1688,10 +1871,6 @@ Osi = {}
 
 --- @class AttributeFlagsComponent:BaseComponent
 --- @field AttributeFlags uint32
-
-
---- @class AvailableLevelComponent:BaseComponent
---- @field Level int32
 
 
 --- @class AvatarComponent:BaseComponent
@@ -1825,6 +2004,12 @@ Osi = {}
 --- @field field_2A uint8
 
 
+--- @class CameraBlockerTrigger:AreaTrigger
+--- @field field_70 FixedString[]
+--- @field field_80 FixedString
+--- @field field_84 number
+
+
 --- @class CameraComponent:BaseComponent
 --- @field AcceptsInput boolean
 --- @field Active boolean
@@ -1836,15 +2021,24 @@ Osi = {}
 --- @field UseSplitScreenFov boolean
 
 
+--- @class CameraLockTriggerData:ITriggerData
+--- @field TriggerCameraLockPos boolean
+--- @field TriggerGameCameraBehavior uint32
+
+
+--- @class CampChestTriggerData:ITriggerData
+--- @field Index uint8
+
+
+--- @class CampRegionTriggerData:ITriggerData
+
+
 --- @class CanBeDisarmedComponent:BaseComponent
 --- @field Flags uint16
 
 
 --- @class CanBeLootedComponent:BaseComponent
 --- @field Flags uint16
-
-
---- @class CanBeWieldedComponent:BaseComponent
 
 
 --- @class CanDeflectProjectilesComponent:BaseComponent
@@ -1902,6 +2096,9 @@ Osi = {}
 
 --- @class CanSpeakComponent:BaseComponent
 --- @field Flags uint16
+
+
+--- @class CanTradeComponent:BaseComponent
 
 
 --- @class CanTravelComponent:BaseComponent
@@ -2015,7 +2212,7 @@ Osi = {}
 --- @field IsPlayer boolean
 --- @field IsSimpleCharacter boolean
 --- @field IsSteeringEnabled boolean
---- @field IsTradable uint8
+--- @field IsTradable IsTradableType
 --- @field IsWorldClimbingEnabled boolean
 --- @field ItemList InventoryItemData[]
 --- @field JumpUpLadders boolean
@@ -2127,6 +2324,23 @@ Osi = {}
 --- @field DamageType DamageType
 
 
+--- @class ChasmRegionTriggerData:ITriggerData
+--- @field Triggers FixedString[]
+
+
+--- @class ChasmSeederTriggerData:ITriggerData
+--- @field MaxChasmHeightOffset number
+--- @field MaxChasmTiles int32
+--- @field Triggers FixedString[]
+
+
+--- @class CinematicArenaTriggerData:ITriggerData
+--- @field MainMenuActivateCameraEventType string
+--- @field MainMenuResetEventType string
+--- @field MainMenuStartEventType string
+--- @field Timeline Set_Guid
+
+
 --- @class ClassInfo
 --- @field ClassUUID Guid
 --- @field Level int32
@@ -2168,6 +2382,14 @@ Osi = {}
 --- @field IsBase boolean
 
 
+--- @class CombinedLightComponent:MoveableObject
+--- @field Entity EntityHandle
+--- @field InstanceGuid FixedString
+--- @field Template FixedString
+--- @field TemplateType uint8
+--- @field Transform Transform
+
+
 --- @class CombinedLightTemplate:LightTemplate
 --- @field GameplayCheckLOS boolean
 --- @field GameplayDirectionalDimensions vec3
@@ -2194,13 +2416,13 @@ Osi = {}
 
 --- @class ConcentrationTarget
 --- @field Concentration EntityHandle
+--- @field CreateSurfaceConcentrationTarget boolean
 --- @field Status ComponentHandle
 --- @field SurfaceIndex int16
 --- @field Target EntityHandle
 --- @field field_0 EntityHandle
 --- @field field_10 ComponentHandle
 --- @field field_18 int16
---- @field field_1A boolean
 --- @field field_8 EntityHandle
 
 
@@ -2226,6 +2448,134 @@ Osi = {}
 
 --- @class ConstrainActionData:IActionData
 --- @field Damage number
+
+
+--- @class Construction
+--- @field Filling EntityHandle[]
+--- @field InstanceId Guid
+--- @field Template ConstructionTemplate
+--- @field Tiles EntityHandle[]
+
+
+--- @class ConstructionFilling:StandardGameObject
+--- @field Construction FixedString
+--- @field Entity EntityHandle
+--- @field FadeGroup FixedString
+--- @field Fadeable boolean
+--- @field HierarchyOnlyFade boolean
+--- @field Id FixedString
+--- @field InstanceId Guid
+--- @field Material FixedString
+--- @field Physics FixedString
+--- @field Renderable RenderableObject
+--- @field Renderable2 RenderableObject
+--- @field SeeThrough boolean
+--- @field Template ConstructionFillingTemplate
+--- @field Tiling number
+--- @field WalkOn boolean
+
+
+--- @class ConstructionFillingTemplate
+--- @field BoundMax vec3
+--- @field BoundMin vec3
+--- @field FadeChildren FixedString[]
+--- @field FadeGroup FixedString
+--- @field Fadeable boolean
+--- @field HLOD Guid
+--- @field HiddenFromMinimapRendering boolean
+--- @field HierarchyOnlyFade boolean
+--- @field Id FixedString
+--- @field Indices uint16[]
+--- @field Material FixedString
+--- @field Name string
+--- @field Physics FixedString
+--- @field Rotation vec4
+--- @field Scale number
+--- @field SeeThrough boolean
+--- @field Splines ConstructionSpline[]
+--- @field Tiling number
+--- @field Translate vec3
+--- @field UVOffset vec2
+--- @field UVRotation number
+--- @field Vertices ConstructionVertexElement[]
+--- @field WalkOn boolean
+--- @field field_D8 uint8
+
+
+--- @class ConstructionPoint:ConstructionPointSchema
+--- @field Branches ConstructionPoint[]
+--- @field field_40 uint8
+--- @field field_41 uint8
+
+
+--- @class ConstructionPointSchema
+--- @field InstanceId Guid
+--- @field Position vec3
+--- @field Rotation vec4
+--- @field Scale vec3
+--- @field field_38 uint8
+--- @field field_39 uint8
+
+
+--- @class ConstructionSpline
+--- @field InstanceId Guid
+
+
+--- @class ConstructionTemplate:GameObjectTemplate
+--- @field ConstructionBend boolean
+--- @field FadeChildren FixedString[]
+--- @field FadeGroup FixedString
+--- @field Fadeable boolean
+--- @field HierarchyOnlyFade boolean
+--- @field SeeThrough boolean
+--- @field TileSet FixedString
+--- @field Tiles ConstructionTileTemplate[]
+--- @field field_100 int64
+--- @field field_108 int64
+
+
+--- @class ConstructionTile:StandardGameObject
+--- @field Construction FixedString
+--- @field Entity EntityHandle
+--- @field Flags uint8
+--- @field InstanceId Guid
+--- @field Scale number
+--- @field Template ConstructionTileTemplate
+--- @field field_48 EntityHandle
+--- @field field_5C FixedString
+
+
+--- @class ConstructionTileTemplate
+--- @field CanSeeThrough boolean
+--- @field ClickThrough boolean
+--- @field Climbable boolean
+--- @field Flip boolean
+--- @field HLOD Guid
+--- @field OverridePhysicsResource FixedString
+--- @field Rotation vec4
+--- @field Scale number
+--- @field ScaleX number
+--- @field ShootThrough boolean
+--- @field ShootThroughType uint8
+--- @field Side int32
+--- @field Stretchable boolean
+--- @field TemplateGuid Guid
+--- @field Tile Guid
+--- @field Transforms Transform[]
+--- @field Translate vec3
+--- @field UUID FixedString
+--- @field WalkOn boolean
+--- @field WalkThrough boolean
+--- @field gapA4 uint8
+
+
+--- @class ConstructionVertexElement
+--- @field Position vec3
+--- @field UV vec2
+--- @field field_14 int32
+--- @field field_18 int32
+--- @field field_1C int32
+--- @field field_20 int32
 
 
 --- @class ConsumeActionData:IActionData
@@ -2261,6 +2611,14 @@ Osi = {}
 --- @field SurfaceType SurfaceType
 
 
+--- @class CrimeAreaTriggerData:ITriggerData
+--- @field CrimeArea int16
+
+
+--- @class CrimeRegionTriggerData:ITriggerData
+--- @field Region FixedString
+
+
 --- @class CriticalHitBoostComponent:BaseComponent
 --- @field Flags CriticalHitAttackFlags
 --- @field SuccessFlags CriticalHitSuccessFlags
@@ -2273,12 +2631,62 @@ Osi = {}
 --- @field AttackType SpellAttackType
 
 
+--- @class CrowdCharacterCustomAnimation
+--- @field AnimationShortName FixedString
+--- @field Weight number
+
+
+--- @class CrowdCharacterDynamicAnimationTag
+--- @field Tag Guid
+--- @field Weight number
+
+
+--- @class CrowdCharacterTriggerData:ITriggerData
+--- @field AnimationSelectionTimeMax number
+--- @field AnimationSelectionTimeMin number
+--- @field CharacterSpacing number
+--- @field CustomAnimations CrowdCharacterCustomAnimation[]
+--- @field DetourChance number
+--- @field DetourMaxWaitTime number
+--- @field DetourMinWaitTime number
+--- @field DetourPatrolSplines FixedString[]
+--- @field DispersePatrolSplines FixedString[]
+--- @field DynamicAnimationTags CrowdCharacterDynamicAnimationTag[]
+--- @field GroupSizeMax int16
+--- @field GroupSizeMin int16
+--- @field GroupSpawnTimeMax number
+--- @field GroupSpawnTimeMin number
+--- @field MaxCharacters int16
+--- @field PatrolSplines FixedString[]
+--- @field PatrolWalkingPercentage number
+--- @field PointsOfInterest FixedString[]
+--- @field PositionPerturbation number
+--- @field ProxiesOnly boolean
+--- @field ReversePatrolDirection boolean
+--- @field SpawnTemplates CrowdCharacterTriggerSpawnTemplate[]
+--- @field SpawningEnabled boolean
+--- @field YawPerturbationDegrees number
+
+
+--- @class CrowdCharacterTriggerSpawnTemplate
+--- @field CharacterTemplateId FixedString
+--- @field SpawnWeight number
+
+
 --- @class CullComponent:BaseComponent
 --- @field CullFlags uint16
 
 
+--- @class CullTrigger:AreaTrigger
+
+
 --- @class CustomIconComponent:BaseComponent
+--- @field Icon ScratchBuffer
 --- @field Source uint8
+
+
+--- @class CustomIconsStorageSingletonComponent:BaseComponent
+--- @field Icons table<Guid, ScratchBuffer>
 
 
 --- @class CustomNameComponent:BaseComponent
@@ -2389,37 +2797,6 @@ Osi = {}
 --- @field Translate vec3
 
 
---- @class DeadByDefaultComponent:BaseComponent
---- @field DeadByDefault uint8
-
-
---- @class DeathComponent:BaseComponent
---- @field Combat Guid
---- @field DeathType uint8
---- @field LeaveTrace boolean
---- @field Target EntityHandle
---- @field field_10 Guid
---- @field field_21 uint8
---- @field field_22 uint8
---- @field field_23 uint8
---- @field field_24 uint8
---- @field field_28 int32
---- @field field_2C uint8
---- @field field_30 vec3
---- @field field_3C vec3
---- @field field_48 uint8
---- @field field_4C int32
---- @field field_60 uint8
---- @field field_61 uint8
---- @field field_62 uint8
---- @field field_64 vec3?
---- @field field_8 EntityHandle
-
-
---- @class DeathStateComponent:BaseComponent
---- @field State uint32
-
-
 --- @class DefaultCameraBehavior:BaseComponent
 --- @field CaptureInput boolean
 --- @field Forward number
@@ -2430,6 +2807,9 @@ Osi = {}
 --- @field field_0 number
 --- @field field_19 boolean
 --- @field field_1A boolean
+
+
+--- @class DefaultSyncedTriggerData:ITriggerData
 
 
 --- @class DestroyActionData:IActionData
@@ -2648,11 +3028,9 @@ Osi = {}
 --- @field State uint8
 
 
---- @class ExperienceComponent:BaseComponent
---- @field CurrentLevelExperience int32
---- @field NextLevelExperience int32
---- @field TotalExperience int32
---- @field field_28 uint8
+--- @class EventTriggerData:ITriggerData
+--- @field EnterEvent FixedString
+--- @field LeaveEvent FixedString
 
 
 --- @class ExpertiseBonusBoostComponent:BaseComponent
@@ -2661,6 +3039,11 @@ Osi = {}
 
 --- @class ExpertiseComponent:BaseComponent
 --- @field Expertise Set_SkillId
+
+
+--- @class ExplorationTriggerData:ITriggerData
+--- @field ExplorationReward Guid
+--- @field LevelOverride int32
 
 
 --- @class ExposureSettings
@@ -2690,6 +3073,9 @@ Osi = {}
 --- @field field_10 uint8
 
 
+--- @class FadeTrigger:AreaTrigger
+
+
 --- @class FallDamageMultiplierBoostComponent:BaseComponent
 --- @field Amount number
 
@@ -2714,6 +3100,20 @@ Osi = {}
 --- @field field_1C int32
 
 
+--- @class FloorTrigger:AreaTrigger
+--- @field BuildingUUID FixedString
+--- @field Floor int32
+--- @field IsRoof boolean
+
+
+--- @class FloorTriggerData:ITriggerData
+--- @field AttachedPortal FixedString[]
+--- @field BuildingUUID FixedString
+--- @field Floor int32
+--- @field IsRoof boolean
+--- @field TriggersToHide FixedString[]
+
+
 --- @class Fog
 --- @field FogLayer0 FogLayer
 --- @field FogLayer1 FogLayer
@@ -2732,6 +3132,10 @@ Osi = {}
 --- @field NoiseFrequency vec3
 --- @field NoiseRotation vec3
 --- @field NoiseWind vec3
+
+
+--- @class FogVolumeRequestComponent:MoveableObject
+--- @field field_0 Guid
 
 
 --- @class GameObjectTemplate
@@ -2989,6 +3393,10 @@ Osi = {}
 --- @class GravityDisabledComponent:BaseComponent
 
 
+--- @class GravityDisabledUntilMovedComponent:BaseComponent
+--- @field Transform Transform
+
+
 --- @class GuaranteedChanceRollOutcomeBoostComponent:BaseComponent
 --- @field field_0 boolean
 
@@ -3015,7 +3423,7 @@ Osi = {}
 
 
 --- @class HitDamageOverride
---- @field DamageType uint8
+--- @field DamageType DamageType
 --- @field OriginalValue int32
 --- @field OverriddenValue int32
 
@@ -3097,6 +3505,12 @@ Osi = {}
 --- @field Type ActionDataType
 
 
+--- @class ITriggerData
+
+
+--- @class ITriggerPhysicsData
+
+
 --- @class IconComponent:BaseComponent
 --- @field Icon FixedString
 
@@ -3169,7 +3583,7 @@ Osi = {}
 --- @field CanBePickpocketed boolean
 --- @field Conditions AiActionConditions
 --- @field IsDroppedOnDeath boolean
---- @field IsTradable uint8
+--- @field IsTradable IsTradableType
 --- @field ItemName string
 --- @field LevelName string
 --- @field TemplateID FixedString
@@ -3183,10 +3597,16 @@ Osi = {}
 --- @field field_4 vec3
 
 
+--- @class IsFallingComponent:BaseComponent
+
+
 --- @class IsGlobalComponent:BaseComponent
 
 
 --- @class IsInTurnBasedModeComponent:BaseComponent
+
+
+--- @class IsSeeThroughComponent:BaseComponent
 
 
 --- @class IsSummonComponent:BaseComponent
@@ -3529,6 +3949,12 @@ Osi = {}
 --- @field VolumetricCloudSettings VolumetricCloudSettings
 
 
+--- @class LightingTrigger:AreaTrigger
+--- @field CurrentLightingResourceID FixedString
+--- @field LightingResourceIDs FixedString[]
+--- @field field_84 number
+
+
 --- @class LocalTransform
 --- @field LocalBound AABound
 --- @field LocalTransform Transform
@@ -3731,6 +4157,12 @@ Osi = {}
 --- @field field_8 EntityHandle
 
 
+--- @class MaxIncomingComponent:BaseComponent
+
+
+--- @class MaxOutgoingComponent:BaseComponent
+
+
 --- @class MaximizeHealingBoostComponent:BaseComponent
 --- @field Direction HealDirection
 --- @field TargetTypes StatsTargetTypeFlags
@@ -3853,6 +4285,32 @@ Osi = {}
 
 --- @class MovementSpeedLimitBoostComponent:BaseComponent
 --- @field MovementType uint8
+
+
+--- @class MusicOriginSound
+--- @field OriginOnly FixedString
+--- @field OriginTheme FixedString
+--- @field OriginThemeAddInstrument boolean
+
+
+--- @class MusicVolumeEvent
+--- @field Bansuri FixedString
+--- @field Cello FixedString
+--- @field IsStinger boolean
+--- @field MusicEvent FixedString
+--- @field OriginSound MusicOriginSound
+--- @field Tambura FixedString
+--- @field TriggerOnEnter boolean
+--- @field TriggerOnlyOnce boolean
+--- @field Ud FixedString
+
+
+--- @class MusicVolumeTriggerData:ITriggerData
+--- @field Events MusicVolumeEvent[]
+
+
+--- @class NavigationCloudTriggerData:ITriggerData
+--- @field GenerateType int32
 
 
 --- @class NoesisBaseCommand:NoesisBaseComponent
@@ -4127,8 +4585,8 @@ Osi = {}
 --- @field PassiveId FixedString
 --- @field Source EntityHandle
 --- @field ToggledOn boolean
---- @field Type uint8
---- @field field_0 uint8
+--- @field Type PassiveSourceType
+--- @field field_0 PassiveSourceType
 --- @field field_10 EntityHandle
 --- @field field_18 boolean
 --- @field field_19 boolean
@@ -4171,6 +4629,11 @@ Osi = {}
 --- @field field_48 int32
 
 
+--- @class PathingDistanceChangedOneFrameComponent:BaseComponent
+--- @field DistanceXZ number
+--- @field field_4 number
+
+
 --- @class PhysicalForceRangeBonusBoostComponent:BaseComponent
 --- @field field_0 number
 --- @field field_4 uint8
@@ -4189,6 +4652,23 @@ Osi = {}
 --- @class PickingStateComponent:BaseComponent
 
 
+--- @class PlatformSystem:BaseSystem
+--- @field PlatformEntities table<FixedString, EntityHandle>
+--- @field TransformChanged PlatformTransformChangeRequest[]
+--- @field UpdateSubgrids EntityHandle[]
+
+
+--- @class PlatformTransformChangeRequest
+--- @field FireEvents boolean
+--- @field Platform EntityHandle
+--- @field Transform Transform
+
+
+--- @class PlatformTransformData
+--- @field FireEvents boolean
+--- @field Transform Transform
+
+
 --- @class PlaySoundActionData:IActionData
 --- @field ActivateSoundEvent FixedString
 --- @field PlayOnHUD boolean
@@ -4201,6 +4681,27 @@ Osi = {}
 --- @field Initialized boolean
 --- @field OwnerProfileID FixedString
 --- @field ReservedProfileID FixedString
+
+
+--- @class PointSoundTriggerData:ITriggerData
+--- @field AttenuationScale number
+--- @field CustomMixRadius int16
+--- @field Dummies vec3[]
+--- @field MaxAttenuation int16
+--- @field MixdownDelayTime number
+--- @field MixdownSpeed uint8
+--- @field SoundEvent FixedString
+--- @field UseOcclusion boolean
+
+
+--- @class PointSoundTriggerDummyData:ITriggerData
+--- @field ParentTrigger FixedString
+
+
+--- @class PointTrigger:Trigger
+
+
+--- @class PortalTrigger:AreaTrigger
 
 
 --- @class PostProcessCameraSetting
@@ -4321,6 +4822,12 @@ Osi = {}
 --- @field field_0 int32
 
 
+--- @class RegionTriggerData:ITriggerData
+--- @field RegionCameraLock boolean
+--- @field RegionCameraLockPos boolean
+--- @field RegionMaskRegionInWorld boolean
+
+
 --- @class RelationComponent:BaseComponent
 --- @field field_0 table<uint32, uint8>
 --- @field field_100 table<uint32, uint8>
@@ -4366,41 +4873,52 @@ Osi = {}
 --- @field AC uint8
 --- @field Ability AbilityId
 --- @field AdditionalValue int32
---- @field AdvantageType uint8
+--- @field AdvantageType AdvantageBoostType
+--- @field Canceled boolean
+--- @field ConsumedInspirationPoint boolean
+--- @field DC uint8
+--- @field DialogId int32
 --- @field DiceAdditionalValue uint8
 --- @field DiscardedDiceTotal uint8
 --- @field Entity2Uuid Guid
 --- @field EntityUuid Guid
+--- @field ExcludedBonusesTags Guid[]
 --- @field Finished boolean
 --- @field FixedRollBonuses FixedRollBonus[]
+--- @field FromScript boolean
 --- @field Metadata StatsRollMetadata
 --- @field NaturalRoll uint8
 --- @field PassiveRollDelay number
 --- @field PassiveRollDelay2 number
+--- @field RequestStop boolean
 --- @field ResolvedRollBonuses ResolvedRollBonus[]
 --- @field Result StatsRollResult
 --- @field Roll Roll
 --- @field RollComponentType uint8
 --- @field RollContext uint8
+--- @field RollDelayRemaining number
 --- @field RollEntity EntityHandle
 --- @field RollType uint8
 --- @field RollUuid Guid
+--- @field RolledComponentType0 boolean
+--- @field Roller EntityHandle
 --- @field Skill SkillId
 --- @field SpellCheck uint8
 --- @field StatsExpression string
+--- @field Subject EntityHandle
 --- @field field_1B0 string
---- @field field_1CC uint8
+--- @field field_1CC boolean
 --- @field field_20 EntityHandle
---- @field field_4E uint8
+--- @field field_4E boolean
 --- @field field_4F uint8
---- @field field_55 uint8
+--- @field field_55 boolean
 --- @field field_58 int32
 --- @field field_60 EntityHandle
---- @field field_88 uint8
+--- @field field_88 boolean
 --- @field field_89 uint8
 --- @field field_8A uint8
 --- @field field_90 Guid[]
---- @field field_A2 uint8
+--- @field field_A2 boolean
 
 
 --- @class RerollBoostComponent:BaseComponent
@@ -4436,6 +4954,7 @@ Osi = {}
 
 
 --- @class ResolvedRollBonus
+--- @field Bonus int32
 --- @field Description TranslatedString
 --- @field DiceSize DiceSizeId
 --- @field NumDice uint8
@@ -4446,6 +4965,11 @@ Osi = {}
 --- @class ResourceRollDefinition
 --- @field field_0 Guid
 --- @field field_10 uint8
+
+
+--- @class ResourceSetTriggerData:ITriggerData
+--- @field Atmosphere FixedString[]
+--- @field FadeTime number
 
 
 --- @class Roll
@@ -4469,6 +4993,16 @@ Osi = {}
 --- @field DiceNegative boolean
 --- @field DiceValue DiceSizeId
 --- @field field_8 boolean
+
+
+--- @class RoomTrigger:AreaTrigger
+
+
+--- @class RoomTriggerData:ITriggerData
+--- @field AttachedPortals FixedString[]
+--- @field Border number
+--- @field OneShotTrigger boolean
+--- @field RenderMethod uint8
 
 
 --- @class RulesetComponent:BaseComponent
@@ -4556,20 +5090,12 @@ Osi = {}
 --- @class ShapeshiftStateComponent:BaseComponent
 --- @field BloodSurfaceType uint8?
 --- @field BloodType FixedString?
---- @field field_C ShapeshiftStateInner?
-
-
---- @class ShapeshiftStateInner
---- @field field_0 FixedString
---- @field field_4 uint32
+--- @field Template TemplateInfo?
+--- @field field_C TemplateInfo?
 
 
 --- @class ShootThroughTypeComponent:BaseComponent
 --- @field Type uint8
-
-
---- @class ShortRestComponent:BaseComponent
---- @field StateId uint8
 
 
 --- @class ShowStoryElementUIActionData:IActionData
@@ -4684,12 +5210,84 @@ Osi = {}
 
 
 --- @class SoundComponent:BaseComponent
+--- @field ActiveData SoundComponentActiveData
+--- @field Duration number
+--- @field Effect FixedString
 --- @field Entity EntityHandle
 --- @field Flags uint32
+--- @field field_1C number
+
+
+--- @class SoundComponentActiveData
+--- @field Entity EntityHandle
 --- @field SoundObjectId uint64
---- @field field_14 number
---- @field field_18 FixedString
---- @field field_1C int32
+--- @field SoundSwitches table<FixedString, FixedString>
+
+
+--- @class SoundEvent
+
+
+--- @class SoundExternalPath
+--- @field Codec AudioCodec
+--- @field Path string
+
+
+--- @class SoundPostEventRequest
+--- @field Event Variant<FixedString,SoundEvent,STDString>
+--- @field Flags SoundEventFlags
+--- @field Path Variant<FixedString,SoundExternalPath>
+--- @field PlayerIndex uint8
+--- @field Seek number
+--- @field Subject Variant<EntityHandle,uint64>
+--- @field Type SoundEventType
+
+
+--- @class SoundRTPCSync
+--- @field Name FixedString
+--- @field Value number
+--- @field field_8 int32
+
+
+--- @class SoundRoutingSystem:BaseSystem
+--- @field PostEvent SoundPostEventRequest[]
+--- @field Seek SoundSeekRequest[]
+--- @field SetRTPC SoundSetRTPCRequest[]
+--- @field SetSwitch SoundSetSwitchRequest[]
+
+
+--- @class SoundSeekRequest
+--- @field Entity EntityHandle
+--- @field Event Variant<FixedString,SoundEvent,STDString>
+--- @field PlayerIndex uint8
+--- @field Seek number
+--- @field field_38 int32
+
+
+--- @class SoundSetRTPCRequest
+--- @field Entity EntityHandle
+--- @field PlayerIndex uint8
+--- @field RTPC Variant<FixedString,STDString>
+--- @field Reset boolean
+--- @field Type SoundEventType
+--- @field Value number
+--- @field field_36 uint8
+
+
+--- @class SoundSetSwitchRequest
+--- @field Subject Variant<EntityHandle,uint64>
+--- @field Switch FixedString
+--- @field Value FixedString
+
+
+--- @class SoundStateSync
+--- @field Group FixedString
+--- @field State FixedString
+--- @field field_8 int32
+
+
+--- @class SoundVolumeTrigger:AreaTrigger
+--- @field RTPCs SoundRTPCSync[]
+--- @field States SoundStateSync[]
 
 
 --- @class SourceAdvantageBoostComponent:BaseComponent
@@ -4705,6 +5303,19 @@ Osi = {}
 
 --- @class SpeakerComponent:BaseComponent
 --- @field field_0 FixedString[]
+
+
+--- @class SpectatorTriggerData:ITriggerData
+--- @field DOFAperature number
+--- @field DOFFarOnly number
+--- @field DOFFarSharpDistance number
+--- @field DOFFocalDistance number
+--- @field DOFNearOnly number
+--- @field DOFNearSharpDistance number
+--- @field FOV number
+--- @field Lerp boolean
+--- @field Speed number
+--- @field UseDOF boolean
 
 
 --- @class SpellBookActionData:IActionData
@@ -4745,8 +5356,23 @@ Osi = {}
 --- @class StandActionData:IActionData
 
 
+--- @class StandardGameObject
+--- @field GameObjectEntity EntityRef
+--- @field GameObjectFlags uint16
+--- @field Level FixedString
+
+
+--- @class StartTriggerData:ITriggerData
+--- @field Angle number
+--- @field Player uint8
+
+
 --- @class StaticPhysicsComponent:BaseComponent
 --- @field Physics PhxPhysicsObject
+
+
+--- @class StatsAreaTriggerData:ITriggerData
+--- @field AreaLevelOverrideGuid Guid
 
 
 --- @class StatsComponent:BaseComponent
@@ -4989,6 +5615,11 @@ Osi = {}
 --- @field Visibility uint8
 
 
+--- @class TeleportTriggerData:ITriggerData
+--- @field Angle number
+--- @field Zoom boolean
+
+
 --- @class TemplateAnimationSetOverrideComponent:BaseComponent
 --- @field Overrides AnimationWaterfallElement[]
 
@@ -5110,6 +5741,35 @@ Osi = {}
 --- @field FallbackPreviewRadius number
 
 
+--- @class TileSetConstructionLine
+--- @field End TileSetConstructionPoint
+--- @field InstanceId Guid
+--- @field Points TileSetConstructionPoint[]
+--- @field Start TileSetConstructionPoint
+
+
+--- @class TileSetConstructionNeighbourPoint
+--- @field NeighbourLists table<uint8, TileSetNeighbourPointTileList>
+--- @field NeighbourPoints Guid[]
+
+
+--- @class TileSetConstructionPoint
+--- @field ConstructionPointStop boolean
+--- @field Lines TileSetConstructionLine[]
+--- @field NeighbourPoints TileSetConstructionNeighbourPoint[]
+--- @field Point ConstructionPoint
+--- @field byte40 uint8
+--- @field byte41 uint8
+
+
+--- @class TileSetNeighbourPointTileList
+--- @field LeftCornerTiles ConstructionTileTemplate[]
+--- @field NonOptimalTilesEnd uint32
+--- @field NonOptimalTilesStart uint32
+--- @field RightCornerTiles ConstructionTileTemplate[]
+--- @field StraightTiles ConstructionTileTemplate[]
+
+
 --- @class TimeFactorComponent:BaseComponent
 --- @field Value number
 
@@ -5125,6 +5785,26 @@ Osi = {}
 --- @class TimelineReferencedTemplate
 --- @field ReferencedInTimeline boolean
 --- @field Timelines Set_Guid
+
+
+--- @class TimelineSceneTrigger:AreaTrigger
+--- @field DestroyAfterTimeline boolean
+--- @field DialogueResourceIds Set_Guid
+--- @field FloodSuccess boolean
+--- @field IsWorldTimeline boolean
+--- @field Optional boolean
+--- @field ShouldPreloadWorldTimelineActors boolean
+--- @field TriggerWorldTimelineOnSkillPrepare boolean
+--- @field UseSceneBounds boolean
+
+
+--- @class TimelineSceneTriggerData:ITriggerData
+--- @field IsUsingCalculatedSceneBounds boolean
+--- @field IsWorldTimeline boolean
+--- @field Optional boolean
+--- @field ShouldPreloadWorldTimelineActors boolean
+--- @field Timelines Set_Guid
+--- @field TriggerWorldTimelineOnSkillPrepare boolean
 
 
 --- @class TraderComponent:BaseComponent
@@ -5151,6 +5831,52 @@ Osi = {}
 --- @field Get fun(self:TranslatedString):StringView?
 
 
+--- @class Trigger
+--- @field CustomPointTransform Transform
+--- @field Flags uint16
+--- @field HasCustomPoint boolean
+--- @field IsGlobal boolean
+--- @field Level FixedString
+--- @field PreviousLevel FixedString
+--- @field SyncFlags uint16
+--- @field Template TriggerTemplate
+--- @field TriggerEntity EntityRef
+--- @field TriggerType FixedString
+
+
+--- @class TriggerPhysicsBox:ITriggerPhysicsData
+--- @field Extents vec3
+
+
+--- @class TriggerPhysicsPoly:ITriggerPhysicsData
+--- @field Height number
+--- @field Points vec2[]
+
+
+--- @class TriggerPhysicsSphere:ITriggerPhysicsData
+--- @field Radius number
+
+
+--- @class TriggerTemplate:GameObjectTemplate
+--- @field Color avec4
+--- @field ConstellationConfigName FixedString
+--- @field CustomPointTransform Transform
+--- @field EventSendingMode uint8
+--- @field FadeChildren FixedString[]
+--- @field FadeGroup FixedString
+--- @field FadeGroupOnly boolean
+--- @field Fadeable boolean
+--- @field GizmoColorOverride avec4
+--- @field HasCustomPoint boolean
+--- @field HierarchyOnlyFade boolean
+--- @field IgnoreRaycast boolean
+--- @field OnlyCharacterEvents boolean
+--- @field PhysicsType uint8
+--- @field TriggerGizmoOverride FixedString
+--- @field TriggerType FixedString
+--- @field UsingGizmoColorOverride boolean
+
+
 --- @class TypeInformation
 --- @field ComponentName FixedString
 --- @field ElementType TypeInformationRef
@@ -5167,6 +5893,7 @@ Osi = {}
 --- @field Params TypeInformationRef[]
 --- @field ParentType TypeInformationRef
 --- @field ReturnValues TypeInformationRef[]
+--- @field SystemName FixedString
 --- @field TypeName FixedString
 --- @field VarargParams boolean
 --- @field VarargsReturn boolean
@@ -5302,6 +6029,7 @@ Osi = {}
 --- @field ObjectDescs VisualObjectDesc[]
 --- @field Parent Visual
 --- @field PhysicsFlags uint8
+--- @field SkeletonSlots VisualSkeletonSlot[]
 --- @field VisualEntity EntityRef
 --- @field VisualFlags VisualFlags
 --- @field VisualResource ResourceVisualResource
@@ -5329,6 +6057,13 @@ Osi = {}
 --- @field LOD uint8
 --- @field Renderable RenderableObject
 --- @field field_8 uint8
+
+
+--- @class VisualSkeletonSlot
+--- @field RemapperSlot FixedString
+--- @field Remaps VisualSkeletonSlotRemap[]
+--- @field Skeleton Skeleton
+--- @field field_4 int32
 
 
 --- @class VisualSkeletonSlotRemap
@@ -5435,6 +6170,7 @@ Osi = {}
 
 
 --- @class WeaponSetComponent:BaseComponent
+--- @field WeaponSet WeaponSetType
 
 
 --- @class WeightBoostComponent:BaseComponent
@@ -5478,30 +6214,35 @@ Osi = {}
 --- @field AbilityModifier int32
 --- @field AbilityModifier2 int32
 --- @field Advantage uint8
---- @field AdvantageType uint8
+--- @field AdvantageReason TranslatedString
+--- @field AdvantageType AdvantageBoostType
 --- @field AmountOfDices uint8
 --- @field BoostType BoostType
+--- @field CriticalHitType RollCritical
 --- @field DiceValue DiceSizeId
 --- @field Source ActiveRollModifierSourceInfo
---- @field SuccessFlags uint8
+--- @field SuccessFlags CriticalHitSuccessFlags
 --- @field TargetType uint8
+--- @field TotalValue int32
+--- @field Value int32
 --- @field field_28 uint8
 --- @field field_2C TranslatedString
---- @field field_40 int64
---- @field field_48 int64
---- @field field_F uint8
+--- @field field_40 Guid
+--- @field field_F RollCritical
 
 
 --- @class ActiveRollModifierSourceInfo
---- @field Source FixedString
---- @field SourceType uint8
+--- @field Cause FixedString
+--- @field Equipment EntityHandle
+--- @field Source EntityHandle
+--- @field SourceType BoostSourceType
 --- @field StackId FixedString
 --- @field StackPriority int32
+--- @field Status ComponentHandle
 --- @field field_10 EntityHandle
---- @field field_18 int64
+--- @field field_18 ComponentHandle
 --- @field field_20 uint8
 --- @field field_28 EntityHandle
---- @field field_30 EntityHandle
 
 
 --- @class ActiveRollModifiersComponent:BaseComponent
@@ -5509,6 +6250,7 @@ Osi = {}
 --- @field DynamicModifiers ActiveRollDynamicModifierId[]
 --- @field DynamicModifiers2 ActiveRollDynamicModifierId[]
 --- @field DynamicModifiers3 ActiveRollDynamicModifierId[]
+--- @field Entity EntityHandle
 --- @field ItemSpellModifiers ActiveRollItemSpellModifier[]
 --- @field SpellModifiers ActiveRollSpellModifier[]
 --- @field StaticModifiers ActiveRollStaticModifier[]
@@ -5528,11 +6270,11 @@ Osi = {}
 
 
 --- @class ActiveRollStaticModifier
+--- @field Disabled boolean
 --- @field Modifier ActiveRollModifier
 --- @field ModifierGuid Guid
---- @field field_10 uint8
---- @field field_88 uint32
---- @field field_8C uint32
+--- @field field_10 boolean
+--- @field field_88 uint8
 
 
 --- @class ActiveRollToggledPassiveModifier
@@ -7192,17 +7934,25 @@ Osi = {}
 
 
 --- @class AspkKeysSoundEventKey:AspkKeysKeyBase
---- @field data Variant<AspkKeysSoundEventKeyType1,AspkKeysSoundEventKeyType2,AspkKeysSoundEventKeyType2,AspkKeysSoundEventKeyType2,AspkKeysSoundEventKeyType4,AspkKeysSoundEventKeyType5>
+--- @field data Variant<AspkKeysSoundEventKeyType0,AspkKeysSoundEventKeyType1,AspkKeysSoundEventKeyType2,AspkKeysSoundEventKeyType3,AspkKeysSoundEventKeyType4,AspkKeysSoundEventKeyType5>
 
 
---- @class AspkKeysSoundEventKeyType1
+--- @class AspkKeysSoundEventKeyType0
 --- @field KeepAlive boolean
 --- @field LoopLifetime number
 --- @field SoundEventID Guid
 --- @field SoundObjectIndex uint8
 
 
+--- @class AspkKeysSoundEventKeyType1
+--- @field SoundEventID Guid
+
+
 --- @class AspkKeysSoundEventKeyType2
+--- @field SoundEventID Guid
+
+
+--- @class AspkKeysSoundEventKeyType3
 --- @field SoundEventID Guid
 
 
@@ -7305,6 +8055,7 @@ Osi = {}
 --- @field Elements CharacterCreationAppearanceMaterialSetting[]
 --- @field EyeColor Guid
 --- @field HairColor Guid
+--- @field Icon ScratchBuffer
 --- @field SecondEyeColor Guid
 --- @field SkinColor Guid
 --- @field Visuals Guid[]
@@ -7443,6 +8194,7 @@ Osi = {}
 
 --- @class CharacterCreationLevelUpDefinitionExtra
 --- @field AppearanceElements CharacterCreationAppearanceMaterialSetting[]
+--- @field Icon ScratchBuffer
 --- @field LevelUpData LevelUpData
 --- @field field_0 int32
 --- @field field_8 Guid
@@ -7524,89 +8276,60 @@ Osi = {}
 --- @field field_8 EntityHandle
 
 
---- @class CombatIsCombatPausedComponent:BaseComponent
---- @field PauseSourceTypes uint8
---- @field Paused uint8
+--- @class DeathDeadByDefaultComponent:BaseComponent
+--- @field DeadByDefault uint8
 
 
---- @class CombatIsInCombatComponent:BaseComponent
+--- @class DeathDeathComponent:DeathDeathData
 
 
---- @class CombatParticipantComponent:BaseComponent
---- @field AiHint Guid
---- @field CombatGroupId FixedString
---- @field CombatHandle EntityHandle
---- @field Flags CombatParticipantFlags
---- @field InitiativeRoll int32
---- @field field_C int32
-
-
---- @class CombatStateComponent:BaseComponent
---- @field Initiatives table<EntityHandle, int32>
---- @field IsInNarrativeCombat boolean
---- @field Level FixedString
---- @field MyGuid Guid
---- @field Participants EntityHandle[]
---- @field field_98 EntityHandle
---- @field field_A0 EntityHandle
---- @field field_AC uint8
---- @field field_B0 number
---- @field field_B8 EntityHandle[]
---- @field field_D0 uint8
-
-
---- @class CombatThreatRangeComponent:BaseComponent
---- @field field_0 number
---- @field field_4 int32
---- @field field_8 number
-
-
---- @class CombatTurnBasedComponent:BaseComponent
---- @field ActedThisRoundInCombat boolean
---- @field CanActInCombat boolean
---- @field CanAct_M boolean
+--- @class DeathDeathData
+--- @field Cause EntityHandle
+--- @field CauseOwner EntityHandle
+--- @field CauseType CauseType
+--- @field CauseUuid Guid
+--- @field Chasm boolean
+--- @field ChasmPosition vec3?
 --- @field Combat Guid
---- @field CombatTeam Guid
---- @field EndTurnHoldTimer number?
---- @field HadTurnInCombat boolean
---- @field IsActiveCombatTurn boolean
---- @field IsInCombat_M boolean
---- @field PauseTimer number?
---- @field Removed boolean
---- @field RequestedEndTurn boolean
---- @field Timeout number?
---- @field TurnActionsCompleted boolean
---- @field field_18 number?
---- @field field_20 number?
---- @field field_28 number?
---- @field field_A boolean
---- @field field_C boolean
+--- @field DeathType StatsDeathType
+--- @field ImpactDirection vec3
+--- @field ImpactForce number
+--- @field ImpactPosition vec3
+--- @field InstantKill boolean
+--- @field IsCritical boolean
+--- @field LeaveTrace boolean
+--- @field MainDamageType DamageType
+--- @field StoryActionId int32
+--- @field field_48 uint8
+--- @field field_60 uint8
+--- @field field_61 uint8
+--- @field field_62 uint8
 
 
---- @class CombatTurnBasedEntityInfo
---- @field Entity EntityHandle
---- @field Initiative int32
+--- @class DeathDeathRequestData:DeathDeathData
+--- @field SkipDowned boolean
+--- @field field_78 uint8
+--- @field field_79 uint8
 
 
---- @class CombatTurnBasedGroup
---- @field Handles CombatTurnBasedEntityInfo[]
---- @field Initiative int32
---- @field Participant Guid
---- @field field_28 uint32
---- @field field_30 uint8
+--- @class DeathDeathStateComponent:BaseComponent
+--- @field State uint32
 
 
---- @class CombatTurnOrderComponent:BaseComponent
---- @field Groups CombatTurnBasedGroup[]
---- @field Groups2 CombatTurnBasedGroup[]
---- @field Participants CombatTurnBasedGroup[]
---- @field Participants2 CombatTurnBasedGroup[]
---- @field TurnOrderIndices uint64[]
---- @field TurnOrderIndices2 uint64[]
---- @field field_40 int32
---- @field field_44 int32
---- @field field_48 int32
---- @field field_4C number
+--- @class DeathDeathTypeComponent:BaseComponent
+--- @field DeathType uint8
+
+
+--- @class DeathDownedComponent:BaseComponent
+--- @field DownedStatus FixedString
+--- @field Entity Guid
+
+
+--- @class DeathResurrectionData
+--- @field Animation FixedString
+--- @field Heal boolean
+--- @field HealthPercentage number
+--- @field IsResurrected boolean
 
 
 --- @class DlgActiveRollNode:DlgTaggedQuestionNode
@@ -7856,9 +8579,9 @@ Osi = {}
 
 
 --- @class DlgScriptFlag
+--- @field KeywordConditionList uint64
 --- @field Script string
 --- @field Uuid Guid
---- @field field_28 uint64
 
 
 --- @class DlgSelectSpeakerNode:DlgBaseTaggedNode
@@ -8023,6 +8746,64 @@ Osi = {}
 --- @field WorldRotate vec4
 --- @field WorldRotate2 vec4
 --- @field field_1A uint8
+
+
+--- @class EclCharacterIconRenderSystem:BaseSystem
+--- @field DeletedIconRequests Set_EntityHandle
+--- @field EntityBeingRendered EntityHandle
+--- @field Icon ScratchBuffer
+--- @field IconRendererSetUp boolean
+--- @field IconRequests Set_EntityHandle
+--- @field PollResult uint32
+--- @field ProcessingStage uint32
+--- @field RenderCallback EntityHandle
+--- @field RenderState int32
+--- @field RenderTimeRemaining number
+--- @field SessionCount uint32
+--- @field field_140 EntityHandle
+--- @field field_148 uint32
+--- @field field_CC int32
+--- @field field_D0 int32
+--- @field field_D4 int32
+--- @field field_D9 uint8
+--- @field field_DA uint8
+--- @field field_DB uint8
+--- @field field_DC uint16
+--- @field field_DE uint8
+
+
+--- @class EclCharacterIconRequestComponent:BaseComponent
+--- @field ArmorSetState ArmorSetState?
+--- @field Equipment FixedString[]
+--- @field Template FixedString
+--- @field Trigger string
+--- @field Visual FixedString
+--- @field VisualSet EclVisualSetSlots
+--- @field field_190 EntityHandle
+--- @field field_1B0 int32
+
+
+--- @class EclCharacterIconResultComponent:BaseComponent
+--- @field Icon ScratchBuffer
+
+
+--- @class EclCharacterManager:BaseSystem
+--- @field ChangedTemplates Set_EntityHandle
+--- @field ColorBlindMode uint8
+--- @field PauseState boolean
+--- @field RefreshEquipmentSlot table<EntityHandle, Set_ItemSlot>
+--- @field RefreshLights Set_EntityHandle
+--- @field ReloadPhysics Set_EntityHandle
+--- @field ReloadVisualSets boolean
+--- @field ReloadVisuals Set_EntityHandle
+--- @field RestoreCharacters boolean
+--- @field TradingModeChanges table<EntityHandle, EclTradeModeChangeRequest>
+--- @field UpdateCharacterHighlights Set_EntityHandle[]
+--- @field UpdateCharacterHighlights2 Set_EntityHandle[]
+--- @field UpdateCombatCamera EntityHandle[]
+--- @field UpdateObscurity Set_EntityHandle
+--- @field UpdatePhysicsGroup Set_EntityHandle
+--- @field UpdateRepose Set_EntityHandle
 
 
 --- @class EclCharacterMoveTask:EclCharacterTask
@@ -8194,6 +8975,7 @@ Osi = {}
 
 
 --- @class EclCharacterTaskMoveController:EclCharacterTask
+--- @field IgnoreMovementUntilStickIsReleased boolean
 
 
 --- @class EclCharacterTaskMoveInDirection:EclCharacterTask
@@ -8208,18 +8990,18 @@ Osi = {}
 --- @field AiFloodId int16
 --- @field AlignedTargetPos vec3
 --- @field GroundPosition vec3
---- @field HasEntered boolean
 --- @field HitBound number
 --- @field HoverPos2 vec3
 --- @field HoverTarget EntityHandle
 --- @field MovementType int32
---- @field NeedsTargetUpdate boolean
 --- @field NextTarget NavigationTargetInfo
+--- @field Started boolean
 --- @field StepHeight number
 --- @field Target NavigationTargetInfo
 --- @field TargetEffect EntityHandle
 --- @field TargetPos vec3
---- @field field_33D uint8
+--- @field TargetReady boolean
+--- @field TargetSearchFinished boolean
 
 
 --- @class EclCharacterTaskPickUp:EclCharacterMoveTask
@@ -8337,10 +9119,25 @@ Osi = {}
 --- @field VFX EclStatusVFX[]
 
 
+--- @class EclEquipmentRemoveMaterialRequest
+--- @field CheckFlags uint8
+--- @field Entity EntityHandle
+--- @field Material FixedString
+--- @field RemoveOverlayMaterial boolean
+--- @field field_C boolean
+
+
 --- @class EclEquipmentSubVisualRequest
 --- @field Processed boolean
 --- @field VisualEntity EntityHandle
 --- @field VisualTemplate FixedString
+
+
+--- @class EclEquipmentUnloadRequest
+--- @field Item EntityHandle
+--- @field Parent EntityHandle
+--- @field Slot ItemSlot
+--- @field Visual EntityHandle
 
 
 --- @class EclEquipmentVisual
@@ -8379,6 +9176,22 @@ Osi = {}
 --- @class EclEquipmentVisualsComponent:BaseComponent
 --- @field Entity EntityHandle
 --- @field Equipment table<ItemSlot, EclEquipmentVisual>
+
+
+--- @class EclEquipmentVisualsSystem:BaseSystem
+--- @field AnimationSetRequest table<EntityHandle, EclLoadAnimationFromVisualRequestData[]>
+--- @field DestroyVisuals Set_EntityHandle
+--- @field DyeUpdates Set_EntityHandle
+--- @field InitVisualLevel table<EntityHandle, FixedString>
+--- @field InventoryEvents table<EntityHandle, table<uint16, InventoryContainerSlotData>>
+--- @field PendingSlotLoads table<EntityHandle, uint64>
+--- @field RemoveAnimationSetRequest table<EntityHandle, Set_FixedString>
+--- @field RemoveMaterials EclEquipmentRemoveMaterialRequest[]
+--- @field StreamingCount int32
+--- @field UnloadRequests EclEquipmentUnloadRequest[]
+--- @field UnloadVisualRequestCount int32
+--- @field UpdateSplatter Set_EntityHandle
+--- @field VFXTargetRequest table<EntityHandle, EntityHandle>
 
 
 --- @class EclGameCameraBehavior:BaseComponent
@@ -8485,6 +9298,13 @@ Osi = {}
 --- @class EclIsInSelectorModeComponent:BaseComponent
 
 
+--- @class EclLoadAnimationFromVisualRequestData
+--- @field field_0 FixedString
+--- @field field_4 FixedString
+--- @field field_8 FixedString
+--- @field field_C boolean
+
+
 --- @class EclManagedStatusEffect
 --- @field Group Guid
 --- @field Type uint8
@@ -8505,6 +9325,63 @@ Osi = {}
 --- @class EclManagedStatusVFX:EclStatusVFX
 --- @field EffectHandler EclEffectHandler
 --- @field ManagedStatusEffect EclManagedStatusEffect
+
+
+--- @class EclMaterialParameterFloat
+--- @field Override boolean
+--- @field Parameter FixedString
+--- @field Preset boolean
+--- @field Value number
+--- @field field_9 uint8
+
+
+--- @class EclMaterialParameterPresetSlot
+--- @field CCPreset FixedString
+--- @field GroupName FixedString
+--- @field field_8 uint32
+
+
+--- @class EclMaterialParameterPresetsContainer
+--- @field FloatOverrides EclMaterialParameterFloat[]
+--- @field Presets table<FixedString, EclMaterialParameterPresetSlot>
+--- @field TextureOverrides EclMaterialParameterTexture[]
+--- @field Vec2Overrides EclMaterialParameterVec2[]
+--- @field Vec3Overrides EclMaterialParameterVec3[]
+--- @field Vec4Overrides EclMaterialParameterVec4[]
+--- @field VirtualTextureOverrides EclMaterialParameterTexture[]
+--- @field field_60 FixedString
+
+
+--- @class EclMaterialParameterTexture
+--- @field Override boolean
+--- @field Parameter FixedString
+--- @field Preset boolean
+--- @field Value FixedString
+--- @field field_9 uint8
+
+
+--- @class EclMaterialParameterVec2
+--- @field Override boolean
+--- @field Parameter FixedString
+--- @field Preset boolean
+--- @field Value vec2
+--- @field field_9 uint8
+
+
+--- @class EclMaterialParameterVec3
+--- @field Override boolean
+--- @field Parameter FixedString
+--- @field Preset boolean
+--- @field Value vec3
+--- @field field_9 uint8
+
+
+--- @class EclMaterialParameterVec4
+--- @field Override boolean
+--- @field Parameter FixedString
+--- @field Preset boolean
+--- @field Value avec4
+--- @field field_9 uint8
 
 
 --- @class EclMoveInSpellRangeCache
@@ -8933,7 +9810,7 @@ Osi = {}
 
 --- @class EclTLPreviewDummy:BaseProxyComponent
 --- @field ActiveDummy boolean
---- @field ArmorSetState uint8?
+--- @field ArmorSetState ArmorSetState?
 --- @field ArmorVisibilityControlled boolean
 --- @field ArmorVisibilityControlled2 boolean
 --- @field ClothCollisionResourceIds FixedString[]
@@ -8985,6 +9862,41 @@ Osi = {}
 --- @class EclTaskPreviewInfo
 --- @field SpellColor int32
 --- @field TargetingType int32
+
+
+--- @class EclTradeModeChangeRequest
+--- @field field_0 uint16
+--- @field field_2 uint8
+
+
+--- @class EclVisualLocatorAttachment
+--- @field DisplayName FixedString
+--- @field LocatorName FixedString
+
+
+--- @class EclVisualSetSlot
+--- @field Slot FixedString
+--- @field Visual FixedString
+--- @field field_8 FixedString
+
+
+--- @class EclVisualSetSlots
+--- @field BodySetVisual FixedString
+--- @field LocatorAttachments EclVisualLocatorAttachment[]
+--- @field MaterialOverrides table<FixedString, FixedString>
+--- @field MaterialParameters EclMaterialParameterPresetsContainer
+--- @field MaterialRemaps table<FixedString, FixedString>
+--- @field Materials table<FixedString, EclMaterialParameterPresetsContainer>
+--- @field ShowEquipmentVisuals boolean
+--- @field VisualSet FixedString
+--- @field VisualSlots EclVisualSetSlot[]
+
+
+--- @class EclVisualSystem:BaseSystem
+--- @field ChangeSplatterState table<EntityHandle, uint32>
+--- @field ReloadAllVisuals boolean
+--- @field ReloadVisuals table<EntityHandle, boolean>
+--- @field SplatterType table<EntityHandle, uint32>
 
 
 --- @class EclWorldDragController:EclDragController
@@ -9089,6 +10001,27 @@ Osi = {}
 --- @field Definition CharacterCreationLevelUpDefinitionExtra
 
 
+--- @class EclEquipmentEquipmentSlotVisualState
+--- @field Item EntityHandle
+--- @field field_8 uint8
+--- @field field_9 uint8
+
+
+--- @class EclEquipmentVisualsDesiredStateComponent:BaseComponent
+--- @field Slots table<ItemSlot, EclEquipmentVisualData>
+
+
+--- @class EclEquipmentVisualsVisibilityStateComponent:BaseComponent
+--- @field Equipment table<ItemSlot, EclEquipmentEquipmentSlotVisualState>
+--- @field field_40 uint8
+--- @field field_41 uint8
+
+
+--- @class EclEquipmentVisualsVisibilityStateSystem:BaseSystem
+--- @field SetVisualState table<EntityHandle, boolean>
+--- @field UnloadVisuals Set_EntityHandle
+
+
 --- @class EclInterruptPlayerDecisionComponent:BaseComponent
 --- @field Decisions table<EntityHandle, uint8>
 
@@ -9183,11 +10116,131 @@ Osi = {}
 --- @field Year int32
 
 
+--- @class EocCombatCombatPosition
+--- @field Entity EntityHandle
+--- @field field_14 number
+--- @field field_18 number
+--- @field field_8 vec3
+
+
+--- @class EocCombatDelayedFanfareComponent:BaseComponent
+
+
+--- @class EocCombatIsCombatPausedComponent:BaseComponent
+--- @field PauseSourceTypes uint8
+--- @field Paused uint8
+
+
+--- @class EocCombatIsInCombatComponent:BaseComponent
+
+
+--- @class EocCombatIsThreatenedComponent:BaseComponent
+--- @field ThreatenedBy EntityHandle[]
+
+
+--- @class EocCombatParticipantComponent:BaseComponent
+--- @field AiHint Guid
+--- @field CombatGroupId FixedString
+--- @field CombatHandle EntityHandle
+--- @field Flags CombatParticipantFlags
+--- @field InitiativeRoll int32
+--- @field field_C int32
+
+
+--- @class EocCombatStateComponent:BaseComponent
+--- @field Initiatives table<EntityHandle, int32>
+--- @field IsInNarrativeCombat boolean
+--- @field Level FixedString
+--- @field MyGuid Guid
+--- @field Participants EntityHandle[]
+--- @field field_98 EntityHandle
+--- @field field_A0 EntityHandle
+--- @field field_AC uint8
+--- @field field_B0 number
+--- @field field_B8 EocCombatCombatPosition[]
+--- @field field_D0 uint8
+
+
+--- @class EocCombatThreatRangeComponent:BaseComponent
+--- @field field_0 number
+--- @field field_4 int32
+--- @field field_8 number
+
+
+--- @class EocCombatTurnBasedComponent:BaseComponent
+--- @field ActedThisRoundInCombat boolean
+--- @field CanActInCombat boolean
+--- @field CanAct_M boolean
+--- @field Combat Guid
+--- @field CombatTeam Guid
+--- @field EndTurnHoldTimer number?
+--- @field HadTurnInCombat boolean
+--- @field IsActiveCombatTurn boolean
+--- @field IsInCombat_M boolean
+--- @field PauseTimer number?
+--- @field Removed boolean
+--- @field RequestedEndTurn boolean
+--- @field Timeout number?
+--- @field TurnActionsCompleted boolean
+--- @field field_18 number?
+--- @field field_20 number?
+--- @field field_28 number?
+--- @field field_A boolean
+--- @field field_C boolean
+
+
+--- @class EocCombatTurnBasedEntityInfo
+--- @field Entity EntityHandle
+--- @field Initiative int32
+
+
+--- @class EocCombatTurnBasedGroup
+--- @field Handles EocCombatTurnBasedEntityInfo[]
+--- @field Initiative int32
+--- @field IsPlayer boolean
+--- @field Members EocCombatTurnBasedEntityInfo[]
+--- @field Participant Guid
+--- @field Round uint32
+--- @field Team Guid
+--- @field field_28 uint32
+--- @field field_30 boolean
+
+
+--- @class EocCombatTurnOrderComponent:BaseComponent
+--- @field Groups EocCombatTurnBasedGroup[]
+--- @field Groups2 EocCombatTurnBasedGroup[]
+--- @field Participants EocCombatTurnBasedGroup[]
+--- @field Participants2 EocCombatTurnBasedGroup[]
+--- @field TurnOrderIndices uint64[]
+--- @field TurnOrderIndices2 uint64[]
+--- @field field_40 int32
+--- @field field_44 int32
+--- @field field_48 int32
+--- @field field_4C number
+
+
+--- @class EocExpAvailableLevelComponent:BaseComponent
+--- @field Level int32
+
+
+--- @class EocExpCanLevelUpComponent:BaseComponent
+
+
+--- @class EocExpExperienceComponent:BaseComponent
+--- @field CurrentLevelExperience int32
+--- @field NextLevelExperience int32
+--- @field TotalExperience int32
+--- @field field_28 uint8
+
+
+--- @class EocFtbIsFtbPausedComponent:BaseComponent
+
+
+--- @class EocFtbIsInFtbComponent:BaseComponent
+
+
 --- @class EocFtbParticipantComponent:BaseComponent
 --- @field field_18 EntityHandle
-
-
---- @class EocFtbRespectComponent:BaseComponent
 
 
 --- @class EocFtbZoneBlockReasonComponent:BaseComponent
@@ -9218,6 +10271,69 @@ Osi = {}
 --- @field Passive FixedString
 --- @field Slot uint32
 --- @field SpellId SpellId
+
+
+--- @class EocImprovisedWeaponCanBeWieldedComponent:BaseComponent
+
+
+--- @class EocImprovisedWeaponWieldedComponent:BaseComponent
+--- @field Wielder EntityHandle
+--- @field field_8 uint8
+--- @field field_9 uint8
+
+
+--- @class EocImprovisedWeaponWieldingComponent:BaseComponent
+--- @field Weapon EntityHandle
+
+
+--- @class EocPickupPickUpExecutingComponent:BaseComponent
+
+
+--- @class EocPickupPickUpRequestComponent:BaseComponent
+--- @field State uint8
+--- @field field_0 Guid
+
+
+--- @class EocRestLongRestInScriptPhase:BaseComponent
+
+
+--- @class EocRestLongRestStateComponent:BaseComponent
+--- @field CancelReason RestCancelReason
+--- @field FinishConfirmed boolean
+--- @field Finishing boolean
+--- @field Requester EntityHandle
+--- @field State LongRestState
+--- @field WaitingForOthers boolean
+--- @field field_8 FixedString
+
+
+--- @class EocRestLongRestTimeline:BaseComponent
+--- @field Timeline Guid
+
+
+--- @class EocRestLongRestTimers:BaseComponent
+--- @field field_0 int32
+
+
+--- @class EocRestLongRestUsers:BaseComponent
+--- @field FinishConfirmation Set_UserId
+--- @field RequestRestore boolean
+--- @field States table<UserId, LongRestUserState>
+
+
+--- @class EocRestRestingEntities:BaseComponent
+--- @field HasSurfaces boolean
+--- @field Party Set_EntityHandle
+--- @field RestRequested Set_EntityHandle
+--- @field RestStarted Set_EntityHandle
+--- @field ScriptFinished Set_EntityHandle
+
+
+--- @class EocRestShortRestComponent:BaseComponent
+
+
+--- @class EsvAIHintAreaTrigger:EsvAreaTriggerBase
+--- @field IsAnchor boolean
 
 
 --- @class EsvASAnimation:EsvActionState
@@ -9326,6 +10442,10 @@ Osi = {}
 --- @field Layers EsvActionLayer[]
 
 
+--- @class EsvActionResourceChangeResultsSingletonComponent:BaseComponent
+--- @field Results EntityHandle[]
+
+
 --- @class EsvActionResourceSystem:BaseSystem
 --- @field ActionResourceBoosts table<EntityHandle, ActionResourceQuery>
 --- @field IncreaseInspirationResource table<EntityHandle, InspirationPointGainedRequest[]>
@@ -9354,6 +10474,9 @@ Osi = {}
 --- @field field_4 FixedString
 
 
+--- @class EsvAiGridAreaTrigger:EsvAreaTriggerBase
+
+
 --- @class EsvAnubisExecutorComponent:BaseProxyComponent
 --- @field field_10 uint8
 --- @field field_11 uint8
@@ -9363,14 +10486,25 @@ Osi = {}
 --- @field Tags Guid[]
 
 
+--- @class EsvAreaTriggerBase:AreaTrigger
+--- @field Entity EntityHandle
+
+
+--- @class EsvAtmosphereTrigger:AtmosphereTrigger
+--- @field Entity EntityHandle
+
+
 --- @class EsvAura
---- @field EntityAuraStatuses EsvEntityAuraStatus[]
+--- @field EntityAuraStatuses EsvEntityAuraStatus[][]
 --- @field Flags uint8
 --- @field Functors StatsFunctors
 --- @field Radius number
 --- @field Source EntityRef
 --- @field SpellCastSourceUuid Guid
 --- @field StoryActionId int32
+
+
+--- @class EsvAvatarContainerTrigger:EsvPointTriggerBase
 
 
 --- @class EsvBSAppear:EsvBehaviourState
@@ -9525,6 +10659,15 @@ Osi = {}
 --- @field Type ServerBehaviourType
 
 
+--- @class EsvBlockBronzeTimelinePlacementTrigger:EsvAreaTriggerBase
+
+
+--- @class EsvBodyTypeSystem:BaseSystem
+--- @field CharacterCreationUpdate EntityHandle[]
+--- @field Create EntityHandle[]
+--- @field Update EntityHandle[]
+
+
 --- @class EsvBoostTagComponent:BaseComponent
 --- @field Tags Guid[]
 
@@ -9539,6 +10682,43 @@ Osi = {}
 --- @field Index int32
 --- @field Position vec3
 --- @field field_4 uint8
+
+
+--- @class EsvCampChestTrigger:EsvPointTriggerBase
+--- @field Index uint8
+
+
+--- @class EsvCampRegionTrigger:EsvAreaTriggerBase
+
+
+--- @class EsvCapabilitiesSystem:BaseSystem
+--- @field CanBeDisarmedChanged Set_EntityHandle
+--- @field CanBeLootedChanged Set_EntityHandle
+--- @field CanDeflectProjectilesChanged Set_EntityHandle
+--- @field CanDoActionsChanged Set_EntityHandle
+--- @field CanDoLongRestChanged Set_EntityHandle
+--- @field CanInteractChanged Set_EntityHandle
+--- @field CanModifyHealthChanged Set_EntityHandle
+--- @field CanMoveChanged Set_EntityHandle
+--- @field CanShortRestChanged Set_EntityHandle
+--- @field CanSpeakChanged Set_EntityHandle
+--- @field CanTravelChanged Set_EntityHandle
+--- @field CanTriggerRandomCastChanged Set_EntityHandle
+--- @field FleeCapability table<EntityHandle, int32>
+--- @field GlobalRestState EsvGlobalRestStateRequest[]
+--- @field InvulnerableChanged Set_EntityHandle
+--- @field IsRunning boolean
+--- @field RestCapabilityChanged Set_EntityHandle
+--- @field ShortRestPointsUpdated Set_EntityHandle
+--- @field StatusesChanged Set_EntityHandle
+--- @field StoryShortRestState table<EntityHandle, EsvStoryShortRestStateRequest>
+--- @field TemplateChanged Set_EntityHandle
+--- @field UpdateLongRestState boolean
+--- @field UpdateShortRestState boolean
+--- @field field_58A boolean
+--- @field field_58B boolean
+--- @field qword478 Set_EntityHandle
+--- @field qword4A8 Set_EntityHandle
 
 
 --- @class EsvChangeSurfaceOnPathAction:EsvCreateSurfaceActionBase
@@ -9665,6 +10845,16 @@ Osi = {}
 --- @field GetStatusByType fun(self:EsvCharacter, a1:StatusType):EsvStatus
 
 
+--- @class EsvChasmRegionTrigger:EsvAreaTriggerBase
+--- @field Triggers FixedString[]
+
+
+--- @class EsvChasmSeederTrigger:EsvPointTriggerBase
+--- @field MaxChasmHeightOffset number
+--- @field MaxChasmTiles int32
+--- @field Triggers FixedString[]
+
+
 --- @class EsvClimbBlendspaceData
 --- @field BlendedDuration number
 --- @field StepUpHeightDelta number
@@ -9727,40 +10917,48 @@ Osi = {}
 --- @field SurfaceType SurfaceType
 
 
+--- @class EsvCrimeAreaTrigger:EsvAreaTriggerBase
+--- @field MinimumTension int32
+--- @field field_7C FixedString
+--- @field field_80 int64
+
+
+--- @class EsvCrimeRegionTrigger:EsvAreaTriggerBase
+--- @field Region FixedString
+
+
+--- @class EsvCrowdCharacterTrigger:EsvAreaTriggerBase
+--- @field AnimationSelectionTimeMax number
+--- @field AnimationSelectionTimeMin number
+--- @field CharacterSpacing number
+--- @field CustomAnimations CrowdCharacterCustomAnimation[]
+--- @field DetourChance number
+--- @field DetourMaxWaitTime number
+--- @field DetourMinWaitTime number
+--- @field DetourPatrolSplines FixedString[]
+--- @field DispersePatrolSplines FixedString[]
+--- @field DynamicAnimationTags CrowdCharacterDynamicAnimationTag[]
+--- @field GroupSizeMax int16
+--- @field GroupSizeMin int16
+--- @field GroupSpawnTimeMax number
+--- @field GroupSpawnTimeMin number
+--- @field MaxCharacters int16
+--- @field PatrolSplines FixedString[]
+--- @field PatrolWalkingPercentage number
+--- @field PointsOfInterest FixedString[]
+--- @field PositionPerturbation number
+--- @field ProxiesOnly boolean
+--- @field ReversePatrolDirection boolean
+--- @field SpawnTemplates CrowdCharacterTriggerSpawnTemplate[]
+--- @field SpawningEnabled boolean
+--- @field YawPerturbationDegrees number
+
+
 --- @class EsvDarknessActiveComponent:BaseComponent
-
-
---- @class EsvDeathApplyKnockedOutOneFrameComponent:BaseComponent
---- @field field_0 EntityHandle
---- @field field_10 string
---- @field field_8 uint8
---- @field field_C int32
-
-
---- @class EsvDeathAssignEntityToUserRequestOneFrameComponent:BaseComponent
---- @field UserID int32
-
-
---- @class EsvDeathContinueComponent:BaseComponent
-
-
---- @class EsvDeathDeadByDefaultRequestOneFrameComponent:BaseComponent
---- @field field_0 EntityHandle
---- @field field_8 uint8
---- @field field_9 uint8
-
-
---- @class EsvDelayDeathCauseComponent:BaseComponent
---- @field Blocked_M int32
---- @field DelayCount int32
---- @field field_8 Guid
 
 
 --- @class EsvDialogTagComponent:BaseComponent
 --- @field Tags Guid[]
-
-
---- @class EsvDiedEventOneFrameComponent:BaseComponent
 
 
 --- @class EsvDisarmAttempt
@@ -9789,18 +10987,81 @@ Osi = {}
 --- @field Unknown uint8
 
 
+--- @class EsvDisplayNameRequest
+--- @field DisplayName TranslatedString
+--- @field Entity EntityHandle
+--- @field Type DisplayNameType
+
+
+--- @class EsvDisplayNameSystem:BaseSystem
+--- @field DirtyName Set_EntityHandle
+--- @field DirtyTitle Set_EntityHandle
+--- @field SetDisplayName EsvDisplayNameRequest[]
+--- @field SetDisplayTitle EsvDisplayTitleRequest[]
+
+
 --- @class EsvDisplayTitle
 --- @field NameKey TranslatedString
 --- @field field_10 uint8
 
 
---- @class EsvEntityAuraStatus
---- @field AuraStatus EntityHandle
+--- @class EsvDisplayTitleRequest
+--- @field DisplayName TranslatedString
 --- @field Entity EntityHandle
+--- @field Type DisplayTitleType
+
+
+--- @class EsvDualWieldingSystem:BaseSystem
+--- @field Requests EsvEvaluateDualWieldingRequest[]
+
+
+--- @class EsvEntityAuraStatus
+--- @field Entity EntityHandle
+--- @field StatusId FixedString
+--- @field Time uint32
+
+
+--- @class EsvEocAreaTrigger:EsvAreaTriggerBase
+
+
+--- @class EsvEocPointTrigger:EsvPointTriggerBase
+
+
+--- @class EsvEqualizeExperienceData
+--- @field Entity EntityHandle
+--- @field Experience int32
+
+
+--- @class EsvEvaluateDualWieldingRequest
+--- @field Entity EntityHandle
+--- @field Slot StatsItemSlot
+--- @field Type DualWieldingRequestType
+
+
+--- @class EsvEventTrigger:EsvAreaTriggerBase
+--- @field EnterEvent FixedString
+--- @field LeaveEvent FixedString
 
 
 --- @class EsvExperienceGaveOutComponent:BaseComponent
 --- @field Experience int32
+
+
+--- @class EsvExperienceSystem:EsvExperienceSystemBase
+--- @field AvailableLevelChanged Set_EntityHandle
+--- @field EqualizeExperience table<EntityHandle, EsvEqualizeExperienceData>
+--- @field ExperienceOnDestroy table<EntityHandle, Set_EntityHandle>
+--- @field IncreaseExperience table<EntityHandle, int32>
+--- @field OverrideLevel table<EntityHandle, int32>
+--- @field ReevaluateCanGainXP Set_EntityHandle
+
+
+--- @class EsvExperienceSystemBase:BaseSystem
+
+
+--- @class EsvExplorationTrigger:EsvAreaTriggerBase
+--- @field ExplorationReward Guid
+--- @field LevelOverride int32
 
 
 --- @class EsvExtinguishFireAction:EsvCreateSurfaceActionBase
@@ -9812,6 +11073,19 @@ Osi = {}
 
 
 --- @class EsvFallToProneOneFrameComponent:BaseComponent
+
+
+--- @class EsvFallingSystem:BaseSystem
+--- @field DeferredStopFalling table<EntityHandle, boolean>
+--- @field ResetFallHeight Set_EntityHandle
+--- @field SetLifetime table<EntityHandle, number>
+--- @field SetTeleportFlag table<EntityHandle, EsvSetTeleportFlagRequest>
+--- @field StartFalling Set_EntityHandle
+--- @field StopFalling Set_EntityHandle
+
+
+--- @class EsvFloorTrigger:FloorTrigger
+--- @field Entity EntityHandle
 
 
 --- @class EsvGameTimerComponent:BaseComponent
@@ -9834,6 +11108,22 @@ Osi = {}
 
 --- @class EsvGameplayLightEquipmentComponent:BaseComponent
 --- @field field_0 Set_EntityHandle
+
+
+--- @class EsvGlobalRestStateRequest
+--- @field Remove int32
+--- @field RestType int32
+
+
+--- @class EsvGodSystem:BaseSystem
+--- @field GodOverrides table<EntityHandle, Guid?>
+
+
+--- @class EsvGravitySystem:BaseSystem
+--- @field InstigatorTagChange EntityHandle[]
+--- @field InstigatorTagChange2 EntityHandle[]
+--- @field SetGravityActive table<EntityHandle, EsvSetGravityActiveRequest>
+--- @field SetGravityType table<EntityHandle, GravityType>
 
 
 --- @class EsvIconInfo
@@ -9864,9 +11154,6 @@ Osi = {}
 
 
 --- @class EsvIsMarkedForDeletionComponent:BaseComponent
-
-
---- @class EsvIsUnsummoningComponent:BaseComponent
 
 
 --- @class EsvIsVisionBlockerComponent:BaseComponent
@@ -9985,12 +11272,17 @@ Osi = {}
 --- @field field_FC vec3
 
 
---- @class EsvKillerComponent:BaseComponent
---- @field Killers Set_EntityHandle
-
-
 --- @class EsvLeaderComponent:BaseComponent
 --- @field Followers_M Set_EntityHandle
+
+
+--- @class EsvLeaderSystem:BaseSystem
+--- @field AddFollower table<EntityHandle, Set_EntityHandle>
+--- @field RemoveFollower table<EntityHandle, Set_EntityHandle>
+
+
+--- @class EsvLightingTrigger:LightingTrigger
+--- @field Entity EntityHandle
 
 
 --- @class EsvMSClimbing:EsvMovementState
@@ -10107,6 +11399,19 @@ Osi = {}
 --- @field MovementMachine EsvMovementMachine
 --- @field TransactionId int32
 --- @field Type ServerMovementType
+
+
+--- @class EsvMusicVolumeTrigger:EsvAreaTriggerBase
+--- @field Events MusicVolumeEvent[]
+
+
+--- @class EsvMusicVolumeTriggerState
+--- @field Index uint32
+--- @field PeerId uint16
+
+
+--- @class EsvMusicVolumeTriggerStateComponent:BaseComponent
+--- @field Triggered EsvMusicVolumeTriggerState[]
 
 
 --- @class EsvNetComponent:BaseComponent
@@ -10277,6 +11582,10 @@ Osi = {}
 --- @field MoveAvoidAoO boolean
 
 
+--- @class EsvOsirisPingRequestSingletonComponent:BaseComponent
+--- @field Pings EsvPingRequestData[]
+
+
 --- @class EsvOsirisRateLimitedAutomatedDialogTask:EsvTask
 --- @field AdHistoryId Guid
 --- @field CullingDistance number
@@ -10361,6 +11670,11 @@ Osi = {}
 --- @field Trigger EntityHandle
 
 
+--- @class EsvPartyTeleportSystem:BaseSystem
+--- @field DelayedTeleport boolean
+--- @field Teleport EsvTeleportPartyRequest
+
+
 --- @class EsvPeersInRangeComponent:BaseComponent
 --- @field Peers int32[]
 
@@ -10381,6 +11695,38 @@ Osi = {}
 --- @field field_18 EsvPickpocketAttempt[]
 
 
+--- @class EsvPingCooldownSingletonComponent:BaseComponent
+--- @field Cooldowns table<int16, number>
+
+
+--- @class EsvPingRequestData
+--- @field Position vec3
+--- @field Source EntityHandle
+--- @field Target EntityHandle
+--- @field field_1C boolean
+
+
+--- @class EsvPingRequestSingletonComponent:BaseComponent
+--- @field Pings EsvPingRequestData[]
+
+
+--- @class EsvPingRequestSystem:BaseSystem
+--- @field Pings EsvPingRequestData[]
+--- @field UIPings EsvUIPingRequestData[]
+
+
+--- @class EsvPlatformSetAuthorityTransformRequest
+--- @field FireEvents boolean
+--- @field Platform EntityHandle
+--- @field Transform Transform
+
+
+--- @class EsvPlatformSystem:PlatformSystem
+--- @field Activated boolean
+--- @field DestroyRequests table<EntityHandle, DeathDeathData>
+--- @field SetAuthorityTransform EsvPlatformSetAuthorityTransformRequest[]
+
+
 --- @class EsvPlayerData
 --- @field CachedTension uint8
 --- @field CustomData PlayerCustomData
@@ -10397,6 +11743,10 @@ Osi = {}
 --- @field field_94 boolean
 
 
+--- @class EsvPointTriggerBase:PointTrigger
+--- @field Entity EntityHandle
+
+
 --- @class EsvPolygonSurfaceAction:EsvCreateSurfaceActionBase
 --- @field Characters EntityHandle[]
 --- @field CurrentGrowTimer number
@@ -10406,6 +11756,10 @@ Osi = {}
 --- @field LastSurfaceCellCount int32
 --- @field PolygonVertices vec2[]
 --- @field SomePosition vec3
+
+
+--- @class EsvPortalTrigger:PortalTrigger
+--- @field Entity EntityHandle
 
 
 --- @class EsvProficiencyGroupStatsComponent:BaseComponent
@@ -10435,12 +11789,30 @@ Osi = {}
 --- @field Width number
 
 
+--- @class EsvRegionTrigger:EsvAreaTriggerBase
+--- @field RegionMaskRegionInWorld boolean
+
+
 --- @class EsvReplicationDependencyComponent:BaseComponent
 --- @field Dependency EntityHandle
 
 
 --- @class EsvReplicationDependencyOwnerComponent:BaseComponent
 --- @field Dependents EntityHandle[]
+
+
+--- @class EsvRestoreRequest
+--- @field Entity EntityHandle
+--- @field field_8 boolean
+
+
+--- @class EsvRestoreSystem:BaseSystem
+--- @field PartyRestore EsvRestoreRequest[]
+
+
+--- @class EsvRoomTrigger:RoomTrigger
+--- @field Entity EntityHandle
+--- @field field_78 uint8
 
 
 --- @class EsvSSLookAt:EsvSteeringState
@@ -10496,8 +11868,28 @@ Osi = {}
 --- @class EsvScriptPropertyIsTradableComponent:BaseComponent
 
 
---- @class EsvStateComponent:BaseComponent
---- @field Flags uint32
+--- @class EsvSetGravityActiveRequest
+--- @field Active boolean
+--- @field Instigator EntityHandle
+
+
+--- @class EsvSetTeleportFlagRequest
+--- @field OriginTeleportPos vec3
+--- @field SnapToGrid boolean
+
+
+--- @class EsvSoundVolumeTrigger:SoundVolumeTrigger
+--- @field AreaLevelOverrideGuid Guid
+--- @field Entity EntityHandle
+
+
+--- @class EsvStartTrigger:EsvPointTriggerBase
+--- @field Angle number
+--- @field Player uint8
+
+
+--- @class EsvStatsAreaTrigger:EsvAreaTriggerBase
+--- @field AreaLevelOverrideGuid Guid
 
 
 --- @class EsvStatsEntityDirtyData
@@ -10608,8 +12000,11 @@ Osi = {}
 --- @field IsStable boolean
 --- @field NumStableFailed int32
 --- @field NumStableSuccess int32
+--- @field OnRollsFailed StatsFunctors
+--- @field OnSuccess StatsFunctors
 --- @field RollFailures int32
 --- @field RollSuccesses int32
+--- @field StableRoll StatsExpressionParam
 --- @field StableRollDC int32
 
 
@@ -10647,8 +12042,6 @@ Osi = {}
 
 
 --- @class EsvStatusKnockedDown:EsvStatus
---- @field IsInstant boolean
---- @field KnockedDownState uint8
 
 
 --- @class EsvStatusMachine
@@ -10679,7 +12072,7 @@ Osi = {}
 --- @field Spell SpellId
 --- @field Target EntityRef
 --- @field TargetPosition vec3
---- @field field_1D8 boolean
+--- @field UpdatesSinceSpellCastRequest uint8
 
 
 --- @class EsvStatusRotate:EsvStatus
@@ -10723,6 +12116,11 @@ Osi = {}
 --- @field TransactionId int32
 --- @field Type ServerSteeringType
 --- @field field_10 boolean
+
+
+--- @class EsvStoryShortRestStateRequest
+--- @field Cause uint8
+--- @field Enabled boolean
 
 
 --- @class EsvSurfaceAction
@@ -10774,8 +12172,23 @@ Osi = {}
 --- @field UpdateInProgress boolean
 
 
+--- @class EsvTeleportPartyRequest
+--- @field Event string
+--- @field LevelOrEntity Variant<EntityHandle,FixedString>
+--- @field Movie FixedString
+
+
+--- @class EsvTeleportTrigger:EsvPointTriggerBase
+--- @field Angle number
+--- @field Zoom boolean
+
+
 --- @class EsvTemplateTagComponent:BaseComponent
 --- @field Tags Guid[]
+
+
+--- @class EsvTimelineSceneTrigger:TimelineSceneTrigger
+--- @field Entity EntityHandle
 
 
 --- @class EsvTransformSurfaceAction:EsvSurfaceAction
@@ -10789,6 +12202,14 @@ Osi = {}
 --- @field SurfaceLifetime number
 --- @field SurfaceTransformAction uint8
 --- @field Timer number
+
+
+--- @class EsvUIPingRequestData
+--- @field PingId int16
+--- @field Position vec3
+--- @field Source EntityHandle
+--- @field Target EntityHandle
+--- @field field_24 boolean
 
 
 --- @class EsvUnsheathDefaultComponent:BaseComponent
@@ -10809,6 +12230,12 @@ Osi = {}
 
 
 --- @class EsvVariableManagerComponent:BaseComponent
+
+
+--- @class EsvVisualSystem:BaseSystem
+--- @field BoostsRemoved Set_EntityHandle
+--- @field ItemSetVisualResource table<EntityHandle, FixedString>
+--- @field UpdateVisuals Set_EntityHandle
 
 
 --- @class EsvZoneAction:EsvCreateSurfaceActionBase
@@ -10886,6 +12313,47 @@ Osi = {}
 --- @field field_30 number
 
 
+--- @class EsvApprovalRatingChangeRequest
+--- @field Adjustment int32
+--- @field Avatar EntityHandle
+--- @field ReactionScope ApprovalReactionScope
+--- @field Subject EntityHandle
+--- @field field_18 Guid
+--- @field field_28 Guid
+
+
+--- @class EsvApprovalRatingRemoveRequest
+--- @field Avatar EntityHandle
+--- @field Subject EntityHandle
+
+
+--- @class EsvApprovalRatingSystem:BaseSystem
+--- @field ChangeRating EsvApprovalRatingChangeRequest[]
+--- @field CreateRatingsComponent Set_EntityHandle
+--- @field RemoveRating EsvApprovalRatingRemoveRequest[]
+
+
+--- @class EsvApprovalRatingsChangedOneFrameComponent:BaseComponent
+--- @field Adjustment int32
+--- @field Avatar EntityHandle
+--- @field FinalRating int32
+--- @field ReactionScope ApprovalReactionScope
+--- @field RealAdjustment int32
+--- @field Subject EntityHandle
+--- @field field_20 Guid
+
+
+--- @class EsvAttitudeUpdateRequest
+--- @field Attitude int32
+--- @field Avatar EntityHandle
+
+
+--- @class EsvAttitudeUpdateSystem:BaseSystem
+--- @field CreateAttitudesComponent EntityHandle[]
+--- @field OsirisAddAttitude table<EntityHandle, EsvAttitudeUpdateRequest[]>
+--- @field ReConAddAttitude table<EntityHandle, EsvAttitudeUpdateRequest[]>
+
+
 --- @class EsvBoostAddBoostRequest
 --- @field BoostDescriptions BoostDescription[]
 --- @field Entity EntityHandle
@@ -10934,9 +12402,27 @@ Osi = {}
 --- @field Events EsvBoostBoostChangedEvent[]
 
 
+--- @class EsvBoostChangedEventsSingletonComponent:BaseComponent
+--- @field Events table<EntityHandle, EsvBoostBoostChangedEvent[]>
+
+
+--- @class EsvBoostConditionalState
+--- @field Boost EntityHandle
+--- @field ConditionResult boolean
+
+
+--- @class EsvBoostConditionalStateComponent:BaseComponent
+--- @field States EsvBoostConditionalState[]
+
+
 --- @class EsvBoostEquipmentBoostAddRemoveRequest
 --- @field Action int32
 --- @field Boost EntityHandle
+
+
+--- @class EsvBoostProviderComponent:BaseComponent
+--- @field field_0 EntityHandle[]
+--- @field field_10 EntityHandle[]
 
 
 --- @class EsvBoostRemoveBoostRequest
@@ -10956,6 +12442,10 @@ Osi = {}
 
 --- @class EsvCharacterCreationAppearanceVisualTagComponent:BaseComponent
 --- @field Tags Guid[]
+
+
+--- @class EsvCharacterCreationCustomIconComponent:BaseComponent
+--- @field Icon ScratchBuffer
 
 
 --- @class EsvCharacterCreationEquipmentSetRequestComponent:BaseComponent
@@ -10993,6 +12483,13 @@ Osi = {}
 --- @class EsvCombatCombatStartedEventOneFrameComponent:BaseComponent
 
 
+--- @class EsvCombatCombatSwitchedComponent:BaseComponent
+--- @field field_0 EntityHandle
+--- @field field_18 Guid
+--- @field field_28 EntityHandle
+--- @field field_8 Guid
+
+
 --- @class EsvCombatCombatantKilledEventOneFrameComponent:BaseComponent
 --- @field field_0 EntityHandle
 --- @field field_10 uint8
@@ -11011,14 +12508,32 @@ Osi = {}
 --- @class EsvCombatFleeBlockedComponent:BaseComponent
 
 
+--- @class EsvCombatFleeRequestComponent:BaseComponent
+--- @field RequestGuid Guid
+--- @field UserID UserId
+
+
+--- @class EsvCombatFleeSuccessOneFrameComponent:BaseComponent
+
+
 --- @class EsvCombatGlobalCombatRequest
 --- @field Action uint32
 --- @field Combat EntityHandle
---- @field field_0 EntityHandle
---- @field field_8 EntityHandle
+--- @field Source EntityHandle
+--- @field Target EntityHandle
+
+
+--- @class EsvCombatGlobalCombatRequests:BaseComponent
+--- @field Requests EsvCombatGlobalCombatRequest[]
 
 
 --- @class EsvCombatImmediateJoinComponent:BaseComponent
+
+
+--- @class EsvCombatJoinEventOneFrameComponent:BaseComponent
+--- @field Combat EntityHandle
+--- @field ImmediateJoin boolean
+--- @field Initiative int32
 
 
 --- @class EsvCombatJoinInCurrentRoundFailedEventOneFrameComponent:BaseComponent
@@ -11027,9 +12542,25 @@ Osi = {}
 --- @class EsvCombatJoinInCurrentRoundOneFrameComponent:BaseComponent
 
 
+--- @class EsvCombatJoiningComponent:BaseComponent
+--- @field field_0 number
+
+
+--- @class EsvCombatLateJoinPenaltyComponent:BaseComponent
+--- @field field_0 number
+
+
+--- @class EsvCombatLeaveRequestComponent:BaseComponent
+
+
 --- @class EsvCombatLeftEventOneFrameComponent:BaseComponent
 --- @field field_0 EntityHandle
 --- @field field_8 Guid
+
+
+--- @class EsvCombatMergeComponent:BaseComponent
+--- @field Combat1 EntityHandle
+--- @field Combat2 EntityHandle
 
 
 --- @class EsvCombatNarrativeCombatRequest
@@ -11039,6 +12570,11 @@ Osi = {}
 
 
 --- @class EsvCombatRequestCompletedEventOneFrameComponent:BaseComponent
+
+
+--- @class EsvCombatSurfaceTeamSingletonComponent:BaseComponent
+--- @field field_0 Set_EntityHandle
+--- @field field_30 table<EntityHandle, Guid[]>
 
 
 --- @class EsvCombatSurprisedJoinRequestOneFrameComponent:BaseComponent
@@ -11072,10 +12608,42 @@ Osi = {}
 --- @class EsvCombatThreatRangeChangedEventOneFrameComponent:BaseComponent
 
 
+--- @class EsvCombatTurnActionCompletedRequest
+--- @field ActionsCompleted boolean
+--- @field Entity EntityHandle
+
+
+--- @class EsvCombatTurnOrderSystem:BaseSystem
+--- @field BeginCancelEndTurn EntityHandle[]
+--- @field CancelEndTurn EntityHandle[]
+--- @field ClearTimeout EntityHandle[]
+--- @field EndCancelEndTurn EntityHandle[]
+--- @field EndTurn EntityHandle[]
+--- @field GameState13 boolean
+--- @field SetTimeout table<EntityHandle, number>
+--- @field TurnCompleted EsvCombatTurnActionCompletedRequest[]
+
+
 --- @class EsvConcentrationConcentrationChangedOneFrameComponent:BaseComponent
 --- @field Ended SpellId
 --- @field Interrupted boolean
 --- @field Started SpellId
+
+
+--- @class EsvConcentrationConcentrationRequest
+--- @field BreakConcentration boolean
+--- @field Caster EntityHandle
+--- @field CheckReset boolean
+--- @field ClearConcentration boolean
+--- @field RequestType ServerConcentrationRequestType
+--- @field SpellCastGuid Guid?
+--- @field SpellId SpellId
+--- @field Target ConcentrationTarget
+
+
+--- @class EsvConcentrationConcentrationSystem:BaseSystem
+--- @field ConcentrationRequests EsvConcentrationConcentrationRequest[]
+--- @field field_48 uint8
 
 
 --- @class EsvConcentrationDamageCheckOneFrameComponent:BaseComponent
@@ -11087,6 +12655,66 @@ Osi = {}
 --- @field SurfaceIndex int16
 --- @field Target EntityHandle
 --- @field field_12 boolean
+
+
+--- @class EsvDeathDeathApplyKnockedOutOneFrameComponent:BaseComponent
+--- @field field_0 EntityHandle
+--- @field field_10 string
+--- @field field_8 uint8
+--- @field field_C int32
+
+
+--- @class EsvDeathDeathAssignEntityToUserRequestOneFrameComponent:BaseComponent
+--- @field UserID int32
+
+
+--- @class EsvDeathDeathContinueComponent:BaseComponent
+
+
+--- @class EsvDeathDeathDeadByDefaultRequestOneFrameComponent:BaseComponent
+--- @field DeathType StatsDeathType
+--- @field Entity EntityHandle
+--- @field field_8 boolean
+
+
+--- @class EsvDeathDeathRequestOneFrameComponent:BaseComponent
+--- @field Death DeathDeathRequestData
+--- @field Entity EntityHandle
+
+
+--- @class EsvDeathDelayDeathCauseComponent:BaseComponent
+--- @field DelayCount int32
+--- @field Reason int32
+--- @field field_8 Guid
+
+
+--- @class EsvDeathDelayedDeathComponent:BaseComponent
+--- @field Death DeathDeathRequestData
+--- @field Reason uint32
+--- @field field_88 Guid
+
+
+--- @class EsvDeathDiedEventOneFrameComponent:BaseComponent
+
+
+--- @class EsvDeathDownedEventOneFrameComponent:BaseComponent
+
+
+--- @class EsvDeathKillerComponent:BaseComponent
+--- @field Killers Set_EntityHandle
+
+
+--- @class EsvDeathModifyDelayDeathRequestOneFrameComponent:BaseComponent
+--- @field Entity EntityHandle
+--- @field Increase boolean
+
+
+--- @class EsvDeathResurrectedEventOneFrameComponent:BaseComponent
+--- @field Resurrect DeathResurrectionData
+
+
+--- @class EsvDeathStateComponent:BaseComponent
+--- @field Flags uint32
 
 
 --- @class EsvEcsstatsAbilityCheckEventOneFrameComponent:BaseComponent
@@ -11194,6 +12822,72 @@ Osi = {}
 --- @class EsvFtbRoundEndedEventOneFrameComponent:BaseComponent
 
 
+--- @class EsvFtbSurfaceTeamSingletonComponent:BaseComponent
+--- @field field_0 Set_EntityHandle
+--- @field field_30 table<EntityHandle, Guid[]>
+
+
+--- @class EsvFtbTimeFactorRequestsSingletonComponent:BaseComponent
+--- @field Requests table<EntityHandle, number>
+
+
+--- @class EsvFtbTimeFactorResetRequestsSingletonComponent:BaseComponent
+--- @field Requests Set_EntityHandle
+
+
+--- @class EsvFtbToggleFTBParameters
+--- @field ByPlayer boolean
+--- @field Enter boolean
+--- @field Shared boolean
+
+
+--- @class EsvFtbTurnBasedChangesRequest
+--- @field ActedThisRoundInCombat boolean?
+--- @field CanActInCombat boolean?
+--- @field CombatTeam Guid?
+--- @field EndTurnHoldTimer number??
+--- @field HadTurnInCombat boolean?
+--- @field IsActiveCombatTurn boolean?
+--- @field PauseTimer number??
+--- @field Removed boolean?
+--- @field RequestedEndTurn boolean?
+--- @field Timeout number??
+--- @field TurnActionsCompleted boolean?
+
+
+--- @class EsvFtbTurnBasedChangesRequestSingletonComponent:BaseComponent
+--- @field Requests table<EntityHandle, EsvFtbTurnBasedChangesRequest>
+
+
+--- @class EsvFtbZoneComponent:BaseComponent
+--- @field ByPlayer boolean
+--- @field Creator EntityHandle
+--- @field Entity EntityHandle
+--- @field Shared boolean
+--- @field ZoneGuid Guid
+--- @field field_10 EntityHandle
+--- @field field_18 uint8
+--- @field field_1C number
+--- @field field_20 FixedString
+--- @field field_8 uint8
+
+
+--- @class EsvFtbZoneInstigatorComponent:BaseComponent
+--- @field Instigator EntityHandle
+--- @field Shared boolean
+
+
+--- @class EsvFtbZoneSystem:BaseSystem
+--- @field BeginCancelEndTurn table<EntityHandle, EntityHandle[]>
+--- @field CancelEndTurn table<EntityHandle, EntityHandle[]>
+--- @field EndCancelEndTurn table<EntityHandle, EntityHandle[]>
+--- @field EndTurn Set_EntityHandle
+--- @field EnterExistingSharedFTB table<EntityHandle, EntityHandle>
+--- @field LeaveExistingSharedFTB Set_EntityHandle
+--- @field SetTurnActionsCompleted EsvCombatTurnActionCompletedRequest[]
+--- @field ToggleForCharacter table<EntityHandle, EsvFtbToggleFTBParameters>
+
+
 --- @class EsvHitAnimationEventRequestsData
 --- @field HitAnimationType uint8
 --- @field field_1 uint8
@@ -11206,6 +12900,42 @@ Osi = {}
 
 --- @class EsvHitHitAnimationRequestOneFrameComponent:BaseComponent
 --- @field Requests EsvHitAnimationEventRequestsData[]
+
+
+--- @class EsvHitHitEventData
+--- @field CauseType CauseType
+--- @field Damage int32
+--- @field DamageType DamageType
+--- @field Inflicter Guid
+--- @field InflicterOwner Guid
+--- @field StoryActionId int32
+--- @field TargetProxy Guid
+
+
+--- @class EsvHitHitNotificationEventOneFrameComponent:BaseComponent
+--- @field Dead boolean
+--- @field Hit EsvHitHitEventData
+--- @field Target EntityHandle
+
+
+--- @class EsvHitHitNotificationRequestOneFrameComponent:BaseComponent
+--- @field Hit EsvHitHitEventData
+--- @field Target EntityHandle
+
+
+--- @class EsvHitHitRequest
+--- @field Ability AbilityId
+--- @field DecreaseDelayDeathCount boolean
+--- @field Desc HitDesc
+--- @field HitWith HitWith
+--- @field Originator ActionOriginator
+--- @field SkipNotifications boolean
+--- @field StoryActionId int32
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle
+--- @field Weapon EntityHandle
+--- @field field_1C1 uint8
+--- @field field_1FA boolean
 
 
 --- @class EsvHitHitResultEventOneFrameComponent:BaseComponent
@@ -11221,8 +12951,25 @@ Osi = {}
 --- @field field_20 HitDesc
 
 
+--- @class EsvHitHitSystem:BaseSystem
+--- @field HitAnimationFinished EntityHandle[]
+--- @field Hits EsvHitHitRequest[]
+--- @field Reactions EsvHitReactionRequest[]
+--- @field field_80 uint8
+
+
 --- @class EsvHitOnHitJoinCombatRequestOneFrameComponent:BaseComponent
 --- @field Entities Set_EntityHandle
+
+
+--- @class EsvHitReactionRequest
+--- @field Hit HitDesc
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle
+
+
+--- @class EsvHitUnresolvedHitNotificationComponent:BaseComponent
+--- @field Hits EsvHitHitEventData[]
 
 
 --- @class EsvInterruptActionRequestsComponent:BaseComponent
@@ -11236,14 +12983,18 @@ Osi = {}
 
 
 --- @class EsvInterruptCombatLogRequestData
---- @field MHM_EH_MHS_EH table<EntityHandle, Set_EntityHandle>
---- @field field_0 int64
---- @field field_8 int64
+--- @field UseCosts StatsActionResourceCost[]
+--- @field field_0 EntityHandle
+--- @field field_18 table<EntityHandle, table<InterruptInterruptEvent, InterruptInterruptUsageEntry>>
 
 
 --- @class EsvInterruptDataSingletonComponent:BaseComponent
 --- @field Events InterruptUndecidedEventWithId[]
 --- @field TargetHitInterrupts InterruptDelayedTargetHitInterruptEvent[]
+
+
+--- @class EsvInterruptDecisionSystem:BaseSystem
+--- @field Decisions table<EntityHandle, uint8>
 
 
 --- @class EsvInterruptInitialParticipantData
@@ -11256,27 +13007,43 @@ Osi = {}
 
 
 --- @class EsvInterruptInterruptDataComponent:BaseComponent
+--- @field AnimationIndex int32
 --- @field AnimationInterrupts InterruptAnimationInterruptData[]
 --- @field Event InterruptUndecidedEvent?
+--- @field NextInterruptIndex int32
 --- @field PausedAnimationEvents InterruptPausedAnimationEvent[]
 --- @field SpellCastGuid Guid
---- @field field_250 int32
---- @field field_278 int32
+
+
+--- @class EsvInterruptInterruptRequest
+--- @field Boost EntityHandle
+--- @field Interrupt FixedString
+--- @field IsRemoval boolean
+--- @field Source InterruptRequestSource
+--- @field Spell FixedString
+
+
+--- @class EsvInterruptManagementSystem:BaseSystem
+--- @field IsAsk table<EntityHandle, boolean>
+--- @field IsEnabled table<EntityHandle, boolean>
+--- @field RemoveContainers Set_EntityHandle
+
+
+--- @class EsvInterruptRequestsSystem:BaseSystem
+--- @field Requests table<EntityHandle, EsvInterruptInterruptRequest[]>
 
 
 --- @class EsvInterruptStartRequestData
 --- @field Event InterruptInterruptEvent
---- @field MHM_EH_MHS_EH table<EntityHandle, Set_EntityHandle>
---- @field field_0 int64
---- @field field_158 int64
---- @field field_8 int64
+--- @field Interruptors table<EntityHandle, Set_EntityHandle>
+--- @field SpellCastGuid Guid
+--- @field field_158 uint8
 
 
 --- @class EsvInterruptStopRequestData
 --- @field Event InterruptInterruptEvent
---- @field field_0 int64
---- @field field_118 int64
---- @field field_8 int64
+--- @field SpellCastGuid Guid
+--- @field field_118 uint8
 
 
 --- @class EsvInterruptTurnOrderInZoneComponent:BaseComponent
@@ -11284,9 +13051,8 @@ Osi = {}
 
 
 --- @class EsvInterruptUpdateInterruptorsRequestData
---- @field UseCosts StatsActionResourceCost[]
---- @field field_0 int64
---- @field field_18 table<EntityHandle, table<InterruptInterruptEvent, ConditionRoll>>
+--- @field Interruptors table<EntityHandle, Set_EntityHandle>
+--- @field SpellCastGuid Guid
 
 
 --- @class EsvInterruptUsedOneFrameComponent:BaseComponent
@@ -11299,6 +13065,11 @@ Osi = {}
 --- @field StopRequests EsvInterruptStopRequestData[]
 
 
+--- @class EsvInventoryCanPlaceSystem:BaseSystem
+--- @field FlagsChanged Set_EntityHandle
+--- @field ReevaluateTemplateChange Set_EntityHandle
+
+
 --- @class EsvInventoryCharacterHasGeneratedTradeTreasureComponent:BaseComponent
 
 
@@ -11307,18 +13078,242 @@ Osi = {}
 --- @field field_4 int32
 
 
+--- @class EsvInventoryContainerInteractionRequestData
+--- @field Action Variant<EsvInventoryContainerSortData,EsvInventoryContainerScatterData>
+--- @field Inventory EntityHandle
+
+
+--- @class EsvInventoryContainerScatterData
+--- @field MainInventory boolean
+--- @field OnlyDropOnDeathItems boolean
+--- @field ToParent boolean
+
+
+--- @class EsvInventoryContainerSortData
+--- @field SortType uint8
+
+
+--- @class EsvInventoryCreateRequestData
+--- @field Owner EntityHandle
+--- @field SlotLimit int16
+--- @field Type InventoryType
+--- @field field_C boolean
+
+
+--- @class EsvInventoryDirectStackRequest
+--- @field Amount int32
+--- @field Item EntityHandle
+--- @field Split boolean
+--- @field UpdateEntity boolean
+--- @field field_8 Guid
+
+
+--- @class EsvInventoryDropMovement:PathSettings
+--- @field Event string
+--- @field IsInInventory boolean
+--- @field Position vec3
+--- @field Rotation quat
+--- @field Target EntityHandle
+--- @field field_6C boolean
+--- @field field_78 boolean
+--- @field field_79 boolean
+--- @field field_7A boolean
+
+
+--- @class EsvInventoryEntityHasGeneratedTreasureComponent:BaseComponent
+
+
+--- @class EsvInventoryEntityReceivalNotificationSystem:BaseSystem
+--- @field Notify table<EntityHandle, EntityHandle>
+
+
+--- @class EsvInventoryEquipRequest
+--- @field CheckActionResourceCosts boolean
+--- @field DiscardOnEquipFail boolean
+--- @field EvaluateConditions boolean
+--- @field Item EntityHandle
+--- @field Settings EsvInventoryEquipSettings
+--- @field Slot ItemSlot
+--- @field field_A boolean
+
+
+--- @class EsvInventoryEquipSettings
+--- @field AllowShapeshifted boolean
+--- @field BlockUnequip boolean
+--- @field CanSwapHands boolean
+--- @field IgnoreCombat boolean
+--- @field IgnoreLocked boolean
+--- @field OnlyMainHand boolean
+--- @field field_4 boolean
+
+
+--- @class EsvInventoryEquipmentRequest
+--- @field Action Variant<EsvInventoryEquipRequest,EsvInventoryUnequipRequest>
+--- @field InventoryContainer EntityHandle
+
+
+--- @class EsvInventoryEquipmentSetRequest
+--- @field Equipment FixedString[]
+--- @field RemoveOldEquipmentSets boolean
+--- @field ShapeshiftState Guid
+
+
+--- @class EsvInventoryEquipmentSystem:BaseSystem
+--- @field Equipment EsvInventoryEquipmentRequest[]
+--- @field EquipmentSet table<EntityHandle, EsvInventoryEquipmentSetRequest>
+
+
+--- @class EsvInventoryGenerateTreasureRequestData
+--- @field AllowMultipleGenerations boolean
+--- @field Finder EntityHandle
+--- @field InventoryHolder EntityHandle
+--- @field IsTradeTreasure boolean
+--- @field Level int32
+--- @field Treasure FixedString[]
+
+
 --- @class EsvInventoryGroupCheckComponent:BaseComponent
 --- @field Conditions uint32
+
+
+--- @class EsvInventoryInteractionRequestSystem:BaseSystem
+--- @field ContainerInteractions EsvInventoryContainerInteractionRequestData[]
+--- @field MemberInteraction EsvInventoryMemberInteractionRequestData[]
+--- @field NotifyInteraction EsvInventoryNotifyInteractionRequestData[]
+
+
+--- @class EsvInventoryInteractionSystem:BaseSystem
+--- @field BrokenEntities Set_EntityHandle
+--- @field DestroyedEntities table<EntityHandle, EntityHandle[]>
+--- @field DestroyedMembers table<EntityHandle, EsvInventoryMemberData>
+--- @field LevelOverride table<EntityHandle, FixedString>
+--- @field PositionOverride table<EntityHandle, vec3>
+--- @field field_110 EntityHandle[]
+--- @field field_90 table<EntityHandle, EntityHandle[]>
 
 
 --- @class EsvInventoryIsReplicatedWithComponent:BaseComponent
 
 
+--- @class EsvInventoryLockingSystem:BaseSystem
+--- @field Change table<EntityHandle, InventoryLockChange>
+
+
+--- @class EsvInventoryMagicPocketsTrackingSystem:BaseSystem
+--- @field RequestTrack Set_EntityHandle
+
+
+--- @class EsvInventoryManagementSystem:BaseSystem
+--- @field CreateInventory EsvInventoryCreateRequestData[]
+--- @field DestroyInventory EntityHandle[]
+
+
+--- @class EsvInventoryMemberAddData
+--- @field AddToOwner boolean
+--- @field AddType uint8
+--- @field Grouping boolean
+--- @field Item EntityHandle
+--- @field Slot int16?
+--- @field UseTopOwner boolean
+--- @field field_10 boolean
+--- @field field_11 boolean
+
+
+--- @class EsvInventoryMemberData
+--- @field Inventory EntityHandle
+--- @field InventorySlot int16
+
+
+--- @class EsvInventoryMemberDropData
+--- @field DropMovement EsvInventoryDropMovement?
+--- @field InventoryOwner EntityHandle
+--- @field Level FixedString?
+--- @field Position vec3?
+--- @field Slot int16
+
+
+--- @class EsvInventoryMemberEquipmentRequestFailedData
+--- @field InventoryOwner EntityHandle
+--- @field field_8 uint8
+
+
+--- @class EsvInventoryMemberInteractionRequestData
+--- @field Action Variant<EsvInventoryMemberAddData,EsvInventoryMemberMoveToSlotData,EsvInventoryMemberTransferData,EsvInventoryMemberDropData,EsvInventoryMemberEquipmentRequestFailedData,EsvInventoryMemberRemoveData>
+--- @field Amount int32
+--- @field Inventory EntityHandle
+
+
+--- @class EsvInventoryMemberMoveToSlotData
+--- @field SourceSlot int16
+--- @field TargetSlot int16
+
+
+--- @class EsvInventoryMemberRemoveData
+--- @field Slot int16
+
+
+--- @class EsvInventoryMemberTransferData
+--- @field Grouping boolean
+--- @field IsPickupAction boolean
+--- @field SourceSlot int16
+--- @field TargetInventory EntityHandle
+--- @field TargetSlot int16?
+--- @field Trade boolean
+--- @field TransferToOwner boolean
+--- @field field_12 boolean
+--- @field field_13 boolean
+--- @field field_18 EntityHandle
+
+
+--- @class EsvInventoryNewInventoryMemberSystem:BaseSystem
+--- @field NewMembers Set_EntityHandle
+
+
+--- @class EsvInventoryNotifyInteractionRequestData
+--- @field Actor EntityHandle
+--- @field Container EntityHandle
+
+
 --- @class EsvInventoryReadyToBeAddedToInventoryComponent:BaseComponent
+
+
+--- @class EsvInventorySetBuybackPriceRequest
+--- @field Item EntityHandle
+--- @field Price int16
 
 
 --- @class EsvInventoryShapeshiftEquipmentHistoryComponent:BaseComponent
 --- @field History Guid[]
+
+
+--- @class EsvInventoryStackSystem:BaseSystem
+--- @field Requests EsvInventoryDirectStackRequest[]
+
+
+--- @class EsvInventoryTradeBuybackSystem:BaseSystem
+--- @field SetBuybackPrice EsvInventorySetBuybackPriceRequest[]
+
+
+--- @class EsvInventoryTreasureGenerationSystem:BaseSystem
+--- @field AnubisGenerate EsvInventoryGenerateTreasureRequestData[]
+--- @field CommandGenerate EsvInventoryGenerateTreasureRequestData[]
+--- @field OsirisGenerate EsvInventoryGenerateTreasureRequestData[]
+
+
+--- @class EsvInventoryUnequipRequest
+--- @field DropMovement EsvInventoryDropMovement?
+--- @field Inventory EntityHandle?
+--- @field InventoryOwner EntityHandle?
+--- @field IsPickupAction boolean
+--- @field Item EntityHandle
+--- @field Level FixedString?
+--- @field Position vec3?
+--- @field Settings EsvInventoryEquipSettings
+--- @field ShapeshiftState Guid
+--- @field Slot int16?
+--- @field TransferToOwner boolean
+--- @field Type UnequipType
+--- @field field_FF boolean
 
 
 --- @class EsvItemDynamicLayerOwnerComponent:BaseComponent
@@ -11396,6 +13391,36 @@ Osi = {}
 --- @field OriginalOwner EntityHandle?
 
 
+--- @class EsvPartyEntityTransferData
+--- @field Group Guid
+--- @field Party EntityHandle
+--- @field Position int32
+
+
+--- @class EsvPartyMemberParticipationUpdateRequest
+--- @field Member EntityHandle
+--- @field ToAdd boolean
+
+
+--- @class EsvPartyPartyFollowerRequestData
+--- @field Follower EntityHandle
+--- @field Leader EntityHandle
+--- @field ToAdd boolean
+
+
+--- @class EsvPartyPartySystem:BaseSystem
+--- @field CreateGroupFromMembers EntityHandle[][]
+--- @field FollowerRequest EsvPartyPartyFollowerRequestData[]
+--- @field MemberParticipationUpdate EsvPartyMemberParticipationUpdateRequest[]
+--- @field PostReloadStorySetup table<EntityHandle, vec3>
+--- @field ReevaluateParty Set_EntityHandle
+--- @field SummonsToRemove Set_EntityHandle
+--- @field TransferMember table<EntityHandle, EsvPartyEntityTransferData>
+--- @field TransferUser table<UserId, EntityHandle>
+--- @field Unload boolean
+--- @field UnloadEntities boolean
+
+
 --- @class EsvPartyUserSnapshotComponent:BaseComponent
 --- @field PerUserCharacters table<Guid, EntityHandle[][]>
 --- @field Snapshot table<Guid, EntityHandle[][]>
@@ -11406,17 +13431,27 @@ Osi = {}
 --- @field RollType ConditionRollType
 
 
+--- @class EsvPassiveBoostsComponent:BaseComponent
+--- @field Boosts Guid[]
+--- @field ContextData Variant<StatsAttackTargetContextData,StatsAttackPositionContextData,StatsMoveContextData,StatsSourceContextData,StatsTargetContextData,StatsNearbyAttackedContextData,StatsNearbyAttackingContextData,StatsEquipContextData>?
+--- @field field_0 Guid[]
+
+
 --- @class EsvPassiveChangePassiveRequest
 --- @field Entity EntityHandle
 --- @field Passive FixedString
 --- @field PassiveChange uint8
---- @field PassiveEntity EntityHandle
---- @field field_18 uint8
---- @field field_C int32
+--- @field PassiveSourceType PassiveSourceType
+--- @field Source EntityHandle
 
 
 --- @class EsvPassiveConditionalRollInterruptEventOneFrameComponent:BaseComponent
+--- @field Passive EntityHandle
+--- @field PassiveId FixedString
 --- @field PostponedRolls EsvPassivePostponedConditionalRoll[]
+--- @field RollUuid Guid
+--- @field Source EntityHandle
+--- @field Target EntityHandle
 --- @field field_0 Guid
 --- @field field_10 EntityHandle
 --- @field field_18 EntityHandle
@@ -11469,10 +13504,10 @@ Osi = {}
 
 
 --- @class EsvPassivePostponedConditionalRoll
+--- @field Condition stats::ConditionId
 --- @field Roll ConditionRoll
---- @field field_0 int64
+--- @field RollIndex uint64
 --- @field field_148 uint8
---- @field field_8 int64
 
 
 --- @class EsvPassiveRequestTargetTrackingOneFrameComponent:BaseComponent
@@ -11501,6 +13536,11 @@ Osi = {}
 
 
 --- @class EsvProgressionLevelUpChangedOneFrameComponent:BaseComponent
+
+
+--- @class EsvProgressionManagementSystem:BaseSystem
+--- @field DestroyedProgressions Set_EntityHandle
+--- @field ProgressionUpdates table<EntityHandle, int32>
 
 
 --- @class EsvProjectileAttachmentComponent:BaseComponent
@@ -11651,10 +13691,9 @@ Osi = {}
 
 
 --- @class EsvProjectileSpellComponent:BaseComponent
+--- @field Index int32
 --- @field Spell EntityHandle
 --- @field Target SpellCastIntermediateTarget
---- @field field_B0 int32
---- @field field_B4 uint8
 
 
 --- @class EsvProjectileSplitThrowableObjectRequestOneFrameComponent:BaseComponent
@@ -11665,32 +13704,81 @@ Osi = {}
 --- @field field_0 Guid
 
 
+--- @class EsvRestLongRestSystem:BaseSystem
+--- @field AutoConfirmation boolean[]
+--- @field Finish Set_EntityHandle
+--- @field FinishConfirmation Set_UserId
+--- @field Pending boolean
+--- @field RequestLongRest boolean
+--- @field RequestReloadStory boolean
+--- @field RequestSyncedFinish boolean
+--- @field RequestUserStateRestore boolean
+--- @field RestConfirmed boolean
+--- @field RestRequester EntityHandle
+--- @field RestSupplies table<EntityHandle, int32>
+--- @field ScriptDeny FixedString[]
+--- @field SetPlayersAreDreaming boolean?
+--- @field SetTimeline Set_Guid
+--- @field UserDecision boolean
+--- @field UserDecisionRestType uint8
+
+
+--- @class EsvRestPendingTypeComponent:BaseComponent
+--- @field CancelReason RestCancelReason
+--- @field Supplies table<EntityHandle, int32>
+
+
+--- @class EsvRestRestTypeChosenEventOneFrameComponent:BaseComponent
+--- @field CancelReason RestCancelReason
+--- @field Supplies table<EntityHandle, int32>
+--- @field UserDecision boolean
+
+
+--- @class EsvRestShortRestConsumeResourcesComponent:BaseComponent
+
+
+--- @class EsvRestShortRestResultEventOneFrameComponent:BaseComponent
+--- @field ErrorFlags RestErrorFlags
+--- @field Rested boolean
+
+
+--- @class EsvRestShortRestSystem:BaseSystem
+--- @field FunctorRequest table<EntityHandle, boolean>
+--- @field ReConRequest table<EntityHandle, boolean>
+--- @field UIRequest table<EntityHandle, boolean>
+
+
 --- @class EsvRollDeathSavingThrowRequest
 --- @field DC Variant<int32,Guid>
 --- @field Entity EntityHandle
 
 
 --- @class EsvRollFinishedEvent
---- @field AC uint8
+--- @field AC uint32
 --- @field Ability AbilityId
---- @field AdvantageType1 uint8
---- @field AdvantageType2 uint8
+--- @field Advantage boolean
+--- @field AdvantageType1 boolean
+--- @field AdvantageType2 boolean
+--- @field Canceled boolean
+--- @field ConsumedInspirationPoint boolean
+--- @field DC uint32
 --- @field DiceAdditionalValue int32
+--- @field Disadvantage boolean
 --- @field NaturalRoll int32
---- @field RollComponentType0 uint8
+--- @field Roll EntityHandle
+--- @field RollComponentType0 boolean
 --- @field RollContext uint8
 --- @field RollType uint8
 --- @field RollUuid Guid
+--- @field Roller EntityHandle
 --- @field Skill SkillId
 --- @field Source EntityHandle
 --- @field Source2 EntityHandle
 --- @field SpellCheck uint8
+--- @field Subject EntityHandle
 --- @field field_20 EntityHandle
---- @field field_29 uint8
---- @field field_39 uint8
---- @field field_3A uint8
---- @field field_3B uint8
---- @field field_48 uint8
+--- @field field_29 boolean
+--- @field field_48 boolean
 
 
 --- @class EsvRollRollFinishedEventOneFrameComponent:BaseComponent
@@ -11822,9 +13910,20 @@ Osi = {}
 --- @class EsvSpellBookChangedOneFrameComponent:BaseComponent
 
 
+--- @class EsvSpellLearnRequest
+--- @field Class Guid
+--- @field SpellId FixedString
+
+
 --- @class EsvSpellLearnedSpell
 --- @field ProgressionSource Guid
 --- @field SpellId FixedString
+
+
+--- @class EsvSpellLearningSystem:BaseSystem
+--- @field LearnRequests table<EntityHandle, EsvSpellLearnRequest[]>
+--- @field RemoveLearnedSpells Set_EntityHandle
+--- @field SavantChanged Set_EntityHandle
 
 
 --- @class EsvSpellNewSpellsAddedEventOneFrameComponent:BaseComponent
@@ -11839,6 +13938,16 @@ Osi = {}
 
 --- @class EsvSpellOnDamageSpellsComponent:BaseComponent
 --- @field Spells EsvSpellOnDamageSpell[]
+
+
+--- @class EsvSpellSpellCooldownSystem:BaseSystem
+--- @field RechargeSpells_EH_bool table<EntityHandle, boolean>
+--- @field ResetAllCooldowns Set_EntityHandle
+--- @field ResetCooldowns table<EntityHandle, Set_SpellCooldownType>
+--- @field RoundCooldowns Set_EntityHandle
+--- @field StartCooldown table<EntityHandle, table<SpellId, Guid>>
+--- @field UpdateCooldown table<EntityHandle, number>
+--- @field UseRechargeSpell table<EntityHandle, SpellId[]>
 
 
 --- @class EsvSpellSpellSystem:BaseSystem
@@ -11870,21 +13979,19 @@ Osi = {}
 
 --- @class EsvSpellCastCacheComponent:BaseComponent
 --- @field Costs StatsActionResourceCost[]
---- @field Targets table<FixedString, table<int32, SpellCastIntermediateTarget[]>>
---- @field field_10 table<int32, boolean>
---- @field field_50 uint32
+--- @field HasPathfindTemplate boolean
+--- @field IntermediateTargets table<FixedString, table<int32, SpellCastIntermediateTarget[]>>
+--- @field MovementTransactionId uint32
+--- @field PhaseFinished boolean
+--- @field TargetCounts table<FixedString, int32>
+--- @field TextKeyIndex uint32
+--- @field TextKeyIndices table<int32, boolean>
 --- @field field_54 int32
---- @field field_98 table<FixedString, int32>
---- @field field_D8 uint32
---- @field field_DC int32
---- @field field_E8 uint8
---- @field field_EC uint16
---- @field field_EE uint16
+--- @field field_E0 vec3?
 
 
 --- @class EsvSpellCastCastCancelRequest
 --- @field Caster EntityHandle
---- @field CharacterReassigned boolean
 --- @field Forced boolean
 --- @field SpellCastGuid Guid?
 
@@ -11898,19 +14005,18 @@ Osi = {}
 
 
 --- @class EsvSpellCastCastHitDelayComponent:BaseComponent
---- @field CastHitDelays EsvSpellCastCastHitDelayInfo[]
---- @field CastTargetHitDelay number
---- @field CastTargetHitDelay2 number
+--- @field Delays EsvSpellCastCastHitDelayInfo[]
+--- @field HitDelay number
+--- @field HitDelayRemaining number
 
 
 --- @class EsvSpellCastCastHitDelayInfo
---- @field HitNumber int32
+--- @field InitialIndex int32
+--- @field IntermediateIndex int32
+--- @field NextIndex int32
+--- @field OverallIndex int32?
 --- @field TextKey FixedString
---- @field field_10 number
---- @field field_18 int32
---- @field field_4 int32
---- @field field_8 int32
---- @field field_C int32
+--- @field TextKeyIndex int32
 
 
 --- @class EsvSpellCastCastRequestSystem:BaseSystem
@@ -11924,6 +14030,7 @@ Osi = {}
 --- @field ItemStartRequests EsvSpellCastCastStartRequest[]
 --- @field JumpStartRequests EsvSpellCastCastStartRequest[]
 --- @field NetworkCancelRequests EsvSpellCastCastCancelRequest[]
+--- @field NetworkPreviewUpdateRequests EsvSpellCastPreviewSetRequest[]
 --- @field NetworkStartRequests EsvSpellCastCastStartRequest[]
 --- @field OsirisCancelRequests EsvSpellCastCastCancelRequest[]
 --- @field OsirisCastRequests EsvSpellCastCastStartRequest[]
@@ -11935,49 +14042,307 @@ Osi = {}
 --- @field field_E8 EsvSpellCastCastCancelRequest[]
 
 
+--- @class EsvSpellCastCastRequestsComponent:BaseComponent
+--- @field CancelRequests EsvSpellCastCastCancelRequest[]
+--- @field ConfirmRequests EsvSpellCastCastConfirmRequest[]
+--- @field PreviewSetRequests EsvSpellCastPreviewSetRequest[]
+--- @field StartRequests EsvSpellCastCastStartRequest[]
+
+
 --- @class EsvSpellCastCastResponsibleComponent:BaseComponent
 --- @field Entity EntityHandle
 
 
 --- @class EsvSpellCastCastStartRequest
---- @field CastOptions uint32
+--- @field CastOptions SpellCastOptions
 --- @field CastPosition vec3?
 --- @field Caster EntityHandle
 --- @field Item EntityHandle
 --- @field NetGuid string
 --- @field Originator ActionOriginator
+--- @field RequestGuid Guid
 --- @field Spell SpellId
+--- @field StoryActionId int32
 --- @field Targets SpellCastInitialTarget[]
 --- @field field_70 EntityHandle
---- @field field_88 int32
 --- @field field_A8 uint8
---- @field field_B0 int64
---- @field field_B8 int64
 
 
 --- @class EsvSpellCastClientInitiatedComponent:BaseComponent
 
 
---- @class EsvSpellCastExternalsComponent:BaseComponent
---- @field Externals Guid[]
+--- @class EsvSpellCastEventAddDelayedCastHit
+--- @field InitialIndex uint64
+--- @field IntermediateIndex uint32
+--- @field OverallIndex uint32?
+--- @field TextKey FixedString
+--- @field TextKeyIndex uint32
 
 
---- @class EsvSpellCastFunctorConditional
---- @field Roll ConditionRoll
---- @field field_0 vec3
---- @field field_10 EntityHandle
---- @field field_18 int32
---- @field field_1C uint8
+--- @class EsvSpellCastEventAddMovementInfo
+--- @field PathSettings PathSettings?
+--- @field TargetInfo NavigationTargetInfo?
+
+
+--- @class EsvSpellCastEventAddProjectileCache
+--- @field Projectiles EsvSpellCastProjectileResultsExtraData[]
+
+
+--- @class EsvSpellCastEventAddSharedMovement
+--- @field Position vec3
+--- @field field_C vec3?
+
+
+--- @class EsvSpellCastEventAdvanceReaction
+--- @field SpellConditionsType uint8
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle?
+
+
+--- @class EsvSpellCastEventAdvanceRoll
+--- @field SpellConditionsType uint8
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle?
+--- @field TextKey FixedString
+
+
+--- @class EsvSpellCastEventCacheFlagChange
+--- @field Flag uint32
+
+
+--- @class EsvSpellCastEventCast
+--- @field Hit HitDesc
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle?
+
+
+--- @class EsvSpellCastEventCastHit
+--- @field Index uint32
+--- @field TextKey FixedString
+
+
+--- @class EsvSpellCastEventCastOptionsChange
+--- @field ClearOptions uint32
+--- @field SetOptions uint32
+
+
+--- @class EsvSpellCastEventCastTextKey
+--- @field TextKey FixedString
+
+
+--- @class EsvSpellCastEventChangeCastEndPosition
+--- @field Position vec3
+
+
+--- @class EsvSpellCastEventChangeCastPosition
+--- @field Position vec3
+
+
+--- @class EsvSpellCastEventChangeMovementTransactionId
+--- @field TransactionId uint32
+
+
+--- @class EsvSpellCastEventChangeProjectileDelayTimer
+--- @field ProjectileDelay number
+--- @field ProjectileIndex int32
+
+
+--- @class EsvSpellCastEventChangeStoryActionId
+--- @field StoryActionId int32
+
+
+--- @class EsvSpellCastEventCreateWall
+--- @field Target SpellCastInitialTarget
+
+
+--- @class EsvSpellCastEventCreateZone
+--- @field Target SpellCastInitialTarget
+--- @field TextKey FixedString
+--- @field TextKeyIndex uint32
+
+
+--- @class EsvSpellCastEventDoTeleport
+--- @field Target SpellCastInitialTarget
+--- @field TextKey FixedString
+--- @field TextKeyIndex uint32
+
+
+--- @class EsvSpellCastEventFinish
+--- @field FailReason SpellCastFailReason
+--- @field field_1 uint8
+
+
+--- @class EsvSpellCastEventFireProjectile
+--- @field ProjectileIndex uint32
+--- @field Target SpellCastProjectileTargetData
+--- @field Trajectory FixedString
+--- @field field_34C uint8
+
+
+--- @class EsvSpellCastEventInitializeIntermediateTargets
+--- @field Index uint32
+--- @field Targets SpellCastIntermediateTarget[]
+--- @field TextKey FixedString
+
+
+--- @class EsvSpellCastEventInitializeRolls
+--- @field Rolls SpellCastSpellRollData[]
+
+
+--- @class EsvSpellCastEventInterruptApplyResult:EsvSpellCastInterruptApplyResultBase
+--- @field InterruptUsage table<EntityHandle, InterruptInterruptUsage>
+
+
+--- @class EsvSpellCastEventInterruptEnd
+--- @field Event InterruptInterruptEvent
+--- @field StopInterrupt boolean
+
+
+--- @class EsvSpellCastEventInterruptEventChange
+--- @field Event InterruptInterruptEvent
+--- @field EventInterruptors table<InterruptInterruptEvent, table<EntityHandle, Set_EntityHandle>>
+--- @field ExecutedDependencies table<Guid, InterruptExecutedDependency>
+--- @field HasReplacement boolean
+--- @field InterruptUsage table<EntityHandle, InterruptInterruptUsage>
+--- @field Interruptors table<EntityHandle, Set_EntityHandle>
+--- @field ReplacementEvent InterruptInterruptEvent
+--- @field Results EsvSpellCastInterruptApplyResultBase
+
+
+--- @class EsvSpellCastEventInterruptStart
+--- @field Event InterruptInterruptEvent
+--- @field ExecutedDependencies table<Guid, InterruptExecutedDependency>
+--- @field Interruptors table<EntityHandle, Set_EntityHandle>
+
+
+--- @class EsvSpellCastEventMoveDuringCastEnd
+--- @field AdjustedPosition vec3
+--- @field Position vec3
+
+
+--- @class EsvSpellCastEventMoveDuringCastInitialize
+--- @field Duration number
+
+
+--- @class EsvSpellCastEventMoveDuringCastStart
+--- @field TextKey FixedString
+
+
+--- @class EsvSpellCastEventMoveDuringCastUpdate
+--- @field AdjustedPosition vec3
+--- @field Position vec3
+--- @field Progress number
+
+
+--- @class EsvSpellCastEventMovementEnd
+--- @field PhaseFinished boolean
+
+
+--- @class EsvSpellCastEventPhaseChange
+--- @field Phase SpellCastPhase
+
+
+--- @class EsvSpellCastEventPlayAnimation
+--- @field CastEvent SpellAnimationCastEvent
+
+
+--- @class EsvSpellCastEventPopDelayedProjectile
+--- @field ProjectileIndex int32
+
+
+--- @class EsvSpellCastEventPrecalculatedConditionals
+--- @field Conditionals EsvSpellCastFunctorConditional[]
+
+
+--- @class EsvSpellCastEventPrecalculatedInterruptors
+--- @field HasReplacement boolean
+--- @field Interruptors InterruptPrecalculatedAnimationInterruptData[]
+
+
+--- @class EsvSpellCastEventPushPausedAnimationEvents
+--- @field Events InterruptPausedAnimationEvent[]
+
+
+--- @class EsvSpellCastEventSpellRollAbort
+--- @field Hit HitDesc
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle?
+
+
+--- @class EsvSpellCastEventTargetHit
+--- @field Attack AttackDesc
+--- @field Caster EntityHandle
+--- @field ContextType uint64
+--- @field Hit HitDesc
+--- @field NumConditionRolls uint32
+--- @field SourcePosition vec3?
+--- @field Target EntityHandle
+--- @field TargetPosition vec3
+--- @field TargetProxy EntityHandle?
+
+
+--- @class EsvSpellCastEventTargetsChange
+--- @field Targets SpellCastInitialTarget[]
+
+
+--- @class EsvSpellCastEventTargetsChanged
+--- @field Targets SpellCastInitialTarget[]
+
+
+--- @class EsvSpellCastEventUpdateConditionals
+--- @field Conditionals EsvSpellCastFunctorConditional[]
+
+
+--- @class EsvSpellCastEventUpdateInterruptors
+--- @field Interruptors table<EntityHandle, Set_EntityHandle>
+
+
+--- @class EsvSpellCastEventUseCostsChange
+--- @field Costs StatsActionResourceCost[]
+
+
+--- @class EsvSpellCastEventWeaponSetRequest
+--- @field IsRanged boolean
+
+
+--- @class EsvSpellCastEventZoneRangeUpdate
+--- @field field_0 number
+--- @field field_4 number
+--- @field field_8 number
 --- @field field_C number
 
 
+--- @class EsvSpellCastExternalDependency
+--- @field field_0 int64
+--- @field field_8 int32
+--- @field field_C string
+
+
+--- @class EsvSpellCastExternalsComponent:BaseComponent
+--- @field Externals EsvSpellCastExternalDependency[]
+
+
+--- @class EsvSpellCastFunctorConditional
+--- @field Conditions stats::ConditionId
+--- @field FunctorUuid Guid
+--- @field Roll ConditionRoll
+--- @field Target EntityHandle
+--- @field WasAdjusted boolean
+
+
 --- @class EsvSpellCastHitRegister
---- @field field_0 EntityHandle
---- @field field_8 uint64
+--- @field ContextType uint64
+--- @field Target EntityHandle
 
 
 --- @class EsvSpellCastHitRegisterComponent:BaseComponent
 --- @field Hits EsvSpellCastHitRegister[]
+
+
+--- @class EsvSpellCastInterruptApplyResultBase
+--- @field DamageRollAdjustments table<InterruptDamageFunctorKey, InterruptDamageRollAdjustments>
+--- @field HasReplacement boolean
+--- @field RollAdjustments table<Guid, InterruptRollAdjustments>
 
 
 --- @class EsvSpellCastInterruptRequestsComponent:BaseComponent
@@ -11988,14 +14353,9 @@ Osi = {}
 
 
 --- @class EsvSpellCastInterruptResultsComponent:BaseComponent
+--- @field Conditionals EsvSpellCastFunctorConditional[]
 --- @field Results table<InterruptDamageFunctorKey, InterruptDamageRollAdjustments>
 --- @field Results2 EsvSpellCastFunctorConditional[]
-
-
---- @class EsvSpellCastInterruptRollData
---- @field FixedRollBonuses FixedRollBonus[]
---- @field field_0 int64
---- @field field_8 FixedRollBonus[]
 
 
 --- @class EsvSpellCastInterruptsUsedOneFrameComponent:BaseComponent
@@ -12004,20 +14364,52 @@ Osi = {}
 
 
 --- @class EsvSpellCastMoveDuringCastUpdateEventOneFrameComponent:BaseComponent
---- @field SurfaceTrail vec3
---- @field field_0 vec3
---- @field field_C vec3
+--- @field AdjustedPosition vec3
+--- @field Position vec3
+--- @field SurfaceTrail EsvSpellCastSurfaceTrail?
 
 
 --- @class EsvSpellCastMovementAndPrecalculationEndEventOneFrameComponent:BaseComponent
---- @field field_0 uint8
+--- @field PhaseFinished boolean
 --- @field field_4 int32
+
+
+--- @class EsvSpellCastMovementComponent:BaseComponent
+--- @field Duration number
+--- @field IsMoving boolean
+--- @field Progress number
+--- @field TextKey FixedString
+--- @field field_0 vec3?
+
+
+--- @class EsvSpellCastMovementInfoComponent:BaseComponent
+--- @field PathSettings PathSettings?
+--- @field Settings NavigationTargetInfo?
+
+
+--- @class EsvSpellCastPathfindTrajectory
+
+
+--- @class EsvSpellCastPendingRequestsComponent:BaseComponent
+--- @field CancelRequests EsvSpellCastCastCancelRequest[]
+--- @field ConfirmRequests EsvSpellCastCastConfirmRequest[]
+--- @field PreviewSetRequests EsvSpellCastPreviewSetRequest[]
+
+
+--- @class EsvSpellCastPreviewSetRequest
+--- @field Entity EntityHandle
+--- @field SpellCastGuid Guid
+--- @field field_18 uint8
 
 
 --- @class EsvSpellCastProjectileCacheComponent:BaseComponent
 --- @field ExtraData EsvSpellCastProjectileResultsExtraData[]
+--- @field ProjectileDelayTimers table<int32, number>
 --- @field Target SpellCastProjectileTargetData?
---- @field field_350 table<int32, number>
+
+
+--- @class EsvSpellCastProjectilePathfindCacheComponent:BaseComponent
+--- @field Targets EntityHandle[]
 
 
 --- @class EsvSpellCastProjectileResultsExtraData
@@ -12033,14 +14425,40 @@ Osi = {}
 
 --- @class EsvSpellCastStateComponent:BaseComponent
 --- @field Originator ActionOriginator
---- @field Status uint8
+--- @field Phase SpellCastPhase
 --- @field StoryActionId int32
 --- @field field_4 int32
 
 
+--- @class EsvSpellCastSurfaceTrail
+--- @field Radius number
+--- @field SurfaceType SurfaceType
+
+
+--- @class EsvSpellCastSystemEvent
+--- @field Args Variant<EsvSpellCastEventFinish,EsvSpellCastEventMoveDuringCastInitialize,EsvSpellCastEventMoveDuringCastStart,EsvSpellCastEventMoveDuringCastUpdate,EsvSpellCastEventMoveDuringCastEnd,EsvSpellCastEventCast,EsvSpellCastEventCastHit,EsvSpellCastEventCastTextKey,EsvSpellCastEventTargetHit,EsvSpellCastEventSpellRollAbort,EsvSpellCastEventWeaponSetRequest,EsvSpellCastEventPlayAnimation,EsvSpellCastEventPhaseChange,EsvSpellCastEventCacheFlagChange,EsvSpellCastEventUseCostsChange,EsvSpellCastEventInitializeRolls,EsvSpellCastEventAdvanceRoll,EsvSpellCastEventAdvanceReaction,EsvSpellCastEventFireProjectile,EsvSpellCastEventChangeProjectileDelayTimer,EsvSpellCastEventPopDelayedProjectile,EsvSpellCastEventInitializeIntermediateTargets,EsvSpellCastEventAddDelayedCastHit,EsvSpellCastEventChangeCastPosition,EsvSpellCastEventChangeCastEndPosition,EsvSpellCastEventChangeMovementTransactionId,EsvSpellCastEventMovementEnd,EsvSpellCastEventCreateZone,EsvSpellCastEventDoTeleport,EsvSpellCastEventCreateWall,EsvSpellCastEventTargetsChanged,EsvSpellCastEventCastOptionsChange,EsvSpellCastEventTargetsChange,EsvSpellCastEventAddSharedMovement,EsvSpellCastEventAddProjectileCache,EsvSpellCastEventAddMovementInfo,EsvSpellCastEventInterruptStart,EsvSpellCastEventInterruptEventChange,EsvSpellCastEventInterruptApplyResult,EsvSpellCastEventInterruptEnd,EsvSpellCastEventPrecalculatedInterruptors,EsvSpellCastEventPushPausedAnimationEvents,EsvSpellCastEventChangeStoryActionId,EsvSpellCastEventZoneRangeUpdate,EsvSpellCastEventPrecalculatedConditionals,EsvSpellCastEventUpdateConditionals,EsvSpellCastEventUpdateInterruptors>?
+--- @field Entity EntityHandle
+--- @field Type ServerSpellCastSystemEventType
+
+
+--- @class EsvSpellCastUnsheathFallbackTimerComponent:BaseComponent
+--- @field Time number?
+
+
 --- @class EsvSpellCastUpdateTargetTrackingOneFrameComponent:BaseComponent
+--- @field TargetHistoryUUID Guid
 --- @field Targets Set_EntityHandle
---- @field field_0 Guid
+
+
+--- @class EsvSpellCastWeaponSetChangeRequestOneFrameComponent:BaseComponent
+--- @field IsRanged boolean
+
+
+--- @class EsvSpellCastZoneRangeComponent:BaseComponent
+--- @field field_0 int32
+--- @field field_4 int32
+--- @field field_8 int32
+--- @field field_C int32
 
 
 --- @class EsvStatusActiveComponent:BaseComponent
@@ -12056,10 +14474,17 @@ Osi = {}
 
 
 --- @class EsvStatusAddedStatusAuraEffectEventOneFrameComponent:BaseComponent
---- @field field_0 FixedString
---- @field field_10 EntityHandle
---- @field field_4 int32
---- @field field_8 EntityHandle
+--- @field Source EntityHandle
+--- @field StatusId FixedString
+--- @field StoryActionId int32
+--- @field Subject EntityHandle
+
+
+--- @class EsvStatusAppliedEventRequest
+--- @field Owner EntityHandle
+--- @field Status ComponentHandle
+--- @field StatusID FixedString
+--- @field Type StatusType
 
 
 --- @class EsvStatusApplyEventOneFrameComponent:BaseComponent
@@ -12085,6 +14510,16 @@ Osi = {}
 --- @field field_18 Guid
 
 
+--- @class EsvStatusAttemptedEventRequest
+--- @field Cause Guid
+--- @field Owner EntityHandle
+--- @field Source EntityHandle
+--- @field Status ComponentHandle
+--- @field StatusId FixedString
+--- @field StoryActionId int32
+--- @field Type StatusType
+
+
 --- @class EsvStatusAura
 --- @field Status FixedString
 --- @field Targets Set_EntityHandle
@@ -12105,23 +14540,67 @@ Osi = {}
 --- @field StoryActionId int32
 
 
---- @class EsvStatusDestroyedEventRequest
+--- @class EsvStatusCreateStatusRequest
+--- @field ApplyKnockedOut boolean
+--- @field Cause EntityHandle
+--- @field CauseType CauseType
+--- @field DifficultyStatus FixedString
+--- @field Duration number
+--- @field Force boolean
+--- @field KeepAlive boolean
+--- @field Owner EntityHandle
+--- @field SavegameLoading boolean
+--- @field SourceEquippedItem EntityHandle
+--- @field SourceUsedItem EntityHandle
+--- @field Spell SpellId?
+--- @field StatusHandle ComponentHandle
+--- @field StatusId FixedString
+--- @field StoryActionId int32
+--- @field byte10 boolean
+--- @field byte12 uint8
+
+
+--- @class EsvStatusCreatedEventRequest
+--- @field Owner EntityHandle
+--- @field SavegameLoading boolean
+--- @field Spell SpellId?
+--- @field Status ComponentHandle
+--- @field StatusId FixedString
+--- @field field_18 boolean
+
+
+--- @class EsvStatusDestroyStatusRequest
+--- @field CauseHandle EntityHandle
+--- @field DifficultyStatus FixedString
+--- @field ExcludePropertyFlags uint64
+--- @field Owner EntityHandle
 --- @field Source EntityHandle
---- @field SourceUuid Guid
+--- @field Status EntityHandle
+--- @field StatusCause FixedString
+--- @field StatusHandle ComponentHandle
+--- @field StatusId FixedString
+--- @field StatusType StatusType
+--- @field Transform Guid
+--- @field Type ServerDestroyStatusRequestType
+
+
+--- @class EsvStatusDestroyedEventRequest
+--- @field CastSource Guid
+--- @field CauseGuid Guid
+--- @field HasTriedEntering boolean
+--- @field IsDeleting boolean
+--- @field IsFromItem boolean
+--- @field IsUnique boolean
+--- @field Source EntityHandle
+--- @field SpellCastGuid Guid
 --- @field Status EntityHandle
 --- @field StatusHandle ComponentHandle
 --- @field StatusId FixedString
+--- @field StoryActionId int32
 --- @field Target EntityHandle
 --- @field Type StatusType
 --- @field field_28 EntityHandle
 --- @field field_40 Guid
---- @field field_50 Guid
---- @field field_60 Guid
---- @field field_70 int32
---- @field field_78 uint8
---- @field field_79 uint8
---- @field field_7A uint8
---- @field field_7B uint8
 --- @field field_80 EntityHandle
 
 
@@ -12139,6 +14618,19 @@ Osi = {}
 --- @class EsvStatusDownedChangedEventOneFrameComponent:BaseComponent
 
 
+--- @class EsvStatusOnStatusEventRequest
+--- @field Attack AttackDesc
+--- @field Event uint32
+--- @field Hit HitDesc
+--- @field Subject EntityHandle
+--- @field field_1E0 EntityHandle
+
+
+--- @class EsvStatusOnStatusTurnStartRequest
+--- @field Owner EntityHandle
+--- @field Status ComponentHandle
+
+
 --- @class EsvStatusOwnershipComponent:BaseComponent
 --- @field Owner EntityHandle
 
@@ -12148,9 +14640,16 @@ Osi = {}
 
 
 --- @class EsvStatusRefreshCause
---- @field StoryActionId uint32
+--- @field StoryActionId int32
 --- @field field_0 Guid
 --- @field field_14 uint32
+
+
+--- @class EsvStatusRefreshRequest
+--- @field Cause Guid
+--- @field RefreshedStatusOH EntityHandle
+--- @field StatusOH EntityHandle
+--- @field StoryActionId int32
 
 
 --- @class EsvStatusRefreshedOneFrameComponent:BaseComponent
@@ -12158,25 +14657,47 @@ Osi = {}
 
 
 --- @class EsvStatusRemoveEventOneFrameComponent:BaseComponent
+--- @field CastSource Guid
+--- @field IsDeleting boolean
+--- @field IsFromItem boolean
 --- @field Source EntityHandle
+--- @field SpellCastGuid Guid
 --- @field Status EntityHandle
 --- @field StatusId FixedString
 --- @field StoryActionId int32
 --- @field Target EntityHandle
 --- @field Type StatusType
 --- @field field_10 EntityHandle
---- @field field_2C uint8
---- @field field_2D uint8
 --- @field field_30 Guid
---- @field field_40 Guid
---- @field field_50 Guid
 
 
 --- @class EsvStatusRemovedStatusAuraEffectEventOneFrameComponent:BaseComponent
---- @field field_0 FixedString
---- @field field_10 EntityHandle
---- @field field_4 int32
---- @field field_8 EntityHandle
+--- @field Source EntityHandle
+--- @field StatusId FixedString
+--- @field StoryActionId int32
+--- @field Subject EntityHandle
+
+
+--- @class EsvStatusRequestSystem:BaseSystem
+--- @field Activate table<EntityHandle, uint8>
+--- @field Add Set_ComponentHandle
+--- @field AppliedEvent EsvStatusAppliedEventRequest[]
+--- @field ApplyDefault Set_EntityHandle
+--- @field AttemptedEvent EsvStatusAttemptedEventRequest[]
+--- @field Create EsvStatusCreateStatusRequest[]
+--- @field CreatedEvent EsvStatusCreatedEventRequest[]
+--- @field Deactivate table<EntityHandle, uint8>
+--- @field Destroy EsvStatusDestroyStatusRequest[]
+--- @field Destroy2 EsvStatusDestroyStatusRequest[]
+--- @field Destroy3 EsvStatusDestroyStatusRequest[]
+--- @field DestroyedEvent EsvStatusDestroyedEventRequest[]
+--- @field OnEvent EsvStatusOnStatusEventRequest[]
+--- @field OnTurnStart EsvStatusOnStatusTurnStartRequest[]
+--- @field Refresh EsvStatusRefreshRequest[]
+--- @field RegisterMachineUpdate table<EntityHandle, uint8>
+--- @field StatusEvents table<EntityHandle, uint32>
+--- @field UnregisterMachineUpdate table<EntityHandle, uint8>
+--- @field UpdateLifetime Set_EntityHandle
 
 
 --- @class EsvStatusScheduledForDeletionOneFrameComponent:BaseComponent
@@ -12193,6 +14714,24 @@ Osi = {}
 
 --- @class EsvStatusStatusEventOneFrameComponent:BaseComponent
 --- @field Events uint32
+
+
+--- @class EsvStatusStatusRequestsComponent:BaseComponent
+--- @field Activate Set_EntityHandle
+--- @field Add Set_ComponentHandle
+--- @field AppliedEvent EsvStatusAppliedEventRequest[]
+--- @field AttemptedEvent EsvStatusAttemptedEventRequest[]
+--- @field Create EsvStatusCreateStatusRequest[]
+--- @field CreatedEvent EsvStatusCreatedEventRequest[]
+--- @field Deactivate Set_EntityHandle
+--- @field Destroy EsvStatusDestroyStatusRequest[]
+--- @field DestroyedEvent EsvStatusDestroyedEventRequest[]
+--- @field OnEvent EsvStatusOnStatusEventRequest[]
+--- @field OnTurnStart EsvStatusOnStatusTurnStartRequest[]
+--- @field Refresh EsvStatusRefreshRequest[]
+--- @field RegisterMachineUpdate Set_EntityHandle
+--- @field UnregisterMachineUpdate Set_EntityHandle
+--- @field UpdateLifetime Set_EntityHandle
 
 
 --- @class EsvStatusTurnStartEventOneFrameComponent:BaseComponent
@@ -12227,7 +14766,20 @@ Osi = {}
 --- @class EsvSummonDespawnRequestOneFrameComponent:BaseComponent
 
 
+--- @class EsvSummonDespawnSystem:BaseSystem
+--- @field KillSummon table<EntityHandle, table<EntityHandle, boolean>>
+--- @field KillSummons table<EntityHandle, boolean>
+
+
 --- @class EsvSummonExpiredRequestOneFrameComponent:BaseComponent
+
+
+--- @class EsvSummonIsUnsummoningComponent:BaseComponent
+
+
+--- @class EsvSummonItemSplitEvent
+--- @field Item1 EntityHandle
+--- @field Item2 EntityHandle
 
 
 --- @class EsvSummonLateJoinPenaltyOneFrameComponent:BaseComponent
@@ -12252,15 +14804,148 @@ Osi = {}
 --- @field Entity EntityHandle
 
 
+--- @class EsvSummonSpawnDesc
+--- @field ApplyLateJoinPenalty boolean
+--- @field Attack AttackDesc
+--- @field Caster EntityHandle
+--- @field Hit HitDesc
+--- @field Level FixedString
+--- @field Originator ActionOriginator
+--- @field Position vec3
+--- @field Spell SpellId
+--- @field SpellCastSourceGuid Guid
+--- @field StatusesToApply Set_FixedString
+--- @field StoryActionId int32
+--- @field Template FixedString
+
+
+--- @class EsvSummonSpawnInInventoryDesc
+--- @field Amount int32
+--- @field Attack AttackDesc
+--- @field Equip boolean
+--- @field EquipOffHand boolean
+--- @field Hit HitDesc
+--- @field Level FixedString
+--- @field MovingObject FixedString
+--- @field Originator ActionOriginator
+--- @field PlaceInInventory boolean
+--- @field Source EntityHandle
+--- @field SourceInventory EntityHandle?
+--- @field SpellCastSourceGuid Guid
+--- @field SpellId SpellId
+--- @field StatusesToApply Set_FixedString
+--- @field StoryActionId int32
+
+
+--- @class EsvSummonSpawnSystem:BaseSystem
+--- @field AttachSummon EsvSummonSummonRequest[]
+--- @field CreateSpawn EsvSummonSpawnDesc[]
+--- @field RemovedSummon EsvSummonSummonRequest[]
+--- @field SetupOwner Set_EntityHandle
+--- @field SpawnInInventoryDescs EsvSummonSpawnInInventoryDesc[]
+--- @field SummonDescs EsvSummonSummonDesc[]
+--- @field SummonInInventoryDescs EsvSummonSummonInInventoryDesc[]
+--- @field SummonedItemWasSplit EsvSummonItemSplitEvent[]
+
+
+--- @class EsvSummonSummonDesc
+--- @field AddToExistingConcentration boolean
+--- @field ApplyLateJoinPenalty boolean
+--- @field AttachToProjectile EntityHandle
+--- @field Attack AttackDesc
+--- @field Container FixedString
+--- @field Hit HitDesc
+--- @field IsFromFunctor boolean
+--- @field Level FixedString
+--- @field Lifetime number?
+--- @field MovingObject FixedString
+--- @field Originator ActionOriginator
+--- @field Position vec3
+--- @field Rotation quat
+--- @field SpellId SpellIdWithPrototype
+--- @field StatusesToApply Set_FixedString
+--- @field StoryActionId int32
+--- @field SummonTopOwner EntityHandle
+--- @field UseCasterPassives boolean
+
+
+--- @class EsvSummonSummonInInventoryDesc
+--- @field AllowOffHand boolean
+--- @field Amount uint32
+--- @field Attack AttackDesc
+--- @field Equip boolean
+--- @field ExtendExistingConcentration boolean
+--- @field Hit HitDesc
+--- @field Level FixedString
+--- @field Lifetime number?
+--- @field MovingObject FixedString
+--- @field Originator ActionOriginator
+--- @field PlaceInInventory boolean
+--- @field Source EntityHandle
+--- @field SourceInventory EntityHandle?
+--- @field Spell SpellIdWithPrototype
+--- @field SpellContainer FixedString
+--- @field StatusesToApply Set_FixedString
+--- @field StoryActionId int32
+
+
+--- @class EsvSummonSummonRequest
+--- @field Owner EntityHandle
+--- @field Summon EntityHandle
+--- @field field_10 FixedString
+--- @field field_18 Guid
+
+
 --- @class EsvTagsTagsChangedEventOneFrameComponent:BaseComponent
 --- @field AddedTags Guid[]
 --- @field RemovedTags Guid[]
+
+
+--- @class EsvTemplatesChangeSystem:BaseSystem
+--- @field TemplateSwitch table<EntityHandle, TemplateInfo>
+--- @field TemplateTransformWithScript table<EntityHandle, TemplateInfo>
 
 
 --- @class EsvTemplatesTemplateChangedOneFrameComponent:BaseComponent
 
 
 --- @class EsvTemplatesTemplateTransformedOneFrameComponent:BaseComponent
+
+
+--- @class EsvTriggerCachedLeaveEventData
+--- @field Event FixedString
+--- @field Object Guid
+--- @field field_14 uint8
+
+
+--- @class EsvTriggerCachedLeaveEventsComponent:BaseComponent
+--- @field Updated EsvTriggerCachedLeaveEventData[]
+
+
+--- @class EsvTriggerEventConfigComponent:BaseComponent
+--- @field Config uint8
+
+
+--- @class EsvTriggerLoadedHandledComponent:BaseComponent
+
+
+--- @class EsvTriggerRegisteredForComponent:BaseComponent
+--- @field RegisteredFor Set_Guid
+
+
+--- @class EsvTriggerRegistrationSettingsComponent:BaseComponent
+--- @field Registered boolean
+
+
+--- @class EsvTriggerTriggerWorldAutoTriggeredComponent:BaseComponent
+
+
+--- @class EsvTriggerUpdatedRegisteredForComponent:BaseComponent
+--- @field Updated EntityHandle[]
+
+
+--- @class EsvTriggerUpdatedRegisteredForItemsComponent:BaseComponent
+--- @field Updated EntityHandle[]
 
 
 --- @class ExtuiBulletText:ExtuiStyledRenderable
@@ -12270,7 +14955,6 @@ Osi = {}
 --- @field MouseButtonLeft boolean
 --- @field MouseButtonMiddle boolean
 --- @field MouseButtonRight boolean
---- @field OnClick RegistryEntry
 --- @field Size vec2?
 
 
@@ -12462,7 +15146,6 @@ Osi = {}
 --- @field MouseButtonLeft boolean
 --- @field MouseButtonMiddle boolean
 --- @field MouseButtonRight boolean
---- @field OnClick RegistryEntry
 --- @field Tint vec4
 
 
@@ -12559,7 +15242,6 @@ Osi = {}
 
 --- @class ExtuiMenuItem:ExtuiStyledRenderable
 --- @field Enabled boolean
---- @field OnClick RegistryEntry
 --- @field Shortcut string?
 
 
@@ -12594,7 +15276,6 @@ Osi = {}
 --- @field AllowOverlap boolean
 --- @field DontClosePopups boolean
 --- @field Highlight boolean
---- @field OnClick RegistryEntry
 --- @field SelectableDisabled boolean
 --- @field Selected boolean
 --- @field Size vec2?
@@ -12675,12 +15356,14 @@ Osi = {}
 --- @field NoTabStop boolean
 --- @field NoWindowHoverableCheck boolean
 --- @field OnActivate RegistryEntry
+--- @field OnClick RegistryEntry
 --- @field OnDeactivate RegistryEntry
 --- @field OnDragDrop RegistryEntry
 --- @field OnDragEnd RegistryEntry
 --- @field OnDragStart RegistryEntry
 --- @field OnHoverEnter RegistryEntry
 --- @field OnHoverLeave RegistryEntry
+--- @field OnRightClick RegistryEntry
 --- @field PositionOffset vec2?
 --- @field RequestActivate boolean
 --- @field SameLine boolean
@@ -12783,7 +15466,6 @@ Osi = {}
 
 
 --- @class ExtuiTextLink:ExtuiStyledRenderable
---- @field OnClick RegistryEntry
 
 
 --- @class ExtuiTooltip:ExtuiWindowBase
@@ -12800,7 +15482,6 @@ Osi = {}
 --- @field NavLeftJumpsBackHere boolean
 --- @field NoAutoOpenOnLog boolean
 --- @field NoTreePushOnOpen boolean
---- @field OnClick RegistryEntry
 --- @field OnCollapse RegistryEntry
 --- @field OnExpand RegistryEntry
 --- @field OpenOnArrow boolean
@@ -12897,6 +15578,12 @@ Osi = {}
 --- @field SetSizeConstraints fun(self:ExtuiWindowBase, a1:vec2?, a2:vec2?)
 
 
+--- @class GamePauseComponent:BaseComponent
+
+
+--- @class GamePauseExcludedComponent:BaseComponent
+
+
 --- @class GnBlueprintInstanceData
 --- @field Blueprint GnGenomeBlueprint
 --- @field Flags uint32
@@ -12977,6 +15664,15 @@ Osi = {}
 --- @field Attacker EntityHandle
 
 
+--- @class HitLifetimeComponent:BaseComponent
+--- @field Lifetime number
+--- @field field_4 uint8
+
+
+--- @class HitMetaComponent:BaseComponent
+--- @field HitGuid Guid
+
+
 --- @class HitProxyComponent:BaseComponent
 --- @field Owner EntityHandle
 --- @field field_8 FixedString
@@ -13015,8 +15711,8 @@ Osi = {}
 --- @field ResistanceTypes Set_uint8
 --- @field SpellCastGuid Guid
 --- @field SpellId FixedString
+--- @field StatusId FixedString
 --- @field TotalDamageDone int32
---- @field field_4 FixedString
 --- @field field_8 uint8
 --- @field field_A0 uint8
 --- @field field_A1 uint8
@@ -13184,18 +15880,14 @@ Osi = {}
 --- @field SpellCastGuid Guid
 
 
---- @class InterruptAnimationInterruptData
+--- @class InterruptAnimationInterruptData:InterruptPrecalculatedAnimationInterruptData
 --- @field DamageRollAdjustments table<InterruptDamageFunctorKey, InterruptDamageRollAdjustments>
---- @field Events InterruptInterruptEvent[]
+--- @field ExecutedDependencies2 table<Guid, InterruptExecutedDependency>
 --- @field InterruptUsage table<EntityHandle, InterruptInterruptUsage>
---- @field PrecalculatedInterrupts InterruptPrecalculatedInterruptEvent[]
---- @field Resolved table<Guid, InterruptResolvedData>
+--- @field Interruptors table<InterruptInterruptEvent, table<EntityHandle, Set_EntityHandle>>
 --- @field RollAdjustments table<Guid, InterruptRollAdjustments>
---- @field Usage table<EntityHandle, table<InterruptInterruptEvent, InterruptInterruptUsageEntry>>
 --- @field field_128 int32
 --- @field field_12C number
---- @field field_20 int64
---- @field field_E8 table<InterruptInterruptEvent, table<EntityHandle, EntityHandle>>
 
 
 --- @class InterruptAppliedChange
@@ -13222,23 +15914,35 @@ Osi = {}
 
 
 --- @class InterruptConditionResultEvent
+--- @field ConditionResult boolean
+--- @field Conditions stats::ConditionId
 --- @field DamageEffectFlags DamageFlags
+--- @field FunctorUuid Guid
+--- @field RollUuid Guid
+--- @field SpellCastUuid Guid
+--- @field SpellId FixedString
 --- @field StatsFunctorContext StatsPropertyContext
 --- @field field_0 Guid
 --- @field field_10 FixedString
 --- @field field_18 Guid
 --- @field field_28 Guid
---- @field field_38 int32
---- @field field_48 string
+--- @field field_38 stats::ConditionId
+--- @field field_48 boolean
 
 
 --- @class InterruptConditionalRollEvent
 --- @field Ability AbilityId
 --- @field ConditionRollType ConditionRollType
+--- @field DC int32
+--- @field Passive EntityHandle
+--- @field PassiveId FixedString
 --- @field Roll InterruptRollData
+--- @field RollIndex uint64
 --- @field RollUuid Guid
+--- @field RollUuid2 Guid
+--- @field SwappedSourceAndTarget boolean
 --- @field field_10 Guid
---- @field field_20 int64
+--- @field field_20 uint64
 --- @field field_28 EntityHandle
 --- @field field_30 FixedString
 --- @field field_50 int32
@@ -13291,19 +15995,20 @@ Osi = {}
 
 --- @class InterruptDelayedTargetHitInterruptEvent
 --- @field Attack AttackDesc
+--- @field EventUuid Guid
 --- @field Hit HitDesc
 --- @field Source EntityHandle
 --- @field SourcePos vec3?
 --- @field Spell SpellId
 --- @field Target EntityHandle
 --- @field TargetPos vec3?
---- @field field_0 Guid
---- @field field_10 uint8
+--- @field field_10 boolean
 --- @field field_14 uint32
 --- @field field_1E8 EntityHandle
 --- @field field_1F0 EntityHandle
 --- @field field_1F8 vec3?
 --- @field field_208 vec3?
+--- @field field_48 Guid
 
 
 --- @class InterruptDependency
@@ -13317,6 +16022,7 @@ Osi = {}
 
 
 --- @class InterruptExecutedDependency
+--- @field field_0 uint32
 
 
 --- @class InterruptInterruptEvent
@@ -13351,19 +16057,34 @@ Osi = {}
 
 
 --- @class InterruptPausedAnimationEvent
---- @field field_0 FixedString
---- @field field_4 int32
+--- @field PauseFinishedAnimations boolean
+--- @field TextKey FixedString
 
 
 --- @class InterruptPlaceholderSpellRollEvent
+--- @field Conditions stats::ConditionId
 --- @field Dependency InterruptDependency
+--- @field FunctorUuid Guid
+--- @field RollUuid Guid
+--- @field SpellCastUuid Guid
+--- @field SpellId FixedString
 --- @field StatsFunctorContext StatsPropertyContext
+--- @field TextKey FixedString
 --- @field field_0 Guid
 --- @field field_10 Guid
 --- @field field_20 FixedString
 --- @field field_28 Guid
 --- @field field_58 FixedString
---- @field field_5C int32
+--- @field field_5C stats::ConditionId
+
+
+--- @class InterruptPrecalculatedAnimationInterruptData
+--- @field Events InterruptInterruptEvent[]
+--- @field ExecutedDependencies table<Guid, InterruptExecutedDependency>
+--- @field PrecalculatedInterrupts InterruptPrecalculatedInterruptEvent[]
+--- @field Resolved table<Guid, InterruptResolvedData>
+--- @field Usage table<EntityHandle, table<InterruptInterruptEvent, InterruptInterruptUsageEntry>>
+--- @field field_20 uint8
 
 
 --- @class InterruptPrecalculatedInterruptEvent:InterruptInterruptEvent
@@ -13432,6 +16153,7 @@ Osi = {}
 --- @field Spell SpellId
 --- @field SpellAttackType SpellAttackType
 --- @field SpellCastGuid Guid
+--- @field SpellRollIndex uint32
 --- @field field_0 Guid
 --- @field field_90 uint32
 
@@ -13439,19 +16161,19 @@ Osi = {}
 --- @class InterruptSpellRollEvent
 --- @field Ability AbilityId
 --- @field CauseSpell FixedString
+--- @field ConditionResult boolean
 --- @field ConditionRollType ConditionRollType
 --- @field CriticalRollThreshold int32?
 --- @field Difficulty int32
 --- @field Roll InterruptRollData
 --- @field RollUuid Guid
+--- @field RollUuid2 Guid
 --- @field Spell SpellId
 --- @field SpellAttackType SpellAttackType
 --- @field SpellCastGuid Guid
---- @field WasHit boolean
 --- @field field_10 FixedString
 --- @field field_48 int32?
 --- @field field_52 boolean
---- @field field_58 Guid
 
 
 --- @class InterruptStatusAppliedEvent
@@ -13473,8 +16195,7 @@ Osi = {}
 
 --- @class InterruptUndecidedEventWithId
 --- @field Event InterruptUndecidedEvent
---- @field field_0 vec3
---- @field field_C number
+--- @field EventUuid Guid
 
 
 --- @class InterruptZoneComponent:BaseComponent
@@ -13509,10 +16230,15 @@ Osi = {}
 
 --- @class InventoryDataComponent:BaseComponent
 --- @field Flags uint16
---- @field field_0 uint8
+--- @field SlotLimit uint16
+--- @field Type InventoryType
+--- @field field_0 InventoryType
 
 
 --- @class InventoryDropOnDeathBlockedComponent:BaseComponent
+
+
+--- @class InventoryIsLockedComponent:BaseComponent
 
 
 --- @class InventoryIsOwnedComponent:BaseComponent
@@ -13555,11 +16281,25 @@ Osi = {}
 --- @field Stack EntityHandle
 
 
+--- @class InventoryTopOwnerComponent:BaseComponent
+--- @field TopOwner EntityHandle
+
+
+--- @class InventoryTradeBuybackDataComponent:BaseComponent
+--- @field Amount uint16
+--- @field Buyer EntityHandle
+--- @field Trader EntityHandle
+
+
 --- @class InventoryWeightComponent:BaseComponent
 --- @field Weight int32
 
 
 --- @class InventoryWieldedComponent:BaseComponent
+--- @field field_0 Guid
+
+
+--- @class InventoryWieldingHistoryComponent:BaseComponent
 --- @field field_0 Guid
 
 
@@ -13570,6 +16310,9 @@ Osi = {}
 
 --- @class ItemDestroyedComponent:BaseComponent
 --- @field Info ItemDestroyInfo?
+
+
+--- @class ItemDestroyingComponent:BaseComponent
 
 
 --- @class ItemDoorComponent:BaseComponent
@@ -13588,7 +16331,13 @@ Osi = {}
 --- @class ItemHasOpenedComponent:BaseComponent
 
 
+--- @class ItemInUseComponent:BaseComponent
+
+
 --- @class ItemIsGoldComponent:BaseComponent
+
+
+--- @class ItemIsPoisonedComponent:BaseComponent
 
 
 --- @class ItemItemComponent:BaseComponent
@@ -13668,6 +16417,13 @@ Osi = {}
 
 --- @class LuaTickEvent:LuaEventBase
 --- @field Time GameTime
+
+
+--- @class MultiplayerHostComponent:BaseComponent
+
+
+--- @class MultiplayerUserComponent:BaseComponent
+--- @field UserID UserId
 
 
 --- @class NavigationTargetInfo
@@ -13921,8 +16677,24 @@ Osi = {}
 --- @field field_C vec3
 
 
+--- @class ProgressionAbilityImprovementsComponent:BaseComponent
+--- @field Abilities AbilityId[]
+--- @field AbilityImprovements int32[]
+
+
 --- @class ProgressionContainerComponent:BaseComponent
 --- @field Progressions EntityHandle[][]
+
+
+--- @class ProgressionFeatComponent:BaseComponent
+--- @field AbilityImprovements int32[]
+--- @field AddPassives FixedString[]
+--- @field AddSpells ProgressionSpellDefinition[]
+--- @field ConditionId int32?
+--- @field Expertise SkillId[]
+--- @field Feat Guid
+--- @field Proficiencies SkillId[]
+--- @field field_10 int32
 
 
 --- @class ProgressionLevelUpComponent:BaseComponent
@@ -13944,6 +16716,36 @@ Osi = {}
 --- @field field_44 SpellSourceType
 --- @field field_48 int32
 --- @field field_50 table<Guid, Guid>
+
+
+--- @class ProgressionPassivesComponent:BaseComponent
+--- @field AddPassives FixedString[]
+--- @field RemovePassives FixedString[]
+
+
+--- @class ProgressionReplicatedFeatComponent:BaseComponent
+--- @field Feat Guid
+--- @field field_10 uint8
+--- @field field_14 int32
+
+
+--- @class ProgressionSkillsComponent:BaseComponent
+--- @field Expertise SkillId[]
+--- @field Proficiencies SkillId[]
+
+
+--- @class ProgressionSpellDefinition
+--- @field CastingAbility AbilityId
+--- @field Class Guid
+--- @field CooldownType SpellCooldownType
+--- @field PrepareType SpellPrepareType
+--- @field SpellId FixedString
+--- @field SpellList Guid
+
+
+--- @class ProgressionSpellsComponent:BaseComponent
+--- @field AddSpells ProgressionSpellDefinition[]
+--- @field RemoveSpells ProgressionSpellDefinition[]
 
 
 --- @class ProjectileProjectileResult:PathSettings
@@ -14012,6 +16814,11 @@ Osi = {}
 --- @field Params table<Guid, GnGenomeVariant>
 
 
+--- @class ResourceAnimationDesc
+--- @field ID FixedString
+--- @field flags AnimationSetAnimationFlags
+
+
 --- @class ResourceAnimationResource:ResourceTwoStepLoadableResource
 --- @field AdditiveLoopingAnimationID FixedString
 --- @field AnchorHand uint8
@@ -14035,6 +16842,10 @@ Osi = {}
 --- @field Track uint8
 
 
+--- @class ResourceAnimationSet
+--- @field AnimationSubSets table<FixedString, ResourceAnimationSubSet>
+
+
 --- @class ResourceAnimationSetPriority:ResourceGuidResource
 --- @field AddidionalObjects Guid[]
 --- @field Name string
@@ -14042,21 +16853,12 @@ Osi = {}
 
 
 --- @class ResourceAnimationSetResource:ResourceLoadableResource
---- @field AnimationBank ResourceAnimationSetResourceBank
+--- @field AnimationBank ResourceAnimationSet
 
 
---- @class ResourceAnimationSetResourceBank
---- @field AnimationSubSets table<FixedString, ResourceAnimationSetResourceSubset>
-
-
---- @class ResourceAnimationSetResourceSubset
---- @field Animation table<FixedString, ResourceAnimationSetResourceSubsetAnimations>
+--- @class ResourceAnimationSubSet
+--- @field Animation table<FixedString, ResourceAnimationDesc>
 --- @field FallBackSubSet FixedString
-
-
---- @class ResourceAnimationSetResourceSubsetAnimations
---- @field ID FixedString
---- @field flags AnimationSetAnimationFlags
 
 
 --- @class ResourceApprovalRating:ResourceGuidResource
@@ -15909,6 +18711,10 @@ Osi = {}
 --- @field field_0 Set_Guid
 
 
+--- @class SightIgnoreSurfacesComponent:BaseComponent
+--- @field SurfaceTypes Set_SurfaceType
+
+
 --- @class SightSightBaseComponent:BaseComponent
 --- @field DarkvisionRange number
 --- @field FOV number
@@ -15922,6 +18728,10 @@ Osi = {}
 
 --- @class SpellAddedSpellsComponent:BaseComponent
 --- @field Spells SpellSpellMeta[]
+
+
+--- @class SpellAttackSpellOverrideComponent:BaseComponent
+--- @field AttackSpells table<uint8, FixedString>
 
 
 --- @class SpellBookComponent:BaseComponent
@@ -16041,6 +18851,10 @@ Osi = {}
 --- @field field_30 uint8
 
 
+--- @class SpellScriptedExplosionComponent:BaseComponent
+--- @field Projectile FixedString
+
+
 --- @class SpellSpellAiConditionsComponent:BaseComponent
 --- @field Conditions table<FixedString, AiActionConditions>
 
@@ -16089,51 +18903,57 @@ Osi = {}
 
 
 --- @class SpellCastAnimationInfoComponent:BaseComponent
---- @field DualWielding uint8
---- @field Event uint8
---- @field HasWeapon uint8
---- @field LoopingCastAnimation uint8
+--- @field DualWielding boolean
+--- @field Event SpellAnimationCastEvent
+--- @field HasWeapon boolean
+--- @field LoopingCastAnimation boolean
 --- @field ObjectSize uint8
 --- @field Target EntityHandle
---- @field TargetPosition vec3?
---- @field TargetRotation vec3
---- @field field_0 uint8
+--- @field TargetHitPosition vec3?
+--- @field TargetIsCaster boolean
+--- @field TargetPosition vec3
+--- @field field_0 SpellAnimationCastEvent
 --- @field field_28 uint8
---- @field field_29 uint8
---- @field field_2A uint8
+--- @field field_2A boolean
 --- @field field_2B uint8
---- @field field_2C uint8
---- @field field_2D uint8
+--- @field field_2C boolean
+--- @field field_2D boolean
 --- @field field_2E uint8
 
 
 --- @class SpellCastAnimationRequestOneFrameComponent:BaseComponent
 --- @field CacheFlag256 boolean
 --- @field DualWielding boolean
---- @field Event uint8
+--- @field Event SpellAnimationCastEvent
 --- @field HasWeapon boolean
 --- @field LoopingCastAnimation boolean
 --- @field ObjectSize uint8
 --- @field Target EntityHandle
 --- @field TargetHitPosition vec3?
---- @field field_14 vec3
+--- @field TargetIsCaster boolean
+--- @field TargetPosition vec3
 --- @field field_28 uint8
---- @field field_29 uint8
 
 
 --- @class SpellCastBaseTarget
 --- @field Position vec3?
 --- @field Target EntityHandle
 --- @field TargetOverride EntityHandle?
+--- @field TargetProxy EntityHandle?
 
 
 --- @class SpellCastCacheComponent:BaseComponent
---- @field field_0 uint8
---- @field field_4 uint32
+--- @field Flags uint32
+--- @field SpellCastingAbility AbilityId
 
 
 --- @class SpellCastCanBeTargetedComponent:BaseComponent
---- @field Dummy uint8
+
+
+--- @class SpellCastCastEventOneFrameComponent:BaseComponent
+--- @field Hit HitDesc
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle?
 
 
 --- @class SpellCastCastHitEventOneFrameComponent:BaseComponent
@@ -16149,8 +18969,31 @@ Osi = {}
 --- @class SpellCastCounteredEventOneFrameComponent:BaseComponent
 
 
+--- @class SpellCastDataCache
+--- @field Entity EntityHandle
+--- @field Spell SpellId
+--- @field field_0 int32
+--- @field field_4 uint8
+--- @field field_48 uint8
+--- @field field_49 uint8
+--- @field field_5 uint8
+
+
+--- @class SpellCastDataCacheSingletonComponent:BaseComponent
+--- @field Spells table<Guid, SpellCastDataCache>
+
+
 --- @class SpellCastDestroyEventOneFrameComponent:BaseComponent
 --- @field SpellCastGuid Guid
+
+
+--- @class SpellCastExecutionTimeComponent:BaseComponent
+--- @field Time number?
+
+
+--- @class SpellCastFinishedEventOneFrameComponent:BaseComponent
+--- @field Result SpellCastFailReason
+--- @field field_1 uint8
 
 
 --- @class SpellCastInitialTarget:SpellCastBaseTarget
@@ -16165,8 +19008,8 @@ Osi = {}
 
 
 --- @class SpellCastInterruptResultsComponent:BaseComponent
+--- @field HasReplacement boolean
 --- @field Results Set_EntityHandle
---- @field field_0 string
 
 
 --- @class SpellCastIsCastingComponent:BaseComponent
@@ -16179,9 +19022,16 @@ Osi = {}
 --- @class SpellCastLogicExecutionEndEventOneFrameComponent:BaseComponent
 
 
+--- @class SpellCastLogicExecutionStartEventOneFrameComponent:BaseComponent
+
+
 --- @class SpellCastMovementComponent:BaseComponent
---- @field field_0 vec3
+--- @field Position vec3
 --- @field field_C vec3?
+
+
+--- @class SpellCastOutcomeComponent:BaseComponent
+--- @field Result SpellCastFailReason
 
 
 --- @class SpellCastPrepareEndEventOneFrameComponent:BaseComponent
@@ -16195,10 +19045,8 @@ Osi = {}
 
 --- @class SpellCastProjectileTargetData
 --- @field Hit HitDesc
---- @field PathSettings PathSettings
---- @field PathSettingsOpt string
---- @field Result ProjectileProjectileResult
---- @field ResultOpt string
+--- @field PathSettings PathSettings?
+--- @field Result ProjectileProjectileResult?
 --- @field Target SpellCastIntermediateTarget
 --- @field TextKey FixedString
 --- @field ThrownObject EntityHandle
@@ -16212,9 +19060,8 @@ Osi = {}
 
 --- @class SpellCastSpellRollAbortEventOneFrameComponent:BaseComponent
 --- @field Hit HitDesc
---- @field field_1B0 EntityHandle
---- @field field_1B8 int64
---- @field field_1C0 uint8
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle?
 
 
 --- @class SpellCastSpellRollCastEventData
@@ -16231,7 +19078,7 @@ Osi = {}
 --- @field SpellConditionsType SpellMetaConditionType
 --- @field Target EntityHandle
 --- @field TargetInfo SpellCastSpellRollTargetInfo?
---- @field field_8 EntityHandle?
+--- @field TargetProxy EntityHandle?
 
 
 --- @class SpellCastSpellRollTargetInfo
@@ -16240,18 +19087,20 @@ Osi = {}
 
 
 --- @class SpellCastStateComponent:BaseComponent
+--- @field CastEndPosition vec3?
+--- @field CastOptions SpellCastOptions
+--- @field CastPosition vec3?
 --- @field Caster EntityHandle
 --- @field CasterMoveToPosition vec3?
 --- @field CasterStartPosition vec3
---- @field CasterTargetPosition vec3?
 --- @field Entity EntityHandle
---- @field Flags uint32
+--- @field NetGuid string
 --- @field Random uint32
 --- @field Source EntityHandle
 --- @field SpellCastGuid Guid
 --- @field SpellId SpellId
 --- @field Targets SpellCastInitialTarget[]
---- @field field_38 uint32
+--- @field field_38 SpellCastOptions
 --- @field field_60 vec3?
 --- @field field_80 EntityHandle
 --- @field field_88 uint32
@@ -16259,29 +19108,26 @@ Osi = {}
 
 
 --- @class SpellCastSyncTargetingComponent:BaseComponent
---- @field CanMoveToThrowTarget uint8
+--- @field CanMoveToThrowTarget boolean
 --- @field CasterMoveToPosition vec3?
 --- @field CasterPosition vec3?
 --- @field HoverPosition vec3?
+--- @field Target SpellCastBaseTarget
 --- @field Targets SpellCastInitialTarget[]
---- @field field_10 EntityHandle?
---- @field field_20 vec3?
---- @field field_40 uint8
+--- @field field_40 boolean
 --- @field field_44 int32
 --- @field field_48 vec3?
 --- @field field_58 vec3?
---- @field field_8 EntityHandle
 --- @field field_88 vec3?
 
 
 --- @class SpellCastTargetHitEventOneFrameComponent:BaseComponent
 --- @field Attack AttackDesc
 --- @field Hit HitDesc
---- @field field_1D0 EntityHandle
---- @field field_1D8 int64
---- @field field_1E0 uint8
---- @field field_1E8 EntityHandle
---- @field field_1F0 vec3
+--- @field SpellCast EntityHandle
+--- @field Target EntityHandle
+--- @field TargetPosition vec3
+--- @field TargetProxy EntityHandle?
 
 
 --- @class SpellCastTargetHitInterruptEventOneFrameComponent:BaseComponent
@@ -16301,8 +19147,8 @@ Osi = {}
 --- @class SpellCastTargetReactionEventOneFrameComponent:BaseComponent
 --- @field CastEntity EntityHandle
 --- @field Hit HitDesc
---- @field field_1B0 EntityHandle
---- @field field_1B8 vec3?
+--- @field Target EntityHandle
+--- @field TargetProxy EntityHandle?
 
 
 --- @class SpellCastTargetsChangedEventOneFrameComponent:BaseComponent
@@ -16536,7 +19382,7 @@ Osi = {}
 --- @field PropertyContext StatsPropertyContext
 --- @field RollConditions StatsExportedConditionalRoll[]
 --- @field StatsConditions stats::ConditionId
---- @field StoryActionId uint32
+--- @field StoryActionId int32
 --- @field TypeId StatsFunctorId
 --- @field UniqueName FixedString
 
@@ -16983,7 +19829,6 @@ Osi = {}
 --- @class StatsTargetContextData:StatsContextData
 --- @field Attack AttackDesc
 --- @field Hit HitDesc
---- @field IsFromItem boolean
 --- @field Position vec3
 --- @field Source EntityRef
 --- @field SourceProxy EntityRef
@@ -17122,10 +19967,17 @@ Osi = {}
 --- @field field_8 table<int32, int32[]>
 
 
+--- @class StatusIndicateDarknessComponent:BaseComponent
+
+
 --- @class StatusLifetimeComponent:BaseComponent
 --- @field Lifetime number
 --- @field field_0 int32
 --- @field field_4 number
+
+
+--- @class StatusLoseControlComponent:BaseComponent
+--- @field LoseControl boolean
 
 
 --- @class StatusVisualDisabledComponent:BaseComponent
@@ -17147,6 +19999,87 @@ Osi = {}
 
 --- @class TadpoleTreeTreeStateComponent:BaseComponent
 --- @field State uint8
+
+
+--- @class TranslateChangeData
+--- @field Entity EntityHandle
+--- @field NewPosition vec3
+--- @field OldPosition vec3
+--- @field Override int32
+--- @field field_24 boolean
+--- @field field_25 boolean
+--- @field field_26 boolean
+
+
+--- @class TranslateChangedComponent:BaseComponent
+--- @field Changes table<EntityHandle, TranslateChangeData[]>
+
+
+--- @class TranslateChangedEventOneFrameComponent:BaseComponent
+--- @field Changes TranslateChangeData[]
+
+
+--- @class TriggerAreaComponent:BaseComponent
+--- @field Bounds TriggerPhysicsBoundsInfo
+--- @field Physics Variant<TriggerNonePhysics,TriggerBoxPhysics,TriggerPolyPhysics,TriggerSpherePhysics>
+--- @field RotationInv quat
+
+
+--- @class TriggerBoxPhysics
+--- @field Extents vec3
+
+
+--- @class TriggerContainerComponent:BaseComponent
+--- @field Events TriggerContainerEvent[]
+--- @field field_0 Set_Guid
+
+
+--- @class TriggerContainerEvent
+--- @field Left boolean
+--- @field Object Guid
+--- @field Trigger Guid
+
+
+--- @class TriggerIsInsideOfComponent:BaseComponent
+--- @field InsideOf Guid[]
+
+
+--- @class TriggerNonePhysics
+
+
+--- @class TriggerPhysicsBoundsInfo
+--- @field Area number
+--- @field AreaExp number
+--- @field AreaXZ number
+--- @field AreaXZExp number
+--- @field BoundsMax vec3
+--- @field BoundsMin vec3
+--- @field Position vec3
+--- @field field_10 uint32
+--- @field field_40 vec3
+--- @field field_4C vec3
+--- @field field_8 uint64
+
+
+--- @class TriggerPolyPhysics
+--- @field Height number
+--- @field Points vec2[]
+
+
+--- @class TriggerSpherePhysics
+--- @field Radius number
+
+
+--- @class TriggerTriggerTypeComponent:BaseComponent
+--- @field Type uint8
+
+
+--- @class TriggerUpdatedContainerComponent:BaseComponent
+--- @field Updates EntityHandle[]
+
+
+--- @class TriggerUpdatedPhysicsComponent:BaseComponent
+--- @field Updates EntityHandle[]
 
 
 --- @class UiDCWidget:UiViewModel
@@ -17984,7 +20917,7 @@ local Ext_Debug = {}
 --- @field GetAllEntities fun():EntityHandle[]
 --- @field GetAllEntitiesWithComponent fun(a1:ExtComponentType):EntityHandle[]
 --- @field GetAllEntitiesWithUuid fun():table<Guid, EntityHandle>
---- @field GetRegisteredComponentTypes fun(a1:boolean):string[]
+--- @field GetRegisteredComponentTypes fun(a1:boolean?, a2:boolean?):StringView[]
 --- @field GetTrace fun():EcsECSChangeLog
 --- @field HandleToUuid fun(a1:EntityHandle):Guid?
 --- @field OnChange fun(a1:ExtComponentType, a2:FunctionRef, a3:EntityHandle?, a4:uint64?):uint64?
@@ -17996,6 +20929,8 @@ local Ext_Debug = {}
 --- @field OnDestroyDeferred fun(a1:ExtComponentType, a2:FunctionRef, a3:EntityHandle?):uint64
 --- @field OnDestroyDeferredOnce fun(a1:ExtComponentType, a2:FunctionRef, a3:EntityHandle?):uint64
 --- @field OnDestroyOnce fun(a1:ExtComponentType, a2:FunctionRef, a3:EntityHandle?):uint64
+--- @field OnSystemPostUpdate fun(a1:ExtSystemType, a2:FunctionRef, a3:boolean?):uint64
+--- @field OnSystemUpdate fun(a1:ExtSystemType, a2:FunctionRef, a3:boolean?):uint64
 --- @field Subscribe fun(a1:ExtComponentType, a2:FunctionRef, a3:EntityHandle?, a4:uint64?):uint64?
 --- @field Unsubscribe fun(a1:uint64):boolean
 --- @field UuidToHandle fun(a1:Guid):EntityHandle
@@ -18487,8 +21422,10 @@ Ext_Enums.ActionDataType = {
 
 --- @enum AdvantageBoostType
 Ext_Enums.AdvantageBoostType = {
+	None = 0,
 	Advantage = 1,
 	Disadvantage = 2,
+	[0] = "None",
 	[1] = "Advantage",
 	[2] = "Disadvantage",
 }
@@ -18585,6 +21522,24 @@ Ext_Enums.AppliedMaterialFlags = {
 	[1] = "Instantiated",
 	[2] = "IsOverlay",
 	[4] = "OverlayOriginalMapsSet",
+}
+
+--- @enum ApprovalReactionScope
+Ext_Enums.ApprovalReactionScope = {
+	Global = 0,
+	Local = 1,
+	Dialog = 2,
+	[0] = "Global",
+	[1] = "Local",
+	[2] = "Dialog",
+}
+
+--- @enum ArmorSetState
+Ext_Enums.ArmorSetState = {
+	Normal = 0,
+	Vanity = 1,
+	[0] = "Normal",
+	[1] = "Vanity",
 }
 
 --- @enum ArmorType
@@ -19176,6 +22131,7 @@ Ext_Enums.CauseType = {
 	AURA = 8,
 	InventoryItem = 9,
 	WorldItemThrow = 10,
+	Unknown11 = 11,
 	[0] = "None",
 	[1] = "SurfaceMove",
 	[2] = "SurfaceCreate",
@@ -19187,6 +22143,7 @@ Ext_Enums.CauseType = {
 	[8] = "AURA",
 	[9] = "InventoryItem",
 	[10] = "WorldItemThrow",
+	[11] = "Unknown11",
 }
 
 --- @enum ClientCharacterFlags
@@ -19477,6 +22434,14 @@ Ext_Enums.ConditionRollType = {
 	[16] = "AbilityCheckRoll",
 }
 
+--- @enum ContainerInteractionType
+Ext_Enums.ContainerInteractionType = {
+	Sort = 0,
+	Scatter = 1,
+	[0] = "Sort",
+	[1] = "Scatter",
+}
+
 --- @enum CriticalHitAttackFlags
 Ext_Enums.CriticalHitAttackFlags = {
 	AttackTarget = 1,
@@ -19757,6 +22722,50 @@ Ext_Enums.DiceSizeId = {
 	[8] = "Default",
 }
 
+--- @enum DisplayNameType
+Ext_Enums.DisplayNameType = {
+	None = 0,
+	Unknown = 1,
+	Stats = 2,
+	Transform = 4,
+	CharacterCreation = 5,
+	Template = 6,
+	Story = 8,
+	[0] = "None",
+	[1] = "Unknown",
+	[2] = "Stats",
+	[4] = "Transform",
+	[5] = "CharacterCreation",
+	[6] = "Template",
+	[8] = "Story",
+}
+
+--- @enum DisplayTitleType
+Ext_Enums.DisplayTitleType = {
+	Transform = 0,
+	Story = 1,
+	Template = 2,
+	[0] = "Transform",
+	[1] = "Story",
+	[2] = "Template",
+}
+
+--- @enum DualWieldingRequestType
+Ext_Enums.DualWieldingRequestType = {
+	OnItemEquipped = 1,
+	OnItemEquipped2 = 2,
+	ActionResourceChanged = 3,
+	BoostChanged = 4,
+	ToggleDualWielding = 5,
+	ToggleOnCharacterControlChanged = 6,
+	[1] = "OnItemEquipped",
+	[2] = "OnItemEquipped2",
+	[3] = "ActionResourceChanged",
+	[4] = "BoostChanged",
+	[5] = "ToggleDualWielding",
+	[6] = "ToggleOnCharacterControlChanged",
+}
+
 --- @enum DynamicModifierType
 Ext_Enums.DynamicModifierType = {
 	None = 0,
@@ -19797,6 +22806,20 @@ Ext_Enums.ECSEntityChangeFlags = {
 	[4] = "Immediate",
 	[8] = "Dead",
 	[16] = "Ignore",
+}
+
+--- @enum EEquipmentType
+Ext_Enums.EEquipmentType = {
+	Weapon = 0,
+	Unknown1 = 1,
+	Shield = 2,
+	Armor = 3,
+	Sentinel = 4,
+	[0] = "Weapon",
+	[1] = "Unknown1",
+	[2] = "Shield",
+	[3] = "Armor",
+	[4] = "Sentinel",
 }
 
 --- @enum EffectFlags
@@ -19873,15 +22896,15 @@ Ext_Enums.ExecuteWeaponFunctorsType = {
 Ext_Enums.ExtComponentType = {
 	ActionResources = 0,
 	ActionResourceSpendEvent = 1,
-	ActionResourceEvents = 2,
-	Armor = 3,
-	ArmorSetState = 4,
-	BaseHp = 5,
-	Bound = 6,
-	IsCharacter = 7,
-	Data = 8,
-	Detached = 9,
-	Experience = 10,
+	ActionResourceChangeResults = 2,
+	ActionResourceEvents = 3,
+	Armor = 4,
+	ArmorSetState = 5,
+	BaseHp = 6,
+	Bound = 7,
+	IsCharacter = 8,
+	Data = 9,
+	Detached = 10,
 	Health = 11,
 	Resistances = 12,
 	Hearing = 13,
@@ -19898,681 +22921,838 @@ Ext_Enums.ExtComponentType = {
 	Tag = 24,
 	SpellBookPrepares = 25,
 	Transform = 26,
-	Relation = 27,
-	Faction = 28,
-	CanInteract = 29,
-	CanSpeak = 30,
-	Origin = 31,
-	Level = 32,
-	EocLevel = 33,
-	Classes = 34,
-	MaterialParameterOverride = 35,
-	OffStage = 36,
-	PickingState = 37,
-	Player = 38,
-	SimpleCharacter = 39,
-	Speaker = 40,
-	WeaponSet = 41,
-	DifficultyCheck = 42,
-	AttributeFlags = 43,
-	BodyType = 44,
-	ObjectSize = 45,
-	BaseStats = 46,
-	Expertise = 47,
-	HealBlock = 48,
-	Ruleset = 49,
-	RulesetModifiers = 50,
-	TimeFactor = 51,
-	Clock = 52,
-	BoostCondition = 53,
-	BoostsContainer = 54,
-	BoostInfo = 55,
-	ServerBoostBase = 56,
-	ServerStatusBoostsProcessed = 57,
-	BoostChangedEvent = 58,
-	StatusBoostsRefreshed = 59,
-	BoostBaseUpdated = 60,
-	ServerBaseData = 61,
-	ServerBaseSize = 62,
-	ServerBaseStats = 63,
-	ServerBaseWeapon = 64,
-	ServerBaseProficiency = 65,
-	ServerProficiencyGroupStats = 66,
-	AbilityCheckEvent = 67,
-	EquipmentSlotChangedEvent = 68,
-	LevelChanged = 69,
-	SavingThrowRolledEvent = 70,
-	SkillCheckEvent = 71,
-	WeaponPropertiesChangedEvent = 72,
-	AttributeFlagsChangedEvent = 73,
-	ClassesChangedEvent = 74,
-	StatsAppliedEvent = 75,
-	ShapeshiftState = 76,
-	ShapeshiftHealthReservation = 77,
-	ServerShapeshiftStates = 78,
-	AnimationWaterfall = 79,
-	DynamicAnimationTags = 80,
-	TemplateAnimationSetOverride = 81,
-	AnimationTextKeyEventsSingleton = 82,
-	AnimationGameplayEventsSingleton = 83,
-	AnimationGameplayEvents = 84,
-	AnimationTextKeyEvents = 85,
-	AnimationTriggeredEvents = 86,
-	Effect = 87,
-	PassiveContainer = 88,
-	Passive = 89,
-	PassiveUsageCount = 90,
-	ItemDestroyed = 91,
-	ItemDye = 92,
-	MapMarkerStyle = 93,
-	ItemPortal = 94,
-	IsDoor = 95,
-	ExamineDisabled = 96,
-	ItemHasMoved = 97,
-	HasOpened = 98,
-	IsGold = 99,
-	IsItem = 100,
-	NewInInventory = 101,
-	ShouldDestroyOnSpellCast = 102,
-	ActionType = 103,
-	ItemCanMove = 104,
-	ClimbOn = 105,
-	ItemTemplateDestroyed = 106,
-	InteractionDisabled = 107,
-	IsStoryItem = 108,
-	Ladder = 109,
-	WalkOn = 110,
-	UseAction = 111,
-	OwnedAsLoot = 112,
-	OwneeCurrent = 113,
-	ServerDynamicLayerOwner = 114,
-	ServerIsCurrentOwner = 115,
-	ServerIsLatestOwner = 116,
-	ServerIsPreviousLatestOwner = 117,
-	ServerIsPreviousOwner = 118,
-	ServerIsOriginalOwner = 119,
-	ServerOwneeHistory = 120,
-	ServerOwneeRequest = 121,
-	InventoryMember = 122,
-	InventoryData = 123,
-	InventoryOwner = 124,
-	InventoryIsOwned = 125,
-	InventoryContainer = 126,
-	InventoryMemberTransform = 127,
-	InventoryStack = 128,
-	InventoryStackMember = 129,
-	InventoryWeight = 130,
-	Wielded = 131,
-	CanBeInInventory = 132,
-	CannotBePickpocketed = 133,
-	CannotBeTakenOut = 134,
-	DropOnDeathBlocked = 135,
-	NewItemsInside = 136,
-	NonTradable = 137,
-	ServerInventoryContainerData = 138,
-	ServerInventoryGroupCheck = 139,
-	ServerShapeshiftEquipmentHistory = 140,
-	CharacterHasGeneratedTradeTreasure = 141,
-	ServerInventoryIsReplicatedWith = 142,
-	ItemHasGeneratedTreasure = 143,
-	ReadyToBeAddedToInventory = 144,
-	InventoryPropertyCanBePickpocketed = 145,
-	ScriptPropertyCanBePickpocketed = 146,
-	InventoryPropertyIsDroppedOnDeath = 147,
-	ScriptPropertyIsDroppedOnDeath = 148,
-	InventoryPropertyIsTradable = 149,
-	ScriptPropertyIsTradable = 150,
-	PartyView = 151,
-	PartyComposition = 152,
-	PartyPortals = 153,
-	PartyRecipes = 154,
-	PartyWaypoints = 155,
-	PartyMember = 156,
-	PartyFollower = 157,
-	CurrentlyFollowingParty = 158,
-	BlockFollow = 159,
-	Recruiter = 160,
-	ServerUserSnapshot = 161,
-	EscortFollower = 162,
-	EscortLeader = 163,
-	EscortLeaderPriority = 164,
-	EscortMember = 165,
-	EscortStragglersTracker = 166,
-	EscortHasStragglers = 167,
-	Camera = 168,
-	DefaultCameraBehavior = 169,
-	EffectCameraBehavior = 170,
-	GameCameraBehavior = 171,
-	CameraSelectorMode = 172,
-	CameraTarget = 173,
-	CameraCombatTarget = 174,
-	CameraInSelectorMode = 175,
-	CameraSpellTracking = 176,
-	CampChest = 177,
-	CampEndTheDayState = 178,
-	CampQuality = 179,
-	CampSettings = 180,
-	CampSupply = 181,
-	CampTotalSupplies = 182,
-	CampPresence = 183,
-	IsInCombat = 184,
-	CombatParticipant = 185,
-	CombatState = 186,
-	TurnBased = 187,
-	TurnOrder = 188,
-	IsCombatPaused = 189,
-	ThreatRange = 190,
-	Death = 191,
-	DeathState = 192,
-	DeadByDefault = 193,
-	ServerKiller = 194,
-	ServerDeathState = 195,
-	ServerDeathContinue = 196,
-	DeathApplyKnockedOut = 197,
-	DeathAssignEntityToUserRequest = 198,
-	DeathDeadByDefaultRequest = 199,
-	DiedEvent = 200,
-	FallToProne = 201,
-	HitTarget = 202,
-	HitAttacker = 203,
-	HitWeapon = 204,
-	HitThrownObject = 205,
-	HitProxy = 206,
-	HitProxyOwner = 207,
-	HitReaction = 208,
-	HitAnimationRequest = 209,
-	HitResultEvent = 210,
-	HitJoinCombatRequest = 211,
-	Identity = 212,
-	IdentityState = 213,
-	OriginalIdentity = 214,
-	ServerCanStartCombat = 215,
-	ServerCombatGroupMapping = 216,
-	ServerEnterRequest = 217,
-	ServerFleeBlocked = 218,
-	ServerImmediateJoin = 219,
-	CombatantKilledEvent = 220,
-	CombatLeftEvent = 221,
-	CombatScheduledForDelete = 222,
-	CombatStartedEvent = 223,
-	DelayedFanfareRemovedDuringCombatEvent = 224,
-	CombatJoinInCurrentRoundFailedEvent = 225,
-	CombatJoinInCurrentRound = 226,
-	CombatRequestCompletedEvent = 227,
-	CombatSurprisedJoinRequest = 228,
-	CombatSurprisedStealthRequest = 229,
-	CombatThreatRangeChangedEvent = 230,
-	FTBModeChangedEvent = 231,
-	FTBPlayersTurnEndedEvent = 232,
-	FTBPlayersTurnStartedEvent = 233,
-	FTBRoundEndedEvent = 234,
-	ServerAiInterestedInItems = 235,
-	ServerAiInterestingItem = 236,
-	ServerAiArchetype = 237,
-	ServerAiModifiers = 238,
-	SpellContainer = 239,
-	PlayerPrepareSpell = 240,
-	CCPrepareSpell = 241,
-	SpellModificationContainer = 242,
-	AddedSpells = 243,
-	SpellBookCooldowns = 244,
-	LearnedSpells = 245,
-	SpellAiConditions = 246,
-	OnDamageSpells = 247,
-	NewSpellsAddedEvent = 248,
-	SpellsLearnedEvent = 249,
-	SpellBookChanged = 250,
-	SpellCastAnimationInfo = 251,
-	SpellCastCache = 252,
-	SpellCastCanBeTargeted = 253,
-	SpellCastIsCasting = 254,
-	SpellCastInterruptResults = 255,
-	SpellCastMovement = 256,
-	SpellCastRolls = 257,
-	SpellCastState = 258,
-	SpellSyncTargeting = 259,
-	SpellCastTextKeyEvent = 260,
-	SpellCastHitEvent = 261,
-	SpellCastDestroyEvent = 262,
-	SpellCastSpellRollAbortEvent = 263,
-	SpellCastTargetHitEvent = 264,
-	SpellCastTargetHitInterruptEvent = 265,
-	SpellCastTargetReactionEvent = 266,
-	SpellCastTargetsChangedEvent = 267,
-	SpellCastAnimationRequest = 268,
-	SpellCastCounteredEvent = 269,
-	SpellCastJumpStartEvent = 270,
-	SpellCastLogicExecutionEndEvent = 271,
-	SpellCastPrepareEndEvent = 272,
-	SpellCastPrepareStartEvent = 273,
-	SpellCastPreviewEndEvent = 274,
-	SpellCastThrowPickupPositionChangedEvent = 275,
-	ServerSpellCastHitDelay = 276,
-	ServerSpellCastResponsible = 277,
-	ServerSpellClientInitiated = 278,
-	ServerSpellExternals = 279,
-	ServerSpellHitRegister = 280,
-	ServerSpellInterruptRequests = 281,
-	ServerSpellInterruptResults = 282,
-	ServerSpellCastState = 283,
-	ServerSpellCastCache = 284,
-	ServerSpellCastInterrupt = 285,
-	SpellCastInterruptsUsed = 286,
-	SpellCastMoveDuringCastUpdateEvent = 287,
-	SpellCastMovementAndPrecalculationEndEvent = 288,
-	SpellCastRequestTargetTracking = 289,
-	SpellCastUpdateTargetTracking = 290,
-	SpellWeaponSetChangeRequest = 291,
-	ConcentrationChanged = 292,
-	ConcentrationDamageCheck = 293,
-	ConcentrationClearedEvent = 294,
-	InterruptActionState = 295,
-	InterruptConditionallyDisabled = 296,
-	InterruptContainer = 297,
-	InterruptData = 298,
-	InterruptDecision = 299,
-	InterruptPreferences = 300,
-	InterruptPrepared = 301,
-	InterruptZone = 302,
-	InterruptZoneParticipant = 303,
-	InterruptZoneSource = 304,
-	ServerInterruptAddRemoveRequests = 305,
-	ServerInterruptActionRequests = 306,
-	ServerInterruptZoneRequests = 307,
-	ServerInterruptInitialParticipants = 308,
-	ServerInterruptTurnOrderInZone = 309,
-	ServerInterruptDataSingleton = 310,
-	ServerInterruptUsed = 311,
-	ClientInterruptPlayerDecision = 312,
-	Sight = 313,
-	SightData = 314,
-	SightEntityViewshed = 315,
-	StatusContainer = 316,
-	StatusCause = 317,
-	StatusID = 318,
-	StatusIncapacitated = 319,
-	StatusLifetime = 320,
-	StatusVisualDisabled = 321,
-	ServerStatusCause = 322,
-	ServerStatus = 323,
-	ServerStatusOwnership = 324,
-	ServerStatusDifficultyModifiers = 325,
-	ServerStatusUnique = 326,
-	ServerStatusPerforming = 327,
-	ServerStatusActive = 328,
-	ServerStatusAddedFromSaveLoad = 329,
-	ServerStatusAura = 330,
-	ServerStatusAuraContainer = 331,
-	ServerAddedStatusAuraEffectEvent = 332,
-	ServerRemovedStatusAuraEffectEvent = 333,
-	ServerStatusAddEvent = 334,
-	ServerStatusApplyEvent = 335,
-	ServerStatusAttemptEvent = 336,
-	ServerStatusAttemptFailedEvent = 337,
-	ServerStatusDispelRollCheck = 338,
-	ServerStatusDownedChangedEvent = 339,
-	ServerStatusRefreshed = 340,
-	ServerStatusRemoveEvent = 341,
-	ServerStatusScheduledForDeletion = 342,
-	ServerStatusEvent = 343,
-	ServerStatusTurnStartEvent = 344,
-	ServerStatusUpdateTargetTracking = 345,
-	TadpoleTreeState = 346,
-	TadpolePowers = 347,
-	Tadpoled = 348,
-	HalfIllithid = 349,
-	FullIllithid = 350,
-	CCCompanionDefinition = 351,
-	CCDefinitionCommon = 352,
-	CCFullRespecDefinition = 353,
-	CCRespecDefinition = 354,
-	CCChangeAppearanceDefinition = 355,
-	CCCharacterDefinition = 356,
-	CCSessionCommon = 357,
-	CCState = 358,
-	CCLevelUp = 359,
-	CCLevelUpDefinition = 360,
-	CCFullRespec = 361,
-	CCRespec = 362,
-	CCCreation = 363,
-	CCDefinitionLevelUp = 364,
-	ClientCCDefinitionState = 365,
-	ClientCCDefinitionStateEx = 366,
-	ClientCCBaseDefinitionState = 367,
-	ClientCCCompanionDefinition = 368,
-	ClientCCLevelUpDefinition = 369,
-	ClientCCChangeAppearanceDefinition = 370,
-	ClientCCFullRespecDefinition = 371,
-	ClientCCDummyDefinition = 372,
-	ServerCCAppearanceVisualTag = 373,
-	ServerCCEquipmentSetRequest = 374,
-	ServerCCGod = 375,
-	ServerCCUpdates = 376,
-	ServerCCIsCustom = 377,
-	Background = 378,
-	God = 379,
-	Proficiency = 380,
-	ProficiencyGroup = 381,
-	LevelUp = 382,
-	Floating = 383,
-	Voice = 384,
-	CustomIcon = 385,
-	CharacterCreationStats = 386,
-	Disarmable = 387,
-	ShortRest = 388,
-	IsSummon = 389,
-	SummonContainer = 390,
-	Stealth = 391,
-	ClientControl = 392,
-	IsGlobal = 393,
-	Savegame = 394,
-	DisabledEquipment = 395,
-	LootingState = 396,
-	Loot = 397,
-	Lock = 398,
-	Key = 399,
-	SummonLifetime = 400,
-	Invisibility = 401,
-	Icon = 402,
-	HotbarContainer = 403,
-	HotbarDecks = 404,
-	OriginTag = 405,
-	OriginPassives = 406,
-	ClassTag = 407,
-	BackgroundTag = 408,
-	OriginAppearanceTag = 409,
-	VoiceTag = 410,
-	GodTag = 411,
-	BackgroundPassives = 412,
-	GlobalShortRestDisabled = 413,
-	GlobalLongRestDisabled = 414,
-	StoryShortRestDisabled = 415,
-	FleeCapability = 416,
-	CanDoRest = 417,
-	IsInTurnBasedMode = 418,
-	ItemBoosts = 419,
-	ActiveCharacterLight = 420,
-	Visual = 421,
-	ClientEquipmentVisuals = 422,
-	ClientPaperdoll = 423,
-	TLPreviewDummy = 424,
-	TimelineActorData = 425,
-	ClientTimelineActorControl = 426,
-	AnimationSet = 427,
-	AnimationBlueprint = 428,
-	CanModifyHealth = 429,
-	AvailableLevel = 430,
-	CanBeLooted = 431,
-	CanBeDisarmed = 432,
-	CanTriggerRandomCasts = 433,
-	CanDoActions = 434,
-	ActionUseConditions = 435,
-	CanMove = 436,
-	CanSense = 437,
-	Concentration = 438,
-	Darkness = 439,
-	DualWielding = 440,
-	GameObjectVisual = 441,
-	AppearanceOverride = 442,
-	CharacterCreationTemplateOverride = 443,
-	GravityDisabled = 444,
-	GravityDisabledUntilMoved = 445,
-	CanBeWielded = 446,
-	Avatar = 447,
-	HasExclamationDialog = 448,
-	Trader = 449,
-	Ambushing = 450,
-	InteractionFilter = 451,
-	DisplayName = 452,
-	CustomName = 453,
-	Equipable = 454,
-	GameplayLight = 455,
-	Light = 456,
-	Cull = 457,
-	SceneAttach = 458,
-	Race = 459,
-	CanTravel = 460,
-	Movement = 461,
-	ObjectInteraction = 462,
-	StaticPhysics = 463,
-	Pathing = 464,
-	Steering = 465,
-	CanDeflectProjectiles = 466,
-	ActiveSkeletonSlots = 467,
-	Net = 468,
-	Physics = 469,
-	FTBParticipant = 470,
-	FTBZoneBlockReason = 471,
-	FTBRespect = 472,
-	ApprovalRatings = 473,
-	AttitudesToPlayers = 474,
-	CharacterCreationAppearance = 475,
-	Active = 476,
-	EquipmentVisual = 477,
-	Repose = 478,
-	OriginalTemplate = 479,
-	CanEnterChasm = 480,
-	DialogState = 481,
-	EncumbranceState = 482,
-	EncumbranceStats = 483,
-	Unsheath = 484,
-	UseSocket = 485,
-	UserAvatar = 486,
-	UserReservedFor = 487,
-	Sound = 488,
-	BackgroundGoals = 489,
-	CalendarDaysPassed = 490,
-	CalendarStartingDate = 491,
-	ProgressionContainer = 492,
-	ProgressionMeta = 493,
-	ProgressionChangedContainers = 494,
-	ProgressionLevelUpChanged = 495,
-	CanSeeThrough = 496,
-	CanShootThrough = 497,
-	CanWalkThrough = 498,
-	ShootThroughType = 499,
-	ServerRecruitedBy = 500,
-	ServerGameTimer = 501,
-	ServerExperienceGaveOut = 502,
-	ServerReplicationDependency = 503,
-	ServerIsUnsummoning = 504,
-	ServerActivationGroupContainer = 505,
-	ServerAnubisTag = 506,
-	ServerDialogTag = 507,
-	ServerDisplayNameList = 508,
-	ServerIconList = 509,
-	ServerRaceTag = 510,
-	ServerTemplateTag = 511,
-	ServerBoostTag = 512,
-	ServerSafePosition = 513,
-	ServerAnubisExecutor = 514,
-	ServerLeader = 515,
-	ServerBreadcrumb = 516,
-	ServerDelayDeathCause = 517,
-	ServerPickpocket = 518,
-	ServerReplicationDependencyOwner = 519,
-	ServerGameplayLightEquipment = 520,
-	HistoryTargetUUID = 521,
-	ServerGameplayLightChanges = 522,
-	ServerPeersInRange = 523,
-	ServerSurface = 524,
-	ServerDisarmAttempt = 525,
-	ServerUnsheath = 526,
-	ServerUnsheathScriptOverride = 527,
-	ServerIsLightBlocker = 528,
-	ServerIsVisionBlocker = 529,
-	ServerDarknessActive = 530,
-	ServerHotbarOrder = 531,
-	ServerInventoryItemDataPopulated = 532,
-	ServerVariableManager = 533,
-	IsMarkedForDeletion = 534,
-	JumpFollow = 535,
-	ServerTemplateChangedEvent = 536,
-	ServerTemplateTransformedEvent = 537,
-	TagsChangedEvent = 538,
-	SummonCreatedEvent = 539,
-	SummonAddConcentrationRequest = 540,
-	SummonAddToExistingConcentrationRequest = 541,
-	SummonAttachToProjectileRequest = 542,
-	SummonOwnerSetEvent = 543,
-	SummonPlaceInInventoryRequest = 544,
-	SummonSetLifetimeRequest = 545,
-	SummonDespawnRequest = 546,
-	SummonExpiredRequest = 547,
-	SummonLateJoinPenalty = 548,
-	ServerToggledPassives = 549,
-	ServerPassiveBase = 550,
-	ServerPassivePersistentData = 551,
-	ServerScriptPassives = 552,
-	PassiveRequestTargetTracking = 553,
-	PassiveUpdateTargetTracking = 554,
-	PassiveConditionalRollInterruptEvent = 555,
-	PassivesUpdatedEvent = 556,
-	PasssiveUsageCountIncrementedEvent = 557,
-	ServerCharacter = 558,
-	ServerItem = 559,
-	ProjectileSource = 560,
-	ServerProjectile = 561,
-	ServerProjectileAttachment = 562,
-	ServerProjectileSpell = 563,
-	ServerProjectileInitialization = 564,
-	ServerProjectileCache = 565,
-	ServerOsirisTag = 566,
-	ProjectileImpactEvent = 567,
-	ProjectileRequestTargetTracking = 568,
-	ProjectileUpdateTargetTracking = 569,
-	ProjectileSplitThrowableObjectRequest = 570,
-	ClientCharacter = 571,
-	ClientItem = 572,
-	ClientProjectile = 573,
-	Scenery = 574,
-	RequestedRoll = 575,
-	RollInProgress = 576,
-	ServerRollFinishedEvent = 577,
-	RollModifiers = 578,
-	ServerRollInProgress = 579,
-	ServerRollStartRequest = 580,
-	ServerRollStartSpellRequest = 581,
-	ArmorClassBoost = 582,
-	AbilityBoost = 583,
-	RollBonusBoost = 584,
-	AdvantageBoost = 585,
-	ActionResourceValueBoost = 586,
-	CriticalHitBoost = 587,
-	AbilityFailedSavingThrowBoost = 588,
-	ResistanceBoost = 589,
-	WeaponDamageResistanceBoost = 590,
-	ProficiencyBonusOverrideBoost = 591,
-	JumpMaxDistanceMultiplierBoost = 592,
-	HalveWeaponDamageBoost = 593,
-	UnlockSpellBoost = 594,
-	SourceAdvantageBoost = 595,
-	ProficiencyBonusBoost = 596,
-	ProficiencyBoost = 597,
-	IncreaseMaxHPBoost = 598,
-	ActionResourceBlockBoost = 599,
-	StatusImmunityBoost = 600,
-	UseBoosts = 601,
-	CannotHarmCauseEntityBoost = 602,
-	TemporaryHPBoost = 603,
-	WeightBoost = 604,
-	WeightCategoryBoost = 605,
-	FactionOverrideBoost = 606,
-	ActionResourceMultiplierBoost = 607,
-	BlockRegainHPBoost = 608,
-	InitiativeBoost = 609,
-	DarkvisionRangeBoost = 610,
-	DarkvisionRangeMinBoost = 611,
-	DarkvisionRangeOverrideBoost = 612,
-	AddTagBoost = 613,
-	IgnoreDamageThresholdMinBoost = 614,
-	SkillBoost = 615,
-	WeaponDamageBoost = 616,
-	NullifyAbilityBoost = 617,
-	RerollBoost = 618,
-	DownedStatusBoost = 619,
-	WeaponEnchantmentBoost = 620,
-	GuaranteedChanceRollOutcomeBoost = 621,
-	AttributeBoost = 622,
-	GameplayLightBoost = 623,
-	DualWieldingBoost = 624,
-	SavantBoost = 625,
-	MinimumRollResultBoost = 626,
-	CharacterWeaponDamageBoost = 627,
-	ProjectileDeflectBoost = 628,
-	AbilityOverrideMinimumBoost = 629,
-	ACOverrideFormulaBoost = 630,
-	FallDamageMultiplierBoost = 631,
-	ActiveCharacterLightBoost = 632,
-	WeaponAttackTypeOverrideBoost = 633,
-	WeaponDamageDieOverrideBoost = 634,
-	CarryCapacityMultiplierBoost = 635,
-	WeaponPropertyBoost = 636,
-	WeaponAttackRollAbilityOverrideBoost = 637,
-	SightRangeAdditiveBoost = 638,
-	SightRangeMinimumBoost = 639,
-	SightRangeMaximumBoost = 640,
-	SightRangeOverrideBoost = 641,
-	MovementSpeedLimitBoost = 642,
-	UnlockSpellVariantBoost = 643,
-	DetectCrimesBlockBoost = 644,
-	BlockAbilityModifierFromACBoost = 645,
-	ScaleMultiplierBoost = 646,
-	DamageReductionBoost = 647,
-	ReduceCriticalAttackThresholdBoost = 648,
-	PhysicalForceRangeBonusBoost = 649,
-	ObjectSizeBoost = 650,
-	ObjectSizeOverrideBoost = 651,
-	AiArchetypeOverrideBoost = 652,
-	ExpertiseBonusBoost = 653,
-	EntityThrowDamageBoost = 654,
-	WeaponDamageTypeOverrideBoost = 655,
-	MaximizeHealingBoost = 656,
-	DamageBonusBoost = 657,
-	AdvanceSpellsBoost = 658,
-	SpellResistanceBoost = 659,
-	WeaponAttackRollBonusBoost = 660,
-	SpellSaveDCBoost = 661,
-	RedirectDamageBoost = 662,
-	CanSeeThroughBoost = 663,
-	CanShootThroughBoost = 664,
-	CanWalkThroughBoost = 665,
-	MonkWeaponDamageDiceOverrideBoost = 666,
-	HorizontalFOVOverrideBoost = 667,
-	CharacterUnarmedDamageBoost = 668,
-	ActionResourceReplenishTypeOverrideBoost = 669,
-	ActionResourcePreventReductionBoost = 670,
-	AttackSpellOverrideBoost = 671,
-	LockBoost = 672,
-	IgnorePointBlankDisadvantageBoost = 673,
-	CriticalHitExtraDiceBoost = 674,
-	DodgeAttackRollBoost = 675,
-	GameplayObscurityBoost = 676,
-	MaximumRollResultBoost = 677,
-	UnlockInterruptBoost = 678,
-	JumpMaxDistanceBonusBoost = 679,
-	ArmorAbilityModifierCapOverrideBoost = 680,
-	IgnoreResistanceBoost = 681,
-	ConcentrationIgnoreDamageBoost = 682,
-	IgnoreLowGroundPenaltyBoost = 683,
-	IgnoreSurfaceCoverBoost = 684,
-	ProficiencyBonusIncreaseBoost = 685,
-	DamageTakenBonusBoost = 686,
-	ReceivingCriticalDamageOnHitBoost = 687,
-	Uuid = 688,
-	UuidToHandleMapping = 689,
-	Max = 690,
+	TranslateChanged = 27,
+	TranslateChangedEvent = 28,
+	Relation = 29,
+	Faction = 30,
+	CanInteract = 31,
+	CanSpeak = 32,
+	Origin = 33,
+	Level = 34,
+	EocLevel = 35,
+	Classes = 36,
+	MaterialParameterOverride = 37,
+	OffStage = 38,
+	PickingState = 39,
+	Player = 40,
+	SimpleCharacter = 41,
+	Speaker = 42,
+	WeaponSet = 43,
+	DifficultyCheck = 44,
+	AttributeFlags = 45,
+	BodyType = 46,
+	ObjectSize = 47,
+	BaseStats = 48,
+	Expertise = 49,
+	HealBlock = 50,
+	Ruleset = 51,
+	RulesetModifiers = 52,
+	TimeFactor = 53,
+	Clock = 54,
+	Experience = 55,
+	AvailableLevel = 56,
+	CanLevelUp = 57,
+	BoostCondition = 58,
+	BoostsContainer = 59,
+	BoostInfo = 60,
+	ServerBoostBase = 61,
+	ServerStatusBoostsProcessed = 62,
+	BoostChangedEvent = 63,
+	BoostChangedEventsSingleton = 64,
+	BoostConditionalState = 65,
+	BoostProvider = 66,
+	StatusBoostsRefreshed = 67,
+	BoostBaseUpdated = 68,
+	ServerBaseData = 69,
+	ServerBaseSize = 70,
+	ServerBaseStats = 71,
+	ServerBaseWeapon = 72,
+	ServerBaseProficiency = 73,
+	ServerProficiencyGroupStats = 74,
+	AbilityCheckEvent = 75,
+	EquipmentSlotChangedEvent = 76,
+	LevelChanged = 77,
+	SavingThrowRolledEvent = 78,
+	SkillCheckEvent = 79,
+	WeaponPropertiesChangedEvent = 80,
+	AttributeFlagsChangedEvent = 81,
+	ClassesChangedEvent = 82,
+	StatsAppliedEvent = 83,
+	ShapeshiftState = 84,
+	ShapeshiftHealthReservation = 85,
+	ServerShapeshiftStates = 86,
+	MultiplayerUser = 87,
+	MultiplayerHost = 88,
+	AnimationWaterfall = 89,
+	DynamicAnimationTags = 90,
+	TemplateAnimationSetOverride = 91,
+	AnimationTextKeyEventsSingleton = 92,
+	AnimationGameplayEventsSingleton = 93,
+	AnimationGameplayEvents = 94,
+	AnimationTextKeyEvents = 95,
+	AnimationTriggeredEvents = 96,
+	Effect = 97,
+	PassiveContainer = 98,
+	Passive = 99,
+	PassiveUsageCount = 100,
+	ItemDestroyed = 101,
+	ItemDye = 102,
+	MapMarkerStyle = 103,
+	ItemPortal = 104,
+	ItemDestroying = 105,
+	IsDoor = 106,
+	ExamineDisabled = 107,
+	ItemHasMoved = 108,
+	HasOpened = 109,
+	ItemInUse = 110,
+	ItemIsPoisoned = 111,
+	IsGold = 112,
+	IsItem = 113,
+	NewInInventory = 114,
+	ShouldDestroyOnSpellCast = 115,
+	ActionType = 116,
+	ItemCanMove = 117,
+	ClimbOn = 118,
+	ItemTemplateDestroyed = 119,
+	InteractionDisabled = 120,
+	IsStoryItem = 121,
+	Ladder = 122,
+	WalkOn = 123,
+	UseAction = 124,
+	OwnedAsLoot = 125,
+	OwneeCurrent = 126,
+	ServerDynamicLayerOwner = 127,
+	ServerIsCurrentOwner = 128,
+	ServerIsLatestOwner = 129,
+	ServerIsPreviousLatestOwner = 130,
+	ServerIsPreviousOwner = 131,
+	ServerIsOriginalOwner = 132,
+	ServerOwneeHistory = 133,
+	ServerOwneeRequest = 134,
+	InventoryMember = 135,
+	InventoryData = 136,
+	InventoryOwner = 137,
+	InventoryIsOwned = 138,
+	InventoryContainer = 139,
+	InventoryLocked = 140,
+	InventoryMemberTransform = 141,
+	InventoryStack = 142,
+	InventoryStackMember = 143,
+	InventoryTopOwner = 144,
+	InventoryWeight = 145,
+	TradeBuybackData = 146,
+	Wielded = 147,
+	WieldingHistory = 148,
+	CanBeInInventory = 149,
+	CannotBePickpocketed = 150,
+	CannotBeTakenOut = 151,
+	DropOnDeathBlocked = 152,
+	NewItemsInside = 153,
+	NonTradable = 154,
+	ServerInventoryContainerData = 155,
+	ServerInventoryGroupCheck = 156,
+	ServerShapeshiftEquipmentHistory = 157,
+	CharacterHasGeneratedTradeTreasure = 158,
+	ServerInventoryIsReplicatedWith = 159,
+	ItemHasGeneratedTreasure = 160,
+	ReadyToBeAddedToInventory = 161,
+	HasGeneratedTreasure = 162,
+	InventoryPropertyCanBePickpocketed = 163,
+	ScriptPropertyCanBePickpocketed = 164,
+	InventoryPropertyIsDroppedOnDeath = 165,
+	ScriptPropertyIsDroppedOnDeath = 166,
+	InventoryPropertyIsTradable = 167,
+	ScriptPropertyIsTradable = 168,
+	PartyView = 169,
+	PartyComposition = 170,
+	PartyPortals = 171,
+	PartyRecipes = 172,
+	PartyWaypoints = 173,
+	PartyMember = 174,
+	PartyFollower = 175,
+	CurrentlyFollowingParty = 176,
+	BlockFollow = 177,
+	Recruiter = 178,
+	ServerUserSnapshot = 179,
+	ImprovisedWeaponWielded = 180,
+	ImprovisedWeaponWielding = 181,
+	CanBeWielded = 182,
+	PickUpRequest = 183,
+	PickUpExecuting = 184,
+	EscortFollower = 185,
+	EscortLeader = 186,
+	EscortLeaderPriority = 187,
+	EscortMember = 188,
+	EscortStragglersTracker = 189,
+	EscortHasStragglers = 190,
+	Camera = 191,
+	DefaultCameraBehavior = 192,
+	EffectCameraBehavior = 193,
+	GameCameraBehavior = 194,
+	CameraSelectorMode = 195,
+	CameraTarget = 196,
+	CameraCombatTarget = 197,
+	CameraInSelectorMode = 198,
+	CameraSpellTracking = 199,
+	CampChest = 200,
+	CampEndTheDayState = 201,
+	CampQuality = 202,
+	CampSettings = 203,
+	CampSupply = 204,
+	CampTotalSupplies = 205,
+	CampPresence = 206,
+	IsInCombat = 207,
+	CombatDelayedFanfare = 208,
+	CombatIsThreatened = 209,
+	CombatParticipant = 210,
+	CombatState = 211,
+	TurnBased = 212,
+	TurnOrder = 213,
+	IsCombatPaused = 214,
+	ThreatRange = 215,
+	Death = 216,
+	DeathState = 217,
+	DeathType = 218,
+	DeadByDefault = 219,
+	Downed = 220,
+	ServerKiller = 221,
+	ServerDeathState = 222,
+	ServerDeathContinue = 223,
+	ServerDelayDeath = 224,
+	ServerDelayDeathCause = 225,
+	DeathApplyKnockedOut = 226,
+	DeathAssignEntityToUserRequest = 227,
+	DeathDeadByDefaultRequest = 228,
+	ServerDeathRequest = 229,
+	ServerModifyDelayDeathRequest = 230,
+	ServerResurrectedEvent = 231,
+	DiedEvent = 232,
+	DownedEvent = 233,
+	FallToProne = 234,
+	HitTarget = 235,
+	HitAttacker = 236,
+	HitWeapon = 237,
+	HitThrownObject = 238,
+	HitProxy = 239,
+	HitProxyOwner = 240,
+	HitReaction = 241,
+	HitMeta = 242,
+	HitLifetime = 243,
+	HitAnimationRequest = 244,
+	HitResultEvent = 245,
+	HitJoinCombatRequest = 246,
+	UnresolvedHitNotification = 247,
+	HitNotification = 248,
+	HitNotificationRequest = 249,
+	Identity = 250,
+	IdentityState = 251,
+	OriginalIdentity = 252,
+	ServerCanStartCombat = 253,
+	ServerCombatGroupMapping = 254,
+	ServerEnterRequest = 255,
+	ServerFleeBlocked = 256,
+	ServerImmediateJoin = 257,
+	ServerCombatLeaveRequest = 258,
+	CombatSwitched = 259,
+	CombatFleeRequest = 260,
+	GlobalCombatRequests = 261,
+	CombatJoining = 262,
+	CombatLateJoinPenalty = 263,
+	CombatMerge = 264,
+	CombatSurfaceTeamSingleton = 265,
+	CombatantJoinEvent = 266,
+	CombatFleeSuccess = 267,
+	CombatantKilledEvent = 268,
+	CombatLeftEvent = 269,
+	CombatScheduledForDelete = 270,
+	CombatStartedEvent = 271,
+	DelayedFanfareRemovedDuringCombatEvent = 272,
+	CombatJoinInCurrentRoundFailedEvent = 273,
+	CombatJoinInCurrentRound = 274,
+	CombatRequestCompletedEvent = 275,
+	CombatSurprisedJoinRequest = 276,
+	CombatSurprisedStealthRequest = 277,
+	CombatThreatRangeChangedEvent = 278,
+	FTBParticipant = 279,
+	FTBZoneBlockReason = 280,
+	FTBRespect = 281,
+	FTBPaused = 282,
+	IsInFTB = 283,
+	FTBSurfaceTeamSingleton = 284,
+	FTBTimeFactorRequests = 285,
+	FTBTimeFactorResetRequests = 286,
+	FTBTurnBasedChangesRequest = 287,
+	FTBZone = 288,
+	FTBZoneInstigator = 289,
+	FTBModeChangedEvent = 290,
+	FTBPlayersTurnEndedEvent = 291,
+	FTBPlayersTurnStartedEvent = 292,
+	FTBRoundEndedEvent = 293,
+	ServerAiInterestedInItems = 294,
+	ServerAiInterestingItem = 295,
+	ServerAiArchetype = 296,
+	ServerAiModifiers = 297,
+	SpellContainer = 298,
+	PlayerPrepareSpell = 299,
+	CCPrepareSpell = 300,
+	SpellModificationContainer = 301,
+	AddedSpells = 302,
+	AttackSpellOverride = 303,
+	ScriptedExplosion = 304,
+	SpellBookCooldowns = 305,
+	LearnedSpells = 306,
+	SpellAiConditions = 307,
+	OnDamageSpells = 308,
+	NewSpellsAddedEvent = 309,
+	SpellsLearnedEvent = 310,
+	SpellBookChanged = 311,
+	SpellCastAnimationInfo = 312,
+	SpellCastCache = 313,
+	SpellCastDataCache = 314,
+	SpellCastCanBeTargeted = 315,
+	SpellCastIsCasting = 316,
+	SpellCastInterruptResults = 317,
+	SpellCastMovement = 318,
+	SpellCastMovementInfo = 319,
+	SpellCastRolls = 320,
+	SpellCastState = 321,
+	SpellSyncTargeting = 322,
+	SpellCastOutcome = 323,
+	SpellCastExecutionTime = 324,
+	SpellCastEvent = 325,
+	SpellCastFinishedEvent = 326,
+	SpellCastTextKeyEvent = 327,
+	SpellCastHitEvent = 328,
+	SpellCastDestroyEvent = 329,
+	SpellCastSpellRollAbortEvent = 330,
+	SpellCastTargetHitEvent = 331,
+	SpellCastTargetHitInterruptEvent = 332,
+	SpellCastTargetReactionEvent = 333,
+	SpellCastTargetsChangedEvent = 334,
+	SpellCastAnimationRequest = 335,
+	SpellCastCounteredEvent = 336,
+	SpellCastJumpStartEvent = 337,
+	SpellCastLogicExecutionStartEvent = 338,
+	SpellCastLogicExecutionEndEvent = 339,
+	SpellCastPrepareEndEvent = 340,
+	SpellCastPrepareStartEvent = 341,
+	SpellCastPreviewEndEvent = 342,
+	SpellCastThrowPickupPositionChangedEvent = 343,
+	ServerSpellCastHitDelay = 344,
+	ServerSpellCastMovementInfo = 345,
+	ServerSpellCastRequests = 346,
+	ServerSpellCastPendingRequests = 347,
+	ServerSpellCastResponsible = 348,
+	ServerSpellClientInitiated = 349,
+	ServerSpellExternals = 350,
+	ServerSpellHitRegister = 351,
+	ServerSpellInterruptRequests = 352,
+	ServerSpellInterruptResults = 353,
+	ServerSpellCastMovement = 354,
+	ServerSpellCastState = 355,
+	ServerSpellCastCache = 356,
+	ServerSpellCastInterrupt = 357,
+	ServerSpellCastZoneRange = 358,
+	ServerSpellCastProjectilePathfindCache = 359,
+	ServerSpellCastUnsheathFallbackTimer = 360,
+	SpellCastInterruptsUsed = 361,
+	SpellCastMoveDuringCastUpdateEvent = 362,
+	SpellCastMovementAndPrecalculationEndEvent = 363,
+	SpellCastRequestTargetTracking = 364,
+	SpellCastUpdateTargetTracking = 365,
+	SpellCastWeaponSetChangeRequest = 366,
+	ConcentrationChanged = 367,
+	ConcentrationDamageCheck = 368,
+	ConcentrationClearedEvent = 369,
+	InterruptActionState = 370,
+	InterruptConditionallyDisabled = 371,
+	InterruptContainer = 372,
+	InterruptData = 373,
+	InterruptDecision = 374,
+	InterruptPreferences = 375,
+	InterruptPrepared = 376,
+	InterruptZone = 377,
+	InterruptZoneParticipant = 378,
+	InterruptZoneSource = 379,
+	ServerInterruptAddRemoveRequests = 380,
+	ServerInterruptActionRequests = 381,
+	ServerInterruptZoneRequests = 382,
+	ServerInterruptInitialParticipants = 383,
+	ServerInterruptTurnOrderInZone = 384,
+	ServerInterruptDataSingleton = 385,
+	ServerInterruptUsed = 386,
+	ClientInterruptPlayerDecision = 387,
+	Sight = 388,
+	SightData = 389,
+	SightEntityViewshed = 390,
+	IgnoreSurfaces = 391,
+	StatusContainer = 392,
+	StatusCause = 393,
+	StatusID = 394,
+	StatusIncapacitated = 395,
+	StatusIndicateDarkness = 396,
+	StatusLifetime = 397,
+	StatusLoseControl = 398,
+	StatusVisualDisabled = 399,
+	ServerStatusCause = 400,
+	ServerStatus = 401,
+	ServerStatusOwnership = 402,
+	ServerStatusDifficultyModifiers = 403,
+	ServerStatusUnique = 404,
+	ServerStatusPerforming = 405,
+	ServerStatusActive = 406,
+	ServerStatusAddedFromSaveLoad = 407,
+	ServerStatusAura = 408,
+	ServerStatusAuraContainer = 409,
+	ServerStatusRequests = 410,
+	ServerAddedStatusAuraEffectEvent = 411,
+	ServerRemovedStatusAuraEffectEvent = 412,
+	ServerStatusAddEvent = 413,
+	ServerStatusApplyEvent = 414,
+	ServerStatusAttemptEvent = 415,
+	ServerStatusAttemptFailedEvent = 416,
+	ServerStatusDispelRollCheck = 417,
+	ServerStatusDownedChangedEvent = 418,
+	ServerStatusRefreshed = 419,
+	ServerStatusRemoveEvent = 420,
+	ServerStatusScheduledForDeletion = 421,
+	ServerStatusEvent = 422,
+	ServerStatusTurnStartEvent = 423,
+	ServerStatusUpdateTargetTracking = 424,
+	TadpoleTreeState = 425,
+	TadpolePowers = 426,
+	Tadpoled = 427,
+	HalfIllithid = 428,
+	FullIllithid = 429,
+	ShortRest = 430,
+	GlobalShortRestDisabled = 431,
+	GlobalLongRestDisabled = 432,
+	StoryShortRestDisabled = 433,
+	CanDoRest = 434,
+	LongRestInScriptPhase = 435,
+	LongRestState = 436,
+	LongRestTimeline = 437,
+	LongRestTimers = 438,
+	LongRestUsers = 439,
+	RestingEntities = 440,
+	ShortRestConsumeResources = 441,
+	ServerRestPendingType = 442,
+	ServerRestTypeChosenEvent = 443,
+	ServerShortRestResultEvent = 444,
+	CCCompanionDefinition = 445,
+	CCDefinitionCommon = 446,
+	CCFullRespecDefinition = 447,
+	CCRespecDefinition = 448,
+	CCChangeAppearanceDefinition = 449,
+	CCCharacterDefinition = 450,
+	CCSessionCommon = 451,
+	CCState = 452,
+	CCLevelUp = 453,
+	CCLevelUpDefinition = 454,
+	CCFullRespec = 455,
+	CCRespec = 456,
+	CCCreation = 457,
+	CCDefinitionLevelUp = 458,
+	ClientCCDefinitionState = 459,
+	ClientCCDefinitionStateEx = 460,
+	ClientCCBaseDefinitionState = 461,
+	ClientCCCompanionDefinition = 462,
+	ClientCCLevelUpDefinition = 463,
+	ClientCCChangeAppearanceDefinition = 464,
+	ClientCCFullRespecDefinition = 465,
+	ClientCCDummyDefinition = 466,
+	ServerCCCustomIcon = 467,
+	ServerCCAppearanceVisualTag = 468,
+	ServerCCEquipmentSetRequest = 469,
+	ServerCCGod = 470,
+	ServerCCUpdates = 471,
+	ServerCCIsCustom = 472,
+	TriggerArea = 473,
+	TriggerType = 474,
+	TriggerContainer = 475,
+	TriggerIsInsideOf = 476,
+	TriggerUpdatedContainer = 477,
+	TriggerUpdatedPhysics = 478,
+	ServerStatsAreaTrigger = 479,
+	ServerSoundVolumeTrigger = 480,
+	ServerAIHintAreaTrigger = 481,
+	ServerCrowdCharacterTrigger = 482,
+	ServerChasmSeederTrigger = 483,
+	ServerTeleportTrigger = 484,
+	ServerCampRegionTrigger = 485,
+	ServerEocAreaTrigger = 486,
+	ServerStartTrigger = 487,
+	ServerAtmosphereTrigger = 488,
+	ServerCrimeAreaTrigger = 489,
+	ServerCrimeRegionTrigger = 490,
+	ServerEventTrigger = 491,
+	ServerFloorTrigger = 492,
+	ServerPortalTrigger = 493,
+	ServerRoomTrigger = 494,
+	ServerAvatarContainerTrigger = 495,
+	ServerCampChestTrigger = 496,
+	ServerChasmRegionTrigger = 497,
+	ServerExplorationTrigger = 498,
+	ServerMusicVolumeTrigger = 499,
+	ServerMusicVolumeTriggerState = 500,
+	ServerTimelineSceneTrigger = 501,
+	ServerBlockBronzeTimelinePlacementTrigger = 502,
+	ServerAiGridAreaTrigger = 503,
+	ServerRegionTrigger = 504,
+	ServerLightingTrigger = 505,
+	ServerEocPointTrigger = 506,
+	ServerTriggerEventConfig = 507,
+	ServerTriggerRegisteredFor = 508,
+	ServerRegistrationSettings = 509,
+	ServerUpdatedRegisteredFor = 510,
+	ServerUpdatedRegisteredForItems = 511,
+	ServerTriggerCachedLeaveEvents = 512,
+	ServerTriggerLoadedHandled = 513,
+	ServerTriggerWorldAutoTriggered = 514,
+	ServerOsirisPingRequestSingleton = 515,
+	ServerPingCooldownSingleton = 516,
+	ServerPingRequestSingleton = 517,
+	Background = 518,
+	God = 519,
+	Proficiency = 520,
+	ProficiencyGroup = 521,
+	LevelUp = 522,
+	Floating = 523,
+	Voice = 524,
+	CustomIcon = 525,
+	CharacterCreationStats = 526,
+	Disarmable = 527,
+	IsSummon = 528,
+	SummonContainer = 529,
+	Stealth = 530,
+	ClientControl = 531,
+	IsGlobal = 532,
+	Savegame = 533,
+	LootingState = 534,
+	Loot = 535,
+	Lock = 536,
+	Key = 537,
+	SummonLifetime = 538,
+	Invisibility = 539,
+	Icon = 540,
+	HotbarContainer = 541,
+	HotbarDecks = 542,
+	OriginTag = 543,
+	OriginPassives = 544,
+	ClassTag = 545,
+	BackgroundTag = 546,
+	OriginAppearanceTag = 547,
+	VoiceTag = 548,
+	GodTag = 549,
+	BackgroundPassives = 550,
+	FleeCapability = 551,
+	IsInTurnBasedMode = 552,
+	ItemBoosts = 553,
+	ActiveCharacterLight = 554,
+	Visual = 555,
+	ClientPaperdoll = 556,
+	TLPreviewDummy = 557,
+	TimelineActorData = 558,
+	ClientTimelineActorControl = 559,
+	AnimationSet = 560,
+	AnimationUpdate = 561,
+	AnimationBlueprint = 562,
+	CanModifyHealth = 563,
+	CanBeLooted = 564,
+	CanBeDisarmed = 565,
+	CanTriggerRandomCasts = 566,
+	CanDoActions = 567,
+	ActionUseConditions = 568,
+	CanMove = 569,
+	CanSense = 570,
+	Concentration = 571,
+	Darkness = 572,
+	DualWielding = 573,
+	GameObjectVisual = 574,
+	AppearanceOverride = 575,
+	CharacterCreationTemplateOverride = 576,
+	GravityDisabled = 577,
+	GravityDisabledUntilMoved = 578,
+	Avatar = 579,
+	HasExclamationDialog = 580,
+	Trader = 581,
+	CanTrade = 582,
+	IsFalling = 583,
+	HealMaxIncoming = 584,
+	HealMaxOutgoing = 585,
+	Ambushing = 586,
+	InteractionFilter = 587,
+	DisplayName = 588,
+	CustomName = 589,
+	Equipable = 590,
+	GameplayLight = 591,
+	Light = 592,
+	CombinedLight = 593,
+	Cull = 594,
+	SceneAttach = 595,
+	IsSeeThrough = 596,
+	CustomIconsStorage = 597,
+	FogVolumeRequest = 598,
+	Race = 599,
+	CanTravel = 600,
+	Movement = 601,
+	ObjectInteraction = 602,
+	StaticPhysics = 603,
+	Pathing = 604,
+	PathingDistanceChanged = 605,
+	Steering = 606,
+	CanDeflectProjectiles = 607,
+	ActiveSkeletonSlots = 608,
+	Net = 609,
+	Physics = 610,
+	CharacterCreationAppearance = 611,
+	Active = 612,
+	Repose = 613,
+	OriginalTemplate = 614,
+	CanEnterChasm = 615,
+	DialogState = 616,
+	EncumbranceState = 617,
+	EncumbranceStats = 618,
+	Unsheath = 619,
+	UseSocket = 620,
+	UserAvatar = 621,
+	UserReservedFor = 622,
+	Sound = 623,
+	PauseExcluded = 624,
+	Pause = 625,
+	BackgroundGoals = 626,
+	CalendarDaysPassed = 627,
+	CalendarStartingDate = 628,
+	ApprovalRatings = 629,
+	ServerRatingsChanged = 630,
+	AttitudesToPlayers = 631,
+	DisabledEquipment = 632,
+	EquipmentVisual = 633,
+	ClientEquipmentVisuals = 634,
+	ClientEquipmentVisibilityState = 635,
+	ClientVisualsDesiredState = 636,
+	ClientVisualsVisibilityState = 637,
+	ProgressionContainer = 638,
+	ProgressionMeta = 639,
+	ProgressionChangedContainers = 640,
+	ProgressionLevelUpChanged = 641,
+	ProgressionAbilityImprovements = 642,
+	ProgressionFeat = 643,
+	ProgressionSpells = 644,
+	ProgressionSkills = 645,
+	ProgressionPassives = 646,
+	ProgressionReplicatedFeat = 647,
+	CanSeeThrough = 648,
+	CanShootThrough = 649,
+	CanWalkThrough = 650,
+	ShootThroughType = 651,
+	ServerRecruitedBy = 652,
+	ServerGameTimer = 653,
+	ServerExperienceGaveOut = 654,
+	ServerReplicationDependency = 655,
+	ServerIsUnsummoning = 656,
+	ServerActivationGroupContainer = 657,
+	ServerAnubisTag = 658,
+	ServerDialogTag = 659,
+	ServerDisplayNameList = 660,
+	ServerIconList = 661,
+	ServerRaceTag = 662,
+	ServerTemplateTag = 663,
+	ServerBoostTag = 664,
+	ServerSafePosition = 665,
+	ServerAnubisExecutor = 666,
+	ServerLeader = 667,
+	ServerBreadcrumb = 668,
+	ServerPickpocket = 669,
+	ServerReplicationDependencyOwner = 670,
+	ServerGameplayLightEquipment = 671,
+	HistoryTargetUUID = 672,
+	ServerGameplayLightChanges = 673,
+	ServerPeersInRange = 674,
+	ServerSurface = 675,
+	ServerDisarmAttempt = 676,
+	ServerUnsheath = 677,
+	ServerUnsheathScriptOverride = 678,
+	ServerIsLightBlocker = 679,
+	ServerIsVisionBlocker = 680,
+	ServerDarknessActive = 681,
+	ServerHotbarOrder = 682,
+	ServerInventoryItemDataPopulated = 683,
+	ServerVariableManager = 684,
+	IsMarkedForDeletion = 685,
+	JumpFollow = 686,
+	ServerTemplateChangedEvent = 687,
+	ServerTemplateTransformedEvent = 688,
+	TagsChangedEvent = 689,
+	SummonCreatedEvent = 690,
+	SummonAddConcentrationRequest = 691,
+	SummonAddToExistingConcentrationRequest = 692,
+	SummonAttachToProjectileRequest = 693,
+	SummonOwnerSetEvent = 694,
+	SummonPlaceInInventoryRequest = 695,
+	SummonSetLifetimeRequest = 696,
+	SummonDespawnRequest = 697,
+	SummonExpiredRequest = 698,
+	SummonLateJoinPenalty = 699,
+	ServerToggledPassives = 700,
+	ServerPassiveBoosts = 701,
+	ServerPassiveBase = 702,
+	ServerPassivePersistentData = 703,
+	ServerScriptPassives = 704,
+	PassiveRequestTargetTracking = 705,
+	PassiveUpdateTargetTracking = 706,
+	PassiveConditionalRollInterruptEvent = 707,
+	PassivesUpdatedEvent = 708,
+	PasssiveUsageCountIncrementedEvent = 709,
+	Construction = 710,
+	ConstructionTile = 711,
+	ConstructionFilling = 712,
+	ServerCharacter = 713,
+	ServerItem = 714,
+	ProjectileSource = 715,
+	ServerProjectile = 716,
+	ServerProjectileAttachment = 717,
+	ServerProjectileSpell = 718,
+	ServerProjectileInitialization = 719,
+	ServerProjectileCache = 720,
+	ServerOsirisTag = 721,
+	ProjectileImpactEvent = 722,
+	ProjectileRequestTargetTracking = 723,
+	ProjectileUpdateTargetTracking = 724,
+	ProjectileSplitThrowableObjectRequest = 725,
+	ClientCharacterIconRequest = 726,
+	ClientCharacterIconResult = 727,
+	ClientCharacter = 728,
+	ClientItem = 729,
+	ClientProjectile = 730,
+	Scenery = 731,
+	RequestedRoll = 732,
+	RollInProgress = 733,
+	ServerRollFinishedEvent = 734,
+	RollModifiers = 735,
+	ServerRollInProgress = 736,
+	ServerRollStartRequest = 737,
+	ServerRollStartSpellRequest = 738,
+	ArmorClassBoost = 739,
+	AbilityBoost = 740,
+	RollBonusBoost = 741,
+	AdvantageBoost = 742,
+	ActionResourceValueBoost = 743,
+	CriticalHitBoost = 744,
+	AbilityFailedSavingThrowBoost = 745,
+	ResistanceBoost = 746,
+	WeaponDamageResistanceBoost = 747,
+	ProficiencyBonusOverrideBoost = 748,
+	JumpMaxDistanceMultiplierBoost = 749,
+	HalveWeaponDamageBoost = 750,
+	UnlockSpellBoost = 751,
+	SourceAdvantageBoost = 752,
+	ProficiencyBonusBoost = 753,
+	ProficiencyBoost = 754,
+	IncreaseMaxHPBoost = 755,
+	ActionResourceBlockBoost = 756,
+	StatusImmunityBoost = 757,
+	UseBoosts = 758,
+	CannotHarmCauseEntityBoost = 759,
+	TemporaryHPBoost = 760,
+	WeightBoost = 761,
+	WeightCategoryBoost = 762,
+	FactionOverrideBoost = 763,
+	ActionResourceMultiplierBoost = 764,
+	BlockRegainHPBoost = 765,
+	InitiativeBoost = 766,
+	DarkvisionRangeBoost = 767,
+	DarkvisionRangeMinBoost = 768,
+	DarkvisionRangeOverrideBoost = 769,
+	AddTagBoost = 770,
+	IgnoreDamageThresholdMinBoost = 771,
+	SkillBoost = 772,
+	WeaponDamageBoost = 773,
+	NullifyAbilityBoost = 774,
+	RerollBoost = 775,
+	DownedStatusBoost = 776,
+	WeaponEnchantmentBoost = 777,
+	GuaranteedChanceRollOutcomeBoost = 778,
+	AttributeBoost = 779,
+	GameplayLightBoost = 780,
+	DualWieldingBoost = 781,
+	SavantBoost = 782,
+	MinimumRollResultBoost = 783,
+	CharacterWeaponDamageBoost = 784,
+	ProjectileDeflectBoost = 785,
+	AbilityOverrideMinimumBoost = 786,
+	ACOverrideFormulaBoost = 787,
+	FallDamageMultiplierBoost = 788,
+	ActiveCharacterLightBoost = 789,
+	WeaponAttackTypeOverrideBoost = 790,
+	WeaponDamageDieOverrideBoost = 791,
+	CarryCapacityMultiplierBoost = 792,
+	WeaponPropertyBoost = 793,
+	WeaponAttackRollAbilityOverrideBoost = 794,
+	SightRangeAdditiveBoost = 795,
+	SightRangeMinimumBoost = 796,
+	SightRangeMaximumBoost = 797,
+	SightRangeOverrideBoost = 798,
+	MovementSpeedLimitBoost = 799,
+	UnlockSpellVariantBoost = 800,
+	DetectCrimesBlockBoost = 801,
+	BlockAbilityModifierFromACBoost = 802,
+	ScaleMultiplierBoost = 803,
+	DamageReductionBoost = 804,
+	ReduceCriticalAttackThresholdBoost = 805,
+	PhysicalForceRangeBonusBoost = 806,
+	ObjectSizeBoost = 807,
+	ObjectSizeOverrideBoost = 808,
+	AiArchetypeOverrideBoost = 809,
+	ExpertiseBonusBoost = 810,
+	EntityThrowDamageBoost = 811,
+	WeaponDamageTypeOverrideBoost = 812,
+	MaximizeHealingBoost = 813,
+	DamageBonusBoost = 814,
+	AdvanceSpellsBoost = 815,
+	SpellResistanceBoost = 816,
+	WeaponAttackRollBonusBoost = 817,
+	SpellSaveDCBoost = 818,
+	RedirectDamageBoost = 819,
+	CanSeeThroughBoost = 820,
+	CanShootThroughBoost = 821,
+	CanWalkThroughBoost = 822,
+	MonkWeaponDamageDiceOverrideBoost = 823,
+	HorizontalFOVOverrideBoost = 824,
+	CharacterUnarmedDamageBoost = 825,
+	ActionResourceReplenishTypeOverrideBoost = 826,
+	ActionResourcePreventReductionBoost = 827,
+	AttackSpellOverrideBoost = 828,
+	LockBoost = 829,
+	IgnorePointBlankDisadvantageBoost = 830,
+	CriticalHitExtraDiceBoost = 831,
+	DodgeAttackRollBoost = 832,
+	GameplayObscurityBoost = 833,
+	MaximumRollResultBoost = 834,
+	UnlockInterruptBoost = 835,
+	JumpMaxDistanceBonusBoost = 836,
+	ArmorAbilityModifierCapOverrideBoost = 837,
+	IgnoreResistanceBoost = 838,
+	ConcentrationIgnoreDamageBoost = 839,
+	IgnoreLowGroundPenaltyBoost = 840,
+	IgnoreSurfaceCoverBoost = 841,
+	ProficiencyBonusIncreaseBoost = 842,
+	DamageTakenBonusBoost = 843,
+	ReceivingCriticalDamageOnHitBoost = 844,
+	Uuid = 845,
+	UuidToHandleMapping = 846,
+	Max = 847,
 	[0] = "ActionResources",
 	[1] = "ActionResourceSpendEvent",
-	[2] = "ActionResourceEvents",
-	[3] = "Armor",
-	[4] = "ArmorSetState",
-	[5] = "BaseHp",
-	[6] = "Bound",
-	[7] = "IsCharacter",
-	[8] = "Data",
-	[9] = "Detached",
-	[10] = "Experience",
+	[2] = "ActionResourceChangeResults",
+	[3] = "ActionResourceEvents",
+	[4] = "Armor",
+	[5] = "ArmorSetState",
+	[6] = "BaseHp",
+	[7] = "Bound",
+	[8] = "IsCharacter",
+	[9] = "Data",
+	[10] = "Detached",
 	[11] = "Health",
 	[12] = "Resistances",
 	[13] = "Hearing",
@@ -20589,670 +23769,827 @@ Ext_Enums.ExtComponentType = {
 	[24] = "Tag",
 	[25] = "SpellBookPrepares",
 	[26] = "Transform",
-	[27] = "Relation",
-	[28] = "Faction",
-	[29] = "CanInteract",
-	[30] = "CanSpeak",
-	[31] = "Origin",
-	[32] = "Level",
-	[33] = "EocLevel",
-	[34] = "Classes",
-	[35] = "MaterialParameterOverride",
-	[36] = "OffStage",
-	[37] = "PickingState",
-	[38] = "Player",
-	[39] = "SimpleCharacter",
-	[40] = "Speaker",
-	[41] = "WeaponSet",
-	[42] = "DifficultyCheck",
-	[43] = "AttributeFlags",
-	[44] = "BodyType",
-	[45] = "ObjectSize",
-	[46] = "BaseStats",
-	[47] = "Expertise",
-	[48] = "HealBlock",
-	[49] = "Ruleset",
-	[50] = "RulesetModifiers",
-	[51] = "TimeFactor",
-	[52] = "Clock",
-	[53] = "BoostCondition",
-	[54] = "BoostsContainer",
-	[55] = "BoostInfo",
-	[56] = "ServerBoostBase",
-	[57] = "ServerStatusBoostsProcessed",
-	[58] = "BoostChangedEvent",
-	[59] = "StatusBoostsRefreshed",
-	[60] = "BoostBaseUpdated",
-	[61] = "ServerBaseData",
-	[62] = "ServerBaseSize",
-	[63] = "ServerBaseStats",
-	[64] = "ServerBaseWeapon",
-	[65] = "ServerBaseProficiency",
-	[66] = "ServerProficiencyGroupStats",
-	[67] = "AbilityCheckEvent",
-	[68] = "EquipmentSlotChangedEvent",
-	[69] = "LevelChanged",
-	[70] = "SavingThrowRolledEvent",
-	[71] = "SkillCheckEvent",
-	[72] = "WeaponPropertiesChangedEvent",
-	[73] = "AttributeFlagsChangedEvent",
-	[74] = "ClassesChangedEvent",
-	[75] = "StatsAppliedEvent",
-	[76] = "ShapeshiftState",
-	[77] = "ShapeshiftHealthReservation",
-	[78] = "ServerShapeshiftStates",
-	[79] = "AnimationWaterfall",
-	[80] = "DynamicAnimationTags",
-	[81] = "TemplateAnimationSetOverride",
-	[82] = "AnimationTextKeyEventsSingleton",
-	[83] = "AnimationGameplayEventsSingleton",
-	[84] = "AnimationGameplayEvents",
-	[85] = "AnimationTextKeyEvents",
-	[86] = "AnimationTriggeredEvents",
-	[87] = "Effect",
-	[88] = "PassiveContainer",
-	[89] = "Passive",
-	[90] = "PassiveUsageCount",
-	[91] = "ItemDestroyed",
-	[92] = "ItemDye",
-	[93] = "MapMarkerStyle",
-	[94] = "ItemPortal",
-	[95] = "IsDoor",
-	[96] = "ExamineDisabled",
-	[97] = "ItemHasMoved",
-	[98] = "HasOpened",
-	[99] = "IsGold",
-	[100] = "IsItem",
-	[101] = "NewInInventory",
-	[102] = "ShouldDestroyOnSpellCast",
-	[103] = "ActionType",
-	[104] = "ItemCanMove",
-	[105] = "ClimbOn",
-	[106] = "ItemTemplateDestroyed",
-	[107] = "InteractionDisabled",
-	[108] = "IsStoryItem",
-	[109] = "Ladder",
-	[110] = "WalkOn",
-	[111] = "UseAction",
-	[112] = "OwnedAsLoot",
-	[113] = "OwneeCurrent",
-	[114] = "ServerDynamicLayerOwner",
-	[115] = "ServerIsCurrentOwner",
-	[116] = "ServerIsLatestOwner",
-	[117] = "ServerIsPreviousLatestOwner",
-	[118] = "ServerIsPreviousOwner",
-	[119] = "ServerIsOriginalOwner",
-	[120] = "ServerOwneeHistory",
-	[121] = "ServerOwneeRequest",
-	[122] = "InventoryMember",
-	[123] = "InventoryData",
-	[124] = "InventoryOwner",
-	[125] = "InventoryIsOwned",
-	[126] = "InventoryContainer",
-	[127] = "InventoryMemberTransform",
-	[128] = "InventoryStack",
-	[129] = "InventoryStackMember",
-	[130] = "InventoryWeight",
-	[131] = "Wielded",
-	[132] = "CanBeInInventory",
-	[133] = "CannotBePickpocketed",
-	[134] = "CannotBeTakenOut",
-	[135] = "DropOnDeathBlocked",
-	[136] = "NewItemsInside",
-	[137] = "NonTradable",
-	[138] = "ServerInventoryContainerData",
-	[139] = "ServerInventoryGroupCheck",
-	[140] = "ServerShapeshiftEquipmentHistory",
-	[141] = "CharacterHasGeneratedTradeTreasure",
-	[142] = "ServerInventoryIsReplicatedWith",
-	[143] = "ItemHasGeneratedTreasure",
-	[144] = "ReadyToBeAddedToInventory",
-	[145] = "InventoryPropertyCanBePickpocketed",
-	[146] = "ScriptPropertyCanBePickpocketed",
-	[147] = "InventoryPropertyIsDroppedOnDeath",
-	[148] = "ScriptPropertyIsDroppedOnDeath",
-	[149] = "InventoryPropertyIsTradable",
-	[150] = "ScriptPropertyIsTradable",
-	[151] = "PartyView",
-	[152] = "PartyComposition",
-	[153] = "PartyPortals",
-	[154] = "PartyRecipes",
-	[155] = "PartyWaypoints",
-	[156] = "PartyMember",
-	[157] = "PartyFollower",
-	[158] = "CurrentlyFollowingParty",
-	[159] = "BlockFollow",
-	[160] = "Recruiter",
-	[161] = "ServerUserSnapshot",
-	[162] = "EscortFollower",
-	[163] = "EscortLeader",
-	[164] = "EscortLeaderPriority",
-	[165] = "EscortMember",
-	[166] = "EscortStragglersTracker",
-	[167] = "EscortHasStragglers",
-	[168] = "Camera",
-	[169] = "DefaultCameraBehavior",
-	[170] = "EffectCameraBehavior",
-	[171] = "GameCameraBehavior",
-	[172] = "CameraSelectorMode",
-	[173] = "CameraTarget",
-	[174] = "CameraCombatTarget",
-	[175] = "CameraInSelectorMode",
-	[176] = "CameraSpellTracking",
-	[177] = "CampChest",
-	[178] = "CampEndTheDayState",
-	[179] = "CampQuality",
-	[180] = "CampSettings",
-	[181] = "CampSupply",
-	[182] = "CampTotalSupplies",
-	[183] = "CampPresence",
-	[184] = "IsInCombat",
-	[185] = "CombatParticipant",
-	[186] = "CombatState",
-	[187] = "TurnBased",
-	[188] = "TurnOrder",
-	[189] = "IsCombatPaused",
-	[190] = "ThreatRange",
-	[191] = "Death",
-	[192] = "DeathState",
-	[193] = "DeadByDefault",
-	[194] = "ServerKiller",
-	[195] = "ServerDeathState",
-	[196] = "ServerDeathContinue",
-	[197] = "DeathApplyKnockedOut",
-	[198] = "DeathAssignEntityToUserRequest",
-	[199] = "DeathDeadByDefaultRequest",
-	[200] = "DiedEvent",
-	[201] = "FallToProne",
-	[202] = "HitTarget",
-	[203] = "HitAttacker",
-	[204] = "HitWeapon",
-	[205] = "HitThrownObject",
-	[206] = "HitProxy",
-	[207] = "HitProxyOwner",
-	[208] = "HitReaction",
-	[209] = "HitAnimationRequest",
-	[210] = "HitResultEvent",
-	[211] = "HitJoinCombatRequest",
-	[212] = "Identity",
-	[213] = "IdentityState",
-	[214] = "OriginalIdentity",
-	[215] = "ServerCanStartCombat",
-	[216] = "ServerCombatGroupMapping",
-	[217] = "ServerEnterRequest",
-	[218] = "ServerFleeBlocked",
-	[219] = "ServerImmediateJoin",
-	[220] = "CombatantKilledEvent",
-	[221] = "CombatLeftEvent",
-	[222] = "CombatScheduledForDelete",
-	[223] = "CombatStartedEvent",
-	[224] = "DelayedFanfareRemovedDuringCombatEvent",
-	[225] = "CombatJoinInCurrentRoundFailedEvent",
-	[226] = "CombatJoinInCurrentRound",
-	[227] = "CombatRequestCompletedEvent",
-	[228] = "CombatSurprisedJoinRequest",
-	[229] = "CombatSurprisedStealthRequest",
-	[230] = "CombatThreatRangeChangedEvent",
-	[231] = "FTBModeChangedEvent",
-	[232] = "FTBPlayersTurnEndedEvent",
-	[233] = "FTBPlayersTurnStartedEvent",
-	[234] = "FTBRoundEndedEvent",
-	[235] = "ServerAiInterestedInItems",
-	[236] = "ServerAiInterestingItem",
-	[237] = "ServerAiArchetype",
-	[238] = "ServerAiModifiers",
-	[239] = "SpellContainer",
-	[240] = "PlayerPrepareSpell",
-	[241] = "CCPrepareSpell",
-	[242] = "SpellModificationContainer",
-	[243] = "AddedSpells",
-	[244] = "SpellBookCooldowns",
-	[245] = "LearnedSpells",
-	[246] = "SpellAiConditions",
-	[247] = "OnDamageSpells",
-	[248] = "NewSpellsAddedEvent",
-	[249] = "SpellsLearnedEvent",
-	[250] = "SpellBookChanged",
-	[251] = "SpellCastAnimationInfo",
-	[252] = "SpellCastCache",
-	[253] = "SpellCastCanBeTargeted",
-	[254] = "SpellCastIsCasting",
-	[255] = "SpellCastInterruptResults",
-	[256] = "SpellCastMovement",
-	[257] = "SpellCastRolls",
-	[258] = "SpellCastState",
-	[259] = "SpellSyncTargeting",
-	[260] = "SpellCastTextKeyEvent",
-	[261] = "SpellCastHitEvent",
-	[262] = "SpellCastDestroyEvent",
-	[263] = "SpellCastSpellRollAbortEvent",
-	[264] = "SpellCastTargetHitEvent",
-	[265] = "SpellCastTargetHitInterruptEvent",
-	[266] = "SpellCastTargetReactionEvent",
-	[267] = "SpellCastTargetsChangedEvent",
-	[268] = "SpellCastAnimationRequest",
-	[269] = "SpellCastCounteredEvent",
-	[270] = "SpellCastJumpStartEvent",
-	[271] = "SpellCastLogicExecutionEndEvent",
-	[272] = "SpellCastPrepareEndEvent",
-	[273] = "SpellCastPrepareStartEvent",
-	[274] = "SpellCastPreviewEndEvent",
-	[275] = "SpellCastThrowPickupPositionChangedEvent",
-	[276] = "ServerSpellCastHitDelay",
-	[277] = "ServerSpellCastResponsible",
-	[278] = "ServerSpellClientInitiated",
-	[279] = "ServerSpellExternals",
-	[280] = "ServerSpellHitRegister",
-	[281] = "ServerSpellInterruptRequests",
-	[282] = "ServerSpellInterruptResults",
-	[283] = "ServerSpellCastState",
-	[284] = "ServerSpellCastCache",
-	[285] = "ServerSpellCastInterrupt",
-	[286] = "SpellCastInterruptsUsed",
-	[287] = "SpellCastMoveDuringCastUpdateEvent",
-	[288] = "SpellCastMovementAndPrecalculationEndEvent",
-	[289] = "SpellCastRequestTargetTracking",
-	[290] = "SpellCastUpdateTargetTracking",
-	[291] = "SpellWeaponSetChangeRequest",
-	[292] = "ConcentrationChanged",
-	[293] = "ConcentrationDamageCheck",
-	[294] = "ConcentrationClearedEvent",
-	[295] = "InterruptActionState",
-	[296] = "InterruptConditionallyDisabled",
-	[297] = "InterruptContainer",
-	[298] = "InterruptData",
-	[299] = "InterruptDecision",
-	[300] = "InterruptPreferences",
-	[301] = "InterruptPrepared",
-	[302] = "InterruptZone",
-	[303] = "InterruptZoneParticipant",
-	[304] = "InterruptZoneSource",
-	[305] = "ServerInterruptAddRemoveRequests",
-	[306] = "ServerInterruptActionRequests",
-	[307] = "ServerInterruptZoneRequests",
-	[308] = "ServerInterruptInitialParticipants",
-	[309] = "ServerInterruptTurnOrderInZone",
-	[310] = "ServerInterruptDataSingleton",
-	[311] = "ServerInterruptUsed",
-	[312] = "ClientInterruptPlayerDecision",
-	[313] = "Sight",
-	[314] = "SightData",
-	[315] = "SightEntityViewshed",
-	[316] = "StatusContainer",
-	[317] = "StatusCause",
-	[318] = "StatusID",
-	[319] = "StatusIncapacitated",
-	[320] = "StatusLifetime",
-	[321] = "StatusVisualDisabled",
-	[322] = "ServerStatusCause",
-	[323] = "ServerStatus",
-	[324] = "ServerStatusOwnership",
-	[325] = "ServerStatusDifficultyModifiers",
-	[326] = "ServerStatusUnique",
-	[327] = "ServerStatusPerforming",
-	[328] = "ServerStatusActive",
-	[329] = "ServerStatusAddedFromSaveLoad",
-	[330] = "ServerStatusAura",
-	[331] = "ServerStatusAuraContainer",
-	[332] = "ServerAddedStatusAuraEffectEvent",
-	[333] = "ServerRemovedStatusAuraEffectEvent",
-	[334] = "ServerStatusAddEvent",
-	[335] = "ServerStatusApplyEvent",
-	[336] = "ServerStatusAttemptEvent",
-	[337] = "ServerStatusAttemptFailedEvent",
-	[338] = "ServerStatusDispelRollCheck",
-	[339] = "ServerStatusDownedChangedEvent",
-	[340] = "ServerStatusRefreshed",
-	[341] = "ServerStatusRemoveEvent",
-	[342] = "ServerStatusScheduledForDeletion",
-	[343] = "ServerStatusEvent",
-	[344] = "ServerStatusTurnStartEvent",
-	[345] = "ServerStatusUpdateTargetTracking",
-	[346] = "TadpoleTreeState",
-	[347] = "TadpolePowers",
-	[348] = "Tadpoled",
-	[349] = "HalfIllithid",
-	[350] = "FullIllithid",
-	[351] = "CCCompanionDefinition",
-	[352] = "CCDefinitionCommon",
-	[353] = "CCFullRespecDefinition",
-	[354] = "CCRespecDefinition",
-	[355] = "CCChangeAppearanceDefinition",
-	[356] = "CCCharacterDefinition",
-	[357] = "CCSessionCommon",
-	[358] = "CCState",
-	[359] = "CCLevelUp",
-	[360] = "CCLevelUpDefinition",
-	[361] = "CCFullRespec",
-	[362] = "CCRespec",
-	[363] = "CCCreation",
-	[364] = "CCDefinitionLevelUp",
-	[365] = "ClientCCDefinitionState",
-	[366] = "ClientCCDefinitionStateEx",
-	[367] = "ClientCCBaseDefinitionState",
-	[368] = "ClientCCCompanionDefinition",
-	[369] = "ClientCCLevelUpDefinition",
-	[370] = "ClientCCChangeAppearanceDefinition",
-	[371] = "ClientCCFullRespecDefinition",
-	[372] = "ClientCCDummyDefinition",
-	[373] = "ServerCCAppearanceVisualTag",
-	[374] = "ServerCCEquipmentSetRequest",
-	[375] = "ServerCCGod",
-	[376] = "ServerCCUpdates",
-	[377] = "ServerCCIsCustom",
-	[378] = "Background",
-	[379] = "God",
-	[380] = "Proficiency",
-	[381] = "ProficiencyGroup",
-	[382] = "LevelUp",
-	[383] = "Floating",
-	[384] = "Voice",
-	[385] = "CustomIcon",
-	[386] = "CharacterCreationStats",
-	[387] = "Disarmable",
-	[388] = "ShortRest",
-	[389] = "IsSummon",
-	[390] = "SummonContainer",
-	[391] = "Stealth",
-	[392] = "ClientControl",
-	[393] = "IsGlobal",
-	[394] = "Savegame",
-	[395] = "DisabledEquipment",
-	[396] = "LootingState",
-	[397] = "Loot",
-	[398] = "Lock",
-	[399] = "Key",
-	[400] = "SummonLifetime",
-	[401] = "Invisibility",
-	[402] = "Icon",
-	[403] = "HotbarContainer",
-	[404] = "HotbarDecks",
-	[405] = "OriginTag",
-	[406] = "OriginPassives",
-	[407] = "ClassTag",
-	[408] = "BackgroundTag",
-	[409] = "OriginAppearanceTag",
-	[410] = "VoiceTag",
-	[411] = "GodTag",
-	[412] = "BackgroundPassives",
-	[413] = "GlobalShortRestDisabled",
-	[414] = "GlobalLongRestDisabled",
-	[415] = "StoryShortRestDisabled",
-	[416] = "FleeCapability",
-	[417] = "CanDoRest",
-	[418] = "IsInTurnBasedMode",
-	[419] = "ItemBoosts",
-	[420] = "ActiveCharacterLight",
-	[421] = "Visual",
-	[422] = "ClientEquipmentVisuals",
-	[423] = "ClientPaperdoll",
-	[424] = "TLPreviewDummy",
-	[425] = "TimelineActorData",
-	[426] = "ClientTimelineActorControl",
-	[427] = "AnimationSet",
-	[428] = "AnimationBlueprint",
-	[429] = "CanModifyHealth",
-	[430] = "AvailableLevel",
-	[431] = "CanBeLooted",
-	[432] = "CanBeDisarmed",
-	[433] = "CanTriggerRandomCasts",
-	[434] = "CanDoActions",
-	[435] = "ActionUseConditions",
-	[436] = "CanMove",
-	[437] = "CanSense",
-	[438] = "Concentration",
-	[439] = "Darkness",
-	[440] = "DualWielding",
-	[441] = "GameObjectVisual",
-	[442] = "AppearanceOverride",
-	[443] = "CharacterCreationTemplateOverride",
-	[444] = "GravityDisabled",
-	[445] = "GravityDisabledUntilMoved",
-	[446] = "CanBeWielded",
-	[447] = "Avatar",
-	[448] = "HasExclamationDialog",
-	[449] = "Trader",
-	[450] = "Ambushing",
-	[451] = "InteractionFilter",
-	[452] = "DisplayName",
-	[453] = "CustomName",
-	[454] = "Equipable",
-	[455] = "GameplayLight",
-	[456] = "Light",
-	[457] = "Cull",
-	[458] = "SceneAttach",
-	[459] = "Race",
-	[460] = "CanTravel",
-	[461] = "Movement",
-	[462] = "ObjectInteraction",
-	[463] = "StaticPhysics",
-	[464] = "Pathing",
-	[465] = "Steering",
-	[466] = "CanDeflectProjectiles",
-	[467] = "ActiveSkeletonSlots",
-	[468] = "Net",
-	[469] = "Physics",
-	[470] = "FTBParticipant",
-	[471] = "FTBZoneBlockReason",
-	[472] = "FTBRespect",
-	[473] = "ApprovalRatings",
-	[474] = "AttitudesToPlayers",
-	[475] = "CharacterCreationAppearance",
-	[476] = "Active",
-	[477] = "EquipmentVisual",
-	[478] = "Repose",
-	[479] = "OriginalTemplate",
-	[480] = "CanEnterChasm",
-	[481] = "DialogState",
-	[482] = "EncumbranceState",
-	[483] = "EncumbranceStats",
-	[484] = "Unsheath",
-	[485] = "UseSocket",
-	[486] = "UserAvatar",
-	[487] = "UserReservedFor",
-	[488] = "Sound",
-	[489] = "BackgroundGoals",
-	[490] = "CalendarDaysPassed",
-	[491] = "CalendarStartingDate",
-	[492] = "ProgressionContainer",
-	[493] = "ProgressionMeta",
-	[494] = "ProgressionChangedContainers",
-	[495] = "ProgressionLevelUpChanged",
-	[496] = "CanSeeThrough",
-	[497] = "CanShootThrough",
-	[498] = "CanWalkThrough",
-	[499] = "ShootThroughType",
-	[500] = "ServerRecruitedBy",
-	[501] = "ServerGameTimer",
-	[502] = "ServerExperienceGaveOut",
-	[503] = "ServerReplicationDependency",
-	[504] = "ServerIsUnsummoning",
-	[505] = "ServerActivationGroupContainer",
-	[506] = "ServerAnubisTag",
-	[507] = "ServerDialogTag",
-	[508] = "ServerDisplayNameList",
-	[509] = "ServerIconList",
-	[510] = "ServerRaceTag",
-	[511] = "ServerTemplateTag",
-	[512] = "ServerBoostTag",
-	[513] = "ServerSafePosition",
-	[514] = "ServerAnubisExecutor",
-	[515] = "ServerLeader",
-	[516] = "ServerBreadcrumb",
-	[517] = "ServerDelayDeathCause",
-	[518] = "ServerPickpocket",
-	[519] = "ServerReplicationDependencyOwner",
-	[520] = "ServerGameplayLightEquipment",
-	[521] = "HistoryTargetUUID",
-	[522] = "ServerGameplayLightChanges",
-	[523] = "ServerPeersInRange",
-	[524] = "ServerSurface",
-	[525] = "ServerDisarmAttempt",
-	[526] = "ServerUnsheath",
-	[527] = "ServerUnsheathScriptOverride",
-	[528] = "ServerIsLightBlocker",
-	[529] = "ServerIsVisionBlocker",
-	[530] = "ServerDarknessActive",
-	[531] = "ServerHotbarOrder",
-	[532] = "ServerInventoryItemDataPopulated",
-	[533] = "ServerVariableManager",
-	[534] = "IsMarkedForDeletion",
-	[535] = "JumpFollow",
-	[536] = "ServerTemplateChangedEvent",
-	[537] = "ServerTemplateTransformedEvent",
-	[538] = "TagsChangedEvent",
-	[539] = "SummonCreatedEvent",
-	[540] = "SummonAddConcentrationRequest",
-	[541] = "SummonAddToExistingConcentrationRequest",
-	[542] = "SummonAttachToProjectileRequest",
-	[543] = "SummonOwnerSetEvent",
-	[544] = "SummonPlaceInInventoryRequest",
-	[545] = "SummonSetLifetimeRequest",
-	[546] = "SummonDespawnRequest",
-	[547] = "SummonExpiredRequest",
-	[548] = "SummonLateJoinPenalty",
-	[549] = "ServerToggledPassives",
-	[550] = "ServerPassiveBase",
-	[551] = "ServerPassivePersistentData",
-	[552] = "ServerScriptPassives",
-	[553] = "PassiveRequestTargetTracking",
-	[554] = "PassiveUpdateTargetTracking",
-	[555] = "PassiveConditionalRollInterruptEvent",
-	[556] = "PassivesUpdatedEvent",
-	[557] = "PasssiveUsageCountIncrementedEvent",
-	[558] = "ServerCharacter",
-	[559] = "ServerItem",
-	[560] = "ProjectileSource",
-	[561] = "ServerProjectile",
-	[562] = "ServerProjectileAttachment",
-	[563] = "ServerProjectileSpell",
-	[564] = "ServerProjectileInitialization",
-	[565] = "ServerProjectileCache",
-	[566] = "ServerOsirisTag",
-	[567] = "ProjectileImpactEvent",
-	[568] = "ProjectileRequestTargetTracking",
-	[569] = "ProjectileUpdateTargetTracking",
-	[570] = "ProjectileSplitThrowableObjectRequest",
-	[571] = "ClientCharacter",
-	[572] = "ClientItem",
-	[573] = "ClientProjectile",
-	[574] = "Scenery",
-	[575] = "RequestedRoll",
-	[576] = "RollInProgress",
-	[577] = "ServerRollFinishedEvent",
-	[578] = "RollModifiers",
-	[579] = "ServerRollInProgress",
-	[580] = "ServerRollStartRequest",
-	[581] = "ServerRollStartSpellRequest",
-	[582] = "ArmorClassBoost",
-	[583] = "AbilityBoost",
-	[584] = "RollBonusBoost",
-	[585] = "AdvantageBoost",
-	[586] = "ActionResourceValueBoost",
-	[587] = "CriticalHitBoost",
-	[588] = "AbilityFailedSavingThrowBoost",
-	[589] = "ResistanceBoost",
-	[590] = "WeaponDamageResistanceBoost",
-	[591] = "ProficiencyBonusOverrideBoost",
-	[592] = "JumpMaxDistanceMultiplierBoost",
-	[593] = "HalveWeaponDamageBoost",
-	[594] = "UnlockSpellBoost",
-	[595] = "SourceAdvantageBoost",
-	[596] = "ProficiencyBonusBoost",
-	[597] = "ProficiencyBoost",
-	[598] = "IncreaseMaxHPBoost",
-	[599] = "ActionResourceBlockBoost",
-	[600] = "StatusImmunityBoost",
-	[601] = "UseBoosts",
-	[602] = "CannotHarmCauseEntityBoost",
-	[603] = "TemporaryHPBoost",
-	[604] = "WeightBoost",
-	[605] = "WeightCategoryBoost",
-	[606] = "FactionOverrideBoost",
-	[607] = "ActionResourceMultiplierBoost",
-	[608] = "BlockRegainHPBoost",
-	[609] = "InitiativeBoost",
-	[610] = "DarkvisionRangeBoost",
-	[611] = "DarkvisionRangeMinBoost",
-	[612] = "DarkvisionRangeOverrideBoost",
-	[613] = "AddTagBoost",
-	[614] = "IgnoreDamageThresholdMinBoost",
-	[615] = "SkillBoost",
-	[616] = "WeaponDamageBoost",
-	[617] = "NullifyAbilityBoost",
-	[618] = "RerollBoost",
-	[619] = "DownedStatusBoost",
-	[620] = "WeaponEnchantmentBoost",
-	[621] = "GuaranteedChanceRollOutcomeBoost",
-	[622] = "AttributeBoost",
-	[623] = "GameplayLightBoost",
-	[624] = "DualWieldingBoost",
-	[625] = "SavantBoost",
-	[626] = "MinimumRollResultBoost",
-	[627] = "CharacterWeaponDamageBoost",
-	[628] = "ProjectileDeflectBoost",
-	[629] = "AbilityOverrideMinimumBoost",
-	[630] = "ACOverrideFormulaBoost",
-	[631] = "FallDamageMultiplierBoost",
-	[632] = "ActiveCharacterLightBoost",
-	[633] = "WeaponAttackTypeOverrideBoost",
-	[634] = "WeaponDamageDieOverrideBoost",
-	[635] = "CarryCapacityMultiplierBoost",
-	[636] = "WeaponPropertyBoost",
-	[637] = "WeaponAttackRollAbilityOverrideBoost",
-	[638] = "SightRangeAdditiveBoost",
-	[639] = "SightRangeMinimumBoost",
-	[640] = "SightRangeMaximumBoost",
-	[641] = "SightRangeOverrideBoost",
-	[642] = "MovementSpeedLimitBoost",
-	[643] = "UnlockSpellVariantBoost",
-	[644] = "DetectCrimesBlockBoost",
-	[645] = "BlockAbilityModifierFromACBoost",
-	[646] = "ScaleMultiplierBoost",
-	[647] = "DamageReductionBoost",
-	[648] = "ReduceCriticalAttackThresholdBoost",
-	[649] = "PhysicalForceRangeBonusBoost",
-	[650] = "ObjectSizeBoost",
-	[651] = "ObjectSizeOverrideBoost",
-	[652] = "AiArchetypeOverrideBoost",
-	[653] = "ExpertiseBonusBoost",
-	[654] = "EntityThrowDamageBoost",
-	[655] = "WeaponDamageTypeOverrideBoost",
-	[656] = "MaximizeHealingBoost",
-	[657] = "DamageBonusBoost",
-	[658] = "AdvanceSpellsBoost",
-	[659] = "SpellResistanceBoost",
-	[660] = "WeaponAttackRollBonusBoost",
-	[661] = "SpellSaveDCBoost",
-	[662] = "RedirectDamageBoost",
-	[663] = "CanSeeThroughBoost",
-	[664] = "CanShootThroughBoost",
-	[665] = "CanWalkThroughBoost",
-	[666] = "MonkWeaponDamageDiceOverrideBoost",
-	[667] = "HorizontalFOVOverrideBoost",
-	[668] = "CharacterUnarmedDamageBoost",
-	[669] = "ActionResourceReplenishTypeOverrideBoost",
-	[670] = "ActionResourcePreventReductionBoost",
-	[671] = "AttackSpellOverrideBoost",
-	[672] = "LockBoost",
-	[673] = "IgnorePointBlankDisadvantageBoost",
-	[674] = "CriticalHitExtraDiceBoost",
-	[675] = "DodgeAttackRollBoost",
-	[676] = "GameplayObscurityBoost",
-	[677] = "MaximumRollResultBoost",
-	[678] = "UnlockInterruptBoost",
-	[679] = "JumpMaxDistanceBonusBoost",
-	[680] = "ArmorAbilityModifierCapOverrideBoost",
-	[681] = "IgnoreResistanceBoost",
-	[682] = "ConcentrationIgnoreDamageBoost",
-	[683] = "IgnoreLowGroundPenaltyBoost",
-	[684] = "IgnoreSurfaceCoverBoost",
-	[685] = "ProficiencyBonusIncreaseBoost",
-	[686] = "DamageTakenBonusBoost",
-	[687] = "ReceivingCriticalDamageOnHitBoost",
-	[688] = "Uuid",
-	[689] = "UuidToHandleMapping",
-	[690] = "Max",
+	[27] = "TranslateChanged",
+	[28] = "TranslateChangedEvent",
+	[29] = "Relation",
+	[30] = "Faction",
+	[31] = "CanInteract",
+	[32] = "CanSpeak",
+	[33] = "Origin",
+	[34] = "Level",
+	[35] = "EocLevel",
+	[36] = "Classes",
+	[37] = "MaterialParameterOverride",
+	[38] = "OffStage",
+	[39] = "PickingState",
+	[40] = "Player",
+	[41] = "SimpleCharacter",
+	[42] = "Speaker",
+	[43] = "WeaponSet",
+	[44] = "DifficultyCheck",
+	[45] = "AttributeFlags",
+	[46] = "BodyType",
+	[47] = "ObjectSize",
+	[48] = "BaseStats",
+	[49] = "Expertise",
+	[50] = "HealBlock",
+	[51] = "Ruleset",
+	[52] = "RulesetModifiers",
+	[53] = "TimeFactor",
+	[54] = "Clock",
+	[55] = "Experience",
+	[56] = "AvailableLevel",
+	[57] = "CanLevelUp",
+	[58] = "BoostCondition",
+	[59] = "BoostsContainer",
+	[60] = "BoostInfo",
+	[61] = "ServerBoostBase",
+	[62] = "ServerStatusBoostsProcessed",
+	[63] = "BoostChangedEvent",
+	[64] = "BoostChangedEventsSingleton",
+	[65] = "BoostConditionalState",
+	[66] = "BoostProvider",
+	[67] = "StatusBoostsRefreshed",
+	[68] = "BoostBaseUpdated",
+	[69] = "ServerBaseData",
+	[70] = "ServerBaseSize",
+	[71] = "ServerBaseStats",
+	[72] = "ServerBaseWeapon",
+	[73] = "ServerBaseProficiency",
+	[74] = "ServerProficiencyGroupStats",
+	[75] = "AbilityCheckEvent",
+	[76] = "EquipmentSlotChangedEvent",
+	[77] = "LevelChanged",
+	[78] = "SavingThrowRolledEvent",
+	[79] = "SkillCheckEvent",
+	[80] = "WeaponPropertiesChangedEvent",
+	[81] = "AttributeFlagsChangedEvent",
+	[82] = "ClassesChangedEvent",
+	[83] = "StatsAppliedEvent",
+	[84] = "ShapeshiftState",
+	[85] = "ShapeshiftHealthReservation",
+	[86] = "ServerShapeshiftStates",
+	[87] = "MultiplayerUser",
+	[88] = "MultiplayerHost",
+	[89] = "AnimationWaterfall",
+	[90] = "DynamicAnimationTags",
+	[91] = "TemplateAnimationSetOverride",
+	[92] = "AnimationTextKeyEventsSingleton",
+	[93] = "AnimationGameplayEventsSingleton",
+	[94] = "AnimationGameplayEvents",
+	[95] = "AnimationTextKeyEvents",
+	[96] = "AnimationTriggeredEvents",
+	[97] = "Effect",
+	[98] = "PassiveContainer",
+	[99] = "Passive",
+	[100] = "PassiveUsageCount",
+	[101] = "ItemDestroyed",
+	[102] = "ItemDye",
+	[103] = "MapMarkerStyle",
+	[104] = "ItemPortal",
+	[105] = "ItemDestroying",
+	[106] = "IsDoor",
+	[107] = "ExamineDisabled",
+	[108] = "ItemHasMoved",
+	[109] = "HasOpened",
+	[110] = "ItemInUse",
+	[111] = "ItemIsPoisoned",
+	[112] = "IsGold",
+	[113] = "IsItem",
+	[114] = "NewInInventory",
+	[115] = "ShouldDestroyOnSpellCast",
+	[116] = "ActionType",
+	[117] = "ItemCanMove",
+	[118] = "ClimbOn",
+	[119] = "ItemTemplateDestroyed",
+	[120] = "InteractionDisabled",
+	[121] = "IsStoryItem",
+	[122] = "Ladder",
+	[123] = "WalkOn",
+	[124] = "UseAction",
+	[125] = "OwnedAsLoot",
+	[126] = "OwneeCurrent",
+	[127] = "ServerDynamicLayerOwner",
+	[128] = "ServerIsCurrentOwner",
+	[129] = "ServerIsLatestOwner",
+	[130] = "ServerIsPreviousLatestOwner",
+	[131] = "ServerIsPreviousOwner",
+	[132] = "ServerIsOriginalOwner",
+	[133] = "ServerOwneeHistory",
+	[134] = "ServerOwneeRequest",
+	[135] = "InventoryMember",
+	[136] = "InventoryData",
+	[137] = "InventoryOwner",
+	[138] = "InventoryIsOwned",
+	[139] = "InventoryContainer",
+	[140] = "InventoryLocked",
+	[141] = "InventoryMemberTransform",
+	[142] = "InventoryStack",
+	[143] = "InventoryStackMember",
+	[144] = "InventoryTopOwner",
+	[145] = "InventoryWeight",
+	[146] = "TradeBuybackData",
+	[147] = "Wielded",
+	[148] = "WieldingHistory",
+	[149] = "CanBeInInventory",
+	[150] = "CannotBePickpocketed",
+	[151] = "CannotBeTakenOut",
+	[152] = "DropOnDeathBlocked",
+	[153] = "NewItemsInside",
+	[154] = "NonTradable",
+	[155] = "ServerInventoryContainerData",
+	[156] = "ServerInventoryGroupCheck",
+	[157] = "ServerShapeshiftEquipmentHistory",
+	[158] = "CharacterHasGeneratedTradeTreasure",
+	[159] = "ServerInventoryIsReplicatedWith",
+	[160] = "ItemHasGeneratedTreasure",
+	[161] = "ReadyToBeAddedToInventory",
+	[162] = "HasGeneratedTreasure",
+	[163] = "InventoryPropertyCanBePickpocketed",
+	[164] = "ScriptPropertyCanBePickpocketed",
+	[165] = "InventoryPropertyIsDroppedOnDeath",
+	[166] = "ScriptPropertyIsDroppedOnDeath",
+	[167] = "InventoryPropertyIsTradable",
+	[168] = "ScriptPropertyIsTradable",
+	[169] = "PartyView",
+	[170] = "PartyComposition",
+	[171] = "PartyPortals",
+	[172] = "PartyRecipes",
+	[173] = "PartyWaypoints",
+	[174] = "PartyMember",
+	[175] = "PartyFollower",
+	[176] = "CurrentlyFollowingParty",
+	[177] = "BlockFollow",
+	[178] = "Recruiter",
+	[179] = "ServerUserSnapshot",
+	[180] = "ImprovisedWeaponWielded",
+	[181] = "ImprovisedWeaponWielding",
+	[182] = "CanBeWielded",
+	[183] = "PickUpRequest",
+	[184] = "PickUpExecuting",
+	[185] = "EscortFollower",
+	[186] = "EscortLeader",
+	[187] = "EscortLeaderPriority",
+	[188] = "EscortMember",
+	[189] = "EscortStragglersTracker",
+	[190] = "EscortHasStragglers",
+	[191] = "Camera",
+	[192] = "DefaultCameraBehavior",
+	[193] = "EffectCameraBehavior",
+	[194] = "GameCameraBehavior",
+	[195] = "CameraSelectorMode",
+	[196] = "CameraTarget",
+	[197] = "CameraCombatTarget",
+	[198] = "CameraInSelectorMode",
+	[199] = "CameraSpellTracking",
+	[200] = "CampChest",
+	[201] = "CampEndTheDayState",
+	[202] = "CampQuality",
+	[203] = "CampSettings",
+	[204] = "CampSupply",
+	[205] = "CampTotalSupplies",
+	[206] = "CampPresence",
+	[207] = "IsInCombat",
+	[208] = "CombatDelayedFanfare",
+	[209] = "CombatIsThreatened",
+	[210] = "CombatParticipant",
+	[211] = "CombatState",
+	[212] = "TurnBased",
+	[213] = "TurnOrder",
+	[214] = "IsCombatPaused",
+	[215] = "ThreatRange",
+	[216] = "Death",
+	[217] = "DeathState",
+	[218] = "DeathType",
+	[219] = "DeadByDefault",
+	[220] = "Downed",
+	[221] = "ServerKiller",
+	[222] = "ServerDeathState",
+	[223] = "ServerDeathContinue",
+	[224] = "ServerDelayDeath",
+	[225] = "ServerDelayDeathCause",
+	[226] = "DeathApplyKnockedOut",
+	[227] = "DeathAssignEntityToUserRequest",
+	[228] = "DeathDeadByDefaultRequest",
+	[229] = "ServerDeathRequest",
+	[230] = "ServerModifyDelayDeathRequest",
+	[231] = "ServerResurrectedEvent",
+	[232] = "DiedEvent",
+	[233] = "DownedEvent",
+	[234] = "FallToProne",
+	[235] = "HitTarget",
+	[236] = "HitAttacker",
+	[237] = "HitWeapon",
+	[238] = "HitThrownObject",
+	[239] = "HitProxy",
+	[240] = "HitProxyOwner",
+	[241] = "HitReaction",
+	[242] = "HitMeta",
+	[243] = "HitLifetime",
+	[244] = "HitAnimationRequest",
+	[245] = "HitResultEvent",
+	[246] = "HitJoinCombatRequest",
+	[247] = "UnresolvedHitNotification",
+	[248] = "HitNotification",
+	[249] = "HitNotificationRequest",
+	[250] = "Identity",
+	[251] = "IdentityState",
+	[252] = "OriginalIdentity",
+	[253] = "ServerCanStartCombat",
+	[254] = "ServerCombatGroupMapping",
+	[255] = "ServerEnterRequest",
+	[256] = "ServerFleeBlocked",
+	[257] = "ServerImmediateJoin",
+	[258] = "ServerCombatLeaveRequest",
+	[259] = "CombatSwitched",
+	[260] = "CombatFleeRequest",
+	[261] = "GlobalCombatRequests",
+	[262] = "CombatJoining",
+	[263] = "CombatLateJoinPenalty",
+	[264] = "CombatMerge",
+	[265] = "CombatSurfaceTeamSingleton",
+	[266] = "CombatantJoinEvent",
+	[267] = "CombatFleeSuccess",
+	[268] = "CombatantKilledEvent",
+	[269] = "CombatLeftEvent",
+	[270] = "CombatScheduledForDelete",
+	[271] = "CombatStartedEvent",
+	[272] = "DelayedFanfareRemovedDuringCombatEvent",
+	[273] = "CombatJoinInCurrentRoundFailedEvent",
+	[274] = "CombatJoinInCurrentRound",
+	[275] = "CombatRequestCompletedEvent",
+	[276] = "CombatSurprisedJoinRequest",
+	[277] = "CombatSurprisedStealthRequest",
+	[278] = "CombatThreatRangeChangedEvent",
+	[279] = "FTBParticipant",
+	[280] = "FTBZoneBlockReason",
+	[281] = "FTBRespect",
+	[282] = "FTBPaused",
+	[283] = "IsInFTB",
+	[284] = "FTBSurfaceTeamSingleton",
+	[285] = "FTBTimeFactorRequests",
+	[286] = "FTBTimeFactorResetRequests",
+	[287] = "FTBTurnBasedChangesRequest",
+	[288] = "FTBZone",
+	[289] = "FTBZoneInstigator",
+	[290] = "FTBModeChangedEvent",
+	[291] = "FTBPlayersTurnEndedEvent",
+	[292] = "FTBPlayersTurnStartedEvent",
+	[293] = "FTBRoundEndedEvent",
+	[294] = "ServerAiInterestedInItems",
+	[295] = "ServerAiInterestingItem",
+	[296] = "ServerAiArchetype",
+	[297] = "ServerAiModifiers",
+	[298] = "SpellContainer",
+	[299] = "PlayerPrepareSpell",
+	[300] = "CCPrepareSpell",
+	[301] = "SpellModificationContainer",
+	[302] = "AddedSpells",
+	[303] = "AttackSpellOverride",
+	[304] = "ScriptedExplosion",
+	[305] = "SpellBookCooldowns",
+	[306] = "LearnedSpells",
+	[307] = "SpellAiConditions",
+	[308] = "OnDamageSpells",
+	[309] = "NewSpellsAddedEvent",
+	[310] = "SpellsLearnedEvent",
+	[311] = "SpellBookChanged",
+	[312] = "SpellCastAnimationInfo",
+	[313] = "SpellCastCache",
+	[314] = "SpellCastDataCache",
+	[315] = "SpellCastCanBeTargeted",
+	[316] = "SpellCastIsCasting",
+	[317] = "SpellCastInterruptResults",
+	[318] = "SpellCastMovement",
+	[319] = "SpellCastMovementInfo",
+	[320] = "SpellCastRolls",
+	[321] = "SpellCastState",
+	[322] = "SpellSyncTargeting",
+	[323] = "SpellCastOutcome",
+	[324] = "SpellCastExecutionTime",
+	[325] = "SpellCastEvent",
+	[326] = "SpellCastFinishedEvent",
+	[327] = "SpellCastTextKeyEvent",
+	[328] = "SpellCastHitEvent",
+	[329] = "SpellCastDestroyEvent",
+	[330] = "SpellCastSpellRollAbortEvent",
+	[331] = "SpellCastTargetHitEvent",
+	[332] = "SpellCastTargetHitInterruptEvent",
+	[333] = "SpellCastTargetReactionEvent",
+	[334] = "SpellCastTargetsChangedEvent",
+	[335] = "SpellCastAnimationRequest",
+	[336] = "SpellCastCounteredEvent",
+	[337] = "SpellCastJumpStartEvent",
+	[338] = "SpellCastLogicExecutionStartEvent",
+	[339] = "SpellCastLogicExecutionEndEvent",
+	[340] = "SpellCastPrepareEndEvent",
+	[341] = "SpellCastPrepareStartEvent",
+	[342] = "SpellCastPreviewEndEvent",
+	[343] = "SpellCastThrowPickupPositionChangedEvent",
+	[344] = "ServerSpellCastHitDelay",
+	[345] = "ServerSpellCastMovementInfo",
+	[346] = "ServerSpellCastRequests",
+	[347] = "ServerSpellCastPendingRequests",
+	[348] = "ServerSpellCastResponsible",
+	[349] = "ServerSpellClientInitiated",
+	[350] = "ServerSpellExternals",
+	[351] = "ServerSpellHitRegister",
+	[352] = "ServerSpellInterruptRequests",
+	[353] = "ServerSpellInterruptResults",
+	[354] = "ServerSpellCastMovement",
+	[355] = "ServerSpellCastState",
+	[356] = "ServerSpellCastCache",
+	[357] = "ServerSpellCastInterrupt",
+	[358] = "ServerSpellCastZoneRange",
+	[359] = "ServerSpellCastProjectilePathfindCache",
+	[360] = "ServerSpellCastUnsheathFallbackTimer",
+	[361] = "SpellCastInterruptsUsed",
+	[362] = "SpellCastMoveDuringCastUpdateEvent",
+	[363] = "SpellCastMovementAndPrecalculationEndEvent",
+	[364] = "SpellCastRequestTargetTracking",
+	[365] = "SpellCastUpdateTargetTracking",
+	[366] = "SpellCastWeaponSetChangeRequest",
+	[367] = "ConcentrationChanged",
+	[368] = "ConcentrationDamageCheck",
+	[369] = "ConcentrationClearedEvent",
+	[370] = "InterruptActionState",
+	[371] = "InterruptConditionallyDisabled",
+	[372] = "InterruptContainer",
+	[373] = "InterruptData",
+	[374] = "InterruptDecision",
+	[375] = "InterruptPreferences",
+	[376] = "InterruptPrepared",
+	[377] = "InterruptZone",
+	[378] = "InterruptZoneParticipant",
+	[379] = "InterruptZoneSource",
+	[380] = "ServerInterruptAddRemoveRequests",
+	[381] = "ServerInterruptActionRequests",
+	[382] = "ServerInterruptZoneRequests",
+	[383] = "ServerInterruptInitialParticipants",
+	[384] = "ServerInterruptTurnOrderInZone",
+	[385] = "ServerInterruptDataSingleton",
+	[386] = "ServerInterruptUsed",
+	[387] = "ClientInterruptPlayerDecision",
+	[388] = "Sight",
+	[389] = "SightData",
+	[390] = "SightEntityViewshed",
+	[391] = "IgnoreSurfaces",
+	[392] = "StatusContainer",
+	[393] = "StatusCause",
+	[394] = "StatusID",
+	[395] = "StatusIncapacitated",
+	[396] = "StatusIndicateDarkness",
+	[397] = "StatusLifetime",
+	[398] = "StatusLoseControl",
+	[399] = "StatusVisualDisabled",
+	[400] = "ServerStatusCause",
+	[401] = "ServerStatus",
+	[402] = "ServerStatusOwnership",
+	[403] = "ServerStatusDifficultyModifiers",
+	[404] = "ServerStatusUnique",
+	[405] = "ServerStatusPerforming",
+	[406] = "ServerStatusActive",
+	[407] = "ServerStatusAddedFromSaveLoad",
+	[408] = "ServerStatusAura",
+	[409] = "ServerStatusAuraContainer",
+	[410] = "ServerStatusRequests",
+	[411] = "ServerAddedStatusAuraEffectEvent",
+	[412] = "ServerRemovedStatusAuraEffectEvent",
+	[413] = "ServerStatusAddEvent",
+	[414] = "ServerStatusApplyEvent",
+	[415] = "ServerStatusAttemptEvent",
+	[416] = "ServerStatusAttemptFailedEvent",
+	[417] = "ServerStatusDispelRollCheck",
+	[418] = "ServerStatusDownedChangedEvent",
+	[419] = "ServerStatusRefreshed",
+	[420] = "ServerStatusRemoveEvent",
+	[421] = "ServerStatusScheduledForDeletion",
+	[422] = "ServerStatusEvent",
+	[423] = "ServerStatusTurnStartEvent",
+	[424] = "ServerStatusUpdateTargetTracking",
+	[425] = "TadpoleTreeState",
+	[426] = "TadpolePowers",
+	[427] = "Tadpoled",
+	[428] = "HalfIllithid",
+	[429] = "FullIllithid",
+	[430] = "ShortRest",
+	[431] = "GlobalShortRestDisabled",
+	[432] = "GlobalLongRestDisabled",
+	[433] = "StoryShortRestDisabled",
+	[434] = "CanDoRest",
+	[435] = "LongRestInScriptPhase",
+	[436] = "LongRestState",
+	[437] = "LongRestTimeline",
+	[438] = "LongRestTimers",
+	[439] = "LongRestUsers",
+	[440] = "RestingEntities",
+	[441] = "ShortRestConsumeResources",
+	[442] = "ServerRestPendingType",
+	[443] = "ServerRestTypeChosenEvent",
+	[444] = "ServerShortRestResultEvent",
+	[445] = "CCCompanionDefinition",
+	[446] = "CCDefinitionCommon",
+	[447] = "CCFullRespecDefinition",
+	[448] = "CCRespecDefinition",
+	[449] = "CCChangeAppearanceDefinition",
+	[450] = "CCCharacterDefinition",
+	[451] = "CCSessionCommon",
+	[452] = "CCState",
+	[453] = "CCLevelUp",
+	[454] = "CCLevelUpDefinition",
+	[455] = "CCFullRespec",
+	[456] = "CCRespec",
+	[457] = "CCCreation",
+	[458] = "CCDefinitionLevelUp",
+	[459] = "ClientCCDefinitionState",
+	[460] = "ClientCCDefinitionStateEx",
+	[461] = "ClientCCBaseDefinitionState",
+	[462] = "ClientCCCompanionDefinition",
+	[463] = "ClientCCLevelUpDefinition",
+	[464] = "ClientCCChangeAppearanceDefinition",
+	[465] = "ClientCCFullRespecDefinition",
+	[466] = "ClientCCDummyDefinition",
+	[467] = "ServerCCCustomIcon",
+	[468] = "ServerCCAppearanceVisualTag",
+	[469] = "ServerCCEquipmentSetRequest",
+	[470] = "ServerCCGod",
+	[471] = "ServerCCUpdates",
+	[472] = "ServerCCIsCustom",
+	[473] = "TriggerArea",
+	[474] = "TriggerType",
+	[475] = "TriggerContainer",
+	[476] = "TriggerIsInsideOf",
+	[477] = "TriggerUpdatedContainer",
+	[478] = "TriggerUpdatedPhysics",
+	[479] = "ServerStatsAreaTrigger",
+	[480] = "ServerSoundVolumeTrigger",
+	[481] = "ServerAIHintAreaTrigger",
+	[482] = "ServerCrowdCharacterTrigger",
+	[483] = "ServerChasmSeederTrigger",
+	[484] = "ServerTeleportTrigger",
+	[485] = "ServerCampRegionTrigger",
+	[486] = "ServerEocAreaTrigger",
+	[487] = "ServerStartTrigger",
+	[488] = "ServerAtmosphereTrigger",
+	[489] = "ServerCrimeAreaTrigger",
+	[490] = "ServerCrimeRegionTrigger",
+	[491] = "ServerEventTrigger",
+	[492] = "ServerFloorTrigger",
+	[493] = "ServerPortalTrigger",
+	[494] = "ServerRoomTrigger",
+	[495] = "ServerAvatarContainerTrigger",
+	[496] = "ServerCampChestTrigger",
+	[497] = "ServerChasmRegionTrigger",
+	[498] = "ServerExplorationTrigger",
+	[499] = "ServerMusicVolumeTrigger",
+	[500] = "ServerMusicVolumeTriggerState",
+	[501] = "ServerTimelineSceneTrigger",
+	[502] = "ServerBlockBronzeTimelinePlacementTrigger",
+	[503] = "ServerAiGridAreaTrigger",
+	[504] = "ServerRegionTrigger",
+	[505] = "ServerLightingTrigger",
+	[506] = "ServerEocPointTrigger",
+	[507] = "ServerTriggerEventConfig",
+	[508] = "ServerTriggerRegisteredFor",
+	[509] = "ServerRegistrationSettings",
+	[510] = "ServerUpdatedRegisteredFor",
+	[511] = "ServerUpdatedRegisteredForItems",
+	[512] = "ServerTriggerCachedLeaveEvents",
+	[513] = "ServerTriggerLoadedHandled",
+	[514] = "ServerTriggerWorldAutoTriggered",
+	[515] = "ServerOsirisPingRequestSingleton",
+	[516] = "ServerPingCooldownSingleton",
+	[517] = "ServerPingRequestSingleton",
+	[518] = "Background",
+	[519] = "God",
+	[520] = "Proficiency",
+	[521] = "ProficiencyGroup",
+	[522] = "LevelUp",
+	[523] = "Floating",
+	[524] = "Voice",
+	[525] = "CustomIcon",
+	[526] = "CharacterCreationStats",
+	[527] = "Disarmable",
+	[528] = "IsSummon",
+	[529] = "SummonContainer",
+	[530] = "Stealth",
+	[531] = "ClientControl",
+	[532] = "IsGlobal",
+	[533] = "Savegame",
+	[534] = "LootingState",
+	[535] = "Loot",
+	[536] = "Lock",
+	[537] = "Key",
+	[538] = "SummonLifetime",
+	[539] = "Invisibility",
+	[540] = "Icon",
+	[541] = "HotbarContainer",
+	[542] = "HotbarDecks",
+	[543] = "OriginTag",
+	[544] = "OriginPassives",
+	[545] = "ClassTag",
+	[546] = "BackgroundTag",
+	[547] = "OriginAppearanceTag",
+	[548] = "VoiceTag",
+	[549] = "GodTag",
+	[550] = "BackgroundPassives",
+	[551] = "FleeCapability",
+	[552] = "IsInTurnBasedMode",
+	[553] = "ItemBoosts",
+	[554] = "ActiveCharacterLight",
+	[555] = "Visual",
+	[556] = "ClientPaperdoll",
+	[557] = "TLPreviewDummy",
+	[558] = "TimelineActorData",
+	[559] = "ClientTimelineActorControl",
+	[560] = "AnimationSet",
+	[561] = "AnimationUpdate",
+	[562] = "AnimationBlueprint",
+	[563] = "CanModifyHealth",
+	[564] = "CanBeLooted",
+	[565] = "CanBeDisarmed",
+	[566] = "CanTriggerRandomCasts",
+	[567] = "CanDoActions",
+	[568] = "ActionUseConditions",
+	[569] = "CanMove",
+	[570] = "CanSense",
+	[571] = "Concentration",
+	[572] = "Darkness",
+	[573] = "DualWielding",
+	[574] = "GameObjectVisual",
+	[575] = "AppearanceOverride",
+	[576] = "CharacterCreationTemplateOverride",
+	[577] = "GravityDisabled",
+	[578] = "GravityDisabledUntilMoved",
+	[579] = "Avatar",
+	[580] = "HasExclamationDialog",
+	[581] = "Trader",
+	[582] = "CanTrade",
+	[583] = "IsFalling",
+	[584] = "HealMaxIncoming",
+	[585] = "HealMaxOutgoing",
+	[586] = "Ambushing",
+	[587] = "InteractionFilter",
+	[588] = "DisplayName",
+	[589] = "CustomName",
+	[590] = "Equipable",
+	[591] = "GameplayLight",
+	[592] = "Light",
+	[593] = "CombinedLight",
+	[594] = "Cull",
+	[595] = "SceneAttach",
+	[596] = "IsSeeThrough",
+	[597] = "CustomIconsStorage",
+	[598] = "FogVolumeRequest",
+	[599] = "Race",
+	[600] = "CanTravel",
+	[601] = "Movement",
+	[602] = "ObjectInteraction",
+	[603] = "StaticPhysics",
+	[604] = "Pathing",
+	[605] = "PathingDistanceChanged",
+	[606] = "Steering",
+	[607] = "CanDeflectProjectiles",
+	[608] = "ActiveSkeletonSlots",
+	[609] = "Net",
+	[610] = "Physics",
+	[611] = "CharacterCreationAppearance",
+	[612] = "Active",
+	[613] = "Repose",
+	[614] = "OriginalTemplate",
+	[615] = "CanEnterChasm",
+	[616] = "DialogState",
+	[617] = "EncumbranceState",
+	[618] = "EncumbranceStats",
+	[619] = "Unsheath",
+	[620] = "UseSocket",
+	[621] = "UserAvatar",
+	[622] = "UserReservedFor",
+	[623] = "Sound",
+	[624] = "PauseExcluded",
+	[625] = "Pause",
+	[626] = "BackgroundGoals",
+	[627] = "CalendarDaysPassed",
+	[628] = "CalendarStartingDate",
+	[629] = "ApprovalRatings",
+	[630] = "ServerRatingsChanged",
+	[631] = "AttitudesToPlayers",
+	[632] = "DisabledEquipment",
+	[633] = "EquipmentVisual",
+	[634] = "ClientEquipmentVisuals",
+	[635] = "ClientEquipmentVisibilityState",
+	[636] = "ClientVisualsDesiredState",
+	[637] = "ClientVisualsVisibilityState",
+	[638] = "ProgressionContainer",
+	[639] = "ProgressionMeta",
+	[640] = "ProgressionChangedContainers",
+	[641] = "ProgressionLevelUpChanged",
+	[642] = "ProgressionAbilityImprovements",
+	[643] = "ProgressionFeat",
+	[644] = "ProgressionSpells",
+	[645] = "ProgressionSkills",
+	[646] = "ProgressionPassives",
+	[647] = "ProgressionReplicatedFeat",
+	[648] = "CanSeeThrough",
+	[649] = "CanShootThrough",
+	[650] = "CanWalkThrough",
+	[651] = "ShootThroughType",
+	[652] = "ServerRecruitedBy",
+	[653] = "ServerGameTimer",
+	[654] = "ServerExperienceGaveOut",
+	[655] = "ServerReplicationDependency",
+	[656] = "ServerIsUnsummoning",
+	[657] = "ServerActivationGroupContainer",
+	[658] = "ServerAnubisTag",
+	[659] = "ServerDialogTag",
+	[660] = "ServerDisplayNameList",
+	[661] = "ServerIconList",
+	[662] = "ServerRaceTag",
+	[663] = "ServerTemplateTag",
+	[664] = "ServerBoostTag",
+	[665] = "ServerSafePosition",
+	[666] = "ServerAnubisExecutor",
+	[667] = "ServerLeader",
+	[668] = "ServerBreadcrumb",
+	[669] = "ServerPickpocket",
+	[670] = "ServerReplicationDependencyOwner",
+	[671] = "ServerGameplayLightEquipment",
+	[672] = "HistoryTargetUUID",
+	[673] = "ServerGameplayLightChanges",
+	[674] = "ServerPeersInRange",
+	[675] = "ServerSurface",
+	[676] = "ServerDisarmAttempt",
+	[677] = "ServerUnsheath",
+	[678] = "ServerUnsheathScriptOverride",
+	[679] = "ServerIsLightBlocker",
+	[680] = "ServerIsVisionBlocker",
+	[681] = "ServerDarknessActive",
+	[682] = "ServerHotbarOrder",
+	[683] = "ServerInventoryItemDataPopulated",
+	[684] = "ServerVariableManager",
+	[685] = "IsMarkedForDeletion",
+	[686] = "JumpFollow",
+	[687] = "ServerTemplateChangedEvent",
+	[688] = "ServerTemplateTransformedEvent",
+	[689] = "TagsChangedEvent",
+	[690] = "SummonCreatedEvent",
+	[691] = "SummonAddConcentrationRequest",
+	[692] = "SummonAddToExistingConcentrationRequest",
+	[693] = "SummonAttachToProjectileRequest",
+	[694] = "SummonOwnerSetEvent",
+	[695] = "SummonPlaceInInventoryRequest",
+	[696] = "SummonSetLifetimeRequest",
+	[697] = "SummonDespawnRequest",
+	[698] = "SummonExpiredRequest",
+	[699] = "SummonLateJoinPenalty",
+	[700] = "ServerToggledPassives",
+	[701] = "ServerPassiveBoosts",
+	[702] = "ServerPassiveBase",
+	[703] = "ServerPassivePersistentData",
+	[704] = "ServerScriptPassives",
+	[705] = "PassiveRequestTargetTracking",
+	[706] = "PassiveUpdateTargetTracking",
+	[707] = "PassiveConditionalRollInterruptEvent",
+	[708] = "PassivesUpdatedEvent",
+	[709] = "PasssiveUsageCountIncrementedEvent",
+	[710] = "Construction",
+	[711] = "ConstructionTile",
+	[712] = "ConstructionFilling",
+	[713] = "ServerCharacter",
+	[714] = "ServerItem",
+	[715] = "ProjectileSource",
+	[716] = "ServerProjectile",
+	[717] = "ServerProjectileAttachment",
+	[718] = "ServerProjectileSpell",
+	[719] = "ServerProjectileInitialization",
+	[720] = "ServerProjectileCache",
+	[721] = "ServerOsirisTag",
+	[722] = "ProjectileImpactEvent",
+	[723] = "ProjectileRequestTargetTracking",
+	[724] = "ProjectileUpdateTargetTracking",
+	[725] = "ProjectileSplitThrowableObjectRequest",
+	[726] = "ClientCharacterIconRequest",
+	[727] = "ClientCharacterIconResult",
+	[728] = "ClientCharacter",
+	[729] = "ClientItem",
+	[730] = "ClientProjectile",
+	[731] = "Scenery",
+	[732] = "RequestedRoll",
+	[733] = "RollInProgress",
+	[734] = "ServerRollFinishedEvent",
+	[735] = "RollModifiers",
+	[736] = "ServerRollInProgress",
+	[737] = "ServerRollStartRequest",
+	[738] = "ServerRollStartSpellRequest",
+	[739] = "ArmorClassBoost",
+	[740] = "AbilityBoost",
+	[741] = "RollBonusBoost",
+	[742] = "AdvantageBoost",
+	[743] = "ActionResourceValueBoost",
+	[744] = "CriticalHitBoost",
+	[745] = "AbilityFailedSavingThrowBoost",
+	[746] = "ResistanceBoost",
+	[747] = "WeaponDamageResistanceBoost",
+	[748] = "ProficiencyBonusOverrideBoost",
+	[749] = "JumpMaxDistanceMultiplierBoost",
+	[750] = "HalveWeaponDamageBoost",
+	[751] = "UnlockSpellBoost",
+	[752] = "SourceAdvantageBoost",
+	[753] = "ProficiencyBonusBoost",
+	[754] = "ProficiencyBoost",
+	[755] = "IncreaseMaxHPBoost",
+	[756] = "ActionResourceBlockBoost",
+	[757] = "StatusImmunityBoost",
+	[758] = "UseBoosts",
+	[759] = "CannotHarmCauseEntityBoost",
+	[760] = "TemporaryHPBoost",
+	[761] = "WeightBoost",
+	[762] = "WeightCategoryBoost",
+	[763] = "FactionOverrideBoost",
+	[764] = "ActionResourceMultiplierBoost",
+	[765] = "BlockRegainHPBoost",
+	[766] = "InitiativeBoost",
+	[767] = "DarkvisionRangeBoost",
+	[768] = "DarkvisionRangeMinBoost",
+	[769] = "DarkvisionRangeOverrideBoost",
+	[770] = "AddTagBoost",
+	[771] = "IgnoreDamageThresholdMinBoost",
+	[772] = "SkillBoost",
+	[773] = "WeaponDamageBoost",
+	[774] = "NullifyAbilityBoost",
+	[775] = "RerollBoost",
+	[776] = "DownedStatusBoost",
+	[777] = "WeaponEnchantmentBoost",
+	[778] = "GuaranteedChanceRollOutcomeBoost",
+	[779] = "AttributeBoost",
+	[780] = "GameplayLightBoost",
+	[781] = "DualWieldingBoost",
+	[782] = "SavantBoost",
+	[783] = "MinimumRollResultBoost",
+	[784] = "CharacterWeaponDamageBoost",
+	[785] = "ProjectileDeflectBoost",
+	[786] = "AbilityOverrideMinimumBoost",
+	[787] = "ACOverrideFormulaBoost",
+	[788] = "FallDamageMultiplierBoost",
+	[789] = "ActiveCharacterLightBoost",
+	[790] = "WeaponAttackTypeOverrideBoost",
+	[791] = "WeaponDamageDieOverrideBoost",
+	[792] = "CarryCapacityMultiplierBoost",
+	[793] = "WeaponPropertyBoost",
+	[794] = "WeaponAttackRollAbilityOverrideBoost",
+	[795] = "SightRangeAdditiveBoost",
+	[796] = "SightRangeMinimumBoost",
+	[797] = "SightRangeMaximumBoost",
+	[798] = "SightRangeOverrideBoost",
+	[799] = "MovementSpeedLimitBoost",
+	[800] = "UnlockSpellVariantBoost",
+	[801] = "DetectCrimesBlockBoost",
+	[802] = "BlockAbilityModifierFromACBoost",
+	[803] = "ScaleMultiplierBoost",
+	[804] = "DamageReductionBoost",
+	[805] = "ReduceCriticalAttackThresholdBoost",
+	[806] = "PhysicalForceRangeBonusBoost",
+	[807] = "ObjectSizeBoost",
+	[808] = "ObjectSizeOverrideBoost",
+	[809] = "AiArchetypeOverrideBoost",
+	[810] = "ExpertiseBonusBoost",
+	[811] = "EntityThrowDamageBoost",
+	[812] = "WeaponDamageTypeOverrideBoost",
+	[813] = "MaximizeHealingBoost",
+	[814] = "DamageBonusBoost",
+	[815] = "AdvanceSpellsBoost",
+	[816] = "SpellResistanceBoost",
+	[817] = "WeaponAttackRollBonusBoost",
+	[818] = "SpellSaveDCBoost",
+	[819] = "RedirectDamageBoost",
+	[820] = "CanSeeThroughBoost",
+	[821] = "CanShootThroughBoost",
+	[822] = "CanWalkThroughBoost",
+	[823] = "MonkWeaponDamageDiceOverrideBoost",
+	[824] = "HorizontalFOVOverrideBoost",
+	[825] = "CharacterUnarmedDamageBoost",
+	[826] = "ActionResourceReplenishTypeOverrideBoost",
+	[827] = "ActionResourcePreventReductionBoost",
+	[828] = "AttackSpellOverrideBoost",
+	[829] = "LockBoost",
+	[830] = "IgnorePointBlankDisadvantageBoost",
+	[831] = "CriticalHitExtraDiceBoost",
+	[832] = "DodgeAttackRollBoost",
+	[833] = "GameplayObscurityBoost",
+	[834] = "MaximumRollResultBoost",
+	[835] = "UnlockInterruptBoost",
+	[836] = "JumpMaxDistanceBonusBoost",
+	[837] = "ArmorAbilityModifierCapOverrideBoost",
+	[838] = "IgnoreResistanceBoost",
+	[839] = "ConcentrationIgnoreDamageBoost",
+	[840] = "IgnoreLowGroundPenaltyBoost",
+	[841] = "IgnoreSurfaceCoverBoost",
+	[842] = "ProficiencyBonusIncreaseBoost",
+	[843] = "DamageTakenBonusBoost",
+	[844] = "ReceivingCriticalDamageOnHitBoost",
+	[845] = "Uuid",
+	[846] = "UuidToHandleMapping",
+	[847] = "Max",
 }
 
 --- @enum ExtQueryType
@@ -21480,12 +24817,63 @@ Ext_Enums.ExtSystemType = {
 	ServerCastRequest = 4,
 	ServerSpell = 5,
 	ServerCombat = 6,
-	ServerActionResource = 7,
-	ServerBoost = 8,
-	ServerPassive = 9,
-	ServerRoll = 10,
-	ServerStats = 11,
-	Max = 12,
+	ServerTurnOrder = 7,
+	ServerActionResource = 8,
+	ServerBoost = 9,
+	ServerPassive = 10,
+	ServerRoll = 11,
+	ServerStats = 12,
+	ServerVisual = 13,
+	ServerSpellCooldown = 14,
+	ServerSpellLearning = 15,
+	ServerHit = 16,
+	ServerProgression = 17,
+	ServerInterruptDecision = 18,
+	ServerInterruptRequests = 19,
+	ServerInterruptManagement = 20,
+	ServerSummonSpawn = 21,
+	ServerSummonDespawn = 22,
+	ServerCapabilities = 23,
+	ServerTemplateChange = 24,
+	ServerConcentration = 25,
+	ServerExperience = 26,
+	ServerShortRest = 27,
+	ServerLongRest = 28,
+	ServerFTBZone = 29,
+	ServerStatusRequest = 30,
+	ServerInventoryCanPlace = 31,
+	ServerInventoryReceivalNotification = 32,
+	ServerInventoryEquipment = 33,
+	ServerInventoryInteractionRequest = 34,
+	ServerInventoryInteraction = 35,
+	ServerInventoryLocking = 36,
+	ServerMagicPocketsTracking = 37,
+	ServerInventoryManagement = 38,
+	ServerNewInventoryMember = 39,
+	ServerInventoryStack = 40,
+	ServerTradeBuyback = 41,
+	ServerTreasureGeneration = 42,
+	ServerGod = 43,
+	ServerRestore = 44,
+	ServerBodyType = 45,
+	ServerDualWielding = 46,
+	ServerFalling = 47,
+	ServerDisplayName = 48,
+	ServerGravity = 49,
+	ServerLeader = 50,
+	ServerPartyTeleport = 51,
+	ServerPingRequest = 52,
+	ServerPlatform = 53,
+	ServerRating = 54,
+	ServerAttitude = 55,
+	ServerParty = 56,
+	ClientEquipmentVisuals = 57,
+	ClientVisual = 58,
+	ClientCharacterIconRender = 59,
+	ClientCharacterManager = 60,
+	ClientVisualsVisibilityState = 61,
+	SoundRouting = 62,
+	Max = 63,
 	[0] = "PickingHelper",
 	[1] = "ServerDialog",
 	[2] = "AnimationBlueprint",
@@ -21493,12 +24881,63 @@ Ext_Enums.ExtSystemType = {
 	[4] = "ServerCastRequest",
 	[5] = "ServerSpell",
 	[6] = "ServerCombat",
-	[7] = "ServerActionResource",
-	[8] = "ServerBoost",
-	[9] = "ServerPassive",
-	[10] = "ServerRoll",
-	[11] = "ServerStats",
-	[12] = "Max",
+	[7] = "ServerTurnOrder",
+	[8] = "ServerActionResource",
+	[9] = "ServerBoost",
+	[10] = "ServerPassive",
+	[11] = "ServerRoll",
+	[12] = "ServerStats",
+	[13] = "ServerVisual",
+	[14] = "ServerSpellCooldown",
+	[15] = "ServerSpellLearning",
+	[16] = "ServerHit",
+	[17] = "ServerProgression",
+	[18] = "ServerInterruptDecision",
+	[19] = "ServerInterruptRequests",
+	[20] = "ServerInterruptManagement",
+	[21] = "ServerSummonSpawn",
+	[22] = "ServerSummonDespawn",
+	[23] = "ServerCapabilities",
+	[24] = "ServerTemplateChange",
+	[25] = "ServerConcentration",
+	[26] = "ServerExperience",
+	[27] = "ServerShortRest",
+	[28] = "ServerLongRest",
+	[29] = "ServerFTBZone",
+	[30] = "ServerStatusRequest",
+	[31] = "ServerInventoryCanPlace",
+	[32] = "ServerInventoryReceivalNotification",
+	[33] = "ServerInventoryEquipment",
+	[34] = "ServerInventoryInteractionRequest",
+	[35] = "ServerInventoryInteraction",
+	[36] = "ServerInventoryLocking",
+	[37] = "ServerMagicPocketsTracking",
+	[38] = "ServerInventoryManagement",
+	[39] = "ServerNewInventoryMember",
+	[40] = "ServerInventoryStack",
+	[41] = "ServerTradeBuyback",
+	[42] = "ServerTreasureGeneration",
+	[43] = "ServerGod",
+	[44] = "ServerRestore",
+	[45] = "ServerBodyType",
+	[46] = "ServerDualWielding",
+	[47] = "ServerFalling",
+	[48] = "ServerDisplayName",
+	[49] = "ServerGravity",
+	[50] = "ServerLeader",
+	[51] = "ServerPartyTeleport",
+	[52] = "ServerPingRequest",
+	[53] = "ServerPlatform",
+	[54] = "ServerRating",
+	[55] = "ServerAttitude",
+	[56] = "ServerParty",
+	[57] = "ClientEquipmentVisuals",
+	[58] = "ClientVisual",
+	[59] = "ClientCharacterIconRender",
+	[60] = "ClientCharacterManager",
+	[61] = "ClientVisualsVisibilityState",
+	[62] = "SoundRouting",
+	[63] = "Max",
 }
 
 --- @enum FleeErrorFlags
@@ -21593,6 +25032,16 @@ Ext_Enums.Gender = {
 	Female = 1,
 	[0] = "Male",
 	[1] = "Female",
+}
+
+--- @enum GravityType
+Ext_Enums.GravityType = {
+	Enabled = 0,
+	Disabled = 1,
+	DisabledUntilMove = 2,
+	[0] = "Enabled",
+	[1] = "Disabled",
+	[2] = "DisabledUntilMove",
 }
 
 --- @enum GuiButtonFlags
@@ -21744,55 +25193,55 @@ Ext_Enums.GuiColor = {
 --- @enum GuiColorEditFlags
 Ext_Enums.GuiColorEditFlags = {
 	AlphaPreview = 0,
-	AlphaPreview = 2,
-	AlphaPreview = 4,
-	AlphaPreview = 8,
-	AlphaPreview = 16,
-	AlphaPreview = 32,
-	AlphaPreview = 64,
-	AlphaPreview = 128,
-	AlphaPreview = 256,
-	AlphaPreview = 512,
-	AlphaPreview = 1024,
+	NoAlpha = 2,
+	NoPicker = 4,
+	NoOptions = 8,
+	NoSmallPreview = 16,
+	NoInputs = 32,
+	NoTooltip = 64,
+	NoLabel = 128,
+	NoSidePreview = 256,
+	NoDragDrop = 512,
+	NoBorder = 1024,
 	AlphaOpaque = 2048,
-	AlphaPreview = 4096,
-	AlphaPreview = 8192,
-	AlphaPreview = 65536,
-	AlphaPreview = 524288,
-	AlphaPreview = 1048576,
-	AlphaPreview = 2097152,
-	AlphaPreview = 4194304,
-	AlphaPreview = 8388608,
-	AlphaPreview = 16777216,
-	AlphaPreview = 33554432,
-	AlphaPreview = 67108864,
-	AlphaPreview = 134217728,
-	AlphaPreview = 268435456,
+	AlphaNoBg = 4096,
+	AlphaPreviewHalf = 8192,
+	AlphaBar = 65536,
+	HDR = 524288,
+	DisplayRGB = 1048576,
+	DisplayHSV = 2097152,
+	DisplayHex = 4194304,
+	Uint8 = 8388608,
+	Float = 16777216,
+	PickerHueBar = 33554432,
+	PickerHueWheel = 67108864,
+	InputRGB = 134217728,
+	InputHSV = 268435456,
 	[0] = "AlphaPreview",
-	[2] = "AlphaPreview",
-	[4] = "AlphaPreview",
-	[8] = "AlphaPreview",
-	[16] = "AlphaPreview",
-	[32] = "AlphaPreview",
-	[64] = "AlphaPreview",
-	[128] = "AlphaPreview",
-	[256] = "AlphaPreview",
-	[512] = "AlphaPreview",
-	[1024] = "AlphaPreview",
+	[2] = "NoAlpha",
+	[4] = "NoPicker",
+	[8] = "NoOptions",
+	[16] = "NoSmallPreview",
+	[32] = "NoInputs",
+	[64] = "NoTooltip",
+	[128] = "NoLabel",
+	[256] = "NoSidePreview",
+	[512] = "NoDragDrop",
+	[1024] = "NoBorder",
 	[2048] = "AlphaOpaque",
-	[4096] = "AlphaPreview",
-	[8192] = "AlphaPreview",
-	[65536] = "AlphaPreview",
-	[524288] = "AlphaPreview",
-	[1048576] = "AlphaPreview",
-	[2097152] = "AlphaPreview",
-	[4194304] = "AlphaPreview",
-	[8388608] = "AlphaPreview",
-	[16777216] = "AlphaPreview",
-	[33554432] = "AlphaPreview",
-	[67108864] = "AlphaPreview",
-	[134217728] = "AlphaPreview",
-	[268435456] = "AlphaPreview",
+	[4096] = "AlphaNoBg",
+	[8192] = "AlphaPreviewHalf",
+	[65536] = "AlphaBar",
+	[524288] = "HDR",
+	[1048576] = "DisplayRGB",
+	[2097152] = "DisplayHSV",
+	[4194304] = "DisplayHex",
+	[8388608] = "Uint8",
+	[16777216] = "Float",
+	[33554432] = "PickerHueBar",
+	[67108864] = "PickerHueWheel",
+	[134217728] = "InputRGB",
+	[268435456] = "InputHSV",
 }
 
 --- @enum GuiComboFlags
@@ -21997,7 +25446,7 @@ Ext_Enums.GuiSliderFlags = {
 	WrapAround = 256,
 	ClampOnInput = 512,
 	ClampZeroRange = 1024,
-	ClampZeroRange = 1536,
+	AlwaysClamp = 1536,
 	NoSpeedTweaks = 2048,
 	[32] = "Logarithmic",
 	[64] = "NoRoundToFormat",
@@ -22005,7 +25454,7 @@ Ext_Enums.GuiSliderFlags = {
 	[256] = "WrapAround",
 	[512] = "ClampOnInput",
 	[1024] = "ClampZeroRange",
-	[1536] = "ClampZeroRange",
+	[1536] = "AlwaysClamp",
 	[2048] = "NoSpeedTweaks",
 }
 
@@ -22188,18 +25637,18 @@ Ext_Enums.GuiTableFlags = {
 	RowBg = 64,
 	BordersInnerH = 128,
 	BordersOuterH = 256,
-	BordersOuterH = 384,
+	BordersH = 384,
 	BordersInnerV = 512,
-	BordersInnerV = 640,
+	BordersInner = 640,
 	BordersOuterV = 1024,
-	BordersOuterH = 1280,
-	BordersInnerV = 1536,
-	BordersInnerV = 1920,
+	BordersOuter = 1280,
+	BordersV = 1536,
+	Borders = 1920,
 	NoBordersInBody = 2048,
 	NoBordersInBodyUntilResize = 4096,
 	SizingFixedFit = 8192,
 	SizingFixedSame = 16384,
-	SizingFixedSame = 24576,
+	SizingStretchProp = 24576,
 	SizingStretchSame = 32768,
 	NoHostExtendX = 65536,
 	NoHostExtendY = 131072,
@@ -22223,18 +25672,18 @@ Ext_Enums.GuiTableFlags = {
 	[64] = "RowBg",
 	[128] = "BordersInnerH",
 	[256] = "BordersOuterH",
-	[384] = "BordersOuterH",
+	[384] = "BordersH",
 	[512] = "BordersInnerV",
-	[640] = "BordersInnerV",
+	[640] = "BordersInner",
 	[1024] = "BordersOuterV",
-	[1280] = "BordersOuterH",
-	[1536] = "BordersInnerV",
-	[1920] = "BordersInnerV",
+	[1280] = "BordersOuter",
+	[1536] = "BordersV",
+	[1920] = "Borders",
 	[2048] = "NoBordersInBody",
 	[4096] = "NoBordersInBodyUntilResize",
 	[8192] = "SizingFixedFit",
 	[16384] = "SizingFixedSame",
-	[24576] = "SizingFixedSame",
+	[24576] = "SizingStretchProp",
 	[32768] = "SizingStretchSame",
 	[65536] = "NoHostExtendX",
 	[131072] = "NoHostExtendY",
@@ -22264,7 +25713,7 @@ Ext_Enums.GuiTreeNodeFlags = {
 	AllowOverlap = 4,
 	NoTreePushOnOpen = 8,
 	NoAutoOpenOnLog = 16,
-	Framed = 26,
+	CollapsingHeader = 26,
 	DefaultOpen = 32,
 	OpenOnDoubleClick = 64,
 	OpenOnArrow = 128,
@@ -22281,7 +25730,7 @@ Ext_Enums.GuiTreeNodeFlags = {
 	[4] = "AllowOverlap",
 	[8] = "NoTreePushOnOpen",
 	[16] = "NoAutoOpenOnLog",
-	[26] = "Framed",
+	[26] = "CollapsingHeader",
 	[32] = "DefaultOpen",
 	[64] = "OpenOnDoubleClick",
 	[128] = "OpenOnArrow",
@@ -22303,7 +25752,7 @@ Ext_Enums.GuiWindowFlags = {
 	NoScrollbar = 8,
 	NoScrollWithMouse = 16,
 	NoCollapse = 32,
-	NoResize = 43,
+	NoDecoration = 43,
 	AlwaysAutoResize = 64,
 	NoBackground = 128,
 	NoSavedSettings = 256,
@@ -22316,8 +25765,8 @@ Ext_Enums.GuiWindowFlags = {
 	AlwaysHorizontalScrollbar = 32768,
 	NoNavInputs = 65536,
 	NoNavFocus = 131072,
-	NoNavFocus = 196608,
-	NoNavFocus = 197120,
+	NoNav = 196608,
+	NoInputs = 197120,
 	UnsavedDocument = 262144,
 	[1] = "NoTitleBar",
 	[2] = "NoResize",
@@ -22325,7 +25774,7 @@ Ext_Enums.GuiWindowFlags = {
 	[8] = "NoScrollbar",
 	[16] = "NoScrollWithMouse",
 	[32] = "NoCollapse",
-	[43] = "NoResize",
+	[43] = "NoDecoration",
 	[64] = "AlwaysAutoResize",
 	[128] = "NoBackground",
 	[256] = "NoSavedSettings",
@@ -22338,8 +25787,8 @@ Ext_Enums.GuiWindowFlags = {
 	[32768] = "AlwaysHorizontalScrollbar",
 	[65536] = "NoNavInputs",
 	[131072] = "NoNavFocus",
-	[196608] = "NoNavFocus",
-	[197120] = "NoNavFocus",
+	[196608] = "NoNav",
+	[197120] = "NoInputs",
 	[262144] = "UnsavedDocument",
 }
 
@@ -22437,6 +25886,14 @@ Ext_Enums.HitWith = {
 	[9] = "CrushByFall",
 	[10] = "Unknown10",
 	[11] = "Unknown11",
+}
+
+--- @enum IdentityType
+Ext_Enums.IdentityType = {
+	Male = 0,
+	Female = 1,
+	[0] = "Male",
+	[1] = "Female",
 }
 
 --- @enum IngredientTransformType
@@ -22879,6 +26336,54 @@ Ext_Enums.InputType = {
 	[64] = "ClearOnRelease",
 }
 
+--- @enum InterruptRequestSource
+Ext_Enums.InterruptRequestSource = {
+	Boost = 0,
+	Debug = 1,
+	LearnedSpell = 2,
+	[0] = "Boost",
+	[1] = "Debug",
+	[2] = "LearnedSpell",
+}
+
+--- @enum InventoryLockChange
+Ext_Enums.InventoryLockChange = {
+	Lock = 0,
+	Unlock = 1,
+	Toggle = 2,
+	[0] = "Lock",
+	[1] = "Unlock",
+	[2] = "Toggle",
+}
+
+--- @enum InventoryType
+Ext_Enums.InventoryType = {
+	Main = 0,
+	Equipment = 1,
+	Trade = 2,
+	Reward = 3,
+	KeyChainTest = 4,
+	PotionBeltTest = 5,
+	Other = 6,
+	[0] = "Main",
+	[1] = "Equipment",
+	[2] = "Trade",
+	[3] = "Reward",
+	[4] = "KeyChainTest",
+	[5] = "PotionBeltTest",
+	[6] = "Other",
+}
+
+--- @enum IsTradableType
+Ext_Enums.IsTradableType = {
+	Default = 0,
+	Tradable = 1,
+	NonTradable = 2,
+	[0] = "Default",
+	[1] = "Tradable",
+	[2] = "NonTradable",
+}
+
 --- @enum ItemDataRarity
 Ext_Enums.ItemDataRarity = {
 	Common = 0,
@@ -22963,6 +26468,68 @@ Ext_Enums.ItemUseType = {
 	[5] = "Potion",
 	[6] = "Throwable",
 	[7] = "Consumable",
+}
+
+--- @enum LongRestState
+Ext_Enums.LongRestState = {
+	Created = 0,
+	Validation = 1,
+	RestTypeRequest = 2,
+	ScriptPhaseStart = 3,
+	ScriptPhaseRequested = 4,
+	ScriptPhasePending = 5,
+	ScriptPhaseTimeout = 6,
+	ScriptPhaseDenied = 7,
+	Cancelled = 8,
+	Finished = 9,
+	ReadyForDelete = 10,
+	[0] = "Created",
+	[1] = "Validation",
+	[2] = "RestTypeRequest",
+	[3] = "ScriptPhaseStart",
+	[4] = "ScriptPhaseRequested",
+	[5] = "ScriptPhasePending",
+	[6] = "ScriptPhaseTimeout",
+	[7] = "ScriptPhaseDenied",
+	[8] = "Cancelled",
+	[9] = "Finished",
+	[10] = "ReadyForDelete",
+}
+
+--- @enum LongRestType
+Ext_Enums.LongRestType = {
+	None = 0,
+	Full = 1,
+	Exhausted = 2,
+	CanceledByOwner = 3,
+	CanceledByObserver = 4,
+	CantRest = 5,
+	[0] = "None",
+	[1] = "Full",
+	[2] = "Exhausted",
+	[3] = "CanceledByOwner",
+	[4] = "CanceledByObserver",
+	[5] = "CantRest",
+}
+
+--- @enum LongRestUserState
+Ext_Enums.LongRestUserState = {
+	Initial = 0,
+	StartingRest = 1,
+	RequestingData = 2,
+	Resting = 3,
+	WaitingConfirmation = 4,
+	WaitingOthers = 5,
+	Finishing = 6,
+	Finished = 7,
+	[0] = "Initial",
+	[1] = "StartingRest",
+	[2] = "RequestingData",
+	[3] = "Resting",
+	[4] = "WaitingConfirmation",
+	[5] = "WaitingOthers",
+	[6] = "Finishing",
+	[7] = "Finished",
 }
 
 --- @enum LuaTypeId
@@ -24113,12 +27680,12 @@ Ext_Enums.NsManipulationModes = {
 Ext_Enums.NsModifierKeys = {
 	ModifierKeys_Alt = 0,
 	ModifierKeys_Control = 1,
-	ModifierKeys_Alt = 2,
-	ModifierKeys_Control = 3,
+	ModifierKeys_Shift = 2,
+	ModifierKeys_Windows = 3,
 	[0] = "ModifierKeys_Alt",
 	[1] = "ModifierKeys_Control",
-	[2] = "ModifierKeys_Alt",
-	[3] = "ModifierKeys_Control",
+	[2] = "ModifierKeys_Shift",
+	[3] = "ModifierKeys_Windows",
 }
 
 --- @enum NsMouseAction
@@ -24249,6 +27816,28 @@ Ext_Enums.OsirisTaskType = {
 	[24] = "FleeFromRelation",
 	[25] = "FleeFromEntity",
 	[26] = "Combine",
+}
+
+--- @enum PassiveSourceType
+Ext_Enums.PassiveSourceType = {
+	Feat = 0,
+	Progression = 1,
+	Progression2 = 2,
+	Status = 3,
+	Equipment = 4,
+	Stats = 5,
+	Tadpole = 6,
+	Script = 7,
+	Debug = 8,
+	[0] = "Feat",
+	[1] = "Progression",
+	[2] = "Progression2",
+	[3] = "Status",
+	[4] = "Equipment",
+	[5] = "Stats",
+	[6] = "Tadpole",
+	[7] = "Script",
+	[8] = "Debug",
 }
 
 --- @enum PathRootType
@@ -24701,6 +28290,24 @@ Ext_Enums.ResourceReplenishType = {
 	[16] = "ShortRest",
 	[32] = "FullRest",
 	[64] = "ExhaustedRest",
+}
+
+--- @enum RestCancelReason
+Ext_Enums.RestCancelReason = {
+	None = 0,
+	Validation = 1,
+	Script = 2,
+	RestTypeSelectionCanceled = 3,
+	ValidationChangedDuringSelection = 4,
+	AnotherPlayerCanceled = 5,
+	ForcedCancelOnLoad = 6,
+	[0] = "None",
+	[1] = "Validation",
+	[2] = "Script",
+	[3] = "RestTypeSelectionCanceled",
+	[4] = "ValidationChangedDuringSelection",
+	[5] = "AnotherPlayerCanceled",
+	[6] = "ForcedCancelOnLoad",
 }
 
 --- @enum RestErrorFlags
@@ -25581,6 +29188,36 @@ Ext_Enums.ServerCharacterFlags3 = {
 	[16] = "TreasureEquip",
 }
 
+--- @enum ServerConcentrationRequestType
+Ext_Enums.ServerConcentrationRequestType = {
+	RemoveTarget = 1,
+	AddTarget = 2,
+	[1] = "RemoveTarget",
+	[2] = "AddTarget",
+}
+
+--- @enum ServerDestroyStatusRequestType
+Ext_Enums.ServerDestroyStatusRequestType = {
+	StatusType = 0,
+	StatusID = 1,
+	StatusEntity = 3,
+	StatusHandle = 4,
+	SourceEquippedItem = 5,
+	RestingEntityInventory = 6,
+	Death = 7,
+	Cause = 8,
+	DifficultyStatus = 9,
+	[0] = "StatusType",
+	[1] = "StatusID",
+	[3] = "StatusEntity",
+	[4] = "StatusHandle",
+	[5] = "SourceEquippedItem",
+	[6] = "RestingEntityInventory",
+	[7] = "Death",
+	[8] = "Cause",
+	[9] = "DifficultyStatus",
+}
+
 --- @enum ServerGameState
 Ext_Enums.ServerGameState = {
 	Unknown = 0,
@@ -25763,6 +29400,168 @@ Ext_Enums.ServerMovementType = {
 	[7] = "Repose",
 }
 
+--- @enum ServerSpellCastSystemEventType
+Ext_Enums.ServerSpellCastSystemEventType = {
+	Finish = 0,
+	FinishRemove = 1,
+	PreparationStart = 2,
+	PreparationEnd = 3,
+	LogicExecutionStart = 4,
+	LogicExecutionStartRemove = 5,
+	LogicExecutionEnd = 6,
+	MoveDuringCastInitialize = 7,
+	MoveDuringCastStart = 8,
+	MoveDuringCastUpdate = 9,
+	MoveDuringCastEnd = 10,
+	TargetHit = 11,
+	TargetHitRemove = 12,
+	TargetHitInterruptRemove = 13,
+	Cast = 14,
+	CastRemove = 15,
+	CastHit = 16,
+	CastHitRemove = 17,
+	CastTextKey = 18,
+	CastTextKeyRemove = 19,
+	CastTextKeyIndexIncrease = 20,
+	WeaponSetRequest = 21,
+	IsCastingRemove = 22,
+	DestroySpellCastEntity = 23,
+	DestroyEventRemove = 24,
+	JumpStart = 25,
+	PlayAnimation = 26,
+	MovementEnd = 27,
+	TargetReactionRemove = 28,
+	TargetsChanged = 29,
+	AddProjectileCache = 30,
+	AddZoneRange = 31,
+	AddSharedMovement = 32,
+	AddServerMovement = 33,
+	AddMovementInfo = 34,
+	PreviewEnd = 35,
+	CounteredSpellCast = 36,
+	SpellRollAbort = 37,
+	PrecalculationEnd = 38,
+	PrecalculatedConditionals = 39,
+	ThrowPickupPositionChanged = 40,
+	PhaseChange = 41,
+	CacheFlagChange = 42,
+	UseCostsChange = 43,
+	InitializeRolls = 44,
+	AdvanceRoll = 45,
+	AdvanceReaction = 46,
+	FireProjectile = 47,
+	ChangeProjectileDelayTimer = 48,
+	PopDelayedProjectile = 49,
+	InitializeIntermediateTargets = 50,
+	ChangeCastHitDelayTimer = 51,
+	AddDelayedCastHit = 52,
+	PopDelayedCastHit = 53,
+	ChangeCastPosition = 54,
+	ChangeCastEndPosition = 55,
+	ChangeMovementTransactionID = 56,
+	CreateZone = 57,
+	DoTeleport = 58,
+	CreateWall = 59,
+	CastOptionsChange = 60,
+	TargetsChange = 61,
+	PathfindRequest = 62,
+	PathfindResults = 63,
+	PathfindCleanup = 64,
+	ChangeStoryActionId = 65,
+	InterruptStart = 66,
+	InterruptEventChange = 67,
+	InterruptApplyResult = 68,
+	AdvanceInterruptAnimationIndex = 69,
+	InterruptEnd = 70,
+	PrecalculatedInterruptors = 71,
+	PushPausedAnimationEvents = 72,
+	PurgePausedAnimationEvents = 73,
+	ZoneRangeUpdate = 74,
+	UpdateConditionals = 75,
+	UpdateInterruptors = 76,
+	LogicExecutionUpdate = 77,
+	PreparationStarting = 78,
+	[0] = "Finish",
+	[1] = "FinishRemove",
+	[2] = "PreparationStart",
+	[3] = "PreparationEnd",
+	[4] = "LogicExecutionStart",
+	[5] = "LogicExecutionStartRemove",
+	[6] = "LogicExecutionEnd",
+	[7] = "MoveDuringCastInitialize",
+	[8] = "MoveDuringCastStart",
+	[9] = "MoveDuringCastUpdate",
+	[10] = "MoveDuringCastEnd",
+	[11] = "TargetHit",
+	[12] = "TargetHitRemove",
+	[13] = "TargetHitInterruptRemove",
+	[14] = "Cast",
+	[15] = "CastRemove",
+	[16] = "CastHit",
+	[17] = "CastHitRemove",
+	[18] = "CastTextKey",
+	[19] = "CastTextKeyRemove",
+	[20] = "CastTextKeyIndexIncrease",
+	[21] = "WeaponSetRequest",
+	[22] = "IsCastingRemove",
+	[23] = "DestroySpellCastEntity",
+	[24] = "DestroyEventRemove",
+	[25] = "JumpStart",
+	[26] = "PlayAnimation",
+	[27] = "MovementEnd",
+	[28] = "TargetReactionRemove",
+	[29] = "TargetsChanged",
+	[30] = "AddProjectileCache",
+	[31] = "AddZoneRange",
+	[32] = "AddSharedMovement",
+	[33] = "AddServerMovement",
+	[34] = "AddMovementInfo",
+	[35] = "PreviewEnd",
+	[36] = "CounteredSpellCast",
+	[37] = "SpellRollAbort",
+	[38] = "PrecalculationEnd",
+	[39] = "PrecalculatedConditionals",
+	[40] = "ThrowPickupPositionChanged",
+	[41] = "PhaseChange",
+	[42] = "CacheFlagChange",
+	[43] = "UseCostsChange",
+	[44] = "InitializeRolls",
+	[45] = "AdvanceRoll",
+	[46] = "AdvanceReaction",
+	[47] = "FireProjectile",
+	[48] = "ChangeProjectileDelayTimer",
+	[49] = "PopDelayedProjectile",
+	[50] = "InitializeIntermediateTargets",
+	[51] = "ChangeCastHitDelayTimer",
+	[52] = "AddDelayedCastHit",
+	[53] = "PopDelayedCastHit",
+	[54] = "ChangeCastPosition",
+	[55] = "ChangeCastEndPosition",
+	[56] = "ChangeMovementTransactionID",
+	[57] = "CreateZone",
+	[58] = "DoTeleport",
+	[59] = "CreateWall",
+	[60] = "CastOptionsChange",
+	[61] = "TargetsChange",
+	[62] = "PathfindRequest",
+	[63] = "PathfindResults",
+	[64] = "PathfindCleanup",
+	[65] = "ChangeStoryActionId",
+	[66] = "InterruptStart",
+	[67] = "InterruptEventChange",
+	[68] = "InterruptApplyResult",
+	[69] = "AdvanceInterruptAnimationIndex",
+	[70] = "InterruptEnd",
+	[71] = "PrecalculatedInterruptors",
+	[72] = "PushPausedAnimationEvents",
+	[73] = "PurgePausedAnimationEvents",
+	[74] = "ZoneRangeUpdate",
+	[75] = "UpdateConditionals",
+	[76] = "UpdateInterruptors",
+	[77] = "LogicExecutionUpdate",
+	[78] = "PreparationStarting",
+}
+
 --- @enum ServerStatusFlags
 Ext_Enums.ServerStatusFlags = {
 	ForceStatus = 1,
@@ -25941,12 +29740,56 @@ Ext_Enums.SkillId = {
 	[19] = "Sentinel",
 }
 
+--- @enum SoundEventFlags
+Ext_Enums.SoundEventFlags = {
+	SoundCache = 1,
+	UnloadCallback = 2,
+	WaitForLoad = 4,
+	EnableGetSourcePlayPosition = 8,
+	[1] = "SoundCache",
+	[2] = "UnloadCallback",
+	[4] = "WaitForLoad",
+	[8] = "EnableGetSourcePlayPosition",
+}
+
+--- @enum SoundEventType
+Ext_Enums.SoundEventType = {
+	Sound = 0,
+	Music = 1,
+	Ambient = 2,
+	HUD = 3,
+	CineHUD = 4,
+	[0] = "Sound",
+	[1] = "Music",
+	[2] = "Ambient",
+	[3] = "HUD",
+	[4] = "CineHUD",
+}
+
 --- @enum SourceAdvantageType
 Ext_Enums.SourceAdvantageType = {
+	None = 0,
 	SourceAdvantageOnAttack = 1,
 	SourceAllyAdvantageOnAttack = 2,
+	[0] = "None",
 	[1] = "SourceAdvantageOnAttack",
 	[2] = "SourceAllyAdvantageOnAttack",
+}
+
+--- @enum SpellAnimationCastEvent
+Ext_Enums.SpellAnimationCastEvent = {
+	Prepare = 0,
+	Cast = 1,
+	CastContinue = 2,
+	Cancel = 3,
+	Finished = 4,
+	TargetingInfo = 5,
+	[0] = "Prepare",
+	[1] = "Cast",
+	[2] = "CastContinue",
+	[3] = "Cancel",
+	[4] = "Finished",
+	[5] = "TargetingInfo",
 }
 
 --- @enum SpellAttackType
@@ -25985,6 +29828,154 @@ Ext_Enums.SpellAttackTypeOverride = {
 	[2] = "Projectile_MainHandAttack",
 	[3] = "Projectile_OffhandAttack",
 	[4] = "Target_UnarmedAttack",
+}
+
+--- @enum SpellCastFailReason
+Ext_Enums.SpellCastFailReason = {
+	None = 0,
+	Canceled = 2,
+	InvalidSpell = 3,
+	MissingTarget = 4,
+	CantCast = 5,
+	InvalidTarget = 6,
+	CantUseSource = 7,
+	CantSpendUseCosts = 8,
+	MissingAnimations = 9,
+	MissingTargetPosition = 10,
+	TooManyTargets = 11,
+	TooFewTargets = 12,
+	MissingCaster = 13,
+	DeadTarget = 14,
+	EqualTargets = 15,
+	CantFindCastPosition = 16,
+	BlockedRequiredMove = 17,
+	InvalidCastPosition = 18,
+	CantMove = 19,
+	MovementFailed = 20,
+	ServerTimeout = 21,
+	DeadCaster = 22,
+	Countered = 23,
+	SpellRollFailure = 24,
+	UnsheathFailure = 25,
+	[0] = "None",
+	[2] = "Canceled",
+	[3] = "InvalidSpell",
+	[4] = "MissingTarget",
+	[5] = "CantCast",
+	[6] = "InvalidTarget",
+	[7] = "CantUseSource",
+	[8] = "CantSpendUseCosts",
+	[9] = "MissingAnimations",
+	[10] = "MissingTargetPosition",
+	[11] = "TooManyTargets",
+	[12] = "TooFewTargets",
+	[13] = "MissingCaster",
+	[14] = "DeadTarget",
+	[15] = "EqualTargets",
+	[16] = "CantFindCastPosition",
+	[17] = "BlockedRequiredMove",
+	[18] = "InvalidCastPosition",
+	[19] = "CantMove",
+	[20] = "MovementFailed",
+	[21] = "ServerTimeout",
+	[22] = "DeadCaster",
+	[23] = "Countered",
+	[24] = "SpellRollFailure",
+	[25] = "UnsheathFailure",
+}
+
+--- @enum SpellCastOptions
+Ext_Enums.SpellCastOptions = {
+	IgnoreHasSpell = 1,
+	IgnoreCastChecks = 2,
+	IgnoreSpellRolls = 4,
+	IsReaction = 8,
+	NoMovement = 16,
+	AvoidAoO = 32,
+	DestroySource = 64,
+	Immediate = 128,
+	Silent = 256,
+	IgnoreTargetChecks = 512,
+	IsPreview = 1024,
+	IsHoverPreview = 2048,
+	ShowPrepareAnimation = 4096,
+	Forced = 8192,
+	IsRoll = 16384,
+	IsInterrupt = 32768,
+	FromClient = 65536,
+	NoUnsheath = 131072,
+	CheckProjectileTargets = 262144,
+	AvoidDangerousAuras = 524288,
+	Unknown100000 = 1048576,
+	[1] = "IgnoreHasSpell",
+	[2] = "IgnoreCastChecks",
+	[4] = "IgnoreSpellRolls",
+	[8] = "IsReaction",
+	[16] = "NoMovement",
+	[32] = "AvoidAoO",
+	[64] = "DestroySource",
+	[128] = "Immediate",
+	[256] = "Silent",
+	[512] = "IgnoreTargetChecks",
+	[1024] = "IsPreview",
+	[2048] = "IsHoverPreview",
+	[4096] = "ShowPrepareAnimation",
+	[8192] = "Forced",
+	[16384] = "IsRoll",
+	[32768] = "IsInterrupt",
+	[65536] = "FromClient",
+	[131072] = "NoUnsheath",
+	[262144] = "CheckProjectileTargets",
+	[524288] = "AvoidDangerousAuras",
+	[1048576] = "Unknown100000",
+}
+
+--- @enum SpellCastPhase
+Ext_Enums.SpellCastPhase = {
+	None = 0,
+	ValidationStart = 1,
+	ValidationFindCastPosition = 2,
+	ValidationFindCastEndPosition = 3,
+	ValidationPathfind = 4,
+	ValidationFinished = 5,
+	MovementStart = 6,
+	MovementUpdate = 7,
+	MovementSteering = 8,
+	MovementFinished = 9,
+	PrecalculationStart = 10,
+	PrecalculationFinished = 11,
+	PrepareStart = 12,
+	PrepareUpdate = 13,
+	PrepareEnd = 14,
+	PrepareFinished = 15,
+	LogicExecutionStart = 16,
+	LogicExecutionUpdate = 17,
+	LogicExecutionInterrupted = 18,
+	LogicExecutionEnd = 19,
+	LogicExecutionFinished = 20,
+	Finished = 21,
+	[0] = "None",
+	[1] = "ValidationStart",
+	[2] = "ValidationFindCastPosition",
+	[3] = "ValidationFindCastEndPosition",
+	[4] = "ValidationPathfind",
+	[5] = "ValidationFinished",
+	[6] = "MovementStart",
+	[7] = "MovementUpdate",
+	[8] = "MovementSteering",
+	[9] = "MovementFinished",
+	[10] = "PrecalculationStart",
+	[11] = "PrecalculationFinished",
+	[12] = "PrepareStart",
+	[13] = "PrepareUpdate",
+	[14] = "PrepareEnd",
+	[15] = "PrepareFinished",
+	[16] = "LogicExecutionStart",
+	[17] = "LogicExecutionUpdate",
+	[18] = "LogicExecutionInterrupted",
+	[19] = "LogicExecutionEnd",
+	[20] = "LogicExecutionFinished",
+	[21] = "Finished",
 }
 
 --- @enum SpellCooldownType
@@ -27481,6 +31472,16 @@ Ext_Enums.TravelFlags = {
 	[2] = "BlockCampTravel",
 }
 
+--- @enum UnequipType
+Ext_Enums.UnequipType = {
+	ToParentInventory = 0,
+	ToParentOrCreatedInventory = 1,
+	SwapHands = 2,
+	[0] = "ToParentInventory",
+	[1] = "ToParentOrCreatedInventory",
+	[2] = "SwapHands",
+}
+
 --- @enum VisualAttachmentFlags
 Ext_Enums.VisualAttachmentFlags = {
 	ExcludeFromBounds = 1,
@@ -27645,6 +31646,16 @@ Ext_Enums.WeaponFlags = {
 	[1048576] = "AddToHotbar",
 }
 
+--- @enum WeaponSetType
+Ext_Enums.WeaponSetType = {
+	Melee = 0,
+	Ranged = 1,
+	Unknown = 2,
+	[0] = "Melee",
+	[1] = "Ranged",
+	[2] = "Unknown",
+}
+
 --- @enum WeaponType
 Ext_Enums.WeaponType = {
 	None = 0,
@@ -27676,6 +31687,69 @@ Ext_Enums.WeaponType = {
 }
 
 --#endregion
+
+
+--- @class Ext_System
+--- @field ServerBodyType EsvBodyTypeSystem
+--- @field ServerTradeBuyback EsvInventoryTradeBuybackSystem
+--- @field ServerInterruptRequests EsvInterruptRequestsSystem
+--- @field ServerSpellLearning EsvSpellLearningSystem
+--- @field ServerMagicPocketsTracking EsvInventoryMagicPocketsTrackingSystem
+--- @field ServerExperience EsvExperienceSystem
+--- @field ServerRestore EsvRestoreSystem
+--- @field ServerInventoryManagement EsvInventoryManagementSystem
+--- @field ServerVisual EsvVisualSystem
+--- @field ServerAttitude EsvAttitudeUpdateSystem
+--- @field ServerCapabilities EsvCapabilitiesSystem
+--- @field ClientCharacterManager EclCharacterManager
+--- @field ServerSpellCooldown EsvSpellSpellCooldownSystem
+--- @field ServerInventoryReceivalNotification EsvInventoryEntityReceivalNotificationSystem
+--- @field SoundRouting SoundRoutingSystem
+--- @field ServerGod EsvGodSystem
+--- @field ServerInventoryInteraction EsvInventoryInteractionSystem
+--- @field ServerStatusRequest EsvStatusRequestSystem
+--- @field ServerPartyTeleport EsvPartyTeleportSystem
+--- @field ServerPlatform EsvPlatformSystem
+--- @field ServerFalling EsvFallingSystem
+--- @field ServerProgression EsvProgressionManagementSystem
+--- @field ServerTurnOrder EsvCombatTurnOrderSystem
+--- @field ServerRating EsvApprovalRatingSystem
+--- @field ServerInterruptManagement EsvInterruptManagementSystem
+--- @field ServerParty EsvPartyPartySystem
+--- @field ClientVisualsVisibilityState EclEquipmentVisualsVisibilityStateSystem
+--- @field ServerLongRest EsvRestLongRestSystem
+--- @field ServerNewInventoryMember EsvInventoryNewInventoryMemberSystem
+--- @field ServerInventoryEquipment EsvInventoryEquipmentSystem
+--- @field ServerDualWielding EsvDualWieldingSystem
+--- @field ServerInventoryStack EsvInventoryStackSystem
+--- @field ServerStats EsvStatsSystem
+--- @field ServerSummonSpawn EsvSummonSpawnSystem
+--- @field ServerPingRequest EsvPingRequestSystem
+--- @field ServerInterruptDecision EsvInterruptDecisionSystem
+--- @field ServerCastRequest EsvSpellCastCastRequestSystem
+--- @field ServerSpell EsvSpellSpellSystem
+--- @field ServerTemplateChange EsvTemplatesChangeSystem
+--- @field ServerInventoryInteractionRequest EsvInventoryInteractionRequestSystem
+--- @field ServerPassive EsvPassivePassiveSystem
+--- @field ServerInventoryCanPlace EsvInventoryCanPlaceSystem
+--- @field ServerBoost EsvBoostBoostSystem
+--- @field ServerShortRest EsvRestShortRestSystem
+--- @field ServerConcentration EsvConcentrationConcentrationSystem
+--- @field ServerInventoryLocking EsvInventoryLockingSystem
+--- @field ServerHit EsvHitHitSystem
+--- @field ClientEquipmentVisuals EclEquipmentVisualsSystem
+--- @field ServerSummonDespawn EsvSummonDespawnSystem
+--- @field ClientCharacterIconRender EclCharacterIconRenderSystem
+--- @field ServerGravity EsvGravitySystem
+--- @field ServerRoll EsvRollRollSystem
+--- @field ServerCombat EsvCombatSystem
+--- @field ClientVisual EclVisualSystem
+--- @field ServerShapeshift EsvShapeshiftSystem
+--- @field ServerTreasureGeneration EsvInventoryTreasureGenerationSystem
+--- @field ServerLeader EsvLeaderSystem
+--- @field ServerFTBZone EsvFtbZoneSystem
+--- @field ServerDisplayName EsvDisplayNameSystem
+--- @field ServerActionResource EsvActionResourceSystem
 
 --- @class Ext
 --- @field Audio Ext_ClientAudio
@@ -27709,6 +31783,7 @@ Ext_Enums.WeaponType = {
 --- @field Utils Ext_Utils
 --- @field Vars Ext_Vars
 --- @field Enums Ext_Enums
+--- @field System Ext_System
 Ext = {Events = {}}
 
 
@@ -27767,6 +31842,9 @@ Ext.Events.FindPath = {}
 --- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.GameStateChanged = {}
+--- 🔨🔧**Server/Client**🔧🔨  
+--- @type SubscribableEvent<LuaEmptyEvent>  
+Ext.Events.Log = {}
 --- 🔨🔧**Server/Client**🔧🔨  
 --- @type SubscribableEvent<LuaEmptyEvent>  
 Ext.Events.ModuleLoadStarted = {}

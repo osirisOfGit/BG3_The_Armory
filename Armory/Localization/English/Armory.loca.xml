@@ -20,8 +20,8 @@
     <content contentuid="he7ac5c315ea143849d7614f3eea5dc3c3ce6" version="1">Preset Manager</content>
     <content contentuid="h87bb9fb4d984424b90bf2a07018fce4b7bb9" version="1">Item Validation Report</content>
     <content contentuid="h147cf2b184734696946b29f53af8634b2939" version="1">Settings</content>
-    <content contentuid="h3cd833c3ceaf423982e2a4e5ccc5cde2617a" version="1">Show Slot Context Menu only when holding Left Shift</content>
-    <content contentuid="h204c96c088344a14a75291a07a5f994a3527" version="1">If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it</content>
+    <content contentuid="h3cd833c3ceaf423982e2a4e5ccc5cde2617a" version="1">Show Slot Context Menu on Right Click</content>
+    <content contentuid="h204c96c088344a14a75291a07a5f994a3527" version="1">If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if it's right clicked - otherwise, it will show on left click (and it will launch directly to the picker on right click)</content>
     <content contentuid="h6477215a59964b258c51ae8cc3042963197a" version="1">Generate Junk Items in Empty Slots For Transmog</content>
     <content contentuid="hf5af20f3b67c4eefb3f6de7db8a8705973f2" version="1">When enabled, if an item slot is configured for Transmogging but is currently empty, Armory will spawn a junk item to put in the slot so the transmog can occur.</content>
     <content contentuid="h2a832d8c75c24861977ba76a659d90c3b462" version="1">Remove Bladesong Impediment statuses on reload</content>

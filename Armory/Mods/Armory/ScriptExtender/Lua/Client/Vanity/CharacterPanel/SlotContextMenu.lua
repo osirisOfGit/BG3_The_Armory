@@ -13,7 +13,6 @@ SlotContextMenu.Popup = nil
 ---@param parent ExtuiTreeParent
 function SlotContextMenu:initialize(parent)
 	self.Popup = parent:AddPopup("VanitySlotContextMenu")
-	self:SubscribeToKeyEvents()
 end
 
 ---@return VanityOutfitItemEntry
@@ -34,9 +33,8 @@ end
 ---@param defaultFunc function
 ---@param onCloseFunc function
 function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slotButton, buttonType, defaultFunc, onCloseFunc)
-	slotButton.OnClick = function()
-		local settings = ConfigurationStructure.config.vanity.settings.general
-		if self.LastKeyPressed == settings.showSlotContextMenuModifier then
+	local settings = ConfigurationStructure.config.vanity.settings.general
+	local function buildMenu()
 			if not outfitSlot then
 				local outfit = VanityCharacterPanel.activePreset.Outfits[VanityCharacterPanel.criteriaCompositeKey]
 				if outfit then
@@ -92,29 +90,22 @@ function SlotContextMenu:buildMenuForSlot(itemSlot, weaponType, outfitSlot, slot
 
 			self.Popup:Open()
 			self.LastKeyPressed = nil
-		else
+		end
+		local function dontBuildMenu()
 			self.itemSlot = nil
 			self.weaponType = nil
 			self.outfitSlot = nil
 			self.buttonType = nil
 			defaultFunc()
 		end
-	end
-end
 
-function SlotContextMenu:SubscribeToKeyEvents()
-	if not self.Subscription and ConfigurationStructure.config.vanity.settings.general.showSlotContextMenuModifier then
-		---@param key EclLuaKeyInputEvent
-		self.Subscription = Ext.Events.KeyInput:Subscribe(function(key)
-			if key.Event == "KeyDown" then
-				self.LastKeyPressed = key.Key
-			end
-		end)
-	elseif self.Subscription then
-		Ext.Events.KeyInput:Unsubscribe(self.Subscription)
-		self.LastKeyPressed = nil
-		self.Subscription = nil
-	end
+		if settings.showSlotContextMenuOnRightClick then
+			slotButton.OnRightClick = buildMenu
+			slotButton.OnClick = dontBuildMenu
+		else
+			slotButton.OnRightClick = dontBuildMenu
+			slotButton.OnClick = buildMenu
+		end
 end
 
 Translator:RegisterTranslation({

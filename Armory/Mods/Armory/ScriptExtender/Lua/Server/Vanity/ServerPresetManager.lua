@@ -100,7 +100,7 @@ function ServerPresetManager:GetCharacterPreset(character)
 
 	Logger:BasicDebug("%s is assigned to user %s", character, Osi.GetUserName(charUserId))
 
-	return (vanity and vanity.presets[activePresets[Osi.GetUserProfileID(charUserId)]]), charUserId
+	return (vanity and vanity.presets and vanity.presets[activePresets[Osi.GetUserProfileID(charUserId)]]), charUserId
 end
 
 Ext.Osiris.RegisterListener("LevelGameplayStarted", 2, "after", function(levelName, isEditorMode)
@@ -126,7 +126,7 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 
 		ServerPresetManager.ActiveVanityPresets[user] = data.vanityPreset
 
-		if data.vanityPreset then
+		if data.vanityPreset.presets then
 			Logger:BasicInfo("User %s updated preset %s", Osi.GetUserName(user), data.vanityPreset.presets[data.presetId].Name)
 		else
 			Logger:BasicInfo("User %s deactivated preset", Osi.GetUserName(user))

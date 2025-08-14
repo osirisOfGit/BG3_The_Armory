@@ -71,12 +71,15 @@ Mods.BG3MCM.IMGUIAPI:InsertModMenuTab(ModuleUUID, "Vanity",
 		menu.OnClick = function() return menuPopup:Open() end
 
 		---@type ExtuiSelectable
-		local contextMenuSetting = menuPopup:AddSelectable(Translator:translate("Show Slot Context Menu only when holding Left Shift"), "DontClosePopups")
-		contextMenuSetting.Selected = generalSettings.showSlotContextMenuModifier ~= nil
-		contextMenuSetting:Tooltip():AddText("\t " .. Translator:translate("If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it")).TextWrapPos = 600
+		local contextMenuSetting = menuPopup:AddSelectable(Translator:translate("Show Slot Context Menu on Right Click"), "DontClosePopups")
+		contextMenuSetting.Selected = generalSettings.showSlotContextMenuOnRightClick
+		contextMenuSetting:Tooltip():AddText("\t " .. Translator:translate("If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if it's right clicked - otherwise, it will show on left click (and it will launch directly to the picker on right click)")).TextWrapPos = 600
 		contextMenuSetting.OnClick = function()
-			generalSettings.showSlotContextMenuModifier = contextMenuSetting.Selected and "LSHIFT" or nil
-			SlotContextMenu:SubscribeToKeyEvents()
+			generalSettings.showSlotContextMenuOnRightClick = contextMenuSetting.Selected
+
+			if Vanity.ActivePresetId then
+				Vanity:ActivatePreset(Vanity.ActivePresetId)
+			end
 		end
 
 		menuPopup:AddSeparator()
@@ -149,6 +152,12 @@ function Vanity:UpdatePresetOnServer()
 		updatePresetOnServerTimer = nil
 
 		local vanityPreset = VanityExportManager:ExportPresets({ self.ActivePresetId })
+		if not vanityPreset then
+			Logger:BasicDebug("Preset %s was not found - deactivating", self.ActivePresetId)
+			self.ActivePresetId = nil
+			vanityPreset = {}
+		end
+
 		vanityPreset.settings = {
 			general = {
 				fillEmptySlots = ConfigurationStructure.config.vanity.settings.general.fillEmptySlots,
@@ -301,8 +310,8 @@ Translator:RegisterTranslation({
 	["Preset Manager"] = "he7ac5c315ea143849d7614f3eea5dc3c3ce6",
 	["Item Validation Report"] = "h87bb9fb4d984424b90bf2a07018fce4b7bb9",
 	["Settings"] = "h147cf2b184734696946b29f53af8634b2939",
-	["Show Slot Context Menu only when holding Left Shift"] = "h3cd833c3ceaf423982e2a4e5ccc5cde2617a",
-	["If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if 'Left Shift' is being held down while clicking it"] =
+	["Show Slot Context Menu on Right Click"] = "h3cd833c3ceaf423982e2a4e5ccc5cde2617a",
+	["If enabled the context menu that appears when clicking on a given slot/dye icon below will only show up if it's right clicked - otherwise, it will show on left click (and it will launch directly to the picker on right click)"] =
 	"h204c96c088344a14a75291a07a5f994a3527",
 	["Remove Bladesong Impediment statuses on reload"] = "h2a832d8c75c24861977ba76a659d90c3b462",
 
