@@ -153,11 +153,15 @@ function Vanity:UpdatePresetOnServer()
 	updatePresetOnServerTimer = Ext.Timer.WaitFor(350, function()
 		updatePresetOnServerTimer = nil
 
-		local vanityPreset = VanityExportManager:ExportPresets({ self.ActivePresetId })
-		if not vanityPreset then
-			Logger:BasicDebug("Preset %s was not found - deactivating", self.ActivePresetId)
-			self.ActivePresetId = nil
-			vanityPreset = {}
+		---@type Vanity?
+		local vanityPreset = {}
+		if self.ActivePresetId then
+			vanityPreset = VanityExportManager:ExportPresets({ self.ActivePresetId })
+			if not vanityPreset then
+				Logger:BasicDebug("Preset %s was not found - deactivating", self.ActivePresetId or "N/A")
+				self.ActivePresetId = nil
+				vanityPreset = {}
+			end
 		end
 
 		vanityPreset.settings = {
