@@ -54,7 +54,7 @@ PresetProxy = {
 
 			if not presetExport then
 				for user, presetIds in pairs(userPresetPool) do
-					if TableUtils:ListContains(presetIds, k) then
+					if TableUtils:IndexOf(presetIds, k) then
 						local lock = true
 						Channels.GetUserSpecificPreset:RequestToServer({ user = user }, function(data)
 							if next(data) then

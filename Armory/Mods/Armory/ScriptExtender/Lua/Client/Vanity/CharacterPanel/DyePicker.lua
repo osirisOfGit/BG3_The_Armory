@@ -216,7 +216,7 @@ function DyePicker:CreateCustomFilters()
 	end
 
 	similarColourFilter.apply = function(self, itemTemplate)
-		if TableUtils:ListContains(checkboxGroup.Children, function(value)
+		if TableUtils:IndexOf(checkboxGroup.Children, function(value)
 				---@cast value ExtuiCheckbox
 				return value.Checked
 			end)
@@ -265,11 +265,11 @@ end
 ---@param dyeTemplate ItemTemplate
 ---@param displayGroup ExtuiGroup|ExtuiCollapsingHeader
 function DyePicker:DisplayResult(dyeTemplate, displayGroup)
-	if TableUtils:ListContains(self.blacklistedItems, dyeTemplate.Id) then
+	if TableUtils:IndexOf(self.blacklistedItems, dyeTemplate.Id) then
 		return
 	end
 
-	local isFavorited, favoriteIndex = TableUtils:ListContains(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
+	local isFavorited, favoriteIndex = TableUtils:IndexOf(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
 
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return

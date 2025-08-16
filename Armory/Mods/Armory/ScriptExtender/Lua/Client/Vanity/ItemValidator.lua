@@ -93,7 +93,7 @@ function ItemValidator:ValidateItems()
 	if not next(self.Results) then
 		for _, template in pairs(Ext.Template.GetAllRootTemplates()) do
 			local success, error = pcall(function()
-				if template.TemplateType == "item" and ((template.Equipment and template.Equipment.Slot and #template.Equipment.Slot > 0) or TableUtils:ListContains(template.Tags.Tags, function (value)
+				if template.TemplateType == "item" and ((template.Equipment and template.Equipment.Slot and #template.Equipment.Slot > 0) or TableUtils:IndexOf(template.Tags.Tags, function (value)
 					return value == "dc9e09f0-b2ba-4720-bd28-ee9ddbdef2f1"
 				end)) then
 					---@cast template ItemTemplate
@@ -191,7 +191,7 @@ function ItemValidator:ValidateItems()
 						if not statEntry then
 							self:addEntry(template.Name .. "_" .. template.Id, template, "Template",
 								string.format(Translator:translate("Points to stat %s which does not exist"), template.Stats), "Prevents Transmog")
-						elseif not TableUtils:ListContains({ "Armor", "Weapon", "Object" }, statEntry.ModifierList) then
+						elseif not TableUtils:IndexOf({ "Armor", "Weapon", "Object" }, statEntry.ModifierList) then
 							self:addEntry(template.Name .. "_" .. template.Id, template, "Template",
 								string.format(Translator:translate("Points to stat %s which is an invalid stat type of %s", stat, statEntry.ModifierList)),
 								"Prevents Transmog")

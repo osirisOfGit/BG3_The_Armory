@@ -231,7 +231,7 @@ function VanityEffect:deleteStat(effectName)
 
 		local function removeEffect(outfitSlot, presetName, outfitKey, slot, weaponType)
 			if outfitSlot.equipment and outfitSlot.equipment.effects then
-				if TableUtils:ListContains(outfitSlot.equipment.effects, effectName) then
+				if TableUtils:IndexOf(outfitSlot.equipment.effects, effectName) then
 					local tableCopy = {}
 					for _, existingEffect in ipairs(outfitSlot.equipment.effects) do
 						if existingEffect ~= effectName then
@@ -459,7 +459,7 @@ if Ext.IsClient() then
 			---@type ExtuiSelectable
 			local enableEffect = effectMenu:AddSelectable("", "DontClosePopups")
 			enableEffect.UserData = vanityEffect
-			enableEffect.Selected = (vanityOutfitItemEntry and vanityOutfitItemEntry.effects) and TableUtils:ListContains(vanityOutfitItemEntry.effects, effectName) or false
+			enableEffect.Selected = (vanityOutfitItemEntry and vanityOutfitItemEntry.effects) and TableUtils:IndexOf(vanityOutfitItemEntry.effects, effectName) ~= nil or false
 			enableEffect.Label = enableEffect.Selected and Translator:translate("Disable") or Translator:translate("Enable")
 			if enableEffect.Selected then
 				effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })

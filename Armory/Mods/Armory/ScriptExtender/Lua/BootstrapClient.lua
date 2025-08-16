@@ -8,7 +8,6 @@ end)
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
 ConfigurationStructure:InitializeConfig()
 
-Ext.Require("Shared/Channels.lua")
 Ext.Require("Shared/Vanity/UserPresetPoolManager.lua")
 Ext.Require("Client/Vanity/PresetProxy.lua")
 

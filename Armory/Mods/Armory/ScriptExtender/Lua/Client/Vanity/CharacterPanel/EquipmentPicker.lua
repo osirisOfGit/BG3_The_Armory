@@ -33,12 +33,12 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 		if self.header.Visible
 			and itemTemplate.Equipment
 			and itemTemplate.Equipment.Visuals
-			and TableUtils:ListContains(raceGroup.Children, function(value)
+			and TableUtils:IndexOf(raceGroup.Children, function(value)
 				return value.Checked
 			end)
 		then
 			for bodyType in pairs(itemTemplate.Equipment.Visuals) do
-				if TableUtils:ListContains(raceGroup.Children, function(value)
+				if TableUtils:IndexOf(raceGroup.Children, function(value)
 						---@cast value ExtuiCheckbox
 						return value.UserData == bodyType and value.Checked
 					end) then
@@ -135,7 +135,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	armorTypeFilter.apply = function(self, itemTemplate)
 		if self.header.Visible
 			and EquipmentPicker.itemIndex.templateIdAndStat[itemTemplate.Id]
-			and TableUtils:ListContains(armorTypeGroup.Children, function(value)
+			and TableUtils:IndexOf(armorTypeGroup.Children, function(value)
 				return value.Checked
 			end)
 		then
@@ -143,7 +143,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 			local stat = Ext.Stats.Get(EquipmentPicker.itemIndex.templateIdAndStat[itemTemplate.Id])
 
 			if stat.ModifierList == "Armor" then
-				return TableUtils:ListContains(armorTypeGroup.Children, function(value)
+				return TableUtils:IndexOf(armorTypeGroup.Children, function(value)
 					---@cast value ExtuiCheckbox
 					return value.UserData == stat.ArmorType and value.Checked
 				end)
@@ -294,7 +294,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 			end
 
 			if self.header.Visible
-				and TableUtils:ListContains(statSlotGroup.Children, function(value)
+				and TableUtils:IndexOf(statSlotGroup.Children, function(value)
 					return value.Checked
 				end)
 			then
@@ -391,12 +391,12 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 		if self.header.Visible then
 			if not itemTemplate.Equipment or not itemTemplate.Equipment.Slot then
 				return false
-			elseif TableUtils:ListContains(templateSlotGroup.Children, function(value)
+			elseif TableUtils:IndexOf(templateSlotGroup.Children, function(value)
 					return value.Checked
 				end)
 			then
 				for _, slot in pairs(itemTemplate.Equipment.Slot) do
-					if TableUtils:ListContains(templateSlotGroup.Children, function(value)
+					if TableUtils:IndexOf(templateSlotGroup.Children, function(value)
 							---@cast value ExtuiCheckbox
 							return value.UserData == slot and value.Checked
 						end)
@@ -555,7 +555,7 @@ end
 ---@param itemTemplate ItemTemplate
 ---@param displayGroup ExtuiChildWindow|ExtuiCollapsingHeader
 function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
-	local isFavorited, favoriteIndex = TableUtils:ListContains(self.settings.favorites, itemTemplate.Id)
+	local isFavorited, favoriteIndex = TableUtils:IndexOf(self.settings.favorites, itemTemplate.Id)
 	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
 		return
 	end
