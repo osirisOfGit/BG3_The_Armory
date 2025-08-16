@@ -358,6 +358,14 @@ function VanityEffect:deleteStat(effectName)
 					end
 				end
 			end
+
+			if preset.Character then
+				for _, section in pairs(preset.Character) do
+					if section["effects"] and TableUtils:IndexOf(section["effects"], effectName) then
+						table.remove(section["effects"], TableUtils:IndexOf(section["effects"], effectName))
+					end
+				end
+			end
 		end
 
 		Ext.Net.PostMessageToServer(ModuleUUID .. "_DeleteEffect", effectName)
