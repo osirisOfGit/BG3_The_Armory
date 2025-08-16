@@ -465,6 +465,9 @@ if Ext.IsClient() then
 				effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 			end
 
+			---@type ExtuiSelectable
+			local disableDuringDialogue
+
 			enableEffect.OnClick = function()
 				if enableEffect.Selected then
 					effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
@@ -473,6 +476,7 @@ if Ext.IsClient() then
 						vanityOutfitItemEntry.effects = {}
 					end
 					table.insert(vanityOutfitItemEntry.effects, effectName)
+					disableDuringDialogue.Visible = true
 				elseif vanityOutfitItemEntry and vanityOutfitItemEntry.effects and vanityOutfitItemEntry.effects() then
 					effectMenu:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 					local tableCopy = {}
@@ -485,17 +489,26 @@ if Ext.IsClient() then
 					vanityOutfitItemEntry.effects = next(tableCopy) and tableCopy or nil
 
 					Helpers:ClearEmptyTablesInProxyTree(vanityOutfitItemEntry)
+					disableDuringDialogue.Visible = false
 				end
 				onSubmitFunc()
 				enableEffect.Label = enableEffect.Selected and Translator:translate("Disable") or Translator:translate("Enable")
 			end
 
-			if enableEffect.Selected then
-				---@type ExtuiSelectable
-				local disableDuringDialogue = effectMenu:AddSelectable(Translator:translate("Disable During Dialogue"), "DontClosePopups")
-				disableDuringDialogue.Selected = TableUtils:IndexOf(vanityOutfitItemEntry.effects, effectName) ~= nil
+			disableDuringDialogue = effectMenu:AddSelectable("", "DontClosePopups")
+			disableDuringDialogue.Visible = enableEffect.Selected
+			disableDuringDialogue.Label = vanityEffect.disableDuringDialogue
+				and Translator:translate("Enable During Dialogue")
+				or Translator:translate("Disable During Dialogue")
+
+			disableDuringDialogue.Selected = vanityEffect.disableDuringDialogue or false
+			disableDuringDialogue.OnClick = function()
+				vanityEffect.disableDuringDialogue = disableDuringDialogue.Selected
+
 				if disableDuringDialogue.Selected then
-					effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
+					disableDuringDialogue.Label = Translator:translate("Enable During Dialogue")
+				else
+					disableDuringDialogue.Label = Translator:translate("Disable During Dialogue")
 				end
 			end
 
@@ -517,6 +530,7 @@ if Ext.IsClient() then
 			end
 
 			enableEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
+			disableDuringDialogue:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 			editEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 			deleteEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 		end
@@ -554,6 +568,7 @@ Translator:RegisterTranslation({
 	["Disable"] = "h5fbccc4e25c241a887b57c60988bafe7e705",
 	["Enable"] = "hb12adca21c4e45189573c291701a5fa6d293",
 	["Disable During Dialogue"] = "h7bc9ab98a2a44106aa4f1ae5e85d7ae718bb",
+	["Enable During Dialogue"] = "hcd094f8ace4841489f7ee4ab60d53bd23861",
 	["Edit"] = "hca540bf66df845bc9fde931f58c0aaa71b3b",
 	["Delete"] = "h87dc5ed2db464ee9b73b29e2fcd22135100f",
 	["Create New Effect"] = "h16fdaad3e9c04689afcf6469c0bc2f453751",
