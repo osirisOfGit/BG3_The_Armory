@@ -249,19 +249,25 @@ if Ext.IsServer() then
 			effect:createStat()
 		end
 
-		local equippedItem = Osi.GetEquippedItem(character, slot)
-		if equippedItem then
-			Osi.ApplyStatus(Osi.GetEquippedItem(character, slot), effect.Name, 10)
+		if slot ~= "Character" then
+			local equippedItem = Osi.GetEquippedItem(character, slot)
+			if equippedItem then
+				Osi.ApplyStatus(Osi.GetEquippedItem(character, slot), effect.Name, 10)
+			end
+		else
+			Osi.ApplyStatus(character, effect.Name, 10)
 		end
 	end)
 
-	---@type {[Guid]: {[Guid]: string}}
+	---@type {[Guid]: {[Guid]: string[]}}
 	local disabledEffects = {}
 
 	Ext.Osiris.RegisterListener("DialogActorJoined", 4, "before", function(dialog, instanceID, actor, speakerIndex)
 		if Osi.IsPlayer(actor) == 1 then
 			Logger:BasicDebug("%s joined dialogue, checking if any effects need to be disabled", actor)
-			local _, charUserId = ServerPresetManager:GetCharacterPreset(Ext.Entity.Get(actor).Uuid.EntityUuid)
+			---@type EntityHandle
+			local entity = Ext.Entity.Get(actor)
+			local _, charUserId = ServerPresetManager:GetCharacterPreset(entity.Uuid.EntityUuid)
 
 			local vanity = ServerPresetManager.ActiveVanityPresets[charUserId]
 			for _, slot in ipairs(SlotEnum) do
@@ -274,10 +280,23 @@ if Ext.IsServer() then
 							if statusName:find("ARMORY_VANITY_EFFECT") and vanity.effects[statusName].disableDuringDialogue then
 								Logger:BasicDebug("Disabling effect %s", statusName)
 								disabledEffects[actor] = disabledEffects[actor] or {}
-								disabledEffects[actor][equippedItem] = statusName
+								disabledEffects[actor][equippedItem] = disabledEffects[actor][equippedItem] or {}
+								table.insert(disabledEffects[actor][equippedItem], statusName)
 								Osi.RemoveStatus(equippedItem, statusName)
 							end
 						end
+					end
+				end
+			end
+
+			if entity.StatusContainer then
+				for _, statusName in pairs(entity.StatusContainer.Statuses) do
+					if statusName:find("ARMORY_VANITY_EFFECT") and vanity.effects[statusName].disableDuringDialogue then
+						Logger:BasicDebug("Disabling effect %s", statusName)
+						disabledEffects[actor] = disabledEffects[actor] or {}
+						disabledEffects[actor][entity.Uuid.EntityUuid] = disabledEffects[actor][entity.Uuid.EntityUuid] or {}
+						table.insert(disabledEffects[actor][entity.Uuid.EntityUuid], statusName)
+						Osi.RemoveStatus(entity.Uuid.EntityUuid, statusName)
 					end
 				end
 			end
@@ -288,9 +307,11 @@ if Ext.IsServer() then
 		if Osi.IsPlayer(actor) == 1 then
 			if disabledEffects[actor] then
 				Logger:BasicDebug("%s left dialogue, reenabling effects", actor)
-				for itemUuid, effectName in pairs(disabledEffects[actor]) do
-					Logger:BasicDebug("Reenabling %s", effectName)
-					Osi.ApplyStatus(itemUuid, effectName, -1)
+				for itemUuid, effects in pairs(disabledEffects[actor]) do
+					for _, effectName in pairs(effects) do
+						Logger:BasicDebug("Reenabling %s", effectName)
+						Osi.ApplyStatus(itemUuid, effectName, -1)
+					end
 				end
 				disabledEffects[actor] = {}
 			end
@@ -511,7 +532,7 @@ if Ext.IsClient() then
 			local inputs = inputSupplier()
 			if inputs then
 				local effect = VanityEffect:new({}, inputs.Name, inputs)
-				effect.slot = SlotContextMenu.itemSlot
+				effect.slot = SlotContextMenu.itemSlot or "Character"
 				Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
 			end
 		end
@@ -521,7 +542,7 @@ if Ext.IsClient() then
 	---@param parentPopup ExtuiPopup
 	---@param vanityOutfitItemEntry VanityOutfitItemEntry?
 	---@param onSubmitFunc function
-	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc)
+	function VanityEffect:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc, forCharacter)
 		effectCollection = {}
 
 		for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
@@ -549,9 +570,11 @@ if Ext.IsClient() then
 			enableEffect.OnClick = function()
 				if enableEffect.Selected then
 					effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
-					vanityOutfitItemEntry = SlotContextMenu:GetOutfitSlot()
-					if not vanityOutfitItemEntry.effects then
-						vanityOutfitItemEntry.effects = {}
+					if not forCharacter then
+						vanityOutfitItemEntry = SlotContextMenu:GetOutfitSlot()
+						if not vanityOutfitItemEntry.effects then
+							vanityOutfitItemEntry.effects = {}
+						end
 					end
 					table.insert(vanityOutfitItemEntry.effects, effectName)
 					disableDuringDialogue.Visible = true
@@ -564,9 +587,8 @@ if Ext.IsClient() then
 						end
 					end
 					vanityOutfitItemEntry.effects.delete = true
-					vanityOutfitItemEntry.effects = next(tableCopy) and tableCopy or nil
+					vanityOutfitItemEntry.effects = next(tableCopy) and tableCopy or {}
 
-					Helpers:ClearEmptyTablesInProxyTree(vanityOutfitItemEntry)
 					disableDuringDialogue.Visible = false
 				end
 				onSubmitFunc()
@@ -631,7 +653,7 @@ if Ext.IsClient() then
 				ConfigurationStructure.config.vanity.effects[effectName] = effect
 			end
 			menu:Destroy()
-			self:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc)
+			self:buildSlotContextMenuEntries(parentPopup, vanityOutfitItemEntry, onSubmitFunc, forCharacter)
 		end
 	end
 end

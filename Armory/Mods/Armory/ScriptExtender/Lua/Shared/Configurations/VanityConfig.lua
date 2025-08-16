@@ -80,7 +80,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot = {
 
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfit = {}
 
----@alias VanityOutfit {[ActualSlot|"Character"]: VanityOutfitSlot}
+---@alias VanityOutfit {[ActualSlot]: VanityOutfitSlot}
 
 ---@class VanityPreset
 ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
@@ -94,6 +94,8 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
 	isExternalPreset = false,
 	---@type {[VanityCriteriaCompositeKey] : VanityOutfit}
 	Outfits = {},
+	---@type {[VanityCriteriaCompositeKey] : {["effects"]: VanityEffect[]}}
+	Character = {},
 	---@type ModDependency[]
 	CustomDependencies = {}
 }

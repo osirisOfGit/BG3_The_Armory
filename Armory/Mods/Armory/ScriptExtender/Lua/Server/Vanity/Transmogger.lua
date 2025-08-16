@@ -148,6 +148,13 @@ function Transmogger:MogCharacter(character)
 		end
 	end
 
+	if characterPreset.Character and characterPreset.Character[character.Vars.TheArmory_Vanity_ActiveOutfit] then
+		local characterMog = characterPreset.Character[character.Vars.TheArmory_Vanity_ActiveOutfit]
+		if characterMog["effects"] then
+			self:ApplyEffectStatus(characterMog, nil, character, character)
+		end
+	end
+
 	---@type VanityOutfit
 	local outfit = characterPreset.Outfits[character.Vars.TheArmory_Vanity_ActiveOutfit]
 	if not outfit then
@@ -461,12 +468,38 @@ function Transmogger:ApplyEffectStatus(outfitSlot, actualSlot, createdVanityEnti
 				end
 			end
 		end
+
+		-- Character effects
+		if outfitSlot.effects then
+			for _, effectName in ipairs(outfitSlot.effects) do
+				local effectProps = effects[effectName]
+				if effectProps then
+					if Osi.HasActiveStatus(createdVanityEntity.Uuid.EntityUuid, effectName) == 0 then
+						Logger:BasicDebug("Applying effect %s to %s - effect properties: %s",
+							effectName,
+							createdVanityEntity.DisplayName.Name:Get() or createdVanityEntity.ServerItem.Template.Name,
+							Ext.Json.Stringify(effectProps))
+
+						local effect = VanityEffect:new({}, effectName, effectProps.effectProps)
+						effect:createStat()
+						Ext.Timer.WaitFor(50, function()
+							Osi.ApplyStatus(createdVanityEntity.Uuid.EntityUuid, effectName, -1, 1)
+							createdVanityEntity.Vars.TheArmory_Vanity_EffectsMarker = true
+						end)
+					end
+				else
+					Logger:BasicWarning("Definition for effect %s assigned to %s was not found in the configs", effectName,
+						characterEntity.DisplayName.Name:Get())
+				end
+			end
+		end
+
 		local removeEffectMarker = true
 
 		if createdVanityEntity.StatusContainer then
 			for _, statusName in pairs(createdVanityEntity.StatusContainer.Statuses) do
 				if statusName:find("ARMORY_VANITY_EFFECT") then
-					if effects[statusName] and TableUtils:IndexOf((outfitSlot.equipment and outfitSlot.equipment.effects) or {}, statusName) then
+					if effects[statusName] and TableUtils:IndexOf((outfitSlot.equipment and outfitSlot.equipment.effects or outfitSlot.effects) or {}, statusName) then
 						removeEffectMarker = false
 					else
 						Osi.RemoveStatus(createdVanityEntity.Uuid.EntityUuid, statusName)
@@ -638,6 +671,8 @@ function Transmogger:ClearOutfit(character)
 			end
 		end
 	end
+
+	Transmogger:ApplyEffectStatus({}, nil, charEntity, charEntity)
 	Transmogger:ApplyDye(charEntity)
 end
 

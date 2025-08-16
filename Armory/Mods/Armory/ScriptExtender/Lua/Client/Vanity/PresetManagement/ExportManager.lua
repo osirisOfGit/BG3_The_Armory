@@ -53,6 +53,16 @@ function VanityExportManager:ExportPresets(presetIds, existingExport, newIds)
 				end
 			end
 
+			if preset.Character then
+				for _, section in pairs(preset.Character) do
+					if section["effects"] then
+						for _, effect in pairs(section["effects"]) do
+							export.effects[effect] = TableUtils:DeeplyCopyTable(vanity.effects[effect])
+						end
+					end
+				end
+			end
+
 			if newIds then
 				presetId = FormBuilder:generateGUID()
 			end
