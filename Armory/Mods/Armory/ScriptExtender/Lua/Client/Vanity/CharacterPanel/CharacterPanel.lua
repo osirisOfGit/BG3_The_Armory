@@ -9,13 +9,20 @@ local weaponTypes = {
 }
 
 local function PopulateWeaponTypes()
-	-- `WPN_Scimitar_FlameBlade` (╯‵□′)╯︵┻━┻
 	local foundTypes = {}
 
-	for _, statString in pairs(Ext.Stats.GetStats("Weapon")) do
+	-- All these weapon types inherit from _BaseWeapon, but the `using` field gets wiped if any modder modifies them to use self-inheritance,
+	-- so need to hardcode them :sadge:
+	for _, statString in pairs({ "WPN_Mace", "WPN_LightHammer", "WPN_Scimitar", "WPN_Club", "WPN_Handaxe",
+		"WPN_Javelin", "WPN_Sickle", "WPN_Dagger", "WPN_Flail", "WPN_Greatclub", "WPN_Maul", "WPN_Morningstar",
+		"WPN_Quarterstaff", "WPN_Rapier", "WPN_Shortsword", "WPN_WarPick", "WPN_Greataxe", "WPN_Greatsword", "WPN_Spear",
+		"WPN_Battleaxe", "WPN_Longsword", "WPN_Trident", "WPN_Warhammer", "WPN_Glaive", "WPN_Halberd", "WPN_Pike",
+		"WPN_Scimitar_FlameBlade", "WPN_Dart", "WPN_LightCrossbow", "WPN_Shortbow", "WPN_Sling", "WPN_HandCrossbow",
+		"WPN_HeavyCrossbow", "WPN_Longbow" })
+	do
 		---@type Weapon
 		local stat = Ext.Stats.Get(statString)
-		if stat.Slot and (stat.Using == "_BaseWeapon") then
+		if stat.Slot then
 			if not weaponTypes[stat.Slot] then
 				weaponTypes[stat.Slot] = {}
 			end

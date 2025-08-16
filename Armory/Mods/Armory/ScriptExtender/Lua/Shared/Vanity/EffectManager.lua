@@ -493,7 +493,10 @@ if Ext.IsClient() then
 			if enableEffect.Selected then
 				---@type ExtuiSelectable
 				local disableDuringDialogue = effectMenu:AddSelectable(Translator:translate("Disable During Dialogue"), "DontClosePopups")
-				disableDuringDialogue.Selected = vanityOutfitItemEntry.effects
+				disableDuringDialogue.Selected = TableUtils:IndexOf(vanityOutfitItemEntry.effects, effectName) ~= nil
+				if disableDuringDialogue.Selected then
+					effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
+				end
 			end
 
 			---@type ExtuiSelectable
