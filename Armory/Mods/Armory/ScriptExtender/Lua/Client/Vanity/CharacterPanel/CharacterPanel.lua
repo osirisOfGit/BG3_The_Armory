@@ -142,6 +142,18 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 			VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset, copyPopup, criteriaCompositeKey)
 			copyPopup:Open()
 		end
+
+		local assignCharacterEffects = panelGroup:AddButton(Translator:translate("Add Effects To Character"))
+		assignCharacterEffects.OnClick = function()
+			Helpers:KillChildren(copyPopup)
+			self.activePreset.Character = self.activePreset.Character or {}
+			self.activePreset.Character[self.criteriaCompositeKey] = self.activePreset.Character[self.criteriaCompositeKey] or { effects = {} }
+			
+			copyPopup:Open()
+			VanityEffect:buildSlotContextMenuEntries(copyPopup, self.activePreset.Character[self.criteriaCompositeKey], function()
+				Vanity:UpdatePresetOnServer()
+			end, true)
+		end
 	end
 
 	local displayTable = panelGroup:AddTable("SlotDisplayTable", 5)
@@ -434,4 +446,5 @@ Translator:RegisterTranslation({
 	["This will overwrite all slots in this outfit with the selected outfit (will clear slots that are empty in the chosen outfit)"] = "h0450b90e8cd74c91b1fba6749387ecfd4ec0",
 	["Hiding Appearance"] = "h88ee937b2cc54a608b75e7b6d1cd7682g54e",
 	["EFF"] = "ha10b4c04046f48afb9f17c17727c442feeg0",
+	["Add Effects To Character"] = "ha2588acc82bc4163a2ecb69f10d9d300b5a0"
 })
