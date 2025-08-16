@@ -149,54 +149,85 @@ function VanityEffect:GetEffectOrMeiResource(effectString)
 	end
 end
 
+function VanityEffect:createStat()
+	if not Ext.Stats.Get(self.Name) then
+		Logger:BasicDebug("Creating Effect %s", self.Name)
+		---@type StatusData
+		local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
+		for key, value in pairs(self.effectProps) do
+			if value and value ~= "" then
+				local name, meiOrEffect = self:GetEffectOrMeiResource()
+				newStat[key] = meiOrEffect == "MEI" and value or name
+			end
+		end
+		newStat.StackId = self.Name
+		newStat:Sync()
+
+		if Ext.IsServer() then
+			if Ext.ServerNet.IsHost() then
+				Ext.Timer.WaitFor(100, function()
+					Channels.UpdateStatusEffect:Broadcast({
+						Name = self.Name,
+						effectProps = self.effectProps,
+						disableDuringDialogue = self.disableDuringDialogue
+					})
+				end)
+			end
+		else
+			Ext.System.ClientVisual.ReloadAllVisuals = true
+		end
+		return true
+	end
+end
+
+function VanityEffect:editStat()
+	---@type StatusData?
+	local newStat = Ext.Stats.Get(self.Name)
+	if newStat then
+		Logger:BasicDebug("Updating Effect %s to be %s", self.Name, Ext.Json.Stringify(self.effectProps))
+		for key, value in pairs(self.effectProps) do
+			if value and value ~= "" then
+				local name, meiOrEffect = self:GetEffectOrMeiResource()
+				newStat[key] = meiOrEffect == "MEI" and value or name
+			else
+				newStat[key] = nil
+			end
+		end
+		newStat.StackId = self.Name
+		newStat:Sync()
+
+		if self.Name ~= "TheArmory_Vanity_PreviewEffect" then
+			for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
+				if Osi.HasActiveStatus(entityId, self.Name) == 1 then
+					Osi.RemoveStatus(entityId, self.Name)
+					Ext.Timer.WaitFor(10, function()
+						Osi.ApplyStatus(entityId, self.Name, -1, 1)
+					end)
+				end
+			end
+		end
+
+		if Ext.IsServer() then
+			if Ext.ServerNet.IsHost() then
+				Ext.Timer.WaitFor(100, function()
+					Channels.UpdateStatusEffect:Broadcast({
+						Name = self.Name,
+						effectProps = self.effectProps,
+						disableDuringDialogue = self.disableDuringDialogue
+					})
+				end)
+			end
+		else
+			Ext.System.ClientVisual.ReloadAllVisuals = true
+		end
+
+		return true
+	else
+		return self:createStat()
+	end
+end
+
 if Ext.IsServer() then
-	function VanityEffect:createStat()
-		if not Ext.Stats.Get(self.Name) then
-			Logger:BasicDebug("Creating Effect %s", self.Name)
-			---@type StatusData
-			local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
-			for key, value in pairs(self.effectProps) do
-				if value and value ~= "" then
-					local name, meiOrEffect = self:GetEffectOrMeiResource()
-					newStat[key] = meiOrEffect == "MEI" and value or name
-				end
-			end
-			newStat.StackId = self.Name
-			newStat:Sync()
-			return true
-		end
-	end
-
-	function VanityEffect:editStat()
-		---@type StatusData?
-		local newStat = Ext.Stats.Get(self.Name)
-		if newStat then
-			Logger:BasicDebug("Updating Effect %s to be %s", self.Name, Ext.Json.Stringify(self.effectProps))
-			for key, value in pairs(self.effectProps) do
-				if value and value ~= "" then
-					local name, meiOrEffect = self:GetEffectOrMeiResource()
-					newStat[key] = meiOrEffect == "MEI" and value or name
-				else
-					newStat[key] = nil
-				end
-			end
-			newStat.StackId = self.Name
-			newStat:Sync()
-
-			if self.Name ~= "TheArmory_Vanity_PreviewEffect" then
-				for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
-					if Osi.HasActiveStatus(entityId, self.Name) == 1 then
-						Osi.RemoveStatus(entityId, self.Name)
-						Ext.Timer.WaitFor(10, function()
-							Osi.ApplyStatus(entityId, self.Name, -1, 1)
-						end)
-					end
-				end
-			end
-			return true
-		end
-	end
-
 	Ext.RegisterNetListener(ModuleUUID .. "_EditEffect", function(channel, payload, user)
 		local effectRaw = Ext.Json.Parse(payload)
 		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps):editStat()
@@ -333,6 +364,10 @@ end
 
 if Ext.IsClient() then
 	Ext.Require("Client/_FormBuilder.lua")
+
+	Channels.UpdateStatusEffect:SetHandler(function(effectRaw, user)
+		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps):editStat()
+	end)
 
 	---@type ExtuiWindow
 	local formPopup
@@ -544,7 +579,7 @@ if Ext.IsClient() then
 				and Translator:translate("Enable During Dialogue")
 				or Translator:translate("Disable During Dialogue")
 
-				disableDuringDialogue:Tooltip():AddText("\t " .. Translator:translate("Applies to the effect itself, not just to this item, so only needs to be set once"))
+			disableDuringDialogue:Tooltip():AddText("\t " .. Translator:translate("Applies to the effect itself, not just to this item, so only needs to be set once"))
 
 			disableDuringDialogue.Selected = vanityEffect.disableDuringDialogue or false
 			disableDuringDialogue.OnClick = function()

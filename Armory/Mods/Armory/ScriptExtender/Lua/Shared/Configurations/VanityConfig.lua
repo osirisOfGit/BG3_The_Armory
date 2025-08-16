@@ -80,7 +80,7 @@ ConfigurationStructure.DynamicClassDefinitions.vanity.outfitSlot = {
 
 ConfigurationStructure.DynamicClassDefinitions.vanity.outfit = {}
 
----@alias VanityOutfit {[ActualSlot]: VanityOutfitSlot}
+---@alias VanityOutfit {[ActualSlot|"Character"]: VanityOutfitSlot}
 
 ---@class VanityPreset
 ConfigurationStructure.DynamicClassDefinitions.vanity.preset = {
