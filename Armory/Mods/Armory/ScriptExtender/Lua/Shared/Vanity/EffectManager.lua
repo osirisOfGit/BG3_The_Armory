@@ -12,7 +12,8 @@ VanityEffect = {
 		---@type string?
 		StatusEffect = "",
 	},
-	cachedDisplayNames = {}
+	cachedDisplayNames = {},
+	disableDuringDialogue = false
 }
 
 local defaultEffects = {
@@ -489,6 +490,12 @@ if Ext.IsClient() then
 				enableEffect.Label = enableEffect.Selected and Translator:translate("Disable") or Translator:translate("Enable")
 			end
 
+			if enableEffect.Selected then
+				---@type ExtuiSelectable
+				local disableDuringDialogue = effectMenu:AddSelectable(Translator:translate("Disable During Dialogue"), "DontClosePopups")
+				disableDuringDialogue.Selected = vanityOutfitItemEntry.effects
+			end
+
 			---@type ExtuiSelectable
 			local editEffect = effectMenu:AddSelectable(Translator:translate("Edit"))
 			editEffect.IDContext = effectMenu.Label .. "Edit"
@@ -543,6 +550,7 @@ Translator:RegisterTranslation({
 	["Add Effects"] = "h47d69cc7394e4b1eb882464b287b5719e3fb",
 	["Disable"] = "h5fbccc4e25c241a887b57c60988bafe7e705",
 	["Enable"] = "hb12adca21c4e45189573c291701a5fa6d293",
+	["Disable During Dialogue"] = "h7bc9ab98a2a44106aa4f1ae5e85d7ae718bb",
 	["Edit"] = "hca540bf66df845bc9fde931f58c0aaa71b3b",
 	["Delete"] = "h87dc5ed2db464ee9b73b29e2fcd22135100f",
 	["Create New Effect"] = "h16fdaad3e9c04689afcf6469c0bc2f453751",

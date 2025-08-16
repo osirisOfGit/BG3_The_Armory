@@ -399,4 +399,5 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <!-- END Armor Type Enum -->
     <content contentuid="hf5eaf133134b4a99bbcd336b9c1df434af1d" version="1">Unique Item - Can't Transmog</content>
     <content contentuid="hc60b8ef2b9cf469cb767fa2d8b9ac5c8ea23" version="1">This is a completely unique item, and can't be transmogged by Armory. You can still apply dyes and effects</content>
+    <content contentuid="h7bc9ab98a2a44106aa4f1ae5e85d7ae718bb" version="1">Disable During Dialogue</content>
 </contentList>
