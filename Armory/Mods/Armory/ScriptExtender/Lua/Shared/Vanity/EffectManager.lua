@@ -63,11 +63,11 @@ local defaultEffects = {
 	}
 }
 
----@param instance table
+---@param instance table?
 ---@param name string
 ---@param effectProps VanityEffectProperties
 ---@return VanityEffect
-function VanityEffect:new(instance, name, effectProps)
+function VanityEffect:new(instance, name, effectProps, disableDuringDialogue)
 	instance = instance or {}
 	setmetatable(instance, self)
 	self.__index = self
@@ -77,6 +77,7 @@ function VanityEffect:new(instance, name, effectProps)
 	end
 
 	effectProps.Name = nil
+	instance.disableDuringDialogue = disableDuringDialogue
 	instance.effectProps = TableUtils:DeeplyCopyTable(effectProps)
 
 	return instance
@@ -220,6 +221,48 @@ if Ext.IsServer() then
 		local equippedItem = Osi.GetEquippedItem(character, slot)
 		if equippedItem then
 			Osi.ApplyStatus(Osi.GetEquippedItem(character, slot), effect.Name, 10)
+		end
+	end)
+
+	---@type {[Guid]: {[Guid]: string}}
+	local disabledEffects = {}
+
+	Ext.Osiris.RegisterListener("DialogActorJoined", 4, "before", function(dialog, instanceID, actor, speakerIndex)
+		if Osi.IsPlayer(actor) == 1 then
+			Logger:BasicDebug("%s joined dialogue, checking if any effects need to be disabled", actor)
+			local _, charUserId = ServerPresetManager:GetCharacterPreset(Ext.Entity.Get(actor).Uuid.EntityUuid)
+
+			local vanity = ServerPresetManager.ActiveVanityPresets[charUserId]
+			for _, slot in ipairs(SlotEnum) do
+				local equippedItem = Osi.GetEquippedItem(actor, slot)
+				if equippedItem then
+					---@type EntityHandle
+					local equippedItemEntity = Ext.Entity.Get(equippedItem)
+					if equippedItemEntity.StatusContainer then
+						for _, statusName in pairs(equippedItemEntity.StatusContainer.Statuses) do
+							if statusName:find("ARMORY_VANITY_EFFECT") and vanity.effects[statusName].disableDuringDialogue then
+								Logger:BasicDebug("Disabling effect %s", statusName)
+								disabledEffects[actor] = disabledEffects[actor] or {}
+								disabledEffects[actor][equippedItem] = statusName
+								Osi.RemoveStatus(equippedItem, statusName)
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+
+	Ext.Osiris.RegisterListener("DialogActorLeft", 4, "before", function(dialog, instanceID, actor, instanceEnded)
+		if Osi.IsPlayer(actor) == 1 then
+			if disabledEffects[actor] then
+				Logger:BasicDebug("%s left dialogue, reenabling effects", actor)
+				for itemUuid, effectName in pairs(disabledEffects[actor]) do
+					Logger:BasicDebug("Reenabling %s", effectName)
+					Osi.ApplyStatus(itemUuid, effectName, -1)
+				end
+				disabledEffects[actor] = {}
+			end
 		end
 	end)
 end
@@ -447,7 +490,7 @@ if Ext.IsClient() then
 		effectCollection = {}
 
 		for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
-			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps)
+			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps, vanityEffect.disableDuringDialogue)
 		end
 
 		---@type ExtuiMenu
@@ -501,15 +544,18 @@ if Ext.IsClient() then
 				and Translator:translate("Enable During Dialogue")
 				or Translator:translate("Disable During Dialogue")
 
+				disableDuringDialogue:Tooltip():AddText("\t " .. Translator:translate("Applies to the effect itself, not just to this item, so only needs to be set once"))
+
 			disableDuringDialogue.Selected = vanityEffect.disableDuringDialogue or false
 			disableDuringDialogue.OnClick = function()
-				vanityEffect.disableDuringDialogue = disableDuringDialogue.Selected
+				ConfigurationStructure.config.vanity.effects[effectName].disableDuringDialogue = disableDuringDialogue.Selected
 
 				if disableDuringDialogue.Selected then
 					disableDuringDialogue.Label = Translator:translate("Enable During Dialogue")
 				else
 					disableDuringDialogue.Label = Translator:translate("Disable During Dialogue")
 				end
+				onSubmitFunc()
 			end
 
 			---@type ExtuiSelectable
@@ -569,6 +615,7 @@ Translator:RegisterTranslation({
 	["Enable"] = "hb12adca21c4e45189573c291701a5fa6d293",
 	["Disable During Dialogue"] = "h7bc9ab98a2a44106aa4f1ae5e85d7ae718bb",
 	["Enable During Dialogue"] = "hcd094f8ace4841489f7ee4ab60d53bd23861",
+	["Applies to the effect itself, not just to this item, so only needs to be set once"] = "hcbed2daa976b4176a3696eed82a3b02dbf7c",
 	["Edit"] = "hca540bf66df845bc9fde931f58c0aaa71b3b",
 	["Delete"] = "h87dc5ed2db464ee9b73b29e2fcd22135100f",
 	["Create New Effect"] = "h16fdaad3e9c04689afcf6469c0bc2f453751",
