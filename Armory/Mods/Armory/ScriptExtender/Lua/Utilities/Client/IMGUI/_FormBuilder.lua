@@ -26,11 +26,12 @@ end
 ---@param parent ExtuiTreeParent
 ---@param onSubmitFunc fun(formResults: table<string, string|boolean>)
 ---@param formInputs FormStructure[]
+---@return function
 function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 	Helpers:KillChildren(parent)
 
 	for _, formInput in pairs(formInputs) do
-		local label = parent:AddText(Translator:translate(formInput.label))
+		local label = parent:AddText(formInput.label)
 
 		if formInput.errorMessageIfEmpty then
 			label.Label = label.Label .. "*"
@@ -76,14 +77,14 @@ function FormBuilder:CreateForm(parent, onSubmitFunc, formInputs)
 			resultsView.NoSavedSettings = true
 			resultsView.Visible = false
 			formInput.input.OnChange = function()
-				local contains, key = TableUtils:IndexOf(keyToDisplayMap, formInput.input.Text)
-				formInput.input.UserData = (contains and key or formInput.input.Text) == formInput.input.UserData
+				local displayKey = TableUtils:IndexOf(keyToDisplayMap, formInput.input.Text)
+				formInput.input.UserData = (displayKey or formInput.input.Text) == formInput.input.UserData
 					and formInput.input.UserData
 					or nil
 
 				Helpers:KillChildren(resultsView)
 				resultsView.Visible = true
-				for key, displayName in TableUtils:OrderedPairs(keyToDisplayMap, function (key)
+				for key, displayName in TableUtils:OrderedPairs(keyToDisplayMap, function(key)
 					return keyToDisplayMap[key]
 				end) do
 					if #input.Text == 0 or input.UserData or string.match(string.upper(displayName), string.upper(input.Text)) then

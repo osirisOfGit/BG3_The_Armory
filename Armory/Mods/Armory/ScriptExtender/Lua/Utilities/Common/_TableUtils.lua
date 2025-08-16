@@ -2,6 +2,11 @@
 
 TableUtils = {}
 
+---@generic K
+---@param tarTable table<K, number>? will be created if it doesn't exist
+---@param key K 
+---@param amount number
+---@return table<K, number> table optionally created if one was not provided, with the amount specified added to the key (or just assigned to the key, if missing)
 function TableUtils:AddItemToTable_AddingToExistingAmount(tarTable, key, amount)
 	if not tarTable then
 		tarTable = {}
@@ -11,6 +16,8 @@ function TableUtils:AddItemToTable_AddingToExistingAmount(tarTable, key, amount)
 	else
 		tarTable[key] = tarTable[key] + amount
 	end
+
+	return tarTable
 end
 
 -- stolen from https://stackoverflow.com/questions/640642/how-do-you-copy-a-lua-table-by-value
@@ -40,18 +47,15 @@ function TableUtils:DeeplyCopyTable(obj)
 	return copy(obj, nil, false)
 end
 
---- Creates an immutable table
----@param tableName string
----@return table
-function TableUtils:MakeImmutableTableCopy(myTable)
-	return copy(myTable, nil, true)
-end
-
 ---Compare two lists
----@param first
----@param second
----@treturn boolean true if the lists are equal
+---@param first table
+---@param second table
+---@return boolean doesMatch true if the lists are equal
 function TableUtils:CompareLists(first, second)
+	if (first and not second) or (not first and second) then
+		return false
+	end
+
 	for property, value in pairs(first) do
 		if value ~= second[property] then
 			return false
@@ -70,7 +74,7 @@ end
 --- Deeply compare two tables for equality
 ---@param first table
 ---@param second table
----@return boolean true if the tables are deeply equal
+---@return boolean isEqual true if the tables are deeply equal
 function TableUtils:TablesAreEqual(first, second)
 	if first == second then
 		return true
@@ -100,19 +104,24 @@ end
 
 --- Custom pairs function that iterates over a table with alphanumeric indexes in alphabetical order
 --- Optionally accepts a function to transform the key for sorting and returning
+--- If keys are inequal types, will convert both to strings just for comparison
 ---@generic K
 ---@generic V
 ---@param t table<K,V>
----@param keyTransformFunc (fun(key: string):any)?
----@return fun(table: table<K, V>, index?: K):K, V
+---@param keyTransformFunc (fun(key: K, value: V):any)?
+---@return fun(table: table<K, V>, index?: K):K,V
 function TableUtils:OrderedPairs(t, keyTransformFunc)
 	local keys = {}
 	for k in pairs(t) do
 		table.insert(keys, k)
 	end
 	table.sort(keys, function(a, b)
-		local keyA = keyTransformFunc and keyTransformFunc(a) or tostring(a)
-		local keyB = keyTransformFunc and keyTransformFunc(b) or tostring(b)
+		local keyA = keyTransformFunc and keyTransformFunc(a, t[a]) or a
+		local keyB = keyTransformFunc and keyTransformFunc(b, t[b]) or b
+		if type(keyA) ~= type(keyB) then
+			keyA = tostring(keyA)
+			keyB = tostring(keyB)
+		end
 		return keyA < keyB
 	end)
 
@@ -128,25 +137,39 @@ function TableUtils:OrderedPairs(t, keyTransformFunc)
 end
 
 ---@generic K, V
----@param list table<K, V>
----@param str string|fun(value: V): boolean
----@return boolean, any?
-function TableUtils:ListContains(list, str)
+---@param list (table<K, V>)?
+---@param valueToFind (V|fun(value: V): boolean)?
+---@return K? index if element is found in the list, this is the key it's under
+function TableUtils:IndexOf(list, valueToFind)
 	if not list then
-		return false
+		return
 	end
 	for i, value in pairs(list) do
-		if type(str) == "string" then
-			if value == str then
-				return true, i
+		if type(valueToFind) == "function" then
+			if valueToFind(value) then
+				return i
 			end
-		elseif type(str) == "function" then
-			if str(value) then
-				return true, i
-			end
+		elseif value == valueToFind then
+			return i
 		end
 	end
-	return false
+end
+
+--- Reindexes a table with numeric keys so they increment sequentially from 1, modifying the input table in-place
+---@generic T:table
+---@param tbl T
+---@return T
+function TableUtils:ReindexNumericTable(tbl)
+	local values = {}
+	for k, value in pairs(tbl) do
+		table.insert(values, value)
+		tbl[k] = nil
+	end
+	-- Reinsert values with sequential numeric keys
+	for i, value in ipairs(values) do
+		tbl[i] = value
+	end
+	return tbl
 end
 
 --- Returns a pairs()-like iterator that iterates over multiple tables sequentially
@@ -186,12 +209,29 @@ function TableUtils:CombinedPairs(...)
 	end
 end
 
+--- Convenience method for counting the number of elements in a non-numerically indexed table
 ---@param tbl table
 ---@return number
 function TableUtils:CountElements(tbl)
 	local count = 0
-	for _, value in pairs(tbl) do
+	for _, _ in pairs(tbl) do
 		count = count + 1
 	end
 	return count
+end
+
+--- Converts all stringified number indexes in-place to their numerical equivalents
+---@param tbl table
+function TableUtils:ConvertStringifiedNumberIndexes(tbl)
+	for key, value in TableUtils:OrderedPairs(tbl) do
+		local numericKey = type(key) ~= "number" and tonumber(key) or nil
+		if numericKey then
+			tbl[key] = nil
+			tbl[numericKey] = value
+		end
+
+		if type(value) == "table" then
+			self:ConvertStringifiedNumberIndexes(value)
+		end
+	end
 end

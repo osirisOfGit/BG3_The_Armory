@@ -373,6 +373,9 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="h38a45f57bdd7446bb5464ce2cfd4078bcegf" version="1">Preview</content>
     <content contentuid="h10acf4ac4f2b4c6887e317d60bea1cf23e8g" version="1">Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds</content>
     <content contentuid="h47d69cc7394e4b1eb882464b287b5719e3fb" version="1">Add Effects</content>
+    <content contentuid="h7bc9ab98a2a44106aa4f1ae5e85d7ae718bb" version="1">Disable During Dialogue</content>
+    <content contentuid="hcd094f8ace4841489f7ee4ab60d53bd23861" version="1">Enable During Dialogue</content>
+    <content contentuid="hcbed2daa976b4176a3696eed82a3b02dbf7c" version="1">Applies to the effect itself, not just to this item, so only needs to be set once</content>
     <content contentuid="h5fbccc4e25c241a887b57c60988bafe7e705" version="1">Disable</content>
     <content contentuid="hb12adca21c4e45189573c291701a5fa6d293" version="1">Enable</content>
     <content contentuid="hca540bf66df845bc9fde931f58c0aaa71b3b" version="1">Edit</content>
@@ -397,6 +400,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="he67556c5cd334e3b95059f53d78a0ecacb3b" version="1">Splint</content>
     <content contentuid="he25527b08ccf4a7e9593c12ef25515185eea" version="1">Plate</content>
     <!-- END Armor Type Enum -->
+
     <content contentuid="hf5eaf133134b4a99bbcd336b9c1df434af1d" version="1">Unique Item - Can't Transmog</content>
     <content contentuid="hc60b8ef2b9cf469cb767fa2d8b9ac5c8ea23" version="1">This is a completely unique item, and can't be transmogged by Armory. You can still apply dyes and effects</content>
 </contentList>

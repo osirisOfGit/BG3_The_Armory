@@ -21,7 +21,7 @@ end
 ---@tparam string filepath required
 ---@treturn string
 function FileUtils:BuildAbsoluteFileTargetPath(filepath)
-	return ModUtils:GetModInfo().Directory .. "/" .. filepath
+	return Ext.Mod.GetMod(ModuleUUID).Info.Directory .. "/" .. filepath
 end
 
 --- Convenience for saving a Lua Table to a file under the AIM mod directory, logging and swallowing any errors encountered
@@ -31,7 +31,9 @@ end
 function FileUtils:SaveTableToFile(filepath, content)
 	local jsonSuccess, response = pcall(function()
 		return Ext.Json.Stringify(content, {
-			Beautify = false
+			Beautify = false,
+			IterateUserdata = true,
+			StringifyInternalTypes = true
 		})
 	end)
 

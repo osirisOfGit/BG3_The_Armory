@@ -143,7 +143,7 @@ function PickerBaseClass:InitializeSearchBank()
 						---@type Weapon|Armor
 						local stat = Ext.Stats.Get(template.Stats)
 
-						if not TableUtils:ListContains({ "Armor", "Weapon", "Object" }, stat.ModifierList) then
+						if not TableUtils:IndexOf({ "Armor", "Weapon", "Object" }, stat.ModifierList) then
 							error(string.format("Stat %s is an invalid stat type of %s", stat.Name, stat.ModifierList))
 						end
 
@@ -554,7 +554,7 @@ function PickerBaseClass:BuildFilters()
 	---@param itemTemplate ItemTemplate
 		function(self, itemTemplate)
 			for modName, templateIds in pairs(self.filterTable) do
-				if TableUtils:ListContains(templateIds, itemTemplate.Id) then
+				if TableUtils:IndexOf(templateIds, itemTemplate.Id) then
 					self.filterTable[modName] = nil
 
 					self.filterBuilders[modName] = function()
@@ -604,7 +604,7 @@ function PickerBaseClass:BuildFilters()
 			---@cast selectable ExtuiSelectable
 			if selectable.Selected then
 				anySelected = true
-				if TableUtils:ListContains(pickerInstance.itemIndex.modIdAndTemplateIds[selectable.UserData], itemTemplate.Id) then
+				if TableUtils:IndexOf(pickerInstance.itemIndex.modIdAndTemplateIds[selectable.UserData], itemTemplate.Id) then
 					return true
 				end
 			end
