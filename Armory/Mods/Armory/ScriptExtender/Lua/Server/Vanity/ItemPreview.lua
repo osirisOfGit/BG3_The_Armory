@@ -111,7 +111,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 end)
 
 local function DeleteItem(character, userPreview)
-	Logger:BasicDebug("%s stopped previewing %s", character, userPreview.previewItem)
+	Logger:BasicDebug("%s stopped previewing %s", character, userPreview.previewItem or "Unknown")
 
 	for _, item in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_PreviewItem") or {}) do
 		local itemEntity = Ext.Entity.Get(item)
