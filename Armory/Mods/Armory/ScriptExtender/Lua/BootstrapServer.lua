@@ -15,6 +15,8 @@ Ext.Require("Server/Vanity/DyePreview.lua")
 Ext.Require("Server/Vanity/PartyOutfitManager.lua")
 Ext.Require("Server/Vanity/Transmogger.lua")
 
+Ext.Require("Shared/EffectsTest.lua")
+
 
 Ext.Vars.RegisterModVariable(ModuleUUID, "SavedPresets", {
 	Server = true,
