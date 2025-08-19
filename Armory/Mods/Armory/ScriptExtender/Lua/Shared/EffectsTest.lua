@@ -44,10 +44,14 @@ Ext.RegisterConsoleCommand("statusfxtest", function(cmd)
 end, { NumArgs = 1, DefaultArgs = { 1 } })
 --#endregion
 
-TestChannels.UpdateStatusEffect:SetRequestHandler(function(data, user)
+TestChannels.UpdateStatusEffect:SetHandler(function(data, user)
 	local stat = Ext.Stats.Create("TEST_STATUSEFFECT_1", "StatusData", "_PASSIVES") --[[@as StatusData]]
 	stat.StatusEffect = "ceeda0ca-0739-4588-a449-d024389f0c2a" -- poison
 	stat.StackId = "TEST_STATUSEFFECT_1"
+
+	Ext.Timer.WaitFor(1000, function()
+		_D(Ext.Stats.Get("TEST_STATUSEFFECT_1"))
+	end)
 end)
 
 --#region Testing with manual replication, no immediate client access
@@ -72,10 +76,6 @@ Ext.RegisterConsoleCommand("statusfxtest_manual_repl_and_access", function(cmd)
 	Ext.Timer.WaitForRealtime(1000, function()
 		TestChannels.UpdateStatusEffect:Broadcast("")
 		Osi.ApplyStatus(Osi.GetHostCharacter(), "TEST_STATUSEFFECT_1", -1, 1, Osi.GetHostCharacter())
-
-		Ext.Timer.WaitFor(1000, function ()
-			_D(Ext.Stats.Get("TEST_STATUSEFFECT_1"))
-		end)
 	end)
 end, { NumArgs = 1, DefaultArgs = { 1 } })
 --#endregion
