@@ -403,6 +403,7 @@ if Ext.IsClient() then
 
 	local resourceEffectCache = {}
 
+	---@type {[string]: string}
 	local effects = {}
 
 	local function buildStatusEffectBank()
@@ -470,50 +471,119 @@ if Ext.IsClient() then
 		formPopup:SetFocus()
 		formPopup.Closeable = true
 		formPopup.NoCollapse = true
-		formPopup.AlwaysAutoResize = true
+		formPopup:SetSize(Styler:ScaleFactor({ 300, 300 }), "FirstUseEver")
 
-		local warningText = formPopup:AddText(
-			Translator:translate("Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"))
-		warningText.UserData = "keep"
-		warningText.TextWrapPos = 0
-		warningText:SetStyle("Alpha", 0.65)
+		formPopup:AddText(Translator:translate("Name") .. ":")
+		local nameInput = formPopup:AddInputText("")
+		nameInput.SameLine = true
+		nameInput.Text = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1)
+		nameInput.Disabled = self.Name and self.Name ~= ""
 
-		---@type FormStructure[]
-		local formInputs = { {
-			label = "Name",
-			type = "Text",
-			errorMessageIfEmpty = "Must provide a name",
-			defaultValue = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1),
-			enabled = self.Name and self.Name ~= ""
-		} }
-		for effectProp, value in TableUtils:OrderedPairs(self.effectProps) do
-			table.insert(formInputs, {
-				label = effectProp,
-				defaultValue = self.effectProps and self.effectProps[effectProp] or nil,
-				propertyField = effectProp,
-				type = type(value) == "number" and "NumericText" or "Text",
-				enumTable = buildStatusEffectBank,
-				errorMessageIfEmpty = "Must select a value"
-			} --[[@as FormStructure]])
+		formPopup:AddText("Chosen Effect: ")
+		local selectedEffect = formPopup:AddText("")
+		selectedEffect.SameLine = true
+
+		---@type ExtuiButton
+		local submitButton = formPopup:AddButton(Translator:translate("Submit"))
+		local errorText = formPopup:AddText("Please provide a name and select an effect")
+		errorText:SetColor("Text", { 1, 0.02, 0, 1 })
+		errorText.Visible = false
+
+		formPopup:AddSeparatorText("Select and Preview"):SetStyle("SeparatorTextAlign", 0.5)
+		
+		formPopup:AddText("Search:")
+		local searchBox = formPopup:AddInputText("")
+		searchBox.SameLine = true
+		searchBox.AutoSelectAll = true
+		searchBox.Hint = "Case-insensitive"
+
+
+		local infoText = formPopup:AddText("Click on an effect to preview it")
+
+		local childWin = formPopup:AddChildWindow("effects")
+
+		local displayTable = childWin:AddTable("effects", 2)
+		displayTable.RowBg = true
+		displayTable.BordersInnerV = true
+
+		local displayRow = displayTable:AddRow()
+
+		local statusEffectBank = buildStatusEffectBank()
+		local counter = 0
+
+		---@type ExtuiSelectable?
+		local chosenEffect
+		local function renderResults()
+			Helpers:KillChildren(displayTable)
+			displayRow = displayTable:AddRow()
+
+			counter = 0
+			local searchUpper = searchBox.Text:upper()
+			for effectId, effectName in TableUtils:OrderedPairs(statusEffectBank, function(key, value)
+				return value
+			end) do
+				if searchUpper == "" or effectName:upper():find(searchUpper) then
+					counter = counter + 1
+					---@type ExtuiSelectable
+					local select = displayRow:AddCell():AddSelectable(effectName)
+					select.UserData = {
+						Name = effectName,
+						StatusEffect = effectId
+					} --[[@as VanityEffectProperties]]
+					select.OnClick = function()
+						if chosenEffect then
+							if chosenEffect.Handle == select.Handle then
+								select.Selected = true
+								return
+							end
+							chosenEffect.Selected = false
+						end
+
+						local effect = VanityEffect:new({}, nameInput.Text ~= "" and nameInput.Text or "RANDOM_PREVIEW", select.UserData)
+						effect.slot = SlotContextMenu.itemSlot or "Character"
+						Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
+						chosenEffect = select
+						selectedEffect.Label = effectName
+					end
+
+					if counter % displayTable.Columns == 0 then
+						displayRow = displayTable:AddRow()
+					end
+				end
+			end
+		end
+		renderResults()
+
+		local timer
+		searchBox.OnChange = function()
+			if timer then
+				Ext.Timer.Cancel(timer)
+			end
+			timer = Ext.Timer.WaitFor(400, function()
+				timer = nil
+				renderResults()
+			end)
 		end
 
-		local inputSupplier = FormBuilder:CreateForm(formPopup,
-			function(inputs)
-				local initiateEdit = self.Name and self.Name ~= ""
+		submitButton.OnClick = function()
+			if not chosenEffect or nameInput.Text == "" then
+				errorText.Visible = true
+			else
+				errorText.Visible = false
+				local initiateEdit = nameInput.Disabled
 				local effectToModify
 				if initiateEdit then
 					effectToModify = self
 				else
-					effectToModify = VanityEffect:new({}, inputs.Name, inputs)
+					effectToModify = VanityEffect:new({}, nameInput.Text, {
+						StatusEffect = chosenEffect.UserData.StatusEffect
+					})
 				end
 
 				if not effectToModify.cachedDisplayNames then
 					effectToModify.cachedDisplayNames = {}
 				end
 				effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = nil
-
-				inputs.Name = nil
-				effectToModify.effectProps = inputs
 
 				local success = pcall(function(...)
 					---@type ResourceMultiEffectInfo
@@ -531,20 +601,20 @@ if Ext.IsClient() then
 				if initiateEdit then
 					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(self))
 				end
-			end,
-			formInputs)
-
-		local previewButton = formPopup:AddButton(Translator:translate("Preview"))
-		previewButton.SameLine = true
-		previewButton.OnClick = function()
-			local inputs = inputSupplier()
-			if inputs then
-				local effect = VanityEffect:new({}, inputs.Name, inputs)
-				effect.slot = SlotContextMenu.itemSlot or "Character"
-				Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
 			end
 		end
-		previewButton:Tooltip():AddText(string.format("\t  " .. Translator:translate("Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"), SlotContextMenu.itemSlot)).TextWrapPos = 600
+
+		-- local previewButton = formPopup:AddButton(Translator:translate("Preview"))
+		-- previewButton.SameLine = true
+		-- previewButton.OnClick = function()
+		-- 	local inputs = inputSupplier()
+		-- 	if inputs then
+		-- 		local effect = VanityEffect:new({}, inputs.Name, inputs)
+		-- 		effect.slot = SlotContextMenu.itemSlot or "Character"
+		-- 		Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
+		-- 	end
+		-- end
+		-- previewButton:Tooltip():AddText(string.format("\t  " .. Translator:translate("Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"), SlotContextMenu.itemSlot)).TextWrapPos = 600
 	end
 
 	---@param parentPopup ExtuiPopup

@@ -62,7 +62,15 @@ function Styler:MiddleAlignedColumnLayout(parent, ...)
 	end
 end
 
-function Styler:ScaleFactor()
+---@param dimensionalArray number[]?
+---@return (number[]|number) dimensionalArray scaled up if present, otherwise it's the scale factor
+function Styler:ScaleFactor(dimensionalArray)
+	if dimensionalArray then
+		for i, v in ipairs(dimensionalArray) do
+			dimensionalArray[i] = v * Ext.IMGUI.GetViewportSize()[2] / 1440
+		end
+		return dimensionalArray
+	end
 	-- testing monitor for development is 1440p
 	return Ext.IMGUI.GetViewportSize()[2] / 1440
 end
