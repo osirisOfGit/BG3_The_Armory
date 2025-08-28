@@ -13,6 +13,7 @@ VanityEffect = {
 		StatusEffect = "",
 	},
 	cachedDisplayNames = {},
+	sourceModId = nil,
 	disableDuringDialogue = false
 }
 
@@ -467,6 +468,8 @@ if Ext.IsClient() then
 			end)
 		end
 
+		local statusEffectBank = buildStatusEffectBank()
+
 		formWindow = Ext.IMGUI.NewWindow(Translator:translate("Create Effect Form"))
 		formWindow:SetFocus()
 		formWindow.Closeable = true
@@ -482,7 +485,7 @@ if Ext.IsClient() then
 		nameInput.Disabled = self.Name and self.Name ~= ""
 
 		formWindow:AddText("Chosen Effect: ")
-		local selectedEffect = formWindow:AddText("")
+		local selectedEffect = formWindow:AddText(self.effectProps.StatusEffect and statusEffectBank[self.effectProps.StatusEffect] or "")
 		selectedEffect.SameLine = true
 
 		---@type ExtuiButton
@@ -499,7 +502,22 @@ if Ext.IsClient() then
 		searchBox.AutoSelectAll = true
 		searchBox.Hint = "Case-insensitive"
 
-		local infoText = formWindow:AddText("Click on an effect to preview it, Right-Click for options")
+		local options = { "All" }
+		local modNameToId = {}
+		local sources = Ext.Types.Serialize(Ext.StaticData.GetSources("MultiEffectInfo"))
+		for modId, modEffects in pairs(sources) do
+			if #modEffects > 0 then
+				table.insert(options, Ext.Mod.GetMod(modId).Info.Name)
+				modNameToId[Ext.Mod.GetMod(modId).Info.Name] = modId
+			end
+		end
+
+		formWindow:AddText("Filter by Mod:")
+		local combo = formWindow:AddCombo("")
+		combo.SameLine = true
+		combo.Options = options
+
+		formWindow:AddText("Click on an effect to preview it, Right-Click for options")
 
 		local childWin = formWindow:AddChildWindow("effects")
 
@@ -509,9 +527,8 @@ if Ext.IsClient() then
 
 		local displayRow = displayTable:AddRow()
 
-		local statusEffectBank = buildStatusEffectBank()
 		local counter = 0
-		
+
 		local effectSettings = ConfigurationStructure.config.vanity.settings.effects
 
 		---@type ExtuiSelectable?
@@ -526,7 +543,10 @@ if Ext.IsClient() then
 			for effectId, effectName in TableUtils:OrderedPairs(statusEffectBank, function(key, value)
 				return value
 			end) do
-				if searchUpper == "" or effectName:upper():find(searchUpper) then
+				if (searchUpper == "" or effectName:upper():find(searchUpper))
+					and (combo.SelectedIndex <= 0
+						or TableUtils:IndexOf(sources[modNameToId[combo.Options[combo.SelectedIndex + 1]]], effectId) ~= nil)
+				then
 					counter = counter + 1
 					---@type ExtuiSelectable
 					local select = displayRow:AddCell():AddSelectable(effectName)
@@ -582,6 +602,8 @@ if Ext.IsClient() then
 			end
 		end
 		renderResults()
+
+		combo.OnChange = renderResults
 
 		local timer
 		searchBox.OnChange = function()
@@ -675,15 +697,8 @@ if Ext.IsClient() then
 					disableDuringDialogue.Visible = true
 				elseif vanityOutfitItemEntry and vanityOutfitItemEntry.effects and vanityOutfitItemEntry.effects() then
 					effectMenu:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
-					local tableCopy = {}
-					for _, existingEffect in ipairs(vanityOutfitItemEntry.effects) do
-						if existingEffect ~= effectName then
-							table.insert(tableCopy, existingEffect)
-						end
-					end
-					vanityOutfitItemEntry.effects.delete = true
-					vanityOutfitItemEntry.effects = next(tableCopy) and tableCopy or {}
 
+					vanityOutfitItemEntry.effects[TableUtils:IndexOf(vanityOutfitItemEntry.effects, effectName)] = nil
 					disableDuringDialogue.Visible = false
 				end
 				onSubmitFunc()

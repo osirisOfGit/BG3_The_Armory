@@ -148,7 +148,7 @@ function VanityCharacterPanel:BuildModule(tabHeader, preset, criteriaCompositeKe
 			Helpers:KillChildren(copyPopup)
 			self.activePreset.Character = self.activePreset.Character or {}
 			self.activePreset.Character[self.criteriaCompositeKey] = self.activePreset.Character[self.criteriaCompositeKey] or { effects = {} }
-			
+
 			copyPopup:Open()
 			VanityEffect:buildSlotContextMenuEntries(copyPopup, self.activePreset.Character[self.criteriaCompositeKey], function()
 				Vanity:UpdatePresetOnServer()
@@ -354,7 +354,11 @@ function VanityCharacterPanel:BuildSlots(parentContainer, group, verticalSlots, 
 			--#endregion
 
 			--#region Effects
-			if outfitSlotEntry and outfitSlotEntry.equipment and outfitSlotEntry.equipment.effects and (outfitSlotEntry.equipment.effects.__call and outfitSlotEntry.equipment.effects() or next(outfitSlotEntry.equipment.effects)) then
+			if outfitSlotEntry
+				and outfitSlotEntry.equipment
+				and outfitSlotEntry.equipment.effects
+				and #(outfitSlotEntry.equipment.effects._real or outfitSlotEntry.equipment.effects) > 0
+			then
 				local effectsText = supplementaryGroup:AddText(Translator:translate("EFF"))
 				effectsText.Font = "Tiny"
 				effectsText:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
