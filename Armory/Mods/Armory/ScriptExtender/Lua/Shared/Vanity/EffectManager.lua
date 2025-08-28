@@ -617,17 +617,19 @@ if Ext.IsClient() then
 		end
 
 		submitButton.OnClick = function()
-			if not chosenEffect or nameInput.Text == "" then
+			if selectedEffect.Label == "" or nameInput.Text == "" then
 				errorText.Visible = true
 			else
+				local statusEffectId = TableUtils:IndexOf(statusEffectBank, selectedEffect.Label)
 				errorText.Visible = false
 				local initiateEdit = nameInput.Disabled
 				local effectToModify
 				if initiateEdit then
 					effectToModify = self
+					effectToModify.effectProps.StatusEffect = statusEffectId
 				else
 					effectToModify = VanityEffect:new({}, nameInput.Text, {
-						StatusEffect = chosenEffect.UserData.StatusEffect
+						StatusEffect = statusEffectId
 					})
 				end
 
@@ -640,6 +642,10 @@ if Ext.IsClient() then
 					---@type ResourceMultiEffectInfo
 					local mei = Ext.StaticData.Get(effectToModify.effectProps.StatusEffect, "MultiEffectInfo")
 					effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
+				end)
+
+				effectToModify.sourceModId = TableUtils:IndexOf(sources, function(value)
+					return TableUtils:IndexOf(value, statusEffectId) ~= nil
 				end)
 
 				effectCollection[effectToModify.Name] = effectToModify
@@ -701,6 +707,8 @@ if Ext.IsClient() then
 					vanityOutfitItemEntry.effects[TableUtils:IndexOf(vanityOutfitItemEntry.effects, effectName)] = nil
 					disableDuringDialogue.Visible = false
 				end
+
+				Helpers:ClearEmptyTablesInProxyTree(vanityOutfitItemEntry.effects)
 				onSubmitFunc()
 				enableEffect.Label = enableEffect.Selected and Translator:translate("Disable") or Translator:translate("Enable")
 			end
