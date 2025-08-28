@@ -399,7 +399,7 @@ if Ext.IsClient() then
 	end)
 
 	---@type ExtuiWindow
-	local formPopup
+	local formWindow
 
 	local resourceEffectCache = {}
 
@@ -461,46 +461,47 @@ if Ext.IsClient() then
 
 	---@param parent ExtuiTreeParent
 	function VanityEffect:buildCreateEffectForm(parent)
-		if formPopup then
+		if formWindow then
 			pcall(function(...)
-				formPopup:Destroy()
+				formWindow:Destroy()
 			end)
 		end
 
-		formPopup = Ext.IMGUI.NewWindow(Translator:translate("Create Effect Form"))
-		formPopup:SetFocus()
-		formPopup.Closeable = true
-		formPopup.NoCollapse = true
-		formPopup:SetSize(Styler:ScaleFactor({ 300, 300 }), "FirstUseEver")
+		formWindow = Ext.IMGUI.NewWindow(Translator:translate("Create Effect Form"))
+		formWindow:SetFocus()
+		formWindow.Closeable = true
+		formWindow.NoCollapse = true
+		formWindow:SetSize(Styler:ScaleFactor({ 300, 300 }), "FirstUseEver")
 
-		formPopup:AddText(Translator:translate("Name") .. ":")
-		local nameInput = formPopup:AddInputText("")
+		local popup = formWindow:AddPopup("effects")
+
+		formWindow:AddText(Translator:translate("Name") .. ":")
+		local nameInput = formWindow:AddInputText("")
 		nameInput.SameLine = true
 		nameInput.Text = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1)
 		nameInput.Disabled = self.Name and self.Name ~= ""
 
-		formPopup:AddText("Chosen Effect: ")
-		local selectedEffect = formPopup:AddText("")
+		formWindow:AddText("Chosen Effect: ")
+		local selectedEffect = formWindow:AddText("")
 		selectedEffect.SameLine = true
 
 		---@type ExtuiButton
-		local submitButton = formPopup:AddButton(Translator:translate("Submit"))
-		local errorText = formPopup:AddText("Please provide a name and select an effect")
+		local submitButton = formWindow:AddButton(Translator:translate("Submit"))
+		local errorText = formWindow:AddText("Please provide a name and select an effect")
 		errorText:SetColor("Text", { 1, 0.02, 0, 1 })
 		errorText.Visible = false
 
-		formPopup:AddSeparatorText("Select and Preview"):SetStyle("SeparatorTextAlign", 0.5)
-		
-		formPopup:AddText("Search:")
-		local searchBox = formPopup:AddInputText("")
+		formWindow:AddSeparatorText("Select and Preview"):SetStyle("SeparatorTextAlign", 0.5)
+
+		formWindow:AddText("Search:")
+		local searchBox = formWindow:AddInputText("")
 		searchBox.SameLine = true
 		searchBox.AutoSelectAll = true
 		searchBox.Hint = "Case-insensitive"
 
+		local infoText = formWindow:AddText("Click on an effect to preview it, Right-Click for options")
 
-		local infoText = formPopup:AddText("Click on an effect to preview it")
-
-		local childWin = formPopup:AddChildWindow("effects")
+		local childWin = formWindow:AddChildWindow("effects")
 
 		local displayTable = childWin:AddTable("effects", 2)
 		displayTable.RowBg = true
@@ -510,10 +511,13 @@ if Ext.IsClient() then
 
 		local statusEffectBank = buildStatusEffectBank()
 		local counter = 0
+		
+		local effectSettings = ConfigurationStructure.config.vanity.settings.effects
 
 		---@type ExtuiSelectable?
 		local chosenEffect
 		local function renderResults()
+			chosenEffect = nil
 			Helpers:KillChildren(displayTable)
 			displayRow = displayTable:AddRow()
 
@@ -530,6 +534,11 @@ if Ext.IsClient() then
 						Name = effectName,
 						StatusEffect = effectId
 					} --[[@as VanityEffectProperties]]
+
+					if TableUtils:IndexOf(effectSettings.undesirables, effectId) then
+						select:SetStyle("Alpha", 0.5)
+					end
+
 					select.OnClick = function()
 						if chosenEffect then
 							if chosenEffect.Handle == select.Handle then
@@ -544,6 +553,26 @@ if Ext.IsClient() then
 						Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
 						chosenEffect = select
 						selectedEffect.Label = effectName
+					end
+
+					select.OnRightClick = function()
+						Helpers:KillChildren(popup)
+						popup:Open()
+
+						---@type ExtuiSelectable
+						local unwanted = popup:AddSelectable("Mark As Unwanted")
+						unwanted.Selected = TableUtils:IndexOf(effectSettings, effectId) ~= nil
+
+						unwanted.OnClick = function()
+							local index = TableUtils:IndexOf(effectSettings.undesirables, effectId)
+							if index then
+								effectSettings.undesirables[index] = nil
+								select:SetStyle("Alpha", 1)
+							else
+								table.insert(effectSettings.undesirables, effectId)
+								select:SetStyle("Alpha", 0.5)
+							end
+						end
 					end
 
 					if counter % displayTable.Columns == 0 then
@@ -597,24 +626,12 @@ if Ext.IsClient() then
 				end
 				ConfigurationStructure.config.vanity.effects[effectToModify.Name] = effectToModify
 
-				formPopup:Destroy()
+				formWindow:Destroy()
 				if initiateEdit then
 					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(self))
 				end
 			end
 		end
-
-		-- local previewButton = formPopup:AddButton(Translator:translate("Preview"))
-		-- previewButton.SameLine = true
-		-- previewButton.OnClick = function()
-		-- 	local inputs = inputSupplier()
-		-- 	if inputs then
-		-- 		local effect = VanityEffect:new({}, inputs.Name, inputs)
-		-- 		effect.slot = SlotContextMenu.itemSlot or "Character"
-		-- 		Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
-		-- 	end
-		-- end
-		-- previewButton:Tooltip():AddText(string.format("\t  " .. Translator:translate("Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"), SlotContextMenu.itemSlot)).TextWrapPos = 600
 	end
 
 	---@param parentPopup ExtuiPopup
