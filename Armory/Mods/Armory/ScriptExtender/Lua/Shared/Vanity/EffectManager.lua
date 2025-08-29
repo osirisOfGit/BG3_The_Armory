@@ -490,11 +490,11 @@ if Ext.IsClient() then
 
 		---@type ExtuiButton
 		local submitButton = formWindow:AddButton(Translator:translate("Submit"))
-		local errorText = formWindow:AddText("Please provide a name and select an effect")
+		local errorText = formWindow:AddText(Translator:translate("Please provide a name and select an effect"))
 		errorText:SetColor("Text", { 1, 0.02, 0, 1 })
 		errorText.Visible = false
 
-		formWindow:AddSeparatorText("Select and Preview"):SetStyle("SeparatorTextAlign", 0.5)
+		formWindow:AddSeparatorText(Translator:translate("Select and Preview")):SetStyle("SeparatorTextAlign", 0.5)
 
 		formWindow:AddText("Search:")
 		local searchBox = formWindow:AddInputText("")
@@ -502,34 +502,45 @@ if Ext.IsClient() then
 		searchBox.AutoSelectAll = true
 		searchBox.Hint = "Case-insensitive"
 
-		local options = { "All" }
+		local options = {}
 		local modNameToId = {}
 		local sources = Ext.Types.Serialize(Ext.StaticData.GetSources("MultiEffectInfo"))
 		for modId, modEffects in pairs(sources) do
 			if #modEffects > 0 then
-				table.insert(options, Ext.Mod.GetMod(modId).Info.Name)
-				modNameToId[Ext.Mod.GetMod(modId).Info.Name] = modId
+				for effectId in pairs(statusEffectBank) do
+					if TableUtils:IndexOf(modEffects, effectId) then
+						table.insert(options, Ext.Mod.GetMod(modId).Info.Name)
+						modNameToId[Ext.Mod.GetMod(modId).Info.Name] = modId
+						break
+					end
+				end
 			end
 		end
+		table.sort(options)
+		table.insert(options, 1, "All")
 
 		formWindow:AddText("Filter by Mod:")
 		local combo = formWindow:AddCombo("")
 		combo.SameLine = true
 		combo.Options = options
+		combo.SelectedIndex = 0
 
-		formWindow:AddText("Click on an effect to preview it, Right-Click for options")
+		formWindow:AddText(Translator:translate("Click on an effect to preview it, Right-Click for options"))
 
 		local childWin = formWindow:AddChildWindow("effects")
 
 		local displayTable = childWin:AddTable("effects", 2)
 		displayTable.RowBg = true
 		displayTable.BordersInnerV = true
+		displayTable.OptimizedDraw = true
 
 		local displayRow = displayTable:AddRow()
 
 		local counter = 0
 
 		local effectSettings = ConfigurationStructure.config.vanity.settings.effects
+
+		local sourcesCache = {}
 
 		---@type ExtuiSelectable?
 		local chosenEffect
@@ -559,6 +570,15 @@ if Ext.IsClient() then
 						select:SetStyle("Alpha", 0.5)
 					end
 
+					local modId = sourcesCache[effectId] or TableUtils:IndexOf(sources, function (value)
+						return TableUtils:IndexOf(value, effectId) ~= nil
+					end)
+					if not sourcesCache[effectId] then
+						sourcesCache[effectId] = modId
+					end
+
+					select:Tooltip():AddText(("\t From: %s"):format(modId and TableUtils:IndexOf(modNameToId, modId) or "Unknown"))
+
 					select.OnClick = function()
 						if chosenEffect then
 							if chosenEffect.Handle == select.Handle then
@@ -580,7 +600,7 @@ if Ext.IsClient() then
 						popup:Open()
 
 						---@type ExtuiSelectable
-						local unwanted = popup:AddSelectable("Mark As Unwanted")
+						local unwanted = popup:AddSelectable(Translator:translate("Mark As Unwanted"))
 						unwanted.Selected = TableUtils:IndexOf(effectSettings, effectId) ~= nil
 
 						unwanted.OnClick = function()
@@ -779,12 +799,10 @@ end
 Translator:RegisterTranslation({
 	["Create Effect Form"] = "h6be19d3e032543a58900a528e1399bfefa2g",
 	["StatusEffect"] = "hf66bcec3350b4fa1b317a08b6d038e1d7eg6",
-	["Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"] =
-	"h5f8facf0545f4d9b9871fc4ef0756c720e53",
-	["Must provide a name"] = "h3985d3d0bf8943f7b33cd0ac714e48020447",
-	["Must select a value"] = "h3ab9121338134e3b850376b2c36f65d5ca1b",
-	["Preview"] = "h38a45f57bdd7446bb5464ce2cfd4078bcegf",
-	["Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"] = "h10acf4ac4f2b4c6887e317d60bea1cf23e8g",
+	["Select and Preview"] = "ha73078fc910d45fabe4bd8e0e5c76ad608ba",
+	["Click on an effect to preview it, Right-Click for options"] = "he3f38577711b4786a80551943e45e1ab39ge",
+	["Please provide a name and select an effect"] = "h76efca8adf1744979ae856319043d7ee3601",
+	["Mark As Unwanted"] = "h76efca8adf1744979ae856319043d7ee3601",
 	["Add Effects"] = "h47d69cc7394e4b1eb882464b287b5719e3fb",
 	["Disable"] = "h5fbccc4e25c241a887b57c60988bafe7e705",
 	["Enable"] = "hb12adca21c4e45189573c291701a5fa6d293",
