@@ -788,7 +788,7 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	---@type EntityHandle
 	local itemEntity = Ext.Entity.Get(item)
 	if itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging then
-		itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = nil
+		itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = itemEntity.Vars.TheArmory_Vanity_PreviewItem ~= nil
 		Transmogger:ApplyDye(Ext.Entity.Get(character))
 	else
 		-- When swapping weapons between slots multiple equip/unequip events fire in rapid succession, and since we mog the whole character at once
