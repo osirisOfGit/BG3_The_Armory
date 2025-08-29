@@ -13,7 +13,7 @@ VanityEffect = {
 		StatusEffect = "",
 	},
 	cachedDisplayNames = {},
-	sourceModId = nil,
+	modDependency = nil,
 	disableDuringDialogue = false
 }
 
@@ -570,7 +570,7 @@ if Ext.IsClient() then
 						select:SetStyle("Alpha", 0.5)
 					end
 
-					local modId = sourcesCache[effectId] or TableUtils:IndexOf(sources, function (value)
+					local modId = sourcesCache[effectId] or TableUtils:IndexOf(sources, function(value)
 						return TableUtils:IndexOf(value, effectId) ~= nil
 					end)
 					if not sourcesCache[effectId] then
@@ -664,9 +664,12 @@ if Ext.IsClient() then
 					effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
 				end)
 
-				effectToModify.sourceModId = TableUtils:IndexOf(sources, function(value)
+				effectToModify.modDependency = TableUtils:IndexOf(sources, function(value)
 					return TableUtils:IndexOf(value, statusEffectId) ~= nil
 				end)
+				if effectToModify.modDependency then
+					effectToModify.modDependency = VanityModDependencyManager:RecordDependency(Ext.Mod.GetMod(effectToModify.modDependency))
+				end
 
 				effectCollection[effectToModify.Name] = effectToModify
 				if ConfigurationStructure.config.vanity.effects[effectToModify.Name] then

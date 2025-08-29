@@ -106,7 +106,8 @@ function VanityModDependencyManager:DependencyValidator(vanityContainer, preset,
 								{
 									resourceId = effectInstance.effectProps.StatusEffect,
 									displayValue = effectInstance.cachedDisplayNames and effectInstance.cachedDisplayNames[effectInstance.effectProps.StatusEffect],
-									category = "Effect"
+									category = "Effect",
+									modInfo = effectInstance.modDependency
 								} --[[@as ValidationError]])
 						else
 							if not effectInstance.cachedDisplayNames then
@@ -277,7 +278,7 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 			parent = header
 		end
 
-		local dependencyTable = parent:AddTable("DependencyTable", 6)
+		local dependencyTable = parent:AddTable("DependencyTable", 7)
 		dependencyTable.Resizable = true
 		dependencyTable.RowBg = true
 
@@ -295,6 +296,7 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 		headerRow:AddCell():AddText(Translator:translate("Dye"))
 		headerRow:AddCell():AddText(Translator:translate("Mod"))
 		headerRow:AddCell():AddText(Translator:translate("Effects"))
+		headerRow:AddCell():AddText(Translator:translate("Mod"))
 
 		---@param row ExtuiTableRow
 		---@param itemEntry VanityOutfitItemEntry
@@ -320,6 +322,31 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 			end
 		end
 
+		if preset.Character and preset.Character[compositeKey] then
+			local charEffects = preset.Character[compositeKey]["effects"]
+			if charEffects then
+				local row = dependencyTable:AddRow()
+				row:AddCell():AddText("Character")
+				row:AddCell():AddText("---")
+				row:AddCell():AddText("---")
+				row:AddCell():AddText("---")
+				row:AddCell():AddText("---")
+				local text = row:AddCell():AddText("")
+				local modText = row:AddCell():AddText("")
+				for _, effect in ipairs(charEffects) do
+					text.Label = text.Label .. "|" .. string.sub(effect, #"ARMORY_VANITY_EFFECT_" + 1)
+					local vanityEffect = ConfigurationStructure.config.vanity.effects[effect]
+					if vanityEffect and vanityEffect.modDependency then
+						modText.Label = modText.Label .. ("|%s (%s)"):format(self:GetModInfo(vanityEffect.modDependency))
+					else
+						modText.Label = modText.Label .. "|Unknown"
+					end
+					text.Label = text.Label .. "|"
+					modText.Label = modText.Label .. "|"
+				end
+			end
+		end
+
 		for slot, slotEntry in TableUtils:OrderedPairs(preset.Outfits[compositeKey], function(key)
 			return SlotEnum[key]
 		end) do
@@ -331,12 +358,22 @@ function VanityModDependencyManager:BuildOutfitDependencyReport(preset, criteria
 
 				if slotEntry.equipment and slotEntry.equipment.effects and next(slotEntry.equipment.effects) then
 					local text = row:AddCell():AddText("")
+					local modText = row:AddCell():AddText("")
+
 					table.sort(slotEntry.equipment.effects)
 					for _, effect in ipairs(slotEntry.equipment.effects) do
 						text.Label = text.Label .. "|" .. string.sub(effect, #"ARMORY_VANITY_EFFECT_" + 1)
+						local vanityEffect = ConfigurationStructure.config.vanity.effects[effect]
+						if vanityEffect and vanityEffect.modDependency then
+							modText.Label = modText.Label .. ("|%s (%s)"):format(self:GetModInfo(vanityEffect.modDependency))
+						else
+							modText.Label = modText.Label .. "|Unknown"
+						end
 					end
 					text.Label = text.Label .. "|"
+					modText.Label = modText.Label .. "|"
 				else
+					row:AddCell():AddText("---")
 					row:AddCell():AddText("---")
 				end
 			end
