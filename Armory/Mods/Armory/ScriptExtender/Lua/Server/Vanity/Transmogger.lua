@@ -111,7 +111,7 @@ end
 Transmogger.saveLoadLock = false
 
 ---@param character EntityHandle
-function Transmogger:MogCharacter(character)
+function Transmogger:MogCharacter(character, skipJunk)
 	local characterPreset, charUserId = ServerPresetManager:GetCharacterPreset(character.Uuid.EntityUuid)
 
 	if not characterPreset then
@@ -197,7 +197,7 @@ function Transmogger:MogCharacter(character)
 		end
 
 		if not equippedItem then
-			if self.defaultPieces[actualSlot] and (vanity.settings and vanity.settings.general.fillEmptySlots) then
+			if self.defaultPieces[actualSlot] and (vanity.settings and vanity.settings.general.fillEmptySlots) and not skipJunk then
 				equippedItem = Osi.CreateAt(self.defaultPieces[actualSlot], 0, 0, 0, 0, 0, "")
 			else
 				goto continue
@@ -775,7 +775,7 @@ Ext.Osiris.RegisterListener("Unequipped", 2, "after", function(item, character)
 		local newItem = Transmogger:UnMogItem(item)
 		if newItem and not Ext.Entity.Get(newItem).Vars.TheArmory_Vanity_Item_CurrentlyMogging then
 			Ext.Timer.WaitFor(20, function()
-				Transmogger:MogCharacter(Ext.Entity.Get(character))
+				Transmogger:MogCharacter(Ext.Entity.Get(character), true)
 			end)
 		end
 	end)
@@ -788,8 +788,10 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 	---@type EntityHandle
 	local itemEntity = Ext.Entity.Get(item)
 	if itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging then
-		itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = nil
-		Transmogger:ApplyDye(Ext.Entity.Get(character))
+		if not itemEntity.Vars.TheArmory_Vanity_PreviewItem then
+			itemEntity.Vars.TheArmory_Vanity_Item_CurrentlyMogging = nil
+			Transmogger:ApplyDye(Ext.Entity.Get(character))
+		end
 	else
 		-- When swapping weapons between slots multiple equip/unequip events fire in rapid succession, and since we mog the whole character at once
 		-- need to make sure we don't rapid fire a bunch of transmogs while timers are still processing
@@ -812,14 +814,14 @@ Ext.Osiris.RegisterListener("Equipped", 2, "after", function(item, character)
 						item,
 						character)
 
-					Transmogger:MogCharacter(Ext.Entity.Get(character))
+					Transmogger:MogCharacter(Ext.Entity.Get(character), true)
 				end)
 			else
 				Logger:BasicDebug("Item %s was equipped on %s, executing transmog",
 					item,
 					character)
 
-				Transmogger:MogCharacter(Ext.Entity.Get(character))
+				Transmogger:MogCharacter(Ext.Entity.Get(character), true)
 			end
 		end)
 	end
