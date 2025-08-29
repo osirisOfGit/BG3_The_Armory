@@ -101,7 +101,7 @@ function VanityCharacterCriteria:BuildConfiguredCriteriaCombinationsTable(preset
 
 	local function buildTable()
 		for criteriaCompositeKey, outfit in TableUtils:OrderedPairs(preset.Outfits) do
-			if criteriaCompositeKey == outfitToCopyTo then
+			if criteriaCompositeKey == outfitToCopyTo or not next(outfit._real or outfit) then
 				goto continue
 			end
 			local row = criteriaSelectionDisplayTable:AddRow()

@@ -33,11 +33,13 @@ function Helpers:KillChildren(...)
 end
 
 function Helpers:ClearEmptyTablesInProxyTree(proxyTable)
-	local parentTable = proxyTable._parent_proxy
-	if not proxyTable() then
-		proxyTable.delete = true
-		if parentTable then
-			Helpers:ClearEmptyTablesInProxyTree(parentTable)
+	if proxyTable then
+		local parentTable = not proxyTable._parent_proxy.Author and proxyTable._parent_proxy
+		if not proxyTable() then
+			proxyTable.delete = true
+			if parentTable then
+				Helpers:ClearEmptyTablesInProxyTree(parentTable)
+			end
 		end
 	end
 end
