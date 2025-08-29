@@ -288,6 +288,7 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 	end
 
 	local favoriteButton = Styler:ImageButton(displayGroup:AddImageButton("Favorite" .. dyeTemplate.Id, isFavorited and "star_fileld" or "star_empty", { 26, 26 }))
+	favoriteButton.NoItemNav = true
 
 	local dyeImageButton = Styler:ImageButton(displayGroup:AddImageButton(dyeTemplate.Id, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize }))
 	dyeImageButton.UserData = materialPreset.Guid
