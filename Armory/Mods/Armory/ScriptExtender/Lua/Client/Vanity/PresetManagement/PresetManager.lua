@@ -184,24 +184,26 @@ local function buildDependencyTable(preset, parent)
 	}
 
 	for _, outfitSlot in pairs(preset.Outfits) do
-		for _, vanityOutfit in pairs(outfitSlot) do
-			if vanityOutfit.dye and vanityOutfit.dye.modDependency then
-				if not cachedDeps[vanityOutfit.dye.modDependency.Guid] then
-					table.insert(cachedDeps.dye, vanityOutfit.dye.modDependency)
-					cachedDeps[vanityOutfit.dye.modDependency.Guid] = true
+		if next(outfitSlot._real or outfitSlot) then
+			for _, vanityOutfit in pairs(outfitSlot) do
+				if vanityOutfit.dye and vanityOutfit.dye.modDependency then
+					if not cachedDeps[vanityOutfit.dye.modDependency.Guid] then
+						table.insert(cachedDeps.dye, vanityOutfit.dye.modDependency)
+						cachedDeps[vanityOutfit.dye.modDependency.Guid] = true
+					end
 				end
-			end
-			if vanityOutfit.equipment and vanityOutfit.equipment.modDependency then
-				if not cachedDeps[vanityOutfit.equipment.modDependency.Guid] then
-					table.insert(cachedDeps.equipment, vanityOutfit.equipment.modDependency)
-					cachedDeps[vanityOutfit.equipment.modDependency.Guid] = true
+				if vanityOutfit.equipment and vanityOutfit.equipment.modDependency then
+					if not cachedDeps[vanityOutfit.equipment.modDependency.Guid] then
+						table.insert(cachedDeps.equipment, vanityOutfit.equipment.modDependency)
+						cachedDeps[vanityOutfit.equipment.modDependency.Guid] = true
+					end
 				end
-			end
-			if vanityOutfit.weaponTypes then
-				for _, weaponSlot in pairs(vanityOutfit.weaponTypes) do
-					if weaponSlot.equipment.modDependency and not cachedDeps[weaponSlot.equipment.modDependency.Guid] then
-						table.insert(cachedDeps.equipment, weaponSlot.equipment.modDependency)
-						cachedDeps[weaponSlot.equipment.modDependency.Guid] = true
+				if vanityOutfit.weaponTypes then
+					for _, weaponSlot in pairs(vanityOutfit.weaponTypes) do
+						if weaponSlot.equipment.modDependency and not cachedDeps[weaponSlot.equipment.modDependency.Guid] then
+							table.insert(cachedDeps.equipment, weaponSlot.equipment.modDependency)
+							cachedDeps[weaponSlot.equipment.modDependency.Guid] = true
+						end
 					end
 				end
 			end
@@ -312,7 +314,7 @@ function PresetManager:buildSection(presetId, vanityContainer, presetCollection,
 	if not parentSection then
 		Logger:BasicWarning("Was unable to build a section of the PresetManager sidebar due to a missing parent - what did you do? Call Stack: %s", debug.traceback())
 	end
-	
+
 	local activePreset = Vanity.ActivePresetId
 
 	if externalOwner then
@@ -702,7 +704,7 @@ Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
 			}
 		}
 	end
-	
+
 	return vanityPreset
 end)
 

@@ -13,6 +13,7 @@ VanityEffect = {
 		StatusEffect = "",
 	},
 	cachedDisplayNames = {},
+	modDependency = nil,
 	disableDuringDialogue = false
 }
 
@@ -399,10 +400,11 @@ if Ext.IsClient() then
 	end)
 
 	---@type ExtuiWindow
-	local formPopup
+	local formWindow
 
 	local resourceEffectCache = {}
 
+	---@type {[string]: string}
 	local effects = {}
 
 	local function buildStatusEffectBank()
@@ -460,51 +462,195 @@ if Ext.IsClient() then
 
 	---@param parent ExtuiTreeParent
 	function VanityEffect:buildCreateEffectForm(parent)
-		if formPopup then
+		if formWindow then
 			pcall(function(...)
-				formPopup:Destroy()
+				formWindow:Destroy()
 			end)
 		end
 
-		formPopup = Ext.IMGUI.NewWindow(Translator:translate("Create Effect Form"))
-		formPopup:SetFocus()
-		formPopup.Closeable = true
-		formPopup.NoCollapse = true
-		formPopup.AlwaysAutoResize = true
+		local statusEffectBank = buildStatusEffectBank()
 
-		local warningText = formPopup:AddText(
-			Translator:translate("Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"))
-		warningText.UserData = "keep"
-		warningText.TextWrapPos = 0
-		warningText:SetStyle("Alpha", 0.65)
+		formWindow = Ext.IMGUI.NewWindow(Translator:translate("Create Effect Form"))
+		formWindow:SetFocus()
+		formWindow.Closeable = true
+		formWindow.NoCollapse = true
+		formWindow:SetSize(Styler:ScaleFactor({ 300, 300 }), "FirstUseEver")
 
-		---@type FormStructure[]
-		local formInputs = { {
-			label = "Name",
-			type = "Text",
-			errorMessageIfEmpty = "Must provide a name",
-			defaultValue = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1),
-			enabled = self.Name and self.Name ~= ""
-		} }
-		for effectProp, value in TableUtils:OrderedPairs(self.effectProps) do
-			table.insert(formInputs, {
-				label = effectProp,
-				defaultValue = self.effectProps and self.effectProps[effectProp] or nil,
-				propertyField = effectProp,
-				type = type(value) == "number" and "NumericText" or "Text",
-				enumTable = buildStatusEffectBank,
-				errorMessageIfEmpty = "Must select a value"
-			} --[[@as FormStructure]])
+		local popup = formWindow:AddPopup("effects")
+
+		formWindow:AddText(Translator:translate("Name") .. ":")
+		local nameInput = formWindow:AddInputText("")
+		nameInput.SameLine = true
+		nameInput.Text = self.Name and string.sub(self.Name, #"ARMORY_VANITY_EFFECT_" + 1)
+		nameInput.Disabled = self.Name and self.Name ~= ""
+
+		formWindow:AddText("Chosen Effect: ")
+		local selectedEffect = formWindow:AddText(self.effectProps.StatusEffect and statusEffectBank[self.effectProps.StatusEffect] or "")
+		selectedEffect.SameLine = true
+
+		---@type ExtuiButton
+		local submitButton = formWindow:AddButton(Translator:translate("Submit"))
+		local errorText = formWindow:AddText(Translator:translate("Please provide a name and select an effect"))
+		errorText:SetColor("Text", { 1, 0.02, 0, 1 })
+		errorText.Visible = false
+
+		formWindow:AddSeparatorText(Translator:translate("Select and Preview")):SetStyle("SeparatorTextAlign", 0.5)
+
+		formWindow:AddText("Search:")
+		local searchBox = formWindow:AddInputText("")
+		searchBox.SameLine = true
+		searchBox.AutoSelectAll = true
+		searchBox.Hint = "Case-insensitive"
+
+		local options = {}
+		local modNameToId = {}
+		local sources = Ext.Types.Serialize(Ext.StaticData.GetSources("MultiEffectInfo"))
+		for modId, modEffects in pairs(sources) do
+			if #modEffects > 0 then
+				for effectId in pairs(statusEffectBank) do
+					if TableUtils:IndexOf(modEffects, effectId) then
+						table.insert(options, Ext.Mod.GetMod(modId).Info.Name)
+						modNameToId[Ext.Mod.GetMod(modId).Info.Name] = modId
+						break
+					end
+				end
+			end
+		end
+		table.sort(options)
+		table.insert(options, 1, "All")
+
+		formWindow:AddText("Filter by Mod:")
+		local combo = formWindow:AddCombo("")
+		combo.SameLine = true
+		combo.Options = options
+		combo.SelectedIndex = 0
+
+		formWindow:AddText(Translator:translate("Click on an effect to preview it, Right-Click for options"))
+
+		local childWin = formWindow:AddChildWindow("effects")
+
+		local displayTable = childWin:AddTable("effects", 2)
+		displayTable.RowBg = true
+		displayTable.BordersInnerV = true
+		displayTable.OptimizedDraw = true
+
+		local displayRow = displayTable:AddRow()
+
+		local counter = 0
+
+		local effectSettings = ConfigurationStructure.config.vanity.settings.effects
+
+		local sourcesCache = {}
+
+		---@type ExtuiSelectable?
+		local chosenEffect
+		local function renderResults()
+			chosenEffect = nil
+			Helpers:KillChildren(displayTable)
+			displayRow = displayTable:AddRow()
+
+			counter = 0
+			local searchUpper = searchBox.Text:upper()
+			for effectId, effectName in TableUtils:OrderedPairs(statusEffectBank, function(key, value)
+				return value
+			end) do
+				if (searchUpper == "" or effectName:upper():find(searchUpper))
+					and (combo.SelectedIndex <= 0
+						or TableUtils:IndexOf(sources[modNameToId[combo.Options[combo.SelectedIndex + 1]]], effectId) ~= nil)
+				then
+					counter = counter + 1
+					---@type ExtuiSelectable
+					local select = displayRow:AddCell():AddSelectable(effectName)
+					select.UserData = {
+						Name = effectName,
+						StatusEffect = effectId
+					} --[[@as VanityEffectProperties]]
+
+					if TableUtils:IndexOf(effectSettings.undesirables, effectId) then
+						select:SetStyle("Alpha", 0.5)
+					end
+
+					local modId = sourcesCache[effectId] or TableUtils:IndexOf(sources, function(value)
+						return TableUtils:IndexOf(value, effectId) ~= nil
+					end)
+					if not sourcesCache[effectId] then
+						sourcesCache[effectId] = modId
+					end
+
+					select:Tooltip():AddText(("\t From: %s"):format(modId and TableUtils:IndexOf(modNameToId, modId) or "Unknown"))
+
+					select.OnClick = function()
+						if chosenEffect then
+							if chosenEffect.Handle == select.Handle then
+								select.Selected = true
+								return
+							end
+							chosenEffect.Selected = false
+						end
+
+						local effect = VanityEffect:new({}, nameInput.Text ~= "" and nameInput.Text or "RANDOM_PREVIEW", select.UserData)
+						effect.slot = SlotContextMenu.itemSlot or "Character"
+						Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
+						chosenEffect = select
+						selectedEffect.Label = effectName
+					end
+
+					select.OnRightClick = function()
+						Helpers:KillChildren(popup)
+						popup:Open()
+
+						---@type ExtuiSelectable
+						local unwanted = popup:AddSelectable(Translator:translate("Mark As Unwanted"))
+						unwanted.Selected = TableUtils:IndexOf(effectSettings, effectId) ~= nil
+
+						unwanted.OnClick = function()
+							local index = TableUtils:IndexOf(effectSettings.undesirables, effectId)
+							if index then
+								effectSettings.undesirables[index] = nil
+								select:SetStyle("Alpha", 1)
+							else
+								table.insert(effectSettings.undesirables, effectId)
+								select:SetStyle("Alpha", 0.5)
+							end
+						end
+					end
+
+					if counter % displayTable.Columns == 0 then
+						displayRow = displayTable:AddRow()
+					end
+				end
+			end
+		end
+		renderResults()
+
+		combo.OnChange = renderResults
+
+		local timer
+		searchBox.OnChange = function()
+			if timer then
+				Ext.Timer.Cancel(timer)
+			end
+			timer = Ext.Timer.WaitFor(400, function()
+				timer = nil
+				renderResults()
+			end)
 		end
 
-		local inputSupplier = FormBuilder:CreateForm(formPopup,
-			function(inputs)
-				local initiateEdit = self.Name and self.Name ~= ""
+		submitButton.OnClick = function()
+			if selectedEffect.Label == "" or nameInput.Text == "" then
+				errorText.Visible = true
+			else
+				local statusEffectId = TableUtils:IndexOf(statusEffectBank, selectedEffect.Label)
+				errorText.Visible = false
+				local initiateEdit = nameInput.Disabled
 				local effectToModify
 				if initiateEdit then
 					effectToModify = self
+					effectToModify.effectProps.StatusEffect = statusEffectId
 				else
-					effectToModify = VanityEffect:new({}, inputs.Name, inputs)
+					effectToModify = VanityEffect:new({}, nameInput.Text, {
+						StatusEffect = statusEffectId
+					})
 				end
 
 				if not effectToModify.cachedDisplayNames then
@@ -512,14 +658,18 @@ if Ext.IsClient() then
 				end
 				effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = nil
 
-				inputs.Name = nil
-				effectToModify.effectProps = inputs
-
 				local success = pcall(function(...)
 					---@type ResourceMultiEffectInfo
 					local mei = Ext.StaticData.Get(effectToModify.effectProps.StatusEffect, "MultiEffectInfo")
 					effectToModify.cachedDisplayNames[effectToModify.effectProps.StatusEffect] = mei.Name
 				end)
+
+				effectToModify.modDependency = TableUtils:IndexOf(sources, function(value)
+					return TableUtils:IndexOf(value, statusEffectId) ~= nil
+				end)
+				if effectToModify.modDependency then
+					effectToModify.modDependency = VanityModDependencyManager:RecordDependency(Ext.Mod.GetMod(effectToModify.modDependency))
+				end
 
 				effectCollection[effectToModify.Name] = effectToModify
 				if ConfigurationStructure.config.vanity.effects[effectToModify.Name] then
@@ -527,24 +677,12 @@ if Ext.IsClient() then
 				end
 				ConfigurationStructure.config.vanity.effects[effectToModify.Name] = effectToModify
 
-				formPopup:Destroy()
+				formWindow:Destroy()
 				if initiateEdit then
 					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(self))
 				end
-			end,
-			formInputs)
-
-		local previewButton = formPopup:AddButton(Translator:translate("Preview"))
-		previewButton.SameLine = true
-		previewButton.OnClick = function()
-			local inputs = inputSupplier()
-			if inputs then
-				local effect = VanityEffect:new({}, inputs.Name, inputs)
-				effect.slot = SlotContextMenu.itemSlot or "Character"
-				Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
 			end
 		end
-		previewButton:Tooltip():AddText(string.format("\t  " .. Translator:translate("Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"), SlotContextMenu.itemSlot)).TextWrapPos = 600
 	end
 
 	---@param parentPopup ExtuiPopup
@@ -588,17 +726,12 @@ if Ext.IsClient() then
 					disableDuringDialogue.Visible = true
 				elseif vanityOutfitItemEntry and vanityOutfitItemEntry.effects and vanityOutfitItemEntry.effects() then
 					effectMenu:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
-					local tableCopy = {}
-					for _, existingEffect in ipairs(vanityOutfitItemEntry.effects) do
-						if existingEffect ~= effectName then
-							table.insert(tableCopy, existingEffect)
-						end
-					end
-					vanityOutfitItemEntry.effects.delete = true
-					vanityOutfitItemEntry.effects = next(tableCopy) and tableCopy or {}
 
+					vanityOutfitItemEntry.effects[TableUtils:IndexOf(vanityOutfitItemEntry.effects, effectName)] = nil
 					disableDuringDialogue.Visible = false
 				end
+
+				Helpers:ClearEmptyTablesInProxyTree(vanityOutfitItemEntry.effects)
 				onSubmitFunc()
 				enableEffect.Label = enableEffect.Selected and Translator:translate("Disable") or Translator:translate("Enable")
 			end
@@ -669,12 +802,10 @@ end
 Translator:RegisterTranslation({
 	["Create Effect Form"] = "h6be19d3e032543a58900a528e1399bfefa2g",
 	["StatusEffect"] = "hf66bcec3350b4fa1b317a08b6d038e1d7eg6",
-	["Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies"] =
-	"h5f8facf0545f4d9b9871fc4ef0756c720e53",
-	["Must provide a name"] = "h3985d3d0bf8943f7b33cd0ac714e48020447",
-	["Must select a value"] = "h3ab9121338134e3b850376b2c36f65d5ca1b",
-	["Preview"] = "h38a45f57bdd7446bb5464ce2cfd4078bcegf",
-	["Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds"] = "h10acf4ac4f2b4c6887e317d60bea1cf23e8g",
+	["Select and Preview"] = "ha73078fc910d45fabe4bd8e0e5c76ad608ba",
+	["Click on an effect to preview it, Right-Click for options"] = "he3f38577711b4786a80551943e45e1ab39ge",
+	["Please provide a name and select an effect"] = "h76efca8adf1744979ae856319043d7ee3601",
+	["Mark As Unwanted"] = "h76efca8adf1744979ae856319043d7ee3601",
 	["Add Effects"] = "h47d69cc7394e4b1eb882464b287b5719e3fb",
 	["Disable"] = "h5fbccc4e25c241a887b57c60988bafe7e705",
 	["Enable"] = "hb12adca21c4e45189573c291701a5fa6d293",

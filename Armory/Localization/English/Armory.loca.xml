@@ -367,11 +367,6 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <!-- START Effect Manager -->
     <content contentuid="h6be19d3e032543a58900a528e1399bfefa2g" version="1">Create Effect Form</content>
     <content contentuid="hf66bcec3350b4fa1b317a08b6d038e1d7eg6" version="1">StatusEffect</content>
-    <content contentuid="h5f8facf0545f4d9b9871fc4ef0756c720e53" version="1">Please be aware that there's currently no way for Armory to know which effects came from mods, so these won't show up in the mod dependencies</content>
-    <content contentuid="h3985d3d0bf8943f7b33cd0ac714e48020447" version="1">Must provide a name</content>
-    <content contentuid="h3ab9121338134e3b850376b2c36f65d5ca1b" version="1">Must select a value</content>
-    <content contentuid="h38a45f57bdd7446bb5464ce2cfd4078bcegf" version="1">Preview</content>
-    <content contentuid="h10acf4ac4f2b4c6887e317d60bea1cf23e8g" version="1">Will use a reserved status to apply the selected effect to the equipped item in the currently selected slot (%s) for 10 rounds</content>
     <content contentuid="h47d69cc7394e4b1eb882464b287b5719e3fb" version="1">Add Effects</content>
     <content contentuid="h7bc9ab98a2a44106aa4f1ae5e85d7ae718bb" version="1">Disable During Dialogue</content>
     <content contentuid="hcd094f8ace4841489f7ee4ab60d53bd23861" version="1">Enable During Dialogue</content>
@@ -404,4 +399,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="hf5eaf133134b4a99bbcd336b9c1df434af1d" version="1">Unique Item - Can't Transmog</content>
     <content contentuid="hc60b8ef2b9cf469cb767fa2d8b9ac5c8ea23" version="1">This is a completely unique item, and can't be transmogged by Armory. You can still apply dyes and effects</content>
     <content contentuid="ha2588acc82bc4163a2ecb69f10d9d300b5a0" version="1">Add Effects To Character</content>
+    <content contentuid="ha73078fc910d45fabe4bd8e0e5c76ad608ba" version="1">Select and Preview</content>
+    <content contentuid="he3f38577711b4786a80551943e45e1ab39ge" version="1">Click on an effect to preview it, Right-Click for options</content>
+    <content contentuid="h76efca8adf1744979ae856319043d7ee3601" version="1">Please provide a name and select an effect</content>
 </contentList>

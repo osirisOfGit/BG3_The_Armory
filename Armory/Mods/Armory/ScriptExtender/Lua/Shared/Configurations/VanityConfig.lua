@@ -30,6 +30,9 @@ ConfigurationStructure.config.vanity.settings = {
 		favorites = {},
 		showNames = true,
 		imageSize = 90
+	},
+	effects = {
+		undesirables = {}
 	}
 }
 --#endregion
