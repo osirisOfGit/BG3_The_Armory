@@ -403,7 +403,8 @@ function VanityCharacterCriteria:BuildModule(tabHeader, preset)
 
 				criteriaTableCopy[column.UserData] = otherSelectable.UserData or nil
 
-				if preset.Outfits[CreateCriteriaCompositeKey(criteriaTableCopy)] then
+				local outfit = preset.Outfits[CreateCriteriaCompositeKey(criteriaTableCopy)]
+				if outfit and next((outfit._real or outfit)) then
 					-- Green
 					otherSelectable:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
 				else
