@@ -1,5 +1,7 @@
 Ext.Require("Utilities/Common/_Index.lua")
+Ext.Require("Utilities/Client/IMGUI/_Index.lua")
 Ext.Require("Utilities/Networking/Channels.lua")
+Ext.Require("Shared/NetChannelRegistry.lua")
 
 Ext.Events.StatsLoaded:Subscribe(function()
 	Logger:ClearLogFile()
@@ -13,7 +15,6 @@ Ext.Require("Client/Vanity/PresetProxy.lua")
 
 
 Ext.Require("Client/RandomHelpers.lua")
-Ext.Require("Client/Styler.lua")
 Ext.Require("Client/Vanity/Main.lua")
 
 Ext.Vars.RegisterModVariable(ModuleUUID, "CharacterAssignedCache", {

@@ -96,7 +96,11 @@ function PartyOutfitManager:FindAndApplyOutfit(player, activeOutfits)
 			4       0            1
 			]]
 			local bodyType = playerEntity.CharacterCreationStats.BodyType
-			local bodyShape = playerEntity.CharacterCreationStats.BodyShape
+			local bodyShape = tonumber(playerEntity.CharacterCreationStats.BodyShape)
+			if Ext.Utils.Version() >= 27 and type(bodyType) == "userdata" then
+				bodyType = tonumber(bodyType.Value)
+			end
+
 			if bodyType == 0 then
 				bodyType = 2
 			end
