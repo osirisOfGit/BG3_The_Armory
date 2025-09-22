@@ -312,7 +312,10 @@ end
 ---@param parentSection ExtuiTreeParent
 function PresetManager:buildSection(presetId, vanityContainer, presetCollection, externalOwner, parentSection)
 	if not parentSection then
-		Logger:BasicWarning("Was unable to build a section of the PresetManager sidebar due to a missing parent - what did you do? Call Stack: %s", debug.traceback())
+		Ext.OnNextTick(function(e)
+			self:buildSection(presetId, vanityContainer, presetCollection, externalOwner, parentSection)
+		end)
+		return
 	end
 
 	local activePreset = Vanity.ActivePresetId
