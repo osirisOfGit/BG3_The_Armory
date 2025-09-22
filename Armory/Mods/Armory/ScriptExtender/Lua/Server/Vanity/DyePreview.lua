@@ -6,12 +6,12 @@ local userTracker = {}
 
 -- TODO: Handle user swapping characters while previewing
 
-Ext.RegisterNetListener(ModuleUUID .. "_PreviewDye", function(channel, payload, user)
+Channels.PreviewDye:SetHandler(function(payload, user)
 	user = PeerToUserID(user)
 	local character = Osi.GetCurrentCharacter(user)
 
 	---@type DyePayload
-	local dyePayload = Ext.Json.Parse(payload)
+	local dyePayload = payload
 
 	local equippedItem = Osi.GetEquippedItem(character, dyePayload.slot)
 
@@ -32,7 +32,7 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewDye", function(channel, payload, 
 	end
 end)
 
-Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingDye", function(channel, slot, user)
+Channels.StopPreviewingDye:SetHandler(function(slot, user)
 	user = PeerToUserID(user)
 	local character = Osi.GetCurrentCharacter(user)
 

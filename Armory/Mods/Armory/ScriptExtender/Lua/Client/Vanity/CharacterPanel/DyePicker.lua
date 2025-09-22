@@ -32,7 +32,7 @@ function DyePicker:OpenWindow(itemTemplate, slot, onSelectFunc)
 			self.infoCell = row:AddCell()
 		end,
 		function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", self.slot)
+			Channels.StopPreviewingDye:SendToServer(self.slot)
 		end)
 
 	self.onSelectFunc = onSelectFunc
@@ -153,7 +153,8 @@ function DyePicker:CreateCustomFilters()
 	eucledianDistance:Tooltip():AddText("\t  " .. Translator:translate("Faster, less accurate"))
 
 	local cielab94Delta = similarColourFilter.header:AddRadioButton(Translator:translate("CIE94 Delta"), true)
-	cielab94Delta:Tooltip():AddText("\t  " .. Translator:translate("Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)"))
+	cielab94Delta:Tooltip():AddText("\t  " ..
+		Translator:translate("Slower, more accurate (Illuminant = D65, 10 degree observer, unity = 1)\n(don't @ me CIE2000 nerds, I ain't that smart)"))
 
 	eucledianDistance.OnActivate = function()
 		cielab94Delta.Active = eucledianDistance.Active
@@ -326,7 +327,7 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 			self.activeDyeGroup:Destroy()
 			self.activeDyeGroup = nil
 
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingDye", self.slot)
+			Channels.StopPreviewingDye:SendToServer(self.slot)
 			self.onSelectFunc(dyeTemplate)
 			self.window.Open = false
 		end
@@ -358,10 +359,10 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 			end
 		end
 
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewDye", Ext.Json.Stringify({
+		Channels.PreviewDye:SendToServer({
 			materialPreset = dyeImageButton.UserData,
 			slot = self.slot
-		}))
+		})
 	end
 
 	favoriteButton.OnClick = function()

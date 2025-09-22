@@ -229,20 +229,20 @@ function VanityEffect:editStat()
 end
 
 if Ext.IsServer() then
-	Ext.RegisterNetListener(ModuleUUID .. "_EditEffect", function(channel, payload, user)
-		local effectRaw = Ext.Json.Parse(payload)
+	Channels.EditEffect:SetHandler(function(payload, user)
+		local effectRaw = payload
 		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps):editStat()
 	end)
 
-	Ext.RegisterNetListener(ModuleUUID .. "_DeleteEffect", function(channel, effectName, user)
+	Channels.DeleteEffect:SetHandler(function(effectName, user)
 		VanityEffect:deleteStat(effectName)
 	end)
 
-	Ext.RegisterNetListener(ModuleUUID .. "_PreviewEffect", function(channel, payload, user)
+	Channels.PreviewEffect:SetHandler(function(payload, user)
 		user = PeerToUserID(user)
 		local character = Osi.GetCurrentCharacter(user)
 
-		local effectRaw = Ext.Json.Parse(payload)
+		local effectRaw = payload
 		local slot = effectRaw.slot
 
 		local effect = VanityEffect:new({}, "TheArmory_Vanity_PreviewEffect", effectRaw.effectProps)
@@ -369,7 +369,7 @@ function VanityEffect:deleteStat(effectName)
 			end
 		end
 
-		Ext.Net.PostMessageToServer(ModuleUUID .. "_DeleteEffect", effectName)
+		Channels.DeleteEffect:SendToServer(effectName)
 	else
 		for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
 			if Osi.HasActiveStatus(entityId, effectName) == 1 then
@@ -590,7 +590,7 @@ if Ext.IsClient() then
 
 						local effect = VanityEffect:new({}, nameInput.Text ~= "" and nameInput.Text or "RANDOM_PREVIEW", select.UserData)
 						effect.slot = SlotContextMenu.itemSlot or "Character"
-						Ext.Net.PostMessageToServer(ModuleUUID .. "_PreviewEffect", Ext.Json.Stringify(effect))
+						Channels.PreviewEffect:SendToServer(effect)
 						chosenEffect = select
 						selectedEffect.Label = effectName
 					end
@@ -679,7 +679,7 @@ if Ext.IsClient() then
 
 				formWindow:Destroy()
 				if initiateEdit then
-					Ext.Net.PostMessageToServer(ModuleUUID .. "_EditEffect", Ext.Json.Stringify(self))
+					Channels.EditEffect:SendToServer(self)
 				end
 			end
 		end

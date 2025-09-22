@@ -17,21 +17,22 @@ PersistentVars = {}
 --- @alias YesNo "Yes"|"No"
 --- @alias OsirisValue number|string
 
---- Using a DB like a function will allow inserting new values into the database (ex. `Osi.DB_IsPlayer("02a77f1f-872b-49ca-91ab-32098c443beb")`  
+--- Using a DB like a function will allow inserting new values into the database (ex. `Osi.DB_IsPlayer("02a77f1f-872b-49ca-91ab-32098c443beb")`
 --- @overload fun(...:OsirisValue?)
 --- @class OsiDatabase
 local OsiDatabase = {}
---- Databases can be read using the Get method. The method checks its parameters against the database and only returns rows that match the query.  
---- The number of parameters passed to Get must be equivalent to the number of columns in the target database.  
---- Each parameter defines an (optional) filter on the corresponding column.  
+--- Databases can be read using the Get method. The method checks its parameters against the database and only returns rows that match the query.
+--- The number of parameters passed to Get must be equivalent to the number of columns in the target database.
+--- Each parameter defines an (optional) filter on the corresponding column.
 --- If the parameter is nil, the column is not filtered (equivalent to passing _ in Osiris). If the parameter is not nil, only rows with matching values will be returned.
 --- @param ... OsirisValue?
 --- @return table<integer,table<integer,OsirisValue>>
 function OsiDatabase:Get(...) end
---- The Delete method can be used to delete rows from databases.  
---- The number of parameters passed to Delete must be equivalent to the number of columns in the target database.  
---- Each parameter defines an (optional) filter on the corresponding column.  
---- If the parameter is nil, the column is not filtered (equivalent to passing _ in Osiris). If the parameter is not nil, only rows with matching values will be deleted. 
+
+--- The Delete method can be used to delete rows from databases.
+--- The number of parameters passed to Delete must be equivalent to the number of columns in the target database.
+--- Each parameter defines an (optional) filter on the corresponding column.
+--- If the parameter is nil, the column is not filtered (equivalent to passing _ in Osiris). If the parameter is not nil, only rows with matching values will be deleted.
 --- @param ... OsirisValue?
 function OsiDatabase:Delete(...) end
 
@@ -46,7 +47,7 @@ function OsiDatabase:Delete(...) end
 --- @field DB_CombatCharacters OsiDatabase|fun(Guid:string, combatID:integer) All characters in combat
 --- @field DB_Dialogs OsiDatabase|fun(Guid:string, dialog:string)|fun(GUID1:string, GUID2:string, dialog:string)|fun(GUID1:string, GUID2:string, GUID3:string, dialog:string)|fun(GUID1:string, GUID2:string, GUID3:string, GUID4:string, dialog:string) All registered dialogs for objects, the most common being the version with a single character
 
---- The Osi table contains databases as well as calls, queries, events, and custom PROC / QRY defintions, as long as they are used in a script.  
+--- The Osi table contains databases as well as calls, queries, events, and custom PROC / QRY defintions, as long as they are used in a script.
 --- @type OsiCommonDatabases|OsiDynamic
 Osi = {}
 --- @alias AnyRef any
@@ -22009,9 +22010,6 @@ local Ext_Types = {}
 --- @return string fileContents Returns the file contents, for use with Ext.IO.SaveFile
 function Ext_Types.GenerateIdeHelpers(outputPath, opts) end
 
-
-
-
 --- @class Ext_Utils
 --- @field GameVersion fun():string?
 --- @field GetCommandLineParams fun():string[]
@@ -26938,7 +26936,7 @@ Ext_Enums.InputRawType = {
 	home = 10,
 	pageup = 11,
 	del = 12,
-	end = 13,
+	["end"] = 13,
 	pagedown = 14,
 	comma = 15,
 	hyphen = 16,
@@ -32775,99 +32773,99 @@ Ext_Enums.WeaponType = {
 --- @field Vars Ext_Vars
 --- @field Enums Ext_Enums
 --- @field System Ext_System
-Ext = {Events = {}}
+Ext = { Events = {} }
 
 
 --- @class SubscribableEvent<T>:{ (Subscribe:fun(self:SubscribableEvent, callback:fun(e:T|LuaEventBase), opts:{Priority:integer, Once:boolean}?):integer), (Unsubscribe:fun(self:SubscribableEvent, index:integer))}
 
---- Developer functions for the SubscribableEvent type. 
---- Throw can be used to manually throw the event, but special care may be needed to ensure the table used for the event data is valid.  
+--- Developer functions for the SubscribableEvent type.
+--- Throw can be used to manually throw the event, but special care may be needed to ensure the table used for the event data is valid.
 --- @class SubscribableEventDev<T>:{ (Throw:fun(self:SubscribableEvent, e:T|LuaEventBase))}
 
 --#region Extender Events
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaDoConsoleCommandEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaDoConsoleCommandEvent>
 Ext.Events.DoConsoleCommand = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EclLuaControllerAxisEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EclLuaControllerAxisEvent>
 Ext.Events.EclLuaControllerAxis = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EclLuaControllerButtonEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EclLuaControllerButtonEvent>
 Ext.Events.EclLuaControllerButton = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EclLuaGameStateChangedEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EclLuaGameStateChangedEvent>
 Ext.Events.EclLuaGameStateChanged = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EclLuaKeyInputEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EclLuaKeyInputEvent>
 Ext.Events.EclLuaKeyInput = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EclLuaMouseButtonEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EclLuaMouseButtonEvent>
 Ext.Events.EclLuaMouseButton = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EclLuaMouseWheelEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EclLuaMouseWheelEvent>
 Ext.Events.EclLuaMouseWheel = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EclLuaViewportResizedEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EclLuaViewportResizedEvent>
 Ext.Events.EclLuaViewportResized = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.Empty = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EsvLuaAfterExecuteFunctorEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EsvLuaAfterExecuteFunctorEvent>
 Ext.Events.EsvLuaAfterExecuteFunctor = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EsvLuaBeforeDealDamageEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EsvLuaBeforeDealDamageEvent>
 Ext.Events.EsvLuaBeforeDealDamage = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EsvLuaDealDamageEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EsvLuaDealDamageEvent>
 Ext.Events.EsvLuaDealDamage = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EsvLuaExecuteFunctorEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EsvLuaExecuteFunctorEvent>
 Ext.Events.EsvLuaExecuteFunctor = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<EsvLuaGameStateChangedEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<EsvLuaGameStateChangedEvent>
 Ext.Events.EsvLuaGameStateChanged = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaFindPathEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaFindPathEvent>
 Ext.Events.FindPath = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.GameStateChanged = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.Log = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.ModuleLoadStarted = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.ModuleResume = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaNetMessageEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaNetMessageEvent>
 Ext.Events.NetMessage = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.NetModMessage = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.ResetCompleted = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.SessionLoaded = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.SessionLoading = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.Shutdown = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.StatsLoaded = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaEmptyEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaEmptyEvent>
 Ext.Events.StatsStructureLoaded = {}
---- 🔨🔧**Server/Client**🔧🔨  
---- @type SubscribableEvent<LuaTickEvent>  
+--- 🔨🔧**Server/Client**🔧🔨
+--- @type SubscribableEvent<LuaTickEvent>
 Ext.Events.Tick = {}
 --#endregion
 
@@ -32904,21 +32902,21 @@ _DS = Ext.Dump
 --- Console window shortcut for Ext.Utils.Print
 _P = Ext.Utils.Print
 
---- Console window helper to get current player character 
---- This is the host on the server, or the hotbar character on the client  
+--- Console window helper to get current player character
+--- This is the host on the server, or the hotbar character on the client
 --- @return EsvCharacter|EclCharacter
 _C = function() end
 
---- Console window helper to get character being examined on the client-side  
+--- Console window helper to get character being examined on the client-side
 --- @return EclCharacter
 _E = function() end
 
---- Console window helper to get the host's equipped weapon on the server-side  
+--- Console window helper to get the host's equipped weapon on the server-side
 --- @return EsvItem
 _W = function() end
 
---- Helper for dumping variables to the console  
---- This is essentially `Ext.Utils.Print(Ext.DumpExport(val))`  
+--- Helper for dumping variables to the console
+--- This is essentially `Ext.Utils.Print(Ext.DumpExport(val))`
 --- @param val any
 function Ext.Dump(val) end
 
@@ -32927,7 +32925,7 @@ function Ext.Dump(val) end
 --- @return string
 function Ext.DumpExport(val) end
 
---- Register a callback that runs on the next tick, and is then unregistered afterwards  
+--- Register a callback that runs on the next tick, and is then unregistered afterwards
 --- @param callback fun(e:LuaTickEventParams)
 function Ext.OnNextTick(callback) end
 
@@ -33287,4 +33285,3 @@ Ext.ExtraData = {
 }
 
 --#endregion
-

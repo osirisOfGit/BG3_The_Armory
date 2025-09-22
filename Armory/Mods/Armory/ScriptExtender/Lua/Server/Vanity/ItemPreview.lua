@@ -12,8 +12,7 @@ local previewingItemTable = {}
 
 local resetSetTimer
 
-Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload, user)
-	payload = Ext.Json.Parse(payload)
+Channels.PreviewItem:SetHandler(function(payload, user)
 	local templateUUID = payload.templateId
 	local slot = payload.slot
 
@@ -132,7 +131,7 @@ local function DeleteItem(character, userPreview)
 	userPreview.previewItem = nil
 end
 
-Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, payload, user)
+Channels.StopPreviewingItem:SetHandler(function(payload, user)
 	user = PeerToUserID(user)
 	local character = Osi.GetCurrentCharacter(user)
 
