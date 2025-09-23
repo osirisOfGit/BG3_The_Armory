@@ -139,6 +139,8 @@ function DyePicker:CreateCustomFilters()
 	similarColourFilter.header, similarColourFilter.updateLabelWithCount = Styler:DynamicLabelTree(self.filterGroup:AddTree(Translator:translate("Similar Color")))
 
 	local baseColor = similarColourFilter.header:AddColorPicker(Translator:translate("Base Color"))
+	baseColor.AlphaPreview = true
+	baseColor.AlphaOpaque = true
 	baseColor.OnChange = function()
 		self:ProcessFilters()
 	end
