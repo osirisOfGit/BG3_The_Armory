@@ -33,20 +33,26 @@ local function PopulateClassesAndSubclasses()
 		---@type ResourceClassDescription
 		local class = Ext.StaticData.Get(classGuid, "ClassDescription")
 
-		if not Ext.StaticData.Get(class.ParentGuid, "ClassDescription")
-			and not classesAndSubclasses[class.ResourceUUID]
-		then
-			classesAndSubclasses[class.ResourceUUID] = {}
-		else
-			if not classesAndSubclasses[class.ParentGuid] then
-				classesAndSubclasses[class.ParentGuid] = {}
-			end
+		if class then
+			if not Ext.StaticData.Get(class.ParentGuid, "ClassDescription")
+				and not classesAndSubclasses[classGuid]
+			then
+				classesAndSubclasses[classGuid] = {}
+			else
+				if not classesAndSubclasses[class.ParentGuid] then
+					classesAndSubclasses[class.ParentGuid] = {}
+				end
 
-			table.insert(classesAndSubclasses[class.ParentGuid], class)
-			table.sort(classesAndSubclasses[class.ParentGuid], function(a, b)
-				return a.Name < b.Name
-			end)
+				table.insert(classesAndSubclasses[class.ParentGuid], class)
+			end
+		else
+			Logger:BasicWarning("Skipped indexing Class %s as it doesn't actually exist?", classGuid)
 		end
+	end
+	for class, subclasses in pairs(classesAndSubclasses) do
+		table.sort(subclasses, function(a, b)
+			return a.Name < b.Name
+		end)
 	end
 end
 

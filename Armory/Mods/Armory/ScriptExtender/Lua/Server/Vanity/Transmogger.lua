@@ -139,10 +139,12 @@ function Transmogger:MogCharacter(character, skipJunk)
 			and character.ServerShapeshiftStates.States
 			and character.ServerShapeshiftStates.States[1]
 		then
-			for _, status in pairs(character.StatusContainer.Statuses) do
-				if Osi.IsStatusFromGroup(status, "SG_Polymorph") == 1 and Osi.IsStatusFromGroup(status, "SG_Disguise") == 0 then
-					Logger:BasicWarning("Skipping transmog on %s as they're currently affected by a SG_Polymorph (but not SG_Disguise) status", character.Uuid.EntityUuid)
-					return
+			if character.StatusContainer then
+				for _, status in pairs(character.StatusContainer.Statuses) do
+					if Osi.IsStatusFromGroup(status, "SG_Polymorph") == 1 and Osi.IsStatusFromGroup(status, "SG_Disguise") == 0 then
+						Logger:BasicWarning("Skipping transmog on %s as they're currently affected by a SG_Polymorph (but not SG_Disguise) status", character.Uuid.EntityUuid)
+						return
+					end
 				end
 			end
 		end
