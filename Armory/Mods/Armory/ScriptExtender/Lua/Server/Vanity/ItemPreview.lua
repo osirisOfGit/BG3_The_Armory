@@ -57,7 +57,9 @@ Channels.PreviewItem:SetHandler(function(payload, user)
 	end
 
 	local correctArmorSet = string.find(slot, "Vanity") and 1 or 0
-	Osi.SetArmourSet(character, correctArmorSet)
+	if slot ~= "Underwear" then
+		Osi.SetArmourSet(character, correctArmorSet)
+	end
 
 	-- Non-weapons use cross-slot mogging with the default pieces, but weapons are just equipped as-is
 	if not string.find(slot, "Weapon") then
