@@ -113,7 +113,7 @@ end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(_, user)
 	return {
-		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))] or "N/A"
+		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
 	}
 end)
 

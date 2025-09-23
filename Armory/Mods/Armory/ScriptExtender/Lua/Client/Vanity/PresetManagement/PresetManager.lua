@@ -126,7 +126,7 @@ function PresetManager:OpenManager()
 		end
 
 		Channels.GetActiveUserPreset:RequestToServer(nil, function(data)
-			local presetId = data.presetId == "N/A" and nil or data.presetId
+			local presetId = data.presetId
 			if not presetId and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
 				createNewPresetButton.OnClick()
 			end
