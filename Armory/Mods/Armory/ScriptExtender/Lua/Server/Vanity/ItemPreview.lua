@@ -12,8 +12,7 @@ local previewingItemTable = {}
 
 local resetSetTimer
 
-Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload, user)
-	payload = Ext.Json.Parse(payload)
+Channels.PreviewItem:SetHandler(function(payload, user)
 	local templateUUID = payload.templateId
 	local slot = payload.slot
 
@@ -58,7 +57,9 @@ Ext.RegisterNetListener(ModuleUUID .. "_PreviewItem", function(channel, payload,
 	end
 
 	local correctArmorSet = string.find(slot, "Vanity") and 1 or 0
-	Osi.SetArmourSet(character, correctArmorSet)
+	if slot ~= "Underwear" then
+		Osi.SetArmourSet(character, correctArmorSet)
+	end
 
 	-- Non-weapons use cross-slot mogging with the default pieces, but weapons are just equipped as-is
 	if not string.find(slot, "Weapon") then
@@ -132,7 +133,7 @@ local function DeleteItem(character, userPreview)
 	userPreview.previewItem = nil
 end
 
-Ext.RegisterNetListener(ModuleUUID .. "_StopPreviewingItem", function(channel, payload, user)
+Channels.StopPreviewingItem:SetHandler(function(payload, user)
 	user = PeerToUserID(user)
 	local character = Osi.GetCurrentCharacter(user)
 

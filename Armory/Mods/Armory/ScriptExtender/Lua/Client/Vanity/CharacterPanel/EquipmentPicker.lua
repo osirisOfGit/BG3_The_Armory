@@ -531,7 +531,7 @@ function EquipmentPicker:OpenWindow(slot, weaponType, outfitSlot, onSelectFunc)
 			end
 		end,
 		function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+			Channels.StopPreviewingItem:SendToServer()
 		end)
 
 	clearStatSlotChildren()
@@ -615,11 +615,11 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	icon.OnHoverEnter = function()
 		if not self.settings.requireModifierForPreview or Ext.ClientInput.GetInputManager().PressedModifiers == "Shift" then
 			self.equipmentPreviewTimer = Ext.Timer.WaitFor(300, function()
-				Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_PreviewItem", Ext.Json.Stringify({
+				Channels.PreviewItem:SendToServer({
 					templateId = itemTemplate.Id,
 					dye = (self.settings.applyDyesWhenPreviewingEquipment and self.vanityOutfitSlot and self.vanityOutfitSlot.dye) and self.vanityOutfitSlot.dye.guid or nil,
 					slot = self.slot
-				}))
+				})
 
 				self.equipmentPreviewTimer = nil
 			end)
@@ -632,13 +632,13 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 			self.equipmentPreviewTimer = nil
 		end
 
-		Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+		Channels.StopPreviewingItem:SendToServer()
 	end
 
 	icon.OnClick = function()
 		-- Covers scenario where user hovers over one item, then super quickly moves to another and instantly clicks on it
 		Ext.Timer.WaitFor(150, function()
-			Ext.ClientNet.PostMessageToServer(ModuleUUID .. "_StopPreviewingItem", "")
+			Channels.StopPreviewingItem:SendToServer()
 		end)
 		self.onSelectFunc(itemTemplate)
 		self.window.Open = false

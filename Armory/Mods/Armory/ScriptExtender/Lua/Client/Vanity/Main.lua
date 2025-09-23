@@ -291,6 +291,10 @@ validationCheck = Ext.Events.GameStateChanged:Subscribe(function(e)
 	end
 end)
 
+MCM.SetKeybindingCallback('launch_vanity', function()
+	MCM.OpenModPage("Vanity", ModuleUUID, true)
+end)
+
 
 Translator:RegisterTranslation({
 	["Begin by creating a preset with the Preset Manager - you can have any amount of presets, but they must be activated to be applied (each preset manages the entire party - only one preset can be active per save). Once a preset is activated, it will only be active for that save (so save after activating it)."] =

@@ -125,7 +125,7 @@ function PresetManager:OpenManager()
 			presetForm.Visible = not presetForm.Visible
 		end
 
-		Channels.GetActiveUserPreset:RequestToServer({}, function(data)
+		Channels.GetActiveUserPreset:RequestToServer(nil, function(data)
 			local presetId = data.presetId
 			if not presetId and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
 				createNewPresetButton.OnClick()

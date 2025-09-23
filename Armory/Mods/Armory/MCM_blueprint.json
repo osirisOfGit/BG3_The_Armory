@@ -31,6 +31,23 @@
 								"Min": 0,
 								"Max": 5
 							}
+						},
+						{
+							"Type": "keybinding_v2",
+							"Id": "launch_vanity",
+							"Name": "Launch Vanity",
+							"Handles": {
+								"NameHandle": "h13b92883ec614c36814c22303684a3469a7e"
+							},
+							"Default": {
+								"Keyboard": {
+									"Key": "V",
+									"ModifierKeys": [
+										"LAlt",
+										"LCtrl"
+									]
+								}
+							}	
 						}
 					]
 				}

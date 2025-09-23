@@ -1,5 +1,6 @@
 Ext.Require("Utilities/Common/_Index.lua")
 Ext.Require("Utilities/Networking/Channels.lua")
+Ext.Require("Shared/NetChannelRegistry.lua")
 
 Ext.Require("Shared/Configurations/_ConfigurationStructure.lua")
 Ext.Require("Shared/Vanity/ModPresetManager.lua")
