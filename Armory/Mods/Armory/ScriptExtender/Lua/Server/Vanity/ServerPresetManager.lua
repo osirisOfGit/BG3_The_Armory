@@ -112,9 +112,11 @@ Ext.Events.ResetCompleted:Subscribe(function(e)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(_, user)
-	return Ext.Json.Parse(Ext.Json.Stringify({
+	local data = Ext.Json.Parse(Ext.Json.Stringify({
 		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
 	}, { Binary = true }), true)
+	Logger:BasicInfo("Active preset id %s", data)
+	return data
 end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
