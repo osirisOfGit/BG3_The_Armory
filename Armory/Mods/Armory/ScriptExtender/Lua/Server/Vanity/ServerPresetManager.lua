@@ -112,9 +112,14 @@ Ext.Events.ResetCompleted:Subscribe(function(e)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(_, user)
-	return {
-		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
-	}
+	if activePresets then
+		local userPreset = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
+		if userPreset then
+			return {
+				presetId = userPreset
+			}
+		end
+	end
 end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)

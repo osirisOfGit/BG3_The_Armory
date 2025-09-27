@@ -128,6 +128,17 @@ if Ext.IsServer() then
 		UserPresetPoolManager:sendOutVanities(PeerToUserID(user))
 	end)
 
+	Channels.GetUserPresetPool:SetRequestHandler(function(data, user)
+		local presetTable = {}
+		for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
+			if otherUser ~= user then
+				presetTable[otherUser] = vanity
+			end
+		end
+
+		return presetTable
+	end)
+
 	Channels.UpdateUserVanityPool:SetHandler(function(vanity, user)
 		user = PeerToUserID(user)
 
