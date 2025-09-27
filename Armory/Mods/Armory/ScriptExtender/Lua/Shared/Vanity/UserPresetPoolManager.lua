@@ -17,7 +17,7 @@ if Ext.IsServer() then
 			if user then
 				loadingLock[user] = true
 				Logger:BasicDebug("Firing GetUserVanity to %s", Osi.GetUserName(user))
-				Channels.GetUserVanity:RequestToClient(Ext.Json.Parse(Ext.Json.Stringify({}, {Binary = true}), true),
+				Channels.GetUserVanity:RequestToClient({},
 					user,
 					function(data)
 						Logger:BasicInfo("Loaded %s into the pool", Osi.GetUserName(user))
@@ -29,7 +29,7 @@ if Ext.IsServer() then
 					local userId = Osi.GetReservedUserID(player[1])
 					if userId and not loadingLock[userId] then
 						loadingLock[userId] = true
-						Channels.GetUserVanity:RequestToClient(Ext.Json.Parse(Ext.Json.Stringify({}, {Binary = true}), true),
+						Channels.GetUserVanity:RequestToClient({},
 							userId,
 							function(data)
 								Logger:BasicInfo("Loaded %s into the pool", Osi.GetUserName(userId))
@@ -61,9 +61,8 @@ if Ext.IsServer() then
 					end
 				end
 
-				local data = Ext.Json.Parse(Ext.Json.Stringify(presetPool, {Binary = true}), true)
-				Logger:BasicDebug("Firing SendOutPresetPools to %s with data %s", Osi.GetUserName(user), data)
-				Channels.SendOutPresetPools:SendToClient(data, user)
+				Logger:BasicDebug("Firing SendOutPresetPools to %s", Osi.GetUserName(user))
+				Channels.SendOutPresetPools:SendToClient(presetPool, user)
 			end
 
 			UserPresetPoolManager:sendOutVanities(user, true)
@@ -80,10 +79,8 @@ if Ext.IsServer() then
 
 
 	Channels.GetUserSpecificPreset:SetRequestHandler(function(data, user)
-		user = PeerToUserID(user)
-		local datatoReturn = Ext.Json.Parse(Ext.Json.Stringify(UserPresetPoolManager.PresetPool[tonumber(data.user)], {Binary = true}), true)
-		Logger:BasicDebug("%s requested Vanity for %s, sending %s", Osi.GetUserName(user), Osi.GetUserName(tonumber(data.user)), datatoReturn)
-		return datatoReturn
+		Logger:BasicDebug("%s requested Vanity for %s", Osi.GetUserName(PeerToUserID(user)), Osi.GetUserName(tonumber(data.user)))
+		return UserPresetPoolManager.PresetPool[tonumber(data.user)]
 	end)
 
 	function UserPresetPoolManager:sendOutVanities(user, broadcast)
@@ -98,7 +95,7 @@ if Ext.IsServer() then
 				end
 
 				Logger:BasicDebug("Firing UpdateUserVanityPool to %s", Osi.GetUserName(user))
-				Channels.UpdateUserVanityPool:SendToClient(Ext.Json.Parse(Ext.Json.Stringify(presetTable, {Binary = true}), true), user)
+				Channels.UpdateUserVanityPool:SendToClient(presetTable, user)
 			else
 				for otherUser in pairs(UserPresetPoolManager.PresetPool) do
 					if otherUser ~= user then
@@ -109,7 +106,7 @@ if Ext.IsServer() then
 							end
 						end
 						Logger:BasicDebug("Firing UpdateUserVanityPool to %s", Osi.GetUserName(otherUser))
-						Channels.UpdateUserVanityPool:SendToClient(Ext.Json.Parse(Ext.Json.Stringify(presetPool, {Binary = true}), true), otherUser)
+						Channels.UpdateUserVanityPool:SendToClient(presetPool, otherUser)
 					end
 				end
 			end
@@ -140,7 +137,7 @@ if Ext.IsServer() then
 			end
 		end
 
-		return Ext.Json.Parse(Ext.Json.Stringify(presetTable, {Binary = true}), true)
+		return presetTable
 	end)
 
 	Channels.UpdateUserVanityPool:SetHandler(function(vanity, user)

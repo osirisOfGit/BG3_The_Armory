@@ -268,44 +268,46 @@ end
 local userPresetPool = nil
 
 function PresetManager:UpdatePresetView(presetId)
-	presetIdActivelyViewing = presetId
-	Helpers:KillChildren(userPresetSection, modPresetSection, otherUsersSection)
+	if presetWindow.Open then
+		presetIdActivelyViewing = presetId
+		Helpers:KillChildren(userPresetSection, modPresetSection, otherUsersSection)
 
-	if presetActivelyViewing then
-		presetActivelyViewing:Destroy()
-		presetActivelyViewing = nil
-	end
+		if presetActivelyViewing then
+			presetActivelyViewing:Destroy()
+			presetActivelyViewing = nil
+		end
 
-	PresetManager:buildSection(presetId, ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
+		PresetManager:buildSection(presetId, ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
 
-	if not userPresetPool then
-		Channels.GetUserPresetPool:RequestToServer(nil, function(data)
-			userPresetPool = data
-		end)
-	end
-
-	if userPresetPool and next(userPresetPool) then
-		otherUsersSection.Visible = true
-		for user, vanity in pairs(userPresetPool) do
-			---@cast vanity Vanity
-			Channels.GetUserName:RequestToServer({ user = user }, function(data)
-				Logger:BasicDebug("Populating user table for %s", data.username)
-				PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
+		if not userPresetPool then
+			Channels.GetUserPresetPool:RequestToServer(nil, function(data)
+				userPresetPool = data
 			end)
 		end
-	else
-		otherUsersSection.Visible = false
-	end
 
-	VanityModPresetManager:ImportPresetsFromMods()
-	if next(VanityModPresetManager.ModPresetIndex) then
-		for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
-			return Ext.Mod.GetMod(key).Info.Name
-		end) do
-			PresetManager:buildSection(presetId, vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name, modPresetSection)
+		if userPresetPool and next(userPresetPool) then
+			otherUsersSection.Visible = true
+			for user, vanity in pairs(userPresetPool) do
+				---@cast vanity Vanity
+				Channels.GetUserName:RequestToServer({ user = user }, function(data)
+					Logger:BasicDebug("Populating user table for %s", data.username)
+					PresetManager:buildSection(presetIdActivelyViewing, vanity, vanity.presets, data.username, otherUsersSection)
+				end)
+			end
+		else
+			otherUsersSection.Visible = false
 		end
-	else
-		modPresetSection.Visible = false
+
+		VanityModPresetManager:ImportPresetsFromMods()
+		if next(VanityModPresetManager.ModPresetIndex) then
+			for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
+				return Ext.Mod.GetMod(key).Info.Name
+			end) do
+				PresetManager:buildSection(presetId, vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name, modPresetSection)
+			end
+		else
+			modPresetSection.Visible = false
+		end
 	end
 end
 

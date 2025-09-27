@@ -40,9 +40,9 @@ local function initialize()
 			if userPreset then
 				Logger:BasicDebug("Retrieving preset %s for user %s", userPreset, Osi.GetUserName(userId))
 				loadingLock[userId] = true
-				Channels.GetActiveUserPreset:RequestToClient(Ext.Json.Parse(Ext.Json.Stringify({
+				Channels.GetActiveUserPreset:RequestToClient({
 						presetId = userPreset
-					}, { Binary = true }), true),
+					},
 					userId,
 					function(data)
 						ServerPresetManager.ActiveVanityPresets[userId] = data
@@ -112,11 +112,12 @@ Ext.Events.ResetCompleted:Subscribe(function(e)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(_, user)
-	local data = Ext.Json.Parse(Ext.Json.Stringify({
-		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
-	}, { Binary = true }), true)
-	Logger:BasicInfo("Active preset id %s", data)
-	return data
+	if activePresets then
+		local userPreset = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
+		return {
+			presetId = userPreset
+		}
+	end
 end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
@@ -139,6 +140,7 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 		for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
 			if vanity.presets[data.presetId] and otherUser == user then
 				UserPresetPoolManager:GetVanitiesFromUsers(user)
+				Channels.UpdateUserPreset:SendToClient(nil, otherUser)
 				break
 			end
 		end
