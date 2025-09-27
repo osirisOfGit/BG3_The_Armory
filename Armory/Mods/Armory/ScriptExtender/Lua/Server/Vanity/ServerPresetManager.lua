@@ -40,9 +40,9 @@ local function initialize()
 			if userPreset then
 				Logger:BasicDebug("Retrieving preset %s for user %s", userPreset, Osi.GetUserName(userId))
 				loadingLock[userId] = true
-				Channels.GetActiveUserPreset:RequestToClient({
+				Channels.GetActiveUserPreset:RequestToClient(Ext.Json.Parse(Ext.Json.Stringify({
 						presetId = userPreset
-					},
+					}, { Binary = true }), true),
 					userId,
 					function(data)
 						ServerPresetManager.ActiveVanityPresets[userId] = data
@@ -112,9 +112,9 @@ Ext.Events.ResetCompleted:Subscribe(function(e)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(_, user)
-	return {
+	return Ext.Json.Parse(Ext.Json.Stringify({
 		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
-	}
+	}, { Binary = true }), true)
 end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
