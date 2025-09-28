@@ -673,7 +673,6 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 end
 
 Channels.UpdateUserVanityPool:SetHandler(function(data, _)
-	Logger:BasicInfo("REsponse: %s", data or "nils")
 	if next(data) then
 		userPresetPool = data
 		if presetWindow then
