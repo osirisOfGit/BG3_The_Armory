@@ -191,7 +191,7 @@ function Vanity:initialize()
 	Logger:BasicDebug("User has started running game - running check")
 
 	Channels.GetActiveUserPreset:RequestToServer({}, function(data)
-		Vanity.ActivePresetId = data.presetId
+		Vanity.ActivePresetId = data and data.presetId
 
 		if Vanity.ActivePresetId then
 			local function validatePreset()

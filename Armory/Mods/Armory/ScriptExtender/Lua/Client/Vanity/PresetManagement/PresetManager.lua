@@ -125,48 +125,50 @@ function PresetManager:OpenManager()
 			presetForm.Visible = not presetForm.Visible
 		end
 
+		local presetTable = presetWindow:AddTable("PresetTable", 2)
+		presetTable.Resizable = true
+
+		presetTable:AddColumn("PresetSelection", "WidthFixed", 400 * Styler:ScaleFactor())
+		presetTable:AddColumn("PresetInfo", "WidthStretch")
+
+		local row = presetTable:AddRow()
+
+		local selectionCell = row:AddCell():AddChildWindow("UserPresets")
+		selectionCell.NoSavedSettings = true
+		selectionCell:SetSizeConstraints({ 200, 0 })
+		presetTable.ColumnDefs[1].Width = 0
+
+		userPresetSection = selectionCell:AddGroup("User_Presets")
+		local userHeader = userPresetSection:AddSeparatorText(Translator:translate("Your Presets"))
+		userHeader:SetStyle("SeparatorTextAlign", 0.5)
+		userHeader.Font = "Large"
+		userHeader.UserData = "keep"
+
+		otherUsersSection = selectionCell:AddGroup("Other_User_Presets")
+		otherUsersSection.Visible = false
+		local otherUsersHeader = otherUsersSection:AddSeparatorText(Translator:translate("Other User's Presets"))
+		otherUsersHeader:SetStyle("SeparatorTextAlign", 0.5)
+		otherUsersHeader.Font = "Large"
+		otherUsersHeader.UserData = "keep"
+
+		selectionCell:AddNewLine()
+		modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
+		local modHeader = modPresetSection:AddSeparatorText(Translator:translate("Mod Presets"))
+		modHeader:SetStyle("SeparatorTextAlign", 0.5)
+		modHeader.Font = "Large"
+		modHeader.UserData = "keep"
+
+		presetInfoSection = row:AddCell():AddChildWindow(Translator:translate("Preset Information"))
+		presetInfoSection.NoSavedSettings = true
+		presetInfoSection.HorizontalScrollbar = true
+
 		Channels.GetActiveUserPreset:RequestToServer(nil, function(data)
-			local presetId = data.presetId
-			if not presetId and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
-				createNewPresetButton.OnClick()
+			if data then
+				local presetId = data.presetId
+				if not presetId and not ConfigurationStructure.config.vanity.presets() and not next(VanityModPresetManager.PresetModIndex) then
+					createNewPresetButton.OnClick()
+				end
 			end
-
-			local presetTable = presetWindow:AddTable("PresetTable", 2)
-			presetTable.Resizable = true
-
-			presetTable:AddColumn("PresetSelection", "WidthFixed", 400 * Styler:ScaleFactor())
-			presetTable:AddColumn("PresetInfo", "WidthStretch")
-
-			local row = presetTable:AddRow()
-
-			local selectionCell = row:AddCell():AddChildWindow("UserPresets")
-			selectionCell.NoSavedSettings = true
-			selectionCell:SetSizeConstraints({ 200, 0 })
-			presetTable.ColumnDefs[1].Width = 0
-
-			userPresetSection = selectionCell:AddGroup("User_Presets")
-			local userHeader = userPresetSection:AddSeparatorText(Translator:translate("Your Presets"))
-			userHeader:SetStyle("SeparatorTextAlign", 0.5)
-			userHeader.Font = "Large"
-			userHeader.UserData = "keep"
-
-			otherUsersSection = selectionCell:AddGroup("Other_User_Presets")
-			otherUsersSection.Visible = false
-			local otherUsersHeader = otherUsersSection:AddSeparatorText(Translator:translate("Other User's Presets"))
-			otherUsersHeader:SetStyle("SeparatorTextAlign", 0.5)
-			otherUsersHeader.Font = "Large"
-			otherUsersHeader.UserData = "keep"
-
-			selectionCell:AddNewLine()
-			modPresetSection = selectionCell:AddGroup("Mod-Provided_Presets")
-			local modHeader = modPresetSection:AddSeparatorText(Translator:translate("Mod Presets"))
-			modHeader:SetStyle("SeparatorTextAlign", 0.5)
-			modHeader.Font = "Large"
-			modHeader.UserData = "keep"
-
-			presetInfoSection = row:AddCell():AddChildWindow(Translator:translate("Preset Information"))
-			presetInfoSection.NoSavedSettings = true
-			presetInfoSection.HorizontalScrollbar = true
 
 			VanityBackupManager:RestorePresetBackup()
 
@@ -266,20 +268,24 @@ end
 local userPresetPool = nil
 
 function PresetManager:UpdatePresetView(presetId)
-	presetIdActivelyViewing = presetId
-	Helpers:KillChildren(userPresetSection, modPresetSection, otherUsersSection)
+	if presetWindow.Open then
+		presetIdActivelyViewing = presetId
+		Helpers:KillChildren(userPresetSection, modPresetSection, otherUsersSection)
 
-	if presetActivelyViewing then
-		presetActivelyViewing:Destroy()
-		presetActivelyViewing = nil
-	end
+		if presetActivelyViewing then
+			presetActivelyViewing:Destroy()
+			presetActivelyViewing = nil
+		end
 
-	PresetManager:buildSection(presetId, ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
+		PresetManager:buildSection(presetId, ConfigurationStructure.config.vanity, ConfigurationStructure.config.vanity.presets, nil, userPresetSection)
 
-	if not userPresetPool then
-		Channels.GetUserPresetPool:SendToServer({})
-	else
-		if next(userPresetPool) then
+		if not userPresetPool then
+			Channels.GetUserPresetPool:RequestToServer(nil, function(data)
+				userPresetPool = data
+			end)
+		end
+
+		if userPresetPool and next(userPresetPool) then
 			otherUsersSection.Visible = true
 			for user, vanity in pairs(userPresetPool) do
 				---@cast vanity Vanity
@@ -291,17 +297,17 @@ function PresetManager:UpdatePresetView(presetId)
 		else
 			otherUsersSection.Visible = false
 		end
-	end
 
-	VanityModPresetManager:ImportPresetsFromMods()
-	if next(VanityModPresetManager.ModPresetIndex) then
-		for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
-			return Ext.Mod.GetMod(key).Info.Name
-		end) do
-			PresetManager:buildSection(presetId, vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name, modPresetSection)
+		VanityModPresetManager:ImportPresetsFromMods()
+		if next(VanityModPresetManager.ModPresetIndex) then
+			for modId, vanity in TableUtils:OrderedPairs(VanityModPresetManager.ModPresetIndex, function(key)
+				return Ext.Mod.GetMod(key).Info.Name
+			end) do
+				PresetManager:buildSection(presetId, vanity, vanity.presets, Ext.Mod.GetMod(modId).Info.Name, modPresetSection)
+			end
+		else
+			modPresetSection.Visible = false
 		end
-	else
-		modPresetSection.Visible = false
 	end
 end
 
@@ -313,6 +319,7 @@ end
 function PresetManager:buildSection(presetId, vanityContainer, presetCollection, externalOwner, parentSection)
 	if not parentSection then
 		Logger:BasicWarning("Was unable to build a section of the PresetManager sidebar due to a missing parent - what did you do? Call Stack: %s", debug.traceback())
+		return
 	end
 
 	local activePreset = Vanity.ActivePresetId

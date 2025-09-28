@@ -112,9 +112,12 @@ Ext.Events.ResetCompleted:Subscribe(function(e)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(_, user)
-	return {
-		presetId = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
-	}
+	if activePresets then
+		local userPreset = activePresets[Osi.GetUserProfileID(PeerToUserID(user))]
+		return {
+			presetId = userPreset
+		}
+	end
 end)
 
 Channels.UpdateUserPreset:SetHandler(function(data, user)
@@ -137,6 +140,7 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 		for otherUser, vanity in pairs(UserPresetPoolManager.PresetPool) do
 			if vanity.presets[data.presetId] and otherUser == user then
 				UserPresetPoolManager:GetVanitiesFromUsers(user)
+				Channels.UpdateUserPreset:SendToClient(nil, otherUser)
 				break
 			end
 		end
