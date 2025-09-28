@@ -703,7 +703,6 @@ Channels.UpdateUserPreset:SetHandler(function(data, user)
 end)
 
 Channels.GetActiveUserPreset:SetRequestHandler(function(data, user)
-	Logger:BasicInfo("REsponse: %s", data or "nils")
 	local vanityPreset = VanityExportManager:ExportPresets({ data.presetId })
 	if vanityPreset then
 		vanityPreset.settings = {
