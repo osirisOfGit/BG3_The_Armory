@@ -15,8 +15,8 @@
 			"backendHost": "127.0.0.1",
 			"backendPort": 9998,
 			"dbgOptions": {
-				"breakOnError": true,
-				"breakOnGenericError": true
+				"breakOnError": false,
+				"breakOnGenericError": false
 			}
 		}
 	]
