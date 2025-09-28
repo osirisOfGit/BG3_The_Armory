@@ -1,37 +1,37 @@
 # Summary
 
-Date : 2025-09-23 17:16:51
+Date : 2025-09-27 19:05:40
 
 Directory d:\\Mods\\BG3 Modder MultiTool\\The Armory\\Armory\\Mods\\Armory\\ScriptExtender\\Lua
 
-Total : 52 files,  19964 codes, 22301 comments, 8491 blanks, all 50756 lines
+Total : 52 files,  19984 codes, 22301 comments, 8494 blanks, all 50779 lines
 
 Summary / [Details](details.md) / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
 ## Languages
 | language | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Lua | 51 | 19,946 | 22,301 | 8,478 | 50,725 |
+| Lua | 51 | 19,966 | 22,301 | 8,481 | 50,748 |
 | Markdown | 1 | 18 | 0 | 13 | 31 |
 
 ## Directories
 | path | files | code | comment | blank | total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| . | 52 | 19,964 | 22,301 | 8,491 | 50,756 |
+| . | 52 | 19,984 | 22,301 | 8,494 | 50,779 |
 | . (Files) | 2 | 73 | 1 | 18 | 92 |
-| Client | 16 | 4,392 | 397 | 870 | 5,659 |
+| Client | 16 | 4,398 | 397 | 871 | 5,666 |
 | Client (Files) | 2 | 191 | 22 | 29 | 242 |
-| Client\\Vanity | 14 | 4,201 | 375 | 841 | 5,417 |
+| Client\\Vanity | 14 | 4,207 | 375 | 842 | 5,424 |
 | Client\\Vanity (Files) | 4 | 1,096 | 98 | 230 | 1,424 |
 | Client\\Vanity\\CharacterPanel | 6 | 1,791 | 185 | 362 | 2,338 |
-| Client\\Vanity\\PresetManagement | 4 | 1,314 | 92 | 249 | 1,655 |
-| Server | 9 | 1,176 | 112 | 237 | 1,525 |
+| Client\\Vanity\\PresetManagement | 4 | 1,320 | 92 | 250 | 1,662 |
+| Server | 9 | 1,180 | 112 | 237 | 1,529 |
 | Server (Files) | 1 | 3 | 1 | 1 | 5 |
-| Server\\Vanity | 8 | 1,173 | 111 | 236 | 1,520 |
-| Shared | 8 | 1,307 | 146 | 197 | 1,650 |
+| Server\\Vanity | 8 | 1,177 | 111 | 236 | 1,524 |
+| Shared | 8 | 1,317 | 146 | 199 | 1,662 |
 | Shared (Files) | 1 | 12 | 0 | 5 | 17 |
 | Shared\\Configurations | 3 | 246 | 89 | 40 | 375 |
-| Shared\\Vanity | 4 | 1,049 | 57 | 152 | 1,258 |
+| Shared\\Vanity | 4 | 1,059 | 57 | 154 | 1,270 |
 | Utilities | 17 | 13,016 | 21,645 | 7,169 | 41,830 |
 | Utilities (Files) | 1 | 18 | 0 | 13 | 31 |
 | Utilities\\Advanced | 2 | 401 | 60 | 60 | 521 |

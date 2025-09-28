@@ -14,7 +14,7 @@
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\PresetManagement\BackupManager.lua", "Lua", 121, 0, 16, 28, 165
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\PresetManagement\ExportManager.lua", "Lua", 221, 0, 15, 55, 291
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\PresetManagement\ModDependencyManager.lua", "Lua", 359, 0, 24, 55, 438
-"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\PresetManagement\PresetManager.lua", "Lua", 613, 0, 37, 111, 761
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\PresetManagement\PresetManager.lua", "Lua", 619, 0, 37, 112, 768
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\PresetProxy.lua", "Lua", 65, 0, 8, 13, 86
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\_FormBuilder.lua", "Lua", 151, 0, 18, 22, 191
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Server\Utility.lua", "Lua", 3, 0, 1, 1, 5
@@ -24,7 +24,7 @@
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Server\Vanity\ModEventManager.lua", "Lua", 9, 0, 9, 5, 23
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Server\Vanity\OutfitMatcher.lua", "Lua", 44, 0, 8, 6, 58
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Server\Vanity\PartyOutfitManager.lua", "Lua", 174, 0, 11, 34, 219
-"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Server\Vanity\ServerPresetManager.lua", "Lua", 128, 0, 5, 32, 165
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Server\Vanity\ServerPresetManager.lua", "Lua", 132, 0, 5, 32, 169
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Server\Vanity\Transmogger.lua", "Lua", 661, 0, 59, 111, 831
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Configurations\VanityCharacterCriteria.lua", "Lua", 85, 0, 11, 10, 106
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Configurations\VanityConfig.lua", "Lua", 63, 0, 38, 15, 116
@@ -33,7 +33,7 @@
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Vanity\EffectManager.lua", "Lua", 667, 0, 44, 109, 820
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Vanity\MissingEnums.lua", "Lua", 188, 0, 4, 8, 200
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Vanity\ModPresetManager.lua", "Lua", 70, 0, 8, 12, 90
-"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Vanity\UserPresetPoolManager.lua", "Lua", 124, 0, 1, 23, 148
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Vanity\UserPresetPoolManager.lua", "Lua", 134, 0, 1, 25, 160
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Advanced\_CustomEntitySerializer.lua", "Lua", 74, 0, 6, 6, 86
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Advanced\_ECSPrinter.lua", "Lua", 327, 0, 54, 54, 435
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Client\IMGUI\_FormBuilder.lua", "Lua", 151, 0, 19, 22, 192
@@ -51,4 +51,4 @@
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\IDEHelpers\Osi.lua", "Lua", 983, 0, 2797, 1007, 4787
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Networking\Channels.lua", "Lua", 6, 0, 19, 7, 32
 "d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\README.md", "Markdown", 0, 18, 0, 13, 31
-"Total", "-", 19946, 18, 22301, 8491, 50756
+"Total", "-", 19966, 18, 22301, 8494, 50779

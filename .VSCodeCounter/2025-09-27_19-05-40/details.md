@@ -1,10 +1,10 @@
 # Details
 
-Date : 2025-09-23 17:16:51
+Date : 2025-09-27 19:05:40
 
 Directory d:\\Mods\\BG3 Modder MultiTool\\The Armory\\Armory\\Mods\\Armory\\ScriptExtender\\Lua
 
-Total : 52 files,  19964 codes, 22301 comments, 8491 blanks, all 50756 lines
+Total : 52 files,  19984 codes, 22301 comments, 8494 blanks, all 50779 lines
 
 [Summary](results.md) / Details / [Diff Summary](diff.md) / [Diff Details](diff-details.md)
 
@@ -26,7 +26,7 @@ Total : 52 files,  19964 codes, 22301 comments, 8491 blanks, all 50756 lines
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/BackupManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/BackupManager.lua) | Lua | 121 | 16 | 28 | 165 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/ExportManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/ExportManager.lua) | Lua | 221 | 15 | 55 | 291 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/ModDependencyManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/ModDependencyManager.lua) | Lua | 359 | 24 | 55 | 438 |
-| [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/PresetManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/PresetManager.lua) | Lua | 613 | 37 | 111 | 761 |
+| [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/PresetManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetManagement/PresetManager.lua) | Lua | 619 | 37 | 112 | 768 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetProxy.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/Vanity/PresetProxy.lua) | Lua | 65 | 8 | 13 | 86 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/_FormBuilder.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Client/_FormBuilder.lua) | Lua | 151 | 18 | 22 | 191 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Utility.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Utility.lua) | Lua | 3 | 1 | 1 | 5 |
@@ -36,7 +36,7 @@ Total : 52 files,  19964 codes, 22301 comments, 8491 blanks, all 50756 lines
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/ModEventManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/ModEventManager.lua) | Lua | 9 | 9 | 5 | 23 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/OutfitMatcher.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/OutfitMatcher.lua) | Lua | 44 | 8 | 6 | 58 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/PartyOutfitManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/PartyOutfitManager.lua) | Lua | 174 | 11 | 34 | 219 |
-| [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/ServerPresetManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/ServerPresetManager.lua) | Lua | 128 | 5 | 32 | 165 |
+| [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/ServerPresetManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/ServerPresetManager.lua) | Lua | 132 | 5 | 32 | 169 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/Transmogger.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Server/Vanity/Transmogger.lua) | Lua | 661 | 59 | 111 | 831 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Configurations/VanityCharacterCriteria.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Configurations/VanityCharacterCriteria.lua) | Lua | 85 | 11 | 10 | 106 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Configurations/VanityConfig.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Configurations/VanityConfig.lua) | Lua | 63 | 38 | 15 | 116 |
@@ -45,7 +45,7 @@ Total : 52 files,  19964 codes, 22301 comments, 8491 blanks, all 50756 lines
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/EffectManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/EffectManager.lua) | Lua | 667 | 44 | 109 | 820 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/MissingEnums.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/MissingEnums.lua) | Lua | 188 | 4 | 8 | 200 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/ModPresetManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/ModPresetManager.lua) | Lua | 70 | 8 | 12 | 90 |
-| [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/UserPresetPoolManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/UserPresetPoolManager.lua) | Lua | 124 | 1 | 23 | 148 |
+| [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/UserPresetPoolManager.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Shared/Vanity/UserPresetPoolManager.lua) | Lua | 134 | 1 | 25 | 160 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Utilities/Advanced/_CustomEntitySerializer.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Utilities/Advanced/_CustomEntitySerializer.lua) | Lua | 74 | 6 | 6 | 86 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Utilities/Advanced/_ECSPrinter.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Utilities/Advanced/_ECSPrinter.lua) | Lua | 327 | 54 | 54 | 435 |
 | [The Armory/Armory/Mods/Armory/ScriptExtender/Lua/Utilities/Client/IMGUI/_FormBuilder.lua](/The%20Armory/Armory/Mods/Armory/ScriptExtender/Lua/Utilities/Client/IMGUI/_FormBuilder.lua) | Lua | 151 | 19 | 22 | 192 |
