@@ -474,6 +474,8 @@ if Ext.IsClient() then
 		formWindow:SetFocus()
 		formWindow.Closeable = true
 		formWindow.NoCollapse = true
+		formWindow.Scaling = "Scaled"
+		formWindow.Font = MCM.Get("font_size", "755a8a72-407f-4f0d-9a33-274ac0f0b53d")
 		formWindow:SetSize(Styler:ScaleFactor({ 300, 300 }), "FirstUseEver")
 
 		local popup = formWindow:AddPopup("effects")
