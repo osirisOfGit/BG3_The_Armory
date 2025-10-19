@@ -555,8 +555,8 @@ end
 ---@param itemTemplate ItemTemplate
 ---@param displayGroup ExtuiChildWindow|ExtuiCollapsingHeader
 function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
-	local isFavorited, favoriteIndex = TableUtils:IndexOf(self.settings.favorites, itemTemplate.Id)
-	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
+	local favoriteIndex = TableUtils:IndexOf(self.settings.favorites, itemTemplate.Id)
+	if displayGroup.Handle == self.favoritesGroup.Handle and not favoriteIndex then
 		return
 	end
 
@@ -592,13 +592,13 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	favoriteButtonAnchor.SameLine = true
 	local favoriteButton = Styler:ImageButton(favoriteButtonAnchor:AddImageButton("Favorite" .. itemTemplate.Id .. itemStat.Name,
 		-- Generating icon files requires dealing with the toolkit, so, the typo stays ᕦ(ò_óˇ)ᕤ
-		isFavorited and "star_fileld" or "star_empty",
+		favoriteIndex and "star_fileld" or "star_empty",
 		{ 26, 26 }))
 
 	favoriteButton.UserData = itemTemplate.Id
 
 	favoriteButton.OnClick = function()
-		if not isFavorited then
+		if not favoriteIndex then
 			table.insert(ConfigurationStructure.config.vanity.settings.equipment.favorites, favoriteButton.UserData)
 			local func = favoriteButton.OnClick
 			favoriteButton:Destroy()
@@ -613,7 +613,7 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 	end
 
 	icon.OnHoverEnter = function()
-		if not self.settings.requireModifierForPreview or Ext.ClientInput.GetInputManager().PressedModifiers == "Shift" then
+		if (not self.settings.requireModifierForPreview and itemTemplate.Id ~= "6ea2650e-c12b-43d9-873e-f3d426d30d18") or Ext.ClientInput.GetInputManager().PressedModifiers == "Shift" then
 			self.equipmentPreviewTimer = Ext.Timer.WaitFor(300, function()
 				Channels.PreviewItem:SendToServer({
 					templateId = itemTemplate.Id,
@@ -650,6 +650,13 @@ function EquipmentPicker:DisplayResult(itemTemplate, displayGroup)
 
 	local tooltip = icon:Tooltip()
 	Helpers:BuildTooltip(tooltip, itemTemplate.DisplayName:Get() or itemTemplate.Name, itemStat)
+
+	if itemTemplate.Id == "6ea2650e-c12b-43d9-873e-f3d426d30d18" then
+		Styler:Color(
+		tooltip:AddText(
+		Translator:translate("This item has story flags associated to it - if you're in Act 3 and have not yet dealt with Gortash, or don't have an up-to-date save, don't select this item - hold `Shift` to trigger preview (which will trip the flag and run the cutscene if you meet the conditions).")),
+			"ErrorText")
+	end
 
 	if itemTemplate.StatusList then
 		for _, templateStatus in ipairs(itemTemplate.StatusList) do
@@ -691,6 +698,7 @@ Because of this, it's best to select multiple EquipmentRaces that look most simi
 	["Apply Dye?"] = "hd399ef020f5e4e319cf68affb8585f8d06b8",
 	["WARNING: While you have two transmogged weapons equipped, do _not_ drag and drop your main hand onto your offhand slot or vice-versa - this will cause a Crash To Desktop that I can't figure out. You can drag from your inventory into a weapon slot, just not between weapon slots"] =
 	"ha9c5c3919a744036925cf8010a1c7bb48a2f",
+	["This item has story flags associated to it - if you're in Act 3 and have not yet dealt with Gortash, or don't have an up-to-date save, don't select this item - hold `Shift` to trigger preview (which will trip the flag and run the cutscene if you meet the conditions)."] = "he3a56800829144bba1b89ee28a5d6087d487",
 	["Status Effect"] = "had9a379edf23424997655761c7dbbc6eb84g",
 	["Require holding 'Shift' to trigger hover preview"] = "h4ad0af6a98204eb5aa05ce21fb216b68515c",
 	["Must be held before hovering over the item"] = "h1def6ed3b47543629552444734f5757e83b7"

@@ -173,7 +173,7 @@ For Strong types, Human Strongs and Orcs will generally work</content>
     <content contentuid="had9a379edf23424997655761c7dbbc6eb84g" version="1">Status Effect</content>
     <content contentuid="h4ad0af6a98204eb5aa05ce21fb216b68515c" version="1">Require holding 'Shift' to trigger hover preview</content>
     <content contentuid="h1def6ed3b47543629552444734f5757e83b7" version="1">Must be held before hovering over the item</content>
-
+    <content contentuid="he3a56800829144bba1b89ee28a5d6087d487" version="1">This item has story flags associated to it - if you're in Act 3 and have not yet dealt with Gortash, or don't have an up-to-date save, don't select this item - hold `Shift` to trigger preview (which will trip the flag and run the cutscene if you meet the conditions).</content>
     <!-- END Equipment Picker -->
 
     <!-- START Dye Picker -->
@@ -360,7 +360,7 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <!-- END Template Equipment Slot Enum -->
 
     <!-- START Styler -->
-        <!-- Part of the label for the filters in the Pickers -->
+    <!-- Part of the label for the filters in the Pickers -->
     <content contentuid="h3876382ff8ce409fa821615fe1171de2d3a5" version="1">selected</content>
     <!-- END Styler -->
 
@@ -377,6 +377,12 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="h87dc5ed2db464ee9b73b29e2fcd22135100f" version="1">Delete</content>
     <content contentuid="h16fdaad3e9c04689afcf6469c0bc2f453751" version="1">Create New Effect</content>
     <content contentuid="hf7fbcebf0543427487ff3e48b2e16a22e7g0" version="1">Restore Pre-Packaged Effects</content>
+    <content contentuid="ha2588acc82bc4163a2ecb69f10d9d300b5a0" version="1">Add Effects To Character</content>
+    <content contentuid="ha73078fc910d45fabe4bd8e0e5c76ad608ba" version="1">Select and Preview</content>
+    <content contentuid="he3f38577711b4786a80551943e45e1ab39ge" version="1">Click on an effect to preview it, Right-Click for options</content>
+    <content contentuid="h76efca8adf1744979ae856319043d7ee3601" version="1">Please provide a name and select an effect</content>
+    <content contentuid="hc4983e6d1050435885b1aa79566249a0ea07" version="1">Only Enable During Dialogue</content>
+    <content contentuid="hc9eb641f6c8c433db129c5475fa5bc616a96" version="1">Enable Always</content>
     <!-- END Effect Manager -->
 
     <!-- START Armor Type Enum -->
@@ -398,9 +404,5 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
 
     <content contentuid="hf5eaf133134b4a99bbcd336b9c1df434af1d" version="1">Unique Item - Can't Transmog</content>
     <content contentuid="hc60b8ef2b9cf469cb767fa2d8b9ac5c8ea23" version="1">This is a completely unique item, and can't be transmogged by Armory. You can still apply dyes and effects</content>
-    <content contentuid="ha2588acc82bc4163a2ecb69f10d9d300b5a0" version="1">Add Effects To Character</content>
-    <content contentuid="ha73078fc910d45fabe4bd8e0e5c76ad608ba" version="1">Select and Preview</content>
-    <content contentuid="he3f38577711b4786a80551943e45e1ab39ge" version="1">Click on an effect to preview it, Right-Click for options</content>
-    <content contentuid="h76efca8adf1744979ae856319043d7ee3601" version="1">Please provide a name and select an effect</content>
     <content contentuid="h13b92883ec614c36814c22303684a3469a7e" version="1">Launch Vanity</content>
 </contentList>

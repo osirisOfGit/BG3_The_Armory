@@ -14,7 +14,8 @@ VanityEffect = {
 	},
 	cachedDisplayNames = {},
 	modDependency = nil,
-	disableDuringDialogue = false
+	disableDuringDialogue = false,
+	enableOnlyInDialogue = false
 }
 
 local defaultEffects = {
@@ -68,7 +69,7 @@ local defaultEffects = {
 ---@param name string
 ---@param effectProps VanityEffectProperties
 ---@return VanityEffect
-function VanityEffect:new(instance, name, effectProps, disableDuringDialogue)
+function VanityEffect:new(instance, name, effectProps, disableDuringDialogue, enableOnlyInDialogue)
 	instance = instance or {}
 	setmetatable(instance, self)
 	self.__index = self
@@ -79,6 +80,7 @@ function VanityEffect:new(instance, name, effectProps, disableDuringDialogue)
 
 	effectProps.Name = nil
 	instance.disableDuringDialogue = disableDuringDialogue
+	instance.enableOnlyInDialogue = enableOnlyInDialogue
 	instance.effectProps = TableUtils:DeeplyCopyTable(effectProps)
 
 	return instance
@@ -155,10 +157,12 @@ function VanityEffect:createStat()
 		Logger:BasicDebug("Creating Effect %s", self.Name)
 		---@type StatusData
 		local newStat = Ext.Stats.Create(self.Name, "StatusData", "_PASSIVES")
-		for key, value in pairs(self.effectProps) do
-			if value and value ~= "" then
-				local name, meiOrEffect = self:GetEffectOrMeiResource()
-				newStat[key] = meiOrEffect == "MEI" and value or name
+		if not self.enableOnlyInDialogue then
+			for key, value in pairs(self.effectProps) do
+				if value and value ~= "" then
+					local name, meiOrEffect = self:GetEffectOrMeiResource()
+					newStat[key] = meiOrEffect == "MEI" and value or name
+				end
 			end
 		end
 		newStat.StackId = self.Name
@@ -170,32 +174,47 @@ function VanityEffect:createStat()
 					Channels.UpdateStatusEffect:Broadcast({
 						Name = self.Name,
 						effectProps = self.effectProps,
-						disableDuringDialogue = self.disableDuringDialogue
+						disableDuringDialogue = self.disableDuringDialogue,
+						enableOnlyInDialogue = self.enableOnlyInDialogue
 					})
 				end)
 			end
 		else
+			Channels.EditEffect:SendToServer({
+				Name = self.Name,
+				effectProps = self.effectProps,
+				disableDuringDialogue = self.disableDuringDialogue,
+				enableOnlyInDialogue = self.enableOnlyInDialogue,
+				fromClient = true
+			})
 			Ext.System.ClientVisual.ReloadAllVisuals = true
 		end
 		return true
 	end
 end
 
-function VanityEffect:editStat()
+function VanityEffect:editStat(isInDialogue)
 	---@type StatusData?
-	local newStat = Ext.Stats.Get(self.Name)
-	if newStat then
-		Logger:BasicDebug("Updating Effect %s to be %s", self.Name, Ext.Json.Stringify(self.effectProps))
-		for key, value in pairs(self.effectProps) do
-			if value and value ~= "" then
-				local name, meiOrEffect = self:GetEffectOrMeiResource()
-				newStat[key] = meiOrEffect == "MEI" and value or name
-			else
-				newStat[key] = nil
+	local status = Ext.Stats.Get(self.Name)
+	if status then
+		if not self.enableOnlyInDialogue or isInDialogue then
+			Logger:BasicDebug("Updating Effect %s to be %s", self.Name, Ext.Json.Stringify(self.effectProps))
+			for key, value in pairs(self.effectProps) do
+				if value and value ~= "" then
+					local name, meiOrEffect = self:GetEffectOrMeiResource()
+					status[key] = meiOrEffect == "MEI" and value or name
+				else
+					status[key] = nil
+				end
+			end
+		else
+			Logger:BasicDebug("Clearing Effect Props %s as player is not in dialogue", self.Name, Ext.Json.Stringify(self.effectProps))
+			for key in pairs(self.effectProps) do
+				status[key] = ""
 			end
 		end
-		newStat.StackId = self.Name
-		newStat:Sync()
+		status.StackId = self.Name
+		status:Sync()
 
 		if self.Name ~= "TheArmory_Vanity_PreviewEffect" then
 			for _, entityId in pairs(Ext.Vars.GetEntitiesWithVariable("TheArmory_Vanity_EffectsMarker")) do
@@ -214,12 +233,22 @@ function VanityEffect:editStat()
 					Channels.UpdateStatusEffect:Broadcast({
 						Name = self.Name,
 						effectProps = self.effectProps,
-						disableDuringDialogue = self.disableDuringDialogue
+						disableDuringDialogue = self.disableDuringDialogue,
+						enableOnlyInDialogue = self.enableOnlyInDialogue,
+						isInDialogue = isInDialogue
 					})
 				end)
 			end
 		else
 			Ext.System.ClientVisual.ReloadAllVisuals = true
+			Channels.EditEffect:SendToServer({
+				Name = self.Name,
+				effectProps = self.effectProps,
+				disableDuringDialogue = self.disableDuringDialogue,
+				enableOnlyInDialogue = self.enableOnlyInDialogue,
+				isInDialogue = isInDialogue,
+				fromClient = true
+			})
 		end
 
 		return true
@@ -231,7 +260,22 @@ end
 if Ext.IsServer() then
 	Channels.EditEffect:SetHandler(function(payload, user)
 		local effectRaw = payload
-		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps):editStat()
+		local effect = VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps, effectRaw.disableDuringDialogue, effectRaw.enableOnlyInDialogue)
+		if not effectRaw.fromClient then
+			effect:editStat(effectRaw.isInDialogue)
+		else
+			for _, entity in pairs(Ext.Entity.GetAllEntitiesWithComponent("StatusContainer")) do
+				for _, statusName in pairs(entity.StatusContainer.Statuses) do
+					if statusName == effect.Name then
+						Osi.RemoveStatus(entity.Uuid.EntityUuid, statusName)
+						Ext.Timer.WaitFor(100, function()
+							Osi.ApplyStatus(entity.Uuid.EntityUuid, statusName, -1)
+						end)
+						break
+					end
+				end
+			end
+		end
 	end)
 
 	Channels.DeleteEffect:SetHandler(function(effectName, user)
@@ -263,9 +307,12 @@ if Ext.IsServer() then
 	---@type {[Guid]: {[Guid]: string[]}}
 	local disabledEffects = {}
 
+	---@type {[Guid]: {[Guid]: string[]}}
+	local enabledEffects = {}
+
 	Ext.Osiris.RegisterListener("DialogActorJoined", 4, "before", function(dialog, instanceID, actor, speakerIndex)
 		if Osi.IsPlayer(actor) == 1 then
-			Logger:BasicDebug("%s joined dialogue, checking if any effects need to be disabled", actor)
+			Logger:BasicDebug("%s joined dialogue, checking if any effects need to be disabled/enabled", actor)
 			---@type EntityHandle
 			local entity = Ext.Entity.Get(actor)
 			local _, charUserId = ServerPresetManager:GetCharacterPreset(entity.Uuid.EntityUuid)
@@ -278,12 +325,24 @@ if Ext.IsServer() then
 					local equippedItemEntity = Ext.Entity.Get(equippedItem)
 					if equippedItemEntity.StatusContainer then
 						for _, statusName in pairs(equippedItemEntity.StatusContainer.Statuses) do
-							if statusName:find("ARMORY_VANITY_EFFECT") and vanity.effects[statusName].disableDuringDialogue then
-								Logger:BasicDebug("Disabling effect %s", statusName)
-								disabledEffects[actor] = disabledEffects[actor] or {}
-								disabledEffects[actor][equippedItem] = disabledEffects[actor][equippedItem] or {}
-								table.insert(disabledEffects[actor][equippedItem], statusName)
-								Osi.RemoveStatus(equippedItem, statusName)
+							if statusName:find("ARMORY_VANITY_EFFECT") then
+								if vanity.effects[statusName].disableDuringDialogue then
+									Logger:BasicDebug("Disabling effect %s", statusName)
+									disabledEffects[actor] = disabledEffects[actor] or {}
+									disabledEffects[actor][equippedItem] = disabledEffects[actor][equippedItem] or {}
+									table.insert(disabledEffects[actor][equippedItem], statusName)
+									Osi.RemoveStatus(equippedItem, statusName)
+								elseif vanity.effects[statusName].enableOnlyInDialogue then
+									Logger:BasicDebug("Enabling effect %s", statusName)
+
+									enabledEffects[actor] = enabledEffects[actor] or {}
+									enabledEffects[actor][equippedItem] = enabledEffects[actor][equippedItem] or {}
+									table.insert(enabledEffects[actor][equippedItem], statusName)
+
+									local vanityEffect = vanity.effects[statusName]
+									VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps, vanityEffect.disableDuringDialogue, vanityEffect.enableOnlyInDialogue)
+										:editStat(true)
+								end
 							end
 						end
 					end
@@ -292,12 +351,22 @@ if Ext.IsServer() then
 
 			if entity.StatusContainer then
 				for _, statusName in pairs(entity.StatusContainer.Statuses) do
-					if statusName:find("ARMORY_VANITY_EFFECT") and vanity.effects[statusName].disableDuringDialogue then
-						Logger:BasicDebug("Disabling effect %s", statusName)
-						disabledEffects[actor] = disabledEffects[actor] or {}
-						disabledEffects[actor][entity.Uuid.EntityUuid] = disabledEffects[actor][entity.Uuid.EntityUuid] or {}
-						table.insert(disabledEffects[actor][entity.Uuid.EntityUuid], statusName)
-						Osi.RemoveStatus(entity.Uuid.EntityUuid, statusName)
+					if statusName:find("ARMORY_VANITY_EFFECT") then
+						if vanity.effects[statusName].disableDuringDialogue then
+							Logger:BasicDebug("Disabling effect %s", statusName)
+							disabledEffects[actor] = disabledEffects[actor] or {}
+							disabledEffects[actor][entity.Uuid.EntityUuid] = disabledEffects[actor][entity.Uuid.EntityUuid] or {}
+							table.insert(disabledEffects[actor][entity.Uuid.EntityUuid], statusName)
+							Osi.RemoveStatus(entity.Uuid.EntityUuid, statusName)
+						elseif vanity.effects[statusName].enableOnlyInDialogue then
+							Logger:BasicDebug("Enabling effect %s", statusName)
+							enabledEffects[actor] = enabledEffects[actor] or {}
+							enabledEffects[actor][entity.Uuid.EntityUuid] = enabledEffects[actor][entity.Uuid.EntityUuid] or {}
+							table.insert(enabledEffects[actor][entity.Uuid.EntityUuid], statusName)
+
+							local vanityEffect = vanity.effects[statusName]
+							VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps, vanityEffect.disableDuringDialogue, vanityEffect.enableOnlyInDialogue):editStat(true)
+						end
 					end
 				end
 			end
@@ -306,8 +375,8 @@ if Ext.IsServer() then
 
 	Ext.Osiris.RegisterListener("DialogActorLeft", 4, "before", function(dialog, instanceID, actor, instanceEnded)
 		if Osi.IsPlayer(actor) == 1 then
+			Logger:BasicDebug("%s left dialogue, resetting effects", actor)
 			if disabledEffects[actor] then
-				Logger:BasicDebug("%s left dialogue, reenabling effects", actor)
 				for itemUuid, effects in pairs(disabledEffects[actor]) do
 					for _, effectName in pairs(effects) do
 						Logger:BasicDebug("Reenabling %s", effectName)
@@ -315,6 +384,19 @@ if Ext.IsServer() then
 					end
 				end
 				disabledEffects[actor] = {}
+			end
+
+			if enabledEffects[actor] then
+				local _, charUserId = ServerPresetManager:GetCharacterPreset(actor)
+				local vanity = ServerPresetManager.ActiveVanityPresets[charUserId]
+				for itemUuid, effects in pairs(enabledEffects[actor]) do
+					for _, effectName in pairs(effects) do
+						Logger:BasicDebug("Disabling %s", effectName)
+						local vanityEffect = vanity.effects[effectName]
+						VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps, vanityEffect.disableDuringDialogue, vanityEffect.enableOnlyInDialogue):editStat(false)
+					end
+				end
+				enabledEffects[actor] = {}
 			end
 		end
 	end)
@@ -396,7 +478,7 @@ if Ext.IsClient() then
 	Ext.Require("Client/_FormBuilder.lua")
 
 	Channels.UpdateStatusEffect:SetHandler(function(effectRaw, user)
-		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps):editStat()
+		VanityEffect:new({}, effectRaw.Name, effectRaw.effectProps, effectRaw.disableDuringDialogue, effectRaw.enableOnlyInDialogue):editStat(effectRaw.isInDialogue)
 	end)
 
 	---@type ExtuiWindow
@@ -474,6 +556,8 @@ if Ext.IsClient() then
 		formWindow:SetFocus()
 		formWindow.Closeable = true
 		formWindow.NoCollapse = true
+		formWindow.Scaling = "Scaled"
+		formWindow.Font = MCM.Get("font_size", "755a8a72-407f-4f0d-9a33-274ac0f0b53d")
 		formWindow:SetSize(Styler:ScaleFactor({ 300, 300 }), "FirstUseEver")
 
 		local popup = formWindow:AddPopup("effects")
@@ -692,7 +776,7 @@ if Ext.IsClient() then
 		effectCollection = {}
 
 		for effectName, vanityEffect in pairs(ConfigurationStructure.config.vanity.effects) do
-			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps, vanityEffect.disableDuringDialogue)
+			effectCollection[effectName] = VanityEffect:new({}, vanityEffect.Name, vanityEffect.effectProps, vanityEffect.disableDuringDialogue, vanityEffect.enableOnlyInDialogue)
 		end
 
 		---@type ExtuiMenu
@@ -713,6 +797,9 @@ if Ext.IsClient() then
 			---@type ExtuiSelectable
 			local disableDuringDialogue
 
+			---@type ExtuiSelectable
+			local enableOnlyInDialogue
+
 			enableEffect.OnClick = function()
 				if enableEffect.Selected then
 					effectMenu:SetColor("Text", { 144 / 255, 238 / 255, 144 / 255, 1 })
@@ -723,12 +810,16 @@ if Ext.IsClient() then
 						end
 					end
 					table.insert(vanityOutfitItemEntry.effects, effectName)
-					disableDuringDialogue.Visible = true
+
+					disableDuringDialogue.Visible = enableEffect.Selected and not enableOnlyInDialogue.Selected
+					enableOnlyInDialogue.Visible = enableEffect.Selected and not disableDuringDialogue.Selected
 				elseif vanityOutfitItemEntry and vanityOutfitItemEntry.effects and vanityOutfitItemEntry.effects() then
 					effectMenu:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 
 					vanityOutfitItemEntry.effects[TableUtils:IndexOf(vanityOutfitItemEntry.effects, effectName)] = nil
-					disableDuringDialogue.Visible = false
+
+					disableDuringDialogue.Visible = enableEffect.Selected and not enableOnlyInDialogue.Selected
+					enableOnlyInDialogue.Visible = enableEffect.Selected and not disableDuringDialogue.Selected
 				end
 
 				Helpers:ClearEmptyTablesInProxyTree(vanityOutfitItemEntry.effects)
@@ -737,7 +828,6 @@ if Ext.IsClient() then
 			end
 
 			disableDuringDialogue = effectMenu:AddSelectable("", "DontClosePopups")
-			disableDuringDialogue.Visible = enableEffect.Selected
 			disableDuringDialogue.Label = vanityEffect.disableDuringDialogue
 				and Translator:translate("Enable During Dialogue")
 				or Translator:translate("Disable During Dialogue")
@@ -746,6 +836,7 @@ if Ext.IsClient() then
 
 			disableDuringDialogue.Selected = vanityEffect.disableDuringDialogue or false
 			disableDuringDialogue.OnClick = function()
+				enableOnlyInDialogue.Visible = enableEffect.Selected and not disableDuringDialogue.Selected
 				ConfigurationStructure.config.vanity.effects[effectName].disableDuringDialogue = disableDuringDialogue.Selected
 
 				if disableDuringDialogue.Selected then
@@ -754,6 +845,32 @@ if Ext.IsClient() then
 					disableDuringDialogue.Label = Translator:translate("Disable During Dialogue")
 				end
 				onSubmitFunc()
+			end
+
+			enableOnlyInDialogue = effectMenu:AddSelectable("", "DontClosePopups")
+			enableOnlyInDialogue.Selected = vanityEffect.enableOnlyInDialogue or false
+
+			disableDuringDialogue.Visible = enableEffect.Selected and not enableOnlyInDialogue.Selected
+			enableOnlyInDialogue.Visible = enableEffect.Selected and not disableDuringDialogue.Selected
+
+			enableOnlyInDialogue.Label = vanityEffect.enableOnlyInDialogue
+				and Translator:translate("Enable Always")
+				or Translator:translate("Only Enable During Dialogue")
+
+			enableOnlyInDialogue:Tooltip():AddText("\t " .. Translator:translate("Applies to the effect itself, not just to this item, so only needs to be set once"))
+
+			enableOnlyInDialogue.OnClick = function()
+				disableDuringDialogue.Visible = enableEffect.Selected and not enableOnlyInDialogue.Selected
+
+				ConfigurationStructure.config.vanity.effects[effectName].enableOnlyInDialogue = enableOnlyInDialogue.Selected
+				vanityEffect.enableOnlyInDialogue = enableOnlyInDialogue.Selected
+
+				enableOnlyInDialogue.Label = vanityEffect.enableOnlyInDialogue
+					and Translator:translate("Enable Always")
+					or Translator:translate("Only Enable During Dialogue")
+
+				onSubmitFunc()
+				vanityEffect:editStat()
 			end
 
 			---@type ExtuiSelectable
@@ -774,7 +891,7 @@ if Ext.IsClient() then
 			end
 
 			enableEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
-			disableDuringDialogue:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
+			enableOnlyInDialogue:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 			editEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 			deleteEffect:SetColor("Text", { 219 / 255, 201 / 255, 173 / 255, 0.78 })
 		end
@@ -811,6 +928,8 @@ Translator:RegisterTranslation({
 	["Enable"] = "hb12adca21c4e45189573c291701a5fa6d293",
 	["Disable During Dialogue"] = "h7bc9ab98a2a44106aa4f1ae5e85d7ae718bb",
 	["Enable During Dialogue"] = "hcd094f8ace4841489f7ee4ab60d53bd23861",
+	["Only Enable During Dialogue"] = "hc4983e6d1050435885b1aa79566249a0ea07",
+	["Enable Always"] = "hc9eb641f6c8c433db129c5475fa5bc616a96",
 	["Applies to the effect itself, not just to this item, so only needs to be set once"] = "hcbed2daa976b4176a3696eed82a3b02dbf7c",
 	["Edit"] = "hca540bf66df845bc9fde931f58c0aaa71b3b",
 	["Delete"] = "h87dc5ed2db464ee9b73b29e2fcd22135100f",

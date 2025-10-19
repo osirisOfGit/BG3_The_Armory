@@ -93,6 +93,8 @@ function PresetManager:OpenManager()
 		presetWindow = Ext.IMGUI.NewWindow(Translator:translate("Vanity Preset Manager"))
 		presetWindow.Closeable = true
 		presetWindow:SetStyle("WindowMinSize", 250, 850)
+		presetWindow.Scaling = "Scaled"
+		presetWindow.Font = MCM.Get("font_size", "755a8a72-407f-4f0d-9a33-274ac0f0b53d")
 
 		presetWindow.MenuBar = true
 		local menu = presetWindow:AddMainMenu()

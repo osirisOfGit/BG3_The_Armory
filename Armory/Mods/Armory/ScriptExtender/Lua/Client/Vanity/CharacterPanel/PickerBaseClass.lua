@@ -215,7 +215,12 @@ function PickerBaseClass:OpenWindow(slot, customizeFunc, onCloseFunc)
 		self.window = Ext.IMGUI.NewWindow(self.title)
 		self.window.Closeable = true
 		self.window.MenuBar = true
+		self.window.Font = MCM.Get("font_size", "755a8a72-407f-4f0d-9a33-274ac0f0b53d")
 		self.window:SetStyle("WindowMinSize", 250, 850)
+		self.window.Scaling = "Scaled"
+		self.window:SetColor("WindowBg", { 0, 0, 0, 1 })
+		self.window:SetColor("ChildBg", { 0, 0, 0, 1 })
+
 		self.window.OnClose = function()
 			Ext.Timer.WaitFor(60, function()
 				onCloseFunc()

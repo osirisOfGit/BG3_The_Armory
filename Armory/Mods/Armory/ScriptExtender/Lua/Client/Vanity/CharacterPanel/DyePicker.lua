@@ -272,9 +272,9 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 		return
 	end
 
-	local isFavorited, favoriteIndex = TableUtils:IndexOf(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
+	local favoriteIndex = TableUtils:IndexOf(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
 
-	if displayGroup.Handle == self.favoritesGroup.Handle and not isFavorited then
+	if displayGroup.Handle == self.favoritesGroup.Handle and not favoriteIndex then
 		return
 	end
 
@@ -290,7 +290,7 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 		return
 	end
 
-	local favoriteButton = Styler:ImageButton(displayGroup:AddImageButton("Favorite" .. dyeTemplate.Id, isFavorited and "star_fileld" or "star_empty", { 26, 26 }))
+	local favoriteButton = Styler:ImageButton(displayGroup:AddImageButton("Favorite" .. dyeTemplate.Id, favoriteIndex and "star_fileld" or "star_empty", { 26, 26 }))
 	favoriteButton.NoItemNav = true
 
 	local dyeImageButton = Styler:ImageButton(displayGroup:AddImageButton(dyeTemplate.Id, dyeTemplate.Icon, { self.settings.imageSize, self.settings.imageSize }))
@@ -368,7 +368,7 @@ function DyePicker:DisplayResult(dyeTemplate, displayGroup)
 	end
 
 	favoriteButton.OnClick = function()
-		if not isFavorited then
+		if not favoriteIndex then
 			table.insert(ConfigurationStructure.config.vanity.settings.dyes.favorites, dyeTemplate.Id)
 		else
 			table.remove(ConfigurationStructure.config.vanity.settings.dyes.favorites, favoriteIndex)
