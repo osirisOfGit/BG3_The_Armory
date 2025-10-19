@@ -1,0 +1,17 @@
+"filename", "language", "Lua", "Markdown", "comment", "blank", "total"
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\CharacterPanel\EquipmentPicker.lua", "Lua", 7, 0, 0, 1, 8
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\CharacterPanel\PickerBaseClass.lua", "Lua", 4, 0, 0, 1, 5
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\ItemValidator.lua", "Lua", 3, 0, 0, 0, 3
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Client\Vanity\PresetManagement\PresetManager.lua", "Lua", 2, 0, 0, 0, 2
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Shared\Vanity\EffectManager.lua", "Lua", 101, 0, 2, 16, 119
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Client\IMGUI\_FormBuilder.lua", "Lua", 2, 0, 1, 0, 3
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Client\IMGUI\_Styler.lua", "Lua", 146, 0, 33, 22, 201
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Common\_FileUtils.lua", "Lua", -1, 0, 0, 0, -1
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Common\_Logger.lua", "Lua", 13, 0, -3, -2, 8
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Common\_TableUtils.lua", "Lua", 8, 0, 1, -1, 8
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\Common\_Translator.lua", "Lua", 0, 0, 0, -1, -1
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\IDEHelpers\ExtIdeHelpers.lua", "Lua", 510, 0, 88, 34, 632
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\README.md", "Markdown", 0, 4, 0, 3, 7
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\_CustomEntitySerializer.lua", "Lua", 74, 0, 6, 6, 86
+"d:\Mods\BG3 Modder MultiTool\The Armory\Armory\Mods\Armory\ScriptExtender\Lua\Utilities\_ECSPrinter.lua", "Lua", 327, 0, 54, 54, 435
+"Total", "-", 1196, 4, 182, 133, 1515
