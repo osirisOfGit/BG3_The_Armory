@@ -403,4 +403,6 @@ You can view the current backup state in a save by executing !Armory_Vanity_SeeB
     <content contentuid="he3f38577711b4786a80551943e45e1ab39ge" version="1">Click on an effect to preview it, Right-Click for options</content>
     <content contentuid="h76efca8adf1744979ae856319043d7ee3601" version="1">Please provide a name and select an effect</content>
     <content contentuid="h13b92883ec614c36814c22303684a3469a7e" version="1">Launch Vanity</content>
+    <content contentuid="hc4983e6d1050435885b1aa79566249a0ea07" version="1">Only Enable During Dialogue</content>
+    <content contentuid="hc9eb641f6c8c433db129c5475fa5bc616a96" version="1">Enable Always</content>
 </contentList>
