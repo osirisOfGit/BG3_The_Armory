@@ -14,3 +14,5 @@ Channels.UpdateConfiguration = Ext.Net.CreateChannel(ModuleUUID, "UpdateConfigur
 Channels.DeleteEffect = Ext.Net.CreateChannel(ModuleUUID, "DeleteEffect")
 Channels.EditEffect = Ext.Net.CreateChannel(ModuleUUID, "EditEffect")
 Channels.PreviewEffect = Ext.Net.CreateChannel(ModuleUUID, "PreviewEffect")
+
+Channels.RecordProfileId = Ext.Net.CreateChannel(ModuleUUID, "RecordProfileId")

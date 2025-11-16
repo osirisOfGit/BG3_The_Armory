@@ -25,3 +25,11 @@ Ext.Vars.RegisterModVariable(ModuleUUID, "CharacterAssignedCache", {
 	SyncToClient = true,
 	SyncToServer = true,
 })
+
+Channels.RecordProfileId:SetHandler(function(profileId, user)
+	FileUtils:SaveStringContentToFile("UserProfileId.txt", profileId)
+end)
+
+Channels.RecordProfileId:SetRequestHandler(function(_, _)
+	return FileUtils:LoadFile("UserProfileId.txt")
+end)
